@@ -1,0 +1,52 @@
+﻿
+
+@using UserUI.Helper
+@using Resource
+@{
+    ViewBag.Title = LayoutRES.Donate + " " + DonationResources.RepresentativeDonation;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="container">
+    <div class="col-md-4">
+        <h3>@DonationResources.NotDone:<input type="radio" name="ridIsDone" value="0" checked="checked" /></h3>
+    </div>
+    <div class="col-md-4">
+        <h3>@DonationResources.Done:<input type="radio" name="ridIsDone" value="1" /></h3>
+    </div>
+    <div class="col-md-4">
+        <h3>@DonationResources.ConfirmedByAccounts:<input type="radio" name="ridIsDone" value="2" /></h3>
+    </div>
+
+
+</div>
+<head>
+    <title>@LayoutRES.Donate  @DonationResources.RepresentativeDonation</title>
+</head>
+
+<input type="hidden" id="hidIsDone" value="0" />
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="gridTwo" hidden class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="RepresentativeDonationDetailsDiv"></div>
+<h3 id="TotalAmount"></h3>
+@section Scripts {
+    <script>
+            //resourses
+            var NameAnonymous = '@DonationResources.NameAnonymous';
+            var PhoneNumberAnonymous = '@DonationResources.PhoneNumberAnonymous';
+            var AddressAnonymous = '@DonationResources.AddressAnonymous';
+            var EmailAnonymous = '@DonationResources.EmailAnonymous';
+            var Amount = '@DonationResources.Amount';
+            var CreatedOn = '@LayoutRES.CreatedOn';
+            var details = '@LayoutRES.Details';
+            var DonationType = "@DonationResources.DonationType";
+            var DonationDestination = "@DonationResources.DonationDestination";
+            var TitleName = "@DonationResources.DonationTitle";
+            var Delete = '@LayoutRES.Delete';
+        var UserName = '@AuthorizationHelper.UserName';
+        var ReceiptValue = '@DonationResources.ReceiptValue';
+    </script>
+    @Scripts.Render("~/bundles/RepresentativeDonationsList")
+
+    @*<script src="~/Scripts/MersalScripts/DonationManagment/RepresentativeDonationAdmin.js"></script>*@
+}
+

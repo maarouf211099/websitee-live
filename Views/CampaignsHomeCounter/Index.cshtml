@@ -1,0 +1,54 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+                /**/
+
+                ViewBag.Title = CampaignsHomeCounterRes.CampaignsHomeCounter;
+                Layout = "~/Views/Shared/_AdminLayout.cshtml";
+                bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+                var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+                var textAlignRight = isArabic ? "text-align: right;" : "";
+                var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>@CampaignsHomeCounterRes.CampaignsHomeCounter</title>
+    @*<title>Currency Rate</title>*@
+</head>
+@*@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.CreateCasesAdmin))
+    {*@
+        <button id="btnPopupCreateCase" onclick="AddNewCampaignsHomeCounter()" type="button" class="btn btn-info">@CampaignsHomeCounterRes.Add</button>
+    
+
+<br />
+<br />
+
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+<div id="createCampaignsHomeCounterDiv"></div>
+
+
+
+@section Scripts {
+    <script>
+        var Name = '@CampaignsHomeCounterRes.Name';
+        var TitleAr = '@CampaignsHomeCounterRes.TitleAr';
+        var TitleEn = '@CampaignsHomeCounterRes.TitleEn';
+        var GoalTotal = '@CampaignsHomeCounterRes.GoalTotal';
+        var GoalUnit = '@CampaignsHomeCounterRes.GoalUnit';
+        var IsActive='@CampaignsHomeCounterRes.IsActive'
+    </script>
+    <script src="~/Scripts/CampaignsHomeCounter/addCampaignsHomeCounter.js"></script>
+    <script src="~/Scripts/CampaignsHomeCounter/CampaignsHomeCounterIndex.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            RefreshGird();
+        });
+    </script>
+}
+

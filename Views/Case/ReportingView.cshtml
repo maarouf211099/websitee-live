@@ -1,0 +1,224 @@
+﻿
+@using Resource
+@using UserUI.Helper
+@{
+    ViewBag.Title = CaseResources.CaseReports;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<script>
+    var chooseTheCasePlaceHolder = '@DonationResources.ChooseTheCase';
+    function getCurrentDate() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = mm + '/' + dd + '/' + yyyy;
+        return today;
+    }
+</script>
+
+<div class="form-horizontal">
+
+    <div class="form-group">
+        <div class="col-md-12">
+
+            @Html.Label(LayoutRES.StartsWith, new { @class = "col-md-1 control-label" })
+            <div class="col-md-3">
+                @Html.TextBox("StartDateS", "1/1/2017", new { @class = "DatekendoDate" })
+            </div>
+
+            @Html.Label(LayoutRES.endswith, new { @class = "col-md-1 control-label" })
+            <div class="col-md-3">
+                @Html.TextBox("EndDateS", "2/1/2017", new { @class = "DatekendoDate" })
+            </div>
+            @Html.Label(CaseResources.ExportAs, new { @class = "col-md-1 control-label" })
+            <div class="col-md-3">
+                <div class="col-md-4">
+                    <label class="radio-inline">
+                        <input value="pdf" type="radio" name="optradio" style="margin: 4px -20px 0;" checked>PDF
+                    </label>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="radio-inline">
+                        <input value="excel" type="radio" name="optradio" style="margin: 4px -20px 0;">EXCEL
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row report-type">
+            <div class="R-item col-md-3">
+                <input id="btnGetInvestigatorsPerformanceRateReport" value="@CaseResources.InvestigatorsPerformanceRateReport" type="button" class="btn btn-info" />
+            </div>
+
+       
+            <div  class="R-item col-md-3">
+                <input id="btnGetVisitorsPerformanceRateReport" value="@CaseResources.VisitorsPerformanceRateReport" type="button" class="btn btn-info" />
+            </div>
+       
+            <div  class="R-item col-md-3">
+                <input id="btnGetCaseDiseaseReport" value="@CaseResources.CaseDiseaseReport" type="button" class="btn btn-info" />
+            </div>
+        
+            <div  class="R-item col-md-3">
+                <input id="btnGetCaseServicesReport" value="@CaseResources.CaseServicesReport" type="button" class="btn btn-info" />
+            </div>
+        
+            <div  class="R-item col-md-3">
+                <input id="btnGetDisesasesWithGovernoratesReport" value="@CaseResources.DisesasesWithGovernoratesReport" type="button" class="btn btn-info" />
+            </div>
+        
+            <div  class="R-item col-md-3">
+                <input id="btnGetCaseAssistantReport" value="@CaseResources.CaseAssistantReport" type="button" class="btn btn-info" />
+            </div>
+            <div  class="R-item col-md-3">
+                <input id="btnGetAllCasesDonations" value="@CaseResources.AllCasesDonationsReport" type="button" class="btn btn-info" />
+            </div>
+            <div class="R-item col-md-3 last-child">
+                <div class=" ">
+                    <input id="btnGetCaseDonationReport" value="@CaseResources.DonationForSpecificCaseReport" type="button" class="btn btn-info " />
+                
+                    <input type="text" name="CaseId" placeholder="@DonationResources.CaseCode" id="CaseId" class="form-control text-input" />
+                
+                    <span id="CaseIdMsg" class="field-validation-error hidden"><span>@DonationResources.CaseIsRequired</span></span>
+
+                </div>
+               
+            </div>
+         
+          
+        </div>
+    </div>
+</div>
+
+<script>
+
+    //$(function () {
+    //    $("#CaseId").kendoComboBox({
+    //        placeholder: chooseTheCasePlaceHolder,
+    //        dataTextField: "Name",
+    //        dataValueField: "Id",
+    //        filter: "contains",
+    //        dataSource: {
+    //            transport: {
+    //                read: {
+    //                    url: MersalWebAPIBaseUrl + "api/Case/GetCasesNamesIds",
+    //                    headers: getHeaders()
+    //                }
+    //            }
+    //        }
+    //   ,
+    //        filter: "contains",
+    //        suggest: true,
+    //    });
+    //});
+
+    function getReport(url) {
+        var baseUrl = MersalUIBaseUrl + "Reports1/ReportViewer.aspx?ReportName=" + url + "&ReportType=" + $('input[name=optradio]:checked').val();
+        var win = window.open(baseUrl, '_blank');
+        win.focus();
+    }
+    $(document).ready(function () {
+        $('#EndDateS').val(getCurrentDate());
+        $(".DatekendoDate").kendoDatePicker({
+            format: "MM/dd/yyyy"
+        });
+        $('#CaseId').change(function () {
+            $('#CaseIdMsg').addClass("hidden");
+        });
+        $("#btnGetInvestigatorsPerformanceRateReport").click(function () {
+            var ReportUrl = "InvestigatorPerformanceRate&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+        $("#btnGetVisitorsPerformanceRateReport").click(function () {
+            var ReportUrl = "VisitorCaseFollow&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+        $("#btnGetCaseDiseaseReport").click(function () {
+            var ReportUrl = "CaseDisease&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+        $("#btnGetCaseServicesReport").click(function () {
+            var ReportUrl = "CaseServices&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+        $("#btnGetDisesasesWithGovernoratesReport").click(function () {
+            var ReportUrl = "DisesaseWithGovernorate&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+        $("#btnGetCaseAssistantReport").click(function () {
+            var ReportUrl = "CaseAssistant&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+        $("#btnGetCaseDonationReport").click(function () {
+
+            if ($('#CaseId').val() == '') {
+                $('#CaseIdMsg').removeClass("hidden");
+            } else {
+                var newWindow = window.open("", "_blank");
+                newWindow.blur;
+                var apiurl = MersalWebAPIBaseUrl + "api/Case/IsCaseExist";
+                $.ajax({
+                    type: "Get",
+                    contentType: "application/json",
+                    url: apiurl,
+                    crossDomain: true,
+                    data: { "caseId": $('#CaseId').val() },
+                    async: false,
+                    success: function (data) {
+                        var ReportUrl = "CaseDonation&CaseId=" + $("#CaseId").val();
+                        newWindow.location.href = MersalUIBaseUrl + "Reports1/ReportViewer.aspx?ReportName=" + ReportUrl + "&ReportType=" + $('input[name=optradio]:checked').val();
+                        newWindow.focus();
+                    },
+                    error: function (xhr) {
+                        newWindow.close();
+                        alert('@CaseResources.NotExist');
+                    }
+                });
+
+            }
+
+        });
+        $("#btnGetAllCasesDonations").click(function () {
+            var ReportUrl = "AllCasesDonations&DateFrom=" + $("#StartDateS").val() + "&DateTo=" + $("#EndDateS").val();
+            getReport(ReportUrl);
+        });
+    });
+</script>
+<style>
+  .report-type {
+    margin: 10% 2%;
+
+    background: #3c8dbc;
+    border-radius: 10px;
+    border: 1px solid #222d32;
+    padding: 5% 1%;
+    box-shadow: 0px 0px 20px 20px #d7d8da94;
+  }
+  .R-item {
+    padding: 1pc 26px;
+  }
+  .R-item input {
+    width: 100%;
+    background-color: #3c8dbc;
+  }
+  .report-type .last-child .text-input {
+    background-color: #fff;
+    width: 100%;
+  }
+  .report-type .last-child .field-validation-error {
+    color: #fff !important;
+  }
+</style>

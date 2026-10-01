@@ -1,0 +1,300 @@
+﻿@import url(https://fonts.googleapis.com/earlyaccess/droidarabickufi.css);
+
+ul li,
+ul li a,
+ol li,
+ol li a,
+nav > ul > li > a,
+body,
+* {
+  /* font-family: "Droid Arabic Kufi", Titillium Web, sans-serif, fontawesome,
+    themify !important; */
+  font-family: cairo !important;
+}
+
+html,
+body,
+.project-info {
+  direction: rtl;
+}
+
+.ReverseDirection,
+.title2 {
+  direction: ltr;
+}
+
+.FloatRight,
+body,
+.inline-list,
+.inline-list > li,
+nav > ul > li,
+.project-info .urgent-progress,
+.project-info .progress-border .progress .progress-bar,
+.project-info .urgent-progress .goal.raised,
+.story-Header > span.left,
+.n-popup-c > strong,
+.n-popup-c > form .textfield h5,
+.frequency li,
+.case-home .showMore,
+#Hosbital .showMore {
+  float: right;
+}
+
+.ReverseFloat,
+.project-info .goal > i,
+.story-Header > span.right {
+  float: left !important;
+}
+
+.project-info .urgent-progress .goal.raised {
+  text-align: right;
+}
+
+/*.menu-links.slide,*/
+.inline-list > li:before {
+  left: 0;
+  right: initial;
+}
+/* .inline-list {
+    float: left;
+    list-style: outside none none;
+     margin: 0 0 0 170px;
+   
+  } */
+
+.inline-list {
+  margin: 6px 0px;
+}
+
+.inline-list > li {
+  margin-left: 30px;
+  padding-left: 30px;
+  margin-right: 0px;
+  padding-right: 0px;
+}
+
+.n-popup-c > h5 {
+  margin-right: 30px;
+  margin-left: 0px;
+}
+
+.sochial-list {
+  display: flex;
+  list-style: outside none none;
+  float: left;
+}
+.navbar-content .donate-now {
+  margin-right: auto;
+  margin-left: unset;
+  display: flex;
+  align-items: center;
+}
+
+.cases-categores .category-card .border {
+  left: 5%;
+  top: 9%;
+}
+.cases-categores .category-card:last-child .border {
+  /* left: 3%;
+  top: 7%; */
+}
+
+#Campaigns
+  .slider-container
+  .slider-content
+  .slider-single.active
+  .slider-single-likes
+  p {
+  margin: 35.3px 17.9px 15px 3.1px;
+}
+#Campaigns
+  .slider-container
+  .slider-content
+  .slider-single.active
+  .slider-single-likes
+  p {
+  margin: 0.3px 17.9px 15px 33.1px;
+}
+
+.donations-tabsets .arrow {
+  position: relative;
+  background: #e4f3f3;
+  border-radius: 5px;
+}
+.donations-tabsets .arrow:before {
+  content: "";
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border: 10px solid;
+  border-color: transparent transparent transparent #e4f3f3;
+  right: -20px;
+  top: 34%;
+}
+
+#casesListDiv .col-md-4:nth-last-child(0n-1) {}
+
+.list-cases-view .col-md-4:last-child{
+  float: right;
+}
+.float-right{
+  float: right;
+}
+
+@media only screen and (min-width: 900px) {
+  .case-home,
+  footer .row,
+  #Hosbital .row {
+    display: flex;
+  }
+  #donation2 .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .donations-tabsets-links {
+    display: flex;
+    /* margin-top: 3%; */
+  }
+  .donations-tabsets-links ul {
+    display: flex;
+  }
+
+  .donations-tabsets-links ul li {
+    width: 150px;
+    text-align: center;
+  }
+  .cases-categores {
+    margin: 0px 5%;
+    
+  }
+  .bottom-space{
+    margin-bottom: 48%;
+  }
+
+  .cases-categores .category-card:last-child {
+    /* left: -12%; */
+  }
+  #ProjectsDiv {
+    left: 13%;
+  }
+ 
+}
+
+
+
+
+/* ===================== Mobile ====================== */
+
+@media only screen and (max-width: 900px) {
+  .cases-categores {
+    position: relative;
+    left: -12%;
+
+  }
+  .Cib-fawry{
+    display: grid;
+  }
+  #BranchessiteMap li {
+     display: flex;
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+}
+}
+/*----------------- page content ---------------*/
+
+       .content-sector h2::after {
+            left: unset;
+            right:0
+        }
+	.content-sector ul li .img-icon{
+	    left: unset;
+            right:0
+	}
+	.content-sector ul li{
+	    padding-left:0px;
+            padding-right:32px;
+	}
+	.content-sector .logo-shape{
+	    left:20px!important;
+            right: unset!important	
+	}
+
+         
+        .list-social {
+            list-style: none !important;
+            padding: 0;
+        }
+
+            .list-social .item-list {
+                display: inline-block;
+                margin-left: 4px;
+            }
+
+            .list-social .item-list a {
+                display: inline-block;
+                vertical-align: middle;
+                transition:.4s;
+            }
+                .list-social .item-list a:hover{
+                    transform:translateY(-4px);
+                }
+                .list-social .item-list a img {
+                    width: 40px
+                }
+                .content-sector ul li a {
+                    transition: .4s;
+                    vertical-align: middle;
+                    color: #333;
+                    display: inline-block;
+                }
+            .content-sector ul li a:hover {
+                color: #008080 !important;
+                text-decoration: none;
+            }
+        .content-sector h5 {
+            font-size: 18px;
+            font-weight: 400;
+            margin: 10px 0;
+        }
+
+.hotline {
+text-align: left;
+position: fixed;
+bottom: 50px;
+left: 50px;
+width:120px;
+   z-index: 110000000;
+}
+.afya-resource {
+display: flex;
+gap: 10px;
+justify-content: center;
+align-items: center;
+flex-wrap: wrap;
+}
+.afya-resource h3 a {
+background: #edb71f;
+padding: 10px 25px;
+font-size: 18px;
+border-radius: 15px;
+color:#fff;
+font-weight: 500 !important;
+letter-spacing: 0 !important;
+}
+.afya-resource h3 a:hover{
+background: #008080;
+}
+.content-sector .showMore > a.btn{
+display: inline-block;
+margin-top:15px;
+background:#2d2d2d;
+margin-bottom:20px;
+border-radius: 15px;
+}
+@media only screen and (max-width: 600px) { 
+    .hotline {
+        left:0
+    }
+}

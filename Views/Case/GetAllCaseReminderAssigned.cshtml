@@ -1,0 +1,34 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = CaseResources.DelegateTasks;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+
+
+<script>
+    var CaseCode = '@CaseResources.CaseCode'
+    var CaseName = '@CaseResources.CaseName'
+    var Delegate = '@CaseResources.Delegate'
+    var DateFrom = '@CaseResources.DateFrom'
+    var DateTo = '@CaseResources.DateTo'
+    var Title = '@CaseResources.Title'
+    var Description = '@CaseResources.Description'
+
+</script>
+
+
+<script src="~/Scripts/MersalScripts/CasesManagment/CaseReminderAssigned.js"></script>

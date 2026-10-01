@@ -1,0 +1,61 @@
+﻿@using UserUI.Helper
+@{
+    ViewBag.Title = "TextEditor";
+    Layout = "";
+}
+<style>
+    .wysihtml5-editor {
+        direction:rtl !important;
+    }
+</style>
+
+<link href="~/Scripts/TextEditor/_all-skins.min.css" rel="stylesheet" />
+@{
+    if (CultureHelper.IsRighToLeft())
+    {
+        <link href="~/Scripts/TextEditor/bootstrap3-wysihtml5.minRTL.css" rel="stylesheet" />
+
+    }
+    else
+    {
+        <link href="~/Scripts/TextEditor/bootstrap3-wysihtml5.min.css" rel="stylesheet" />
+
+    }
+}
+<div class="box-body pad">
+
+        <textarea id="texteditor" class="textarea" placeholder="...." style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+    
+</div>
+@*<div class="row">
+    <button id="aaa" onclick="showdd()">sssss</button>
+</div>*@
+<script src="~/Scripts/TextEditor/fastclick.min.js"></script>
+<script src="~/Scripts/TextEditor/demo.js"></script>
+<script src="https://cdn.ckeditor.com/4.4.3/standard/ckeditor.js"></script>
+@{
+    if (CultureHelper.IsRighToLeft())
+    {
+        <script src="~/Scripts/TextEditor/bootstrap3-wysihtml5.all.minRTL.js"></script>
+
+    }
+    else
+    {
+        <script src="~/Scripts/TextEditor/bootstrap3-wysihtml5.all.min.js"></script>
+
+    }
+}
+<script>
+      $(function () {
+        // Replace the <textarea id="editor1"> with a CKEditor
+          // instance, using default configuration.
+          
+        //CKEDITOR.replace('editor1');
+        //bootstrap WYSIHTML5 - text editor
+          $(".textarea").wysihtml5();
+      });
+
+      //function showdd() {
+      //    console.log($("#texteditor").val())
+      //}
+</script>

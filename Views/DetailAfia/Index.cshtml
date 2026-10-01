@@ -1,0 +1,75 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource.Afia
+@using DTO
+@using Resource
+
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = DetailAfiaRES.DetailAfia;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>@DetailAfiaRES.DetailAfia</title>
+</head>
+@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.CreateCasesAdmin))
+{
+    <button id="btnPopupCreateCase" onclick="AddNewDetailAfia()" type="button" class="btn btn-info">@DetailAfiaRES.AddNewDetailAfia</button>
+ 
+    @(Html.Kendo().Upload()
+            .Name("Image")
+             
+            .TemplateId("fileTemplate")
+            .HtmlAttributes(new { accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" })
+            .Multiple(false)
+            .Async(a => a
+            .Save("CreateAlbum", "DetailAfia")
+            .AutoUpload(false))
+            .Events(c => c
+            .Upload("onUploadAlbumImageCreate").Success("onSuccessUploadDataCreate"))
+        )
+
+}
+
+<br />
+<br />
+
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+<div id="createDetailAfiaDiv"></div>
+
+
+
+@section Scripts {
+    <script>
+        var Phone1 = '@DetailAfiaRES.Phone1';
+        var Phone2 = '@DetailAfiaRES.Phone2';
+        var Provider = '@DetailAfiaRES.Provider';
+        var Address = '@DetailAfiaRES.Address';
+        var city = '@DetailAfiaRES.city';
+        var Discounts = '@DetailAfiaRES.Discounts';
+        var Exceptions = '@DetailAfiaRES.Exceptions';
+        var Icon = '@DetailAfiaRES.Icon';
+        var IsActive = '@DetailAfiaRES.IsActive';
+        var MasterName = '@DetailAfiaRES.MasterName';
+        var Specialization = '@DetailAfiaRES.Specialization';
+        var RegistraionCode = '@DetailAfiaRES.RegistraionCode';
+    </script>
+    <script src="~/Scripts/AfiaScripts/DetailAfia/addDetailAfia.js"></script>
+    <script src="~/Scripts/AfiaScripts/DetailAfia/DetailAfiaIndex.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            RefreshGird();
+        });
+    </script>
+}
+

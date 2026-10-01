@@ -1,0 +1,59 @@
+﻿@using Resource
+@using UserUI.Helper
+@using Kendo.Mvc.UI;
+@using UserUI.Models
+
+
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+
+<div class="donation-popup">
+    <div class="container">
+        <div class="popup-centralize">
+            <span class="close"><i class="fa fa-remove"></i></span>
+            <div class="payment-box">
+                <div id="DonationsTabs">
+
+                    <ul class="frequency">
+                        <li><a itemprop="url" class="active" href="#OnlineDonationTabs"><i class="fa fa-credit-card"></i>@DonationResources.OnlineDonation</a></li>
+                        <li><a itemprop="url" href="#RepresentativeDonationTabs"><i class="fa fa-user-plus"></i>@DonationResources.RepresentativeDonation</a></li>
+                        <li><a itemprop="url" href="#DonationBankByTransferTabs"><i class="fa fa-money"></i>@DonationResources.DonationByBankTransfer</a></li>
+                    </ul><!-- Frequency -->
+                    <div class="your-donation">
+                        <div class="donation-intro" style="margin-bottom:0px;" id="CaseDetailsDonationPopUp">
+                            <div class="row">
+                                <div class="make-donation">
+                                    <h2 id="caseName_CodeTextDonationPopUp"></h2>
+                                    <h3 id="remainingTextDonationPopUp"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        @Html.Partial("~/Views/Donation/_OnlineDonationViewModel.cshtml", new OnlineDonationViewModel())
+                        @if (AuthorizationHelper.IsAuthenticated())
+                        {
+                            @Html.Partial("~/Views/Donation/_RepresentativeDonationViewModelUser.cshtml", new RepresentativeDonationViewModelUser())
+                            @Html.Partial("~/Views/Donation/_DonationBankByTransferModelUser.cshtml", new DonationByBankTransferViewModelUser())
+                        }
+                        else
+                        {
+                            @Html.Partial("~/Views/Donation/_RepresentativeDonationViewModelAnonymous.cshtml", new RepresentativeDonationViewModelAnonymous())
+                            @Html.Partial("~/Views/Donation/_DonationBankByTransferModelAnonymous.cshtml", new DonationByBankTransferViewModelAnonymous())
+                        }
+                        @*@Html.Partial("~/Views/Donation/_DonateThroughOtherMeans.cshtml", new CreateDonateThroughOtherMeansDto())*@
+
+                    </div><!-- Your Donation -->
+                </div>
+
+                <div class="payment-footer" id="donationSlide">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

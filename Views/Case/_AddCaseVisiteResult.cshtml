@@ -1,0 +1,87 @@
+﻿@model DTO.CaseVisiteDTO
+@using Kendo.Mvc.UI;
+@using Resource
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+<div class="modal fade" id="CaseVisitResultModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.AddCaseFollow</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <input type="hidden" id="hasFile" />
+                <div class="box-body">
+                    @Html.HiddenFor(x => x.CaseId)
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.VisitDateString)
+                        <br />
+                        @Html.TextBoxFor(m => m.VisitDateString, " ", new { @class = "DateTillNow form-control" })
+                        <label id="VisitDateErrorMassage"></label>
+                    </div>
+
+                    <div>
+                        @Html.HiddenFor(x => x.VisiteServiceIDs)
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-12">
+                                @Html.Label(CaseResources.ServiceType)
+                            </div>
+                            <div id="VisiteServiceDiv">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group" id="VisiteDiseaseParentDiv" dir="@dir">
+                            <div class="col-sm-12">
+                                @Html.Label(CaseResources.DisesaseType)
+                            </div>
+                            <div id="VisiteDiseaseDiv">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextAreaFor(m => m.VisitResult, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.VisitResult), rows = "5" })
+                        <label id="VisitResultErrorMassage"></label>
+                    </div>
+                    <div class="demo-section k-content" dir="ltr">
+                        @(Html.Kendo().Upload()
+                            .Name("files")
+                            .Messages(m => m.Select(CaseResources.Attachment))
+                            .TemplateId("fileTemplate")
+                            .HtmlAttributes(new
+                            { accept = "image/*,.rar,.pdf,.csv,.docx,.doc,.xls,.xlsx,application/vnd.ms-excel", id = "VisiteFiles" })
+                            .Async(async => async
+                            .Save("AddCaseVisiteResult", "Case")
+                            .Batch(true)
+                            .AutoUpload(false))
+                            .Multiple(true)
+                            .Events(c => c
+                            .Upload("onUploadVisitResult")
+                            .Select("onSelectVisitResult")
+                            )
+                        )
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="button" onclick="submitVisitResult()" class="btn btn-info pull-right">@LayoutRES.Submit</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                </div><!-- /.box-footer -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ 

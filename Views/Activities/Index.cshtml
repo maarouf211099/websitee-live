@@ -1,0 +1,53 @@
+﻿@using Resource
+@using UserUI.Helper
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var mersalApi = ViewBag.mersalApi;
+}
+
+@{
+    string title2 = ViewBag.IsAcademia == true ? LayoutRES.AcademiaEvents : LayoutRES.PublicEvents;
+    string divName = ViewBag.IsAcademia == true ? "academiaActivitiesContainerDiv" : "publicactivitiesContainerDiv";
+}
+<section>
+    <div class="block">
+        <div class="container"> 
+            <div class="row" style="padding: 30px 30px 30px 0;"> 
+                <div class="title">
+                    <h2>@title2</h2>
+                </div>
+                <div class="container">
+                    <div class="products-list-activity">
+                        <div class="container" id="@divName">
+                        </div>
+                    </div>
+                    <div class="title">
+                        <span>
+                            <a class="theme-btn" onClick="ShowNextTenItems()">@LayoutRES.ShowMore</a>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/Scripts/MersalScripts/ActivitiesIndex.js">
+
+</script>
+<script>
+    var take = 8;
+    var skip = 8;
+    $(document).ready(function () {
+
+        @Html.Raw( (ViewBag.IsAcademia==true ? "drawAcademiaActivities.start('"+@mersalApi+"','"+Url.Action("Details", "Activities")+ "'+'?Id=',take,0)" : "drawPublicActivities.start('"+@mersalApi+"','"+@Url.Action("Details", "Activities")+"'+'?Id=',take,0)"));
+    })
+    function ShowNextTenItems() {
+
+        @Html.Raw( (ViewBag.IsAcademia==true ? "drawAcademiaActivities.start('"+@mersalApi+"','"+Url.Action("Details", "Activities")+ "'+'?Id=',take,skip)" : "drawPublicActivities.start('"+@mersalApi+"','"+@Url.Action("Details", "Activities")+"'+'?Id=',take,skip)"));
+        skip += 8;
+    }
+
+</script>

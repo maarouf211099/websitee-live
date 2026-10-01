@@ -1,0 +1,90 @@
+﻿
+@model DTO.DonationSlideDTO
+@using Resource 
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div class="modal fade" id="EditDonationSlideModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@DonationSlideResource.EditDonationSlide</h4>
+                </div>
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "EditDonationSlideForm" }))
+                    {
+                        @Html.HiddenFor(m => m.Id)
+                        @Html.HiddenFor(m => m.ImageName)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Title)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleAr)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Description)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DescriptionAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.DescriptionAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.DescriptionAr)
+                                </div>
+                            </div>
+                            
+                         
+                            <div class="form-group">
+                                <div class="col-md-8">
+                                    <img src="@Model.ImageName " style="max-width:150px;" />
+                                </div>
+                            </div>
+                            <div class="demo-section k-content @KendoClass ">
+                                @(Html.Kendo().Upload()
+                                    .Name("Image")
+                                     .Messages(m => m.Select(DonationSlideResource.Image).UploadSelectedFiles(LayoutRES.Submit))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*", id = "EditImage" })
+                                    .Multiple(false)
+                                    .Async(a => a
+                                    .Save("EditDonationSlider", "DonationSlider")
+                                    .AutoUpload(false))
+                                    .Events(c => c
+                                    .Upload("onUploadDonationSlideEdit")
+                                    .Success("onSuccessUploadDataEditDonation")
+                                    .Select("onSelectImageDonation")
+                                    )
+                                )
+                            </div>
+                            <input type="hidden" value="false" name="isImageChanged" />
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-8">
+                                    @*<input id="btnSubmitEditDonation" onclick="submitEditSlideDonation()" type="button" value="@LayoutRES.Submit" class="btn btn-default" />*@
+                                    <input id="btnSubmitEditDonation" onclick="submitEditSlideDonation()" type="button" value="@LayoutRES.Submit" class="btn btn-info" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

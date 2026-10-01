@@ -1,0 +1,46 @@
+﻿
+@using UserUI.Helper
+@using Resource
+@model UserDTO
+@using DTO
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@{
+    ViewBag.Title = DonationResources.DonationOnlineList;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<head>
+    <title>@DonationResources.DonationOnlineList</title>
+</head>
+
+
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="gridTwo"></div>
+<div id="OnlineDonationDetailsDiv"></div>
+<h3 id="TotalAmount"></h3>
+@section Scripts {
+
+    <script src="~/Scripts/MersalScripts/DonationManagment/OnlineDonationList.js"></script>
+    <script>
+        var DonationType = "@DonationResources.DonationType";
+        var DonationDestination = "@DonationResources.DonationDestination";
+        var DonationName = "@DonationResources.Name";
+        var address = '@DonationResources.Address';
+        var Email = '@DonationResources.Email';
+        var Phone = '@DonationResources.Phone';
+        var DonationCase = '@CaseResources.Case';
+        var UserName = '@AuthorizationHelper.UserName';
+        var ExcelExportPrivilege = '@AuthorizationHelper.UserIsInPrivilege(5372)';
+        var IsGreaterThan = '@CommonRes.IsGreaterThan';
+        var IsLessThan = '@CommonRes.IsLessThan';
+        var PaymentType = '@DonationResources.PaymentType';
+        var OnlineDonationExcelSheet = '@DonationResources.OnlineDonationExcelSheet';
+
+    </script>
+}
+
+
+

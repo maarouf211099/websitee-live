@@ -1,0 +1,89 @@
+﻿
+
+@model DTO.AlbumListViewDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <meta charset="utf-8">
+    <title>Album Images</title>
+    <link rel="stylesheet" href="~/LigthBoxcss/lightbox.min.css">
+</head>
+
+<section>
+    <div class="block">
+        <div class="container">
+            <div class="row" style="padding: 30px 30px 30px 0;">
+                <div class="col-md-12 column">
+                    <div class="title">
+                        @Html.HiddenFor(x => x.CurrantCountOfAlbums) 
+                     
+                        @if (isArabic)
+                        { 
+                            <h2>@Model.CurrantAlbum.TitleAr</h2>
+                        }
+                        else
+                        { 
+                            <h2>@Model.CurrantAlbum.TitleEn</h2>
+                        } 
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="casesListDiv">
+                            @if (Model.AlbumHomeViewList.Any())
+                            {
+                                foreach (var _Image in Model.AlbumHomeViewList)
+                                {
+                                    <div class="col-md-3" style="margin-bottom: 3px;">
+                                        <div class="story">
+
+                                            @if (isArabic)
+                                            {
+                                                <div style="height: 150px;">
+                                                    <a class="example-image-link" href="@_Image.ImagePath" data-lightbox="example-set" data-title="@_Image.TitleAr"><img width="250" height="150" class="example-image radios-img" src="@_Image.ImagePathThumbnail" alt="" /></a>
+                                                </div>
+                                                @*<a class="example-image-link" href="@_Image.ImagePath" data-lightbox="example-set" data-title="@_Image.TitleAr"><img class="example-image" src="@_Image.ImagePathThumbnail" alt="" /></a>*@
+                                            }
+                                            else {
+                                                <div style="height: 150px;">
+                                                    <a class="example-image-link" href="@_Image.ImagePath" data-lightbox="example-set" data-title="@_Image.TitleEn"><img width="250" height="150" class="example-image" src="@_Image.ImagePathThumbnail" alt="" /></a>
+                                                </div>
+                                                @*<a class="example-image-link" href="@_Image.ImagePath" data-lightbox="example-set" data-title="@_Image.TitleEn"><img class="example-image" src="@_Image.ImagePathThumbnail" alt="" /></a>*@
+                                            }
+                                        </div>
+                                        @*<div class="spent-bar">
+                                                @if (isArabic)
+                                                {
+                                                    <span class="price" style="float: right;"><i>@_Album.TitleAr</i></span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="price"><i>@_Album.TitleEn</i></span>
+
+                                                }
+                                            </div>*@
+                                    </div>
+
+                                }
+                            }
+                        </div>
+                        <div class="title">
+                            <span><a id="btnShowMore" onclick="getMoreImages(@ViewBag.albumId)" class="theme-btn" style="width:150px;cursor: pointer;">@LayoutRES.ShowMore</a></span>
+                        </div>
+                    </div><!-- Successful Stories -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/ListOfImageView")
+    @*<script src="~/Scripts/MersalScripts/AlbumScript/ImageInnerScr.js"></script>
+    <script src="~/Scripts/LightBoxScr/lightbox.min.js"></script>*@
+}

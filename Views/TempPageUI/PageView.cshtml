@@ -1,0 +1,50 @@
+﻿@model TempPageDTO
+@using DTO
+
+@switch (Model.TemplateId)
+{
+    case 1:
+        @Html.Partial("~/Views/TempPageUI/Templates/_Column.cshtml", Model)
+        break;
+    case 2:
+        @Html.Partial("~/Views/TempPageUI/Templates/_Rows.cshtml", Model)
+        break;
+    case 3:
+        @Html.Partial("~/Views/TempPageUI/Templates/_Tabs.cshtml", Model)
+        @section Scripts {
+            <script>
+                $(document).ready(function () {
+                    $(".MakeTabs").tabs();
+                });
+            </script>
+        }
+        break;
+    case 4:
+        @Html.Partial("~/Views/TempPageUI/Templates/_Accordion.cshtml", Model)
+
+        @section Scripts {
+            <script>
+                $(document).ready(function () { 
+                    $("#accordionTemp").accordion({
+                        collapsible: true,
+                        active: 0,
+                        header: ".accordionHeader",
+                    });
+                });
+                $('.accordionHeader').click(function () {
+                    var collapsed = $(this).find('i').hasClass('fa-plus');
+
+                    $('.accordionHeader').find('i').removeClass('fa-minus');
+
+                    $('.accordionHeader').find('i').addClass('fa-plus');
+                    if (collapsed)
+                        $(this).find('i').toggleClass('fa-plus fa-minus');
+                });
+            </script>
+        }
+        break;
+    default:
+        break;
+}
+
+

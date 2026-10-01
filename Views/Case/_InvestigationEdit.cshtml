@@ -1,0 +1,53 @@
+﻿@model DTO.MarkInvestigationDoneDTO
+@using Resource
+@using UserUI.Helper
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+<div class="modal fade" id="InvestigationResultEditModals" role="dialog" dir="@dir">
+    <div class="modal-dialog" style="width: 900px;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@LayoutRES.Edit</h4>
+                </div>
+
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", id = "InvestigationResultEditModalsForm" }))
+                {
+                    <div class="box-body">
+                        <div class="form-horizontal">
+                            @Html.HiddenFor(model => model.Id)
+                            
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        @CaseResources.Recommendation
+                                        @Html.TextAreaFor(x=>x.Recommendation, new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Recommendation, rows = "5" })
+                                        <label id="ErrorRecommendationInvestigation"></label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @CaseResources.Conclusions
+                                        @Html.TextAreaFor(x=>x.Conclusions, new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Conclusions, rows = "5" })
+                                        <label id="ErrorConclusionsInvestigation"></label>
+                                    </div>
+                                </div>
+                          
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">@LayoutRES.SubmitEdit</button>
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,121 @@
+﻿@model DTO.CaseFinalApprove
+@using Resource
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+<div class="modal fade" id="CaseFinalApproveModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.OpenTheCase</h4>
+                    <h4 class="modal-title">@Model.CaseId - @Model.CaseName</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", id = "FinalApproveForm" }))
+                {
+                    @Html.HiddenFor(m => m.CaseId)
+                    <div class="box-body">
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                @Html.LabelFor(m => m.ParentAccountId, new { @class = "control-label" })
+                                @Html.DropDownListFor(x => x.ParentAccountId, new List<SelectListItem>(), new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.ParentAccountId)
+                            </div>
+                            <div class="col-sm-6">
+                                @Html.HiddenFor(m => m.EmployeeId)
+                                @Html.HiddenFor(m => m.CaseId)
+                                @Html.Hidden("EmployeeEmail")
+
+                                @Html.LabelFor(m => m.EmployeeId, new { @class = "control-label" })
+                                @(Html.Kendo().ComboBox()
+                                    .Name("SearchForEmployee")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .HtmlAttributes(new { style = "width:100%", @aria_required = "true" })
+                                    .Filter(FilterType.Contains)
+                                    .Suggest(true)
+                                    .Events(e => e
+                                    .Select("SetEmployeeData")
+                                    .Change("SetEmployeeData")
+                                    )
+                                    .HighlightFirst(true)
+                                    .DataSource(source =>
+                                    {
+                                        source.Custom()
+                                       .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                       .Transport(transport =>
+                                       {
+                                           transport.Read(r => r.Action("GetUsersByLocationCodeKendo", "Case", new { locationCode = "fu" }) // .Data("DateTypeId")
+                                           );
+                                       })
+                                       .Schema(schema => { schema.Data("Data").Total("Total"); });
+                                    }))
+                            </div>
+                            <span class="field-validation-error" id="EmployeeIdErrorMessage" style="display:none;">
+                                @if (isArabic)
+                                {
+                                    <span class="">الموظف مطلوب</span>
+                                }
+                                else
+                                {
+                                    <span class="">Employee Required</span>
+                                }
+                            </span>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                @Html.DisplayNameFor(m => m.CaseCategoryId)
+                                @Html.DropDownListFor(x => x.CaseCategoryId, new List<SelectListItem>(), new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.CaseCategoryId)
+                            </div>
+                            <div class="col-sm-6">
+                                @Html.DisplayNameFor(m => m.RequiredAmount)
+                                @Html.TextBoxFor(x => x.RequiredAmount, new { @class = "form-control", @type = "number" ,min=0})
+                                @Html.ValidationMessageFor(m => m.RequiredAmount)
+                            </div>
+                        </div>
+
+                        @*<div class="demo-section k-content @KendoClass ">
+                            @(Html.Kendo().Upload()
+                            .Name("CaseImageFinalApprove")
+                             .Messages(m => m.Select(CaseResources.CaseImage))
+                            .TemplateId("fileTemplate")
+                            .HtmlAttributes(new { accept = "image/*" })
+                            .Async(a => a
+                            .Save("uploadCaseImageFinalApprove", "Case", new { CaseId = Model.CaseId })
+                            .AutoUpload(true))
+                            .Multiple(false)
+                            )
+                             <span class="field-validation-error" id="CaseImageErrorMessage" style="display:none;">
+                                @if (isArabic)
+                                {
+                                    <span class="">الصورة مطلوب</span>
+                                }
+                                else
+                                {
+                                    <span class="">Image is Required</span>
+                                }
+                            </span> 
+                        </div>*@
+
+
+
+                        <!-- /.box-body -->
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">@CaseResources.OpenTheCase</button>
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                        </div><!-- /.box-footer -->
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

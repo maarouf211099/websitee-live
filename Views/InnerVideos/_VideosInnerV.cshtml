@@ -1,0 +1,52 @@
+﻿@*@{
+        Layout = null;
+    }*@
+@using Resource
+<style>
+    .fields {
+        display: inline-block;
+    }
+.title{
+      text-align: inherit;
+        width: 100%;
+        margin: 0px -9%;
+    
+}
+    .pagenext {
+    }
+</style>
+@*<input type="button" value="Show More" id="loadMore" />*@
+@*// <a href="~/Views/Home/_VideosHome.cshtml">~/Views/Home/_VideosHome.cshtml</a>
+    <a class="theme-btn" href="~/Views/Home/_VideosInner.cshtml" title="" id="loadMore">ShowMore</a>*@
+
+<section>
+    <div class="block">
+        <div class="container">
+            <div class="row" >
+                @Html.Hidden("hidnextpage")
+                @*@Html.Hidden("hidtotalresult") .*@
+                @*<input type="hidden" value="0" id="CurrantCount"   />*@
+
+                 <div class="title">
+                        <h2>  @LayoutRES.Videos  </h2>
+
+                    </div>
+                <div id="containerVideos">
+                </div>
+                <div class="successful-stories">
+                    <div class="title">
+                        <span> 
+                            <input type="button" class="theme-btn pagenext" value='@LayoutRES.ShowMore' id="loadMore" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+    @*<script src="~/Scripts/VideosScripts/VideosInnerscript.js"></script>*@
+    @Scripts.Render("~/bundles/InnerVideo")
+}

@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  http://go.microsoft.com/fwlink/?LinkId=301880
+  -->
+<configuration>
+  <configSections>
+
+    <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+    <!-- For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 -->
+  </configSections>
+
+
+
+  <connectionStrings>
+    <add name="DefaultConnection" connectionString="Data Source=__DB_SERVER__;AttachDbFilename=|DataDirectory|\aspnet-UserUI-20160227024456.mdf;Initial Catalog=__DB_NAME__;user id=__DB_USER__;password=__DB_PASSWORD__;User Instance=True" providerName="System.Data.SqlClient" />
+  </connectionStrings>
+  <appSettings>
+
+  	  <add key="vpc_Version" value="1" />
+    <add key="vpc_Command" value="pay" />
+
+    <add key="vpc_MerchantEGP" value="CIB700512" />
+    <add key="vpc_AccessCodeEGP" value="9AE6E14F" />
+    <add key="SecureSecretEGP" value="__CIB_SECRET__" />
+
+    <add key="vpc_MerchantUSD" value="CIB700512USD" />
+    <add key="vpc_AccessCodeUSD" value="81954F71" />
+    <add key="SecureSecretUSD" value="__CIB_SECRET__" />
+
+    <add key="vpc_MerchantEUR" value="CIB700512EUR" />
+    <add key="vpc_AccessCodeEUR" value="B167A391" />
+    <add key="SecureSecretEUR" value="__CIB_SECRET__" />
+
+
+    <add key="PaymentServerURL" value="https://migs.mastercard.com.au/vpcpay" />
+
+
+
+
+
+  	
+    <add key="webpages:Version" value="3.0.0.0" />
+    <add key="webpages:Enabled" value="false" />
+    <add key="ClientValidationEnabled" value="true" />
+    <add key="UnobtrusiveJavaScriptEnabled" value="true" />
+
+    <!-- 
+    <add key="UserNamagementWebAPIBaseUrl" value="https://35.188.232.237/UserManagementAPI/" />
+    <add key="MersalWebAPIBaseUrl" value="https://35.188.232.237/MersalAPI/" />
+    <add key="SystmeCodeWebAPIBaseUrl" value="https://35.188.232.237/SysCodeAPI/" />
+    <add key="NotificationApi" value="https://35.188.232.237/NotificationAPI" />
+    <add key="NotificationAPIBaseUrl" value="https://35.188.232.237/NotificationAPI/" />
+    
+    <add key="SystmeCodeUIUrl" value="https://35.188.232.237/SysCodeUI/" />
+    <add key="UserNamagementUIUrl" value="https://35.188.232.237/UserManagmentUI/" />
+    <add key="MersalUIBaseUrl" value="https://35.188.232.237/" />
+    <add key="SignalRServiceURL" value="http://35.188.232.237:8083/signalr" /> 
+    -->
+
+     <!-- <add key="CIBSession" value="https://cibpaynow.gateway.mastercard.com/api/rest/version/100/merchant/CIB700512/session" /> -->
+    <add key="CIBSession" value="https://banquemisr.gateway.mastercard.com/api/rest/version/100/merchant/MERSAL/session" />
+
+<!--<add key="CountOfCasesViewAtHome" value="10000000" />-->
+
+
+    <add key="UserNamagementWebAPIBaseUrl" value="https://mersal-ngo.org/UserManagementAPI/" />
+    <add key="MersalWebAPIBaseUrl" value="https://mersal-ngo.org/MersalAPI/" />
+    <add key="SystmeCodeWebAPIBaseUrl" value="https://mersal-ngo.org/SysCodeAPI/" />
+    <add key="NotificationApi" value="https://mersal-ngo.org/NotificationAPI" />
+    <add key="NotificationAPIBaseUrl" value="https://mersal-ngo.org/NotificationAPI/" />    
+    <add key="SystmeCodeUIUrl" value="https://mersal-ngo.org/SysCodeUI/" />
+    <add key="UserNamagementUIUrl" value="https://mersal-ngo.org/UserManagmentUI/" />
+    <add key="MersalUIBaseUrl" value="https://mersal-ngo.org/" />
+    <add key="SignalRServiceURL" value="https://35.188.232.237:443/signalr" /> 
+
+<!-- 	<add key="ReportUserName" value="mersalngo" />
+    <add key="ReportPassword" value="__REPORT_PASSWORD__" /> -->
+	
+	  <add key="ReportUserName" value="smarttechhost" />
+    <add key="ReportPassword" value="__REPORT_PASSWORD__" />
+    <add key="ReportDomain" value="Instance-9" /> 
+<!--     <add key="ReportServer" value="http://localhost/ReportServer/" />
+    <add key="ReportsPath" value="http://localhost/ReportServer/Pages/ReportViewer.aspx" /> -->
+	
+	<add key="ReportServer" value="http://instance-9/ReportServer/" />
+    <add key="ReportsPath" value="http://instance-9/Reports/Pages/ReportViewer.aspx" />
+	
+	
+    <add key="receivedMail" value="info@35.188.232.237" />
+    
+  </appSettings>
+  
+  <system.web> 
+       <!-- <customErrors mode="Off"/>  -->
+       <customErrors mode="Off" />
+    <authentication mode="None" />
+    <compilation debug="true" targetFramework="4.5" />
+    <!--<httpRuntime targetFramework="4.5" />-->
+    <httpRuntime targetFramework="4.5" useFullyQualifiedRedirectUrl="true" maxRequestLength="15360" requestLengthDiskThreshold="15360" />
+        <sessionState mode="InProc" sqlCommandTimeout="0" sqlConnectionString="Server=__DB_SERVER__;Database=__DB_NAME__;Integrated Security=true" timeout="180" sqlConnectionRetryInterval="3600" /> 
+  </system.web> 
+  
+  <location path="Content">
+    <system.webServer>
+    	
+      <httpErrors errorMode="Detailed" />
+        <asp scriptErrorSentToBrowser="true" />
+
+      <staticContent>
+        <clientCache cacheControlCustom="public" cacheControlMode="UseMaxAge" cacheControlMaxAge="365.00:00:00" />
+      </staticContent>
+    </system.webServer>
+  </location>
+  
+  <system.webServer>
+     <staticContent>
+       <mimeMap fileExtension=".webp" mimeType="image/webp" />
+    </staticContent>
+    <urlCompression doDynamicCompression="true" doStaticCompression="true" />
+    <security>
+      <requestFiltering>
+        <!--<requestLimits maxAllowedContentLength="2048"/>-->
+      </requestFiltering>
+    </security>
+        <httpProtocol>
+            <customHeaders>
+                <add name="X-Frame-Options" value="AllowAll" />
+            </customHeaders>
+        </httpProtocol>
+       <rewrite>
+     <rules>
+        <rule name="http to https" enabled="true" stopProcessing="true">
+            <match url="(.*)" />
+            <conditions>
+                        <add input="{HTTPS}" pattern="^OFF$" />
+            </conditions>
+            <action type="Redirect" url="https://{HTTP_HOST}/{Request_URI}" appendQueryString="false" />
+        </rule>
+                <rule name="forcehttps" enabled="false" stopProcessing="true">
+                    <match url="(.*)" />
+                    <conditions>
+                        <add input="{HTTPS}" pattern="^OFF$" />
+                    </conditions>
+                    <action type="Redirect" url="https://{HTTP_HOST}{REQUEST_URI}" appendQueryString="false" />
+                </rule>
+                <rule name="Redirect www to non-www" enabled="true" stopProcessing="true">
+                    <match url="(.*)" />
+                    <conditions>
+                      <add input="{HTTPS}" pattern="^www\.(.+)$" />
+                    </conditions>
+                    <action type="Redirect" url="https://{HTTP_HOST}{REQUEST_URI}" appendQueryString="false" redirectType="Permanent" />
+                </rule>
+                <rule name="Remove www" stopProcessing="true">
+  <match url="(.*)" negate="false"></match>
+  <conditions>
+    <add input="{HTTPS}" pattern="^www\.(.*)$" />
+  </conditions>
+  <action type="Redirect" url="https://{HTTP_HOST}{REQUEST_URI}" appendQueryString="true" redirectType="Permanent" />
+</rule>
+    </rules>
+</rewrite>
+  </system.webServer>
+  <system.webServer>
+  <modules>
+    <remove name="WebDAVModule" />
+  </modules>
+  <handlers>
+    <remove name="WebDAV" />
+  </handlers>
+</system.webServer>
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly>
+        <assemblyIdentity name="System.Web.Helpers" publicKeyToken="31bf3856ad364e35" />
+        <bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" />
+        <bindingRedirect oldVersion="0.0.0.0-5.0.0.0" newVersion="5.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="System.Web.WebPages" publicKeyToken="31bf3856ad364e35" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="WebGrease" publicKeyToken="31bf3856ad364e35" />
+        <bindingRedirect oldVersion="0.0.0.0-1.5.2.14234" newVersion="1.5.2.14234" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="6.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Practices.Unity" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.5.0.0" newVersion="3.5.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
+  <entityFramework>
+    <defaultConnectionFactory type="System.Data.Entity.Infrastructure.LocalDbConnectionFactory, EntityFramework">
+      <parameters>
+        <parameter value="v12.0" />
+      </parameters>
+    </defaultConnectionFactory>
+    <providers>
+      <provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer" />
+    </providers>
+  </entityFramework>
+  <system.net>
+    <mailSettings>
+      <!--<smtp from="__EMAIL__">
+        <network host="__SMTP_HOST__"
+                 port="587"
+                 userName="__SMTP_USER__"
+                 password="__PASSWORD__"
+                 enableSsl="false" />
+      </smtp>-->
+       <smtp from="__EMAIL__">
+        <network host="__SMTP_HOST__" port="2525" userName="__SMTP_USER__" password="__PASSWORD__" enableSsl="false" />
+      </smtp> 
+    </mailSettings>
+  </system.net>
+</configuration>
+<!--enableSsl="false"-->
+
+
+

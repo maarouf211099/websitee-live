@@ -1,0 +1,42 @@
+﻿@using UserUI.Helper
+@using Resource
+@{
+    ViewBag.Title = DonationResources.DonationsByBank;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<script>
+</script>
+<head>
+    <title>@DonationResources.DonationsByBank</title>
+
+</head>
+<div class="container">
+    <div class="col-md-4">
+        <h3>@DonationResources.Done:<input type="radio" name="ridIsDone" value="true" /></h3>
+    </div>
+    <div class="col-md-4">
+        <h3>@DonationResources.NotDone:<input type="radio" name="ridIsDone" value="false" checked="checked" /></h3>
+    </div>
+
+</div>
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="gridTwo" hidden class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="DonationBankTransferDetailsDiv"></div>
+<h3 id="TotalAmount"></h3>
+<input type="hidden" id="hidIsDone" value="false" />
+
+@section Scripts {
+    @Scripts.Render("~/bundles/BankTransactionDonationsList")
+    @* <script src="~/Scripts/MersalScripts/DonationManagment/DonationBankTransfer.js"></script>*@
+<script>
+    var DonationType = "@DonationResources.DonationType";
+    var DonationDestination = "@DonationResources.DonationDestination";
+    var TitleName = "@DonationResources.DonationTitle";
+    var Details = '@LayoutRES.Details';
+    var UserName = '@AuthorizationHelper.UserName';
+</script>
+}
+
+
+

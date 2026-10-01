@@ -1,0 +1,75 @@
+﻿ 
+@model  IEnumerable<SponsorsDTO>
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = HomeRES.Sponsors;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var tblTextAlign = isArabic ? "tblText" : "";
+}
+<style>
+    .tblText tr {
+        text-align: right;
+    }
+
+    .tblText th {
+        text-align: right;
+    }
+</style>
+<div class="form-group">
+    <button onclick="getCreateSponsor()" type="button" class="btn btn-info">@LayoutRES.CreateSponsor</button>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">@HomeRES.Sponsors </h3>
+            </div>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody class="@tblTextAlign">
+                        <tr>
+                            <th>@LayoutRES.TheLink</th>
+                            <th>@LayoutRES.TheImage</th>
+                            <th>@LayoutRES.Details </th>
+                            <th>@LayoutRES.Delete </th>
+                        </tr>
+                        @foreach (var spons in Model)
+                        {
+                            <tr id="S_@spons.Id">
+                                <td><a href="@spons.href" target="_blank">@spons.href </a></td>
+                                <td><img src="@spons.ImagePath" style="max-width:150px;" /></td>
+                                <td><span class="label label-success" style="cursor: pointer;" onclick="getSponsorDetails('@spons.Id')">@LayoutRES.Details</span></td>
+                                <th><span class="label label-danger" style="cursor: pointer;" onclick="DeleteSponsor('@spons.Id')">@LayoutRES.Delete </span> </th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("~/Views/SponsorUI/_CreateSponsor.cshtml", new SponsorsDTO())
+
+
+<div id="EditSponsor">
+
+</div>
+
+@section Scripts {
+    @*<script src="~/Scripts/MersalScripts/SponsorManagement/AdminSponsor.js"></script>*@
+    @Scripts.Render("~/bundles/Sponsor")
+}
+
+
+
+
+
+

@@ -1,0 +1,143 @@
+﻿@using Resource;
+@using Resource.Pharmacy.CasePrescription;
+@using Kendo.Mvc.UI;
+@using System.Configuration;
+@using Resource.Pharmacy;
+@{
+    ViewBag.Title = MedicineRES.InterchangeForCase;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var MersalWebAPIBaseUrl = ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"];
+}
+
+
+<div id="ConfirmSave" class="modal fade" tabindex="-1" role="dialog" style="background-color: rgba(0, 0, 0, .7);" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <h3>
+                    @CaseCustomAtrributeRes.SaveMessage
+                </h3>
+
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-primary" id="btnCreate" onclick="addRow('@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/create')">@CaseCustomAtrributeRes.Save</button>
+                <button type="button" class="btn btn-primary" hidden id="btnDelete" onclick="SoftDelete('@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/delete',true)">@CaseCustomAtrributeRes.Save</button>
+
+                <button type="button" class="btn btn-default" onclick="hideConfirm()">@CaseCustomAtrributeRes.Cancel</button>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "interchangeForCaseForm", name = "interchangeForCaseform" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class=" panel panel-default">
+                <div class="panel-heading">
+                    <b></b>
+                </div>
+                <div id="panelCombox" class="panel-body" style="width:100%;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.Label(CaseResources.Case, new { @class = "control-label" })
+                                @(Html.Kendo().ComboBox()
+          .Name("cases")
+          .Placeholder(CasePrescriptionRES.SelectCase)
+          .DataTextField("DisplayName")
+           .DataValueField("Id")
+          .HtmlAttributes(new { style = "width:100%;" })
+          .Filter("contains")
+          .AutoBind(false)
+          .DataSource(source =>
+          {
+              source.Read(r =>
+              {
+                  r.Url(MersalWebAPIBaseUrl+"/api/Case/GetAllCasesForCombobox").Type(HttpVerbs.Get);
+              })
+              .ServerFiltering(true);
+          })
+                                )
+
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "caseIDerror" })
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                @Html.Label(CasePrescriptionRES.Prescription, new { @class = "control-label" })
+
+                                @(Html.Kendo().ComboBox()
+                                    .Name("prescription")
+                                    .DataTextField("Display")
+                                    .DataValueField("CasePrescriptionId")
+                                    .HtmlAttributes(new { style = "width:100%;" })
+                                    .Filter("contains")
+                                    .AutoBind(false)
+                                    .Events(e => e.Change("refreshGird"))
+                                    .CascadeFrom("cases")
+                                    .CascadeFromField("Id")
+                                    .DataSource(source =>
+                                    {
+                                        source.Read(r =>
+                                        {
+                                            r.Url(MersalWebAPIBaseUrl+"/api/CasePrescriptionPayment/GetCasePrescription")
+                                            .Type(HttpVerbs.Get)
+                                            .Data("filterPrescriptions");
+                                        })
+                                        .ServerFiltering(true);
+                                    })
+                                )
+
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "CaseCategoryIDerror" })
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class=" panel panel-default">
+                    <div class="panel-heading">
+                        <b></b>
+                    </div>
+                    <div id="panelGrid" class="panel-body" style="width:100%;">
+                        <div id="grid" style="width:100%" class="k-rtl row">
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2" id="btnAdd">
+                <input type="submit" style="font-size:95%;" 
+                       
+                       class="btn btn-info btn-block" value="@CaseCustomAtrributeRes.add">
+            </div>
+        </div>
+}
+
+
+
+@section Scripts {
+    <script>
+        var SuccessfulProcess = "@Resource.LayoutRES.SuccessfulProcess";
+    </script>
+    <script src="~/Scripts/PharmacyScripts/casePrescriptionPayment/interchangeForCase.js"></script>
+}

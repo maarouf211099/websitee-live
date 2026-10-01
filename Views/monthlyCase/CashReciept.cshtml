@@ -1,0 +1,208 @@
+﻿@model DTO.AccountTransactionDTO
+@using System.Globalization;
+@using Resource
+@using DTO
+@using UserUI.Helper
+<div class="modal-dialog" style="border: 3px solid #d2d6de !important;" hidden id="PrintDIV" dir="rtl">
+    <!-- Modal content-->
+    <div class="modal-body" style="border: 3px solid #d2d6de !important;float:right !important;direction:rtl !important;width:100%;">
+        <div class="box box-info" style="">
+            <div class="box-header">
+                <img class="" style="position:fixed;top:10px;left:25px; width:200px;height:100px;" src="~/images/mersalLogo.png" />
+
+                <h2 class="" style="position:relative;top:10px;right:25px; width:50%!important;"></h2>
+            </div><!-- /.box-header -->
+            <!-- form start -->
+            <div class="box-body">
+                <!-- general form elements -->
+                <div style="float:right !important;direction:rtl !important;">
+                    <div class="row">
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="codeTXT" style="margin-right:25px!important; color:#337ab7;font-size: 23px;"></label>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="EmplyeeTXT" style="margin-right:25px!important; color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                            <br />
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="AccountTXT" style="margin-right:25px!important; color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="ValueTXT" style="margin-right:25px!important;color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label style="margin-right:25px!important;color:#337ab7;font-size: 23px;">@AccountTransactionRES.describtion  :-</label>
+                                <br />
+                               @* <label id="DescibtionTXT" style="margin-right:50px!important;color:#337ab7;font-size: 18px;"></label>*@
+                                
+                                    <table border="1" style="border-collapse:collapse;width:100%;" >
+                                        <tbody>
+                                            <tr>
+                                                <th style="text-align: center;">@CaseResources.Code</th>
+                                                <th style="text-align: center;">@CaseResources.CaseName</th>
+                                                <th style="text-align: center;">@LayoutRES.Amount</th>
+                                                <th style="text-align: center;">@CaseResources.MedicalDuration</th>
+                                                <th style="text-align: center;">@CaseResources.MedicalDescription</th>
+                                            </tr>
+                                            @*<tr><td>#Code#</td><td>#Name#</td><td>#Amount#</td><td><input type="button" class="rmvbtn" value="@LayoutRES.Delete"/></td></tr>*@
+                                            @foreach (var item in Model.caseMonthlyRequestDetailsDTO)
+                                            {
+                                                <tr>
+                                                    <td>@item.CaseId</td>
+                                                    <td>@item.caseName</td>
+                                                    <td>@item.Amount</td>
+                                                    <td>@item.MedicalDuration</td>
+                                                    <td>@item.MedicalDescription</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                               
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <br />
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label style="margin-right:600px!important;color:#337ab7;font-size: 23px;"> التوقيع</label>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label style="margin-right:600px!important;color:#337ab7;font-size: 23px;"> </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="RequestRecieptModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Case Comment - @Html.DisplayFor(m => m.CaseName)</h4>*@
+
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body AccordionDiv">
+                    <form role="form" id="CreateCashReciept">
+                        <div class="box-body">
+                            <div class="form-group col-md-12" style="display: block;">
+                                <label class="col-md-2 control-label">@Html.Label(AccountTransactionRES.employee) :</label>
+                                <div class="col-sm-10">
+                                    <label>@Model.CreateByName</label>
+                                    @Html.HiddenFor(x => x.CreateByName)
+                                    @Html.HiddenFor(x => x.CreateBy)
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12" style="display: block;">
+                                 <label class="col-md-4 control-label">@Html.Label(AccountRES.Description) :</label>
+                                <div class="col-sm-12">
+                                    @*<label>@Model.describtion</label>*@
+                                    <div class="box">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title"></h3>
+                                        </div><!-- /.box-header -->
+                                        <div class="box-body">
+                                            <table class="table table-bordered" id="monthlyCasesRequesttbl">
+                                                <tbody>
+                                                    <tr>
+                                                        <th style="text-align: center;">@CaseResources.Code</th>
+                                                        <th style="text-align: center;">@CaseResources.CaseName</th>
+                                                        <th style="text-align: center;">@LayoutRES.Amount</th>
+                                                        <th style="text-align: center;">@CaseResources.MedicalDuration</th>
+                                                        <th style="text-align: center;">@CaseResources.MedicalDescription</th>
+                                                    </tr>
+                                                    @*<tr><td>#Code#</td><td>#Name#</td><td>#Amount#</td><td><input type="button" class="rmvbtn" value="@LayoutRES.Delete"/></td></tr>*@
+                                                    @foreach (var item in Model.caseMonthlyRequestDetailsDTO)
+                                                    {
+                                                       <tr>
+                                                           <td>@item.CaseId</td>
+                                                           <td>@item.caseName</td>
+                                                           <td>@item.Amount</td>
+                                                           <td>@item.MedicalDuration</td>
+                                                           <td>@item.MedicalDescription</td>
+                                                       </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div><!-- /.box-body -->
+
+                                        @Html.HiddenFor(x => x.describtion)
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12" style="display: block;">
+                                    <label class="col-md-2 control-label">@Html.Label(LayoutRES.Amount) :</label>
+                                    <div class="col-sm-10">
+                                        <label>@Model.value</label>
+                                        @Html.HiddenFor(x => x.value)
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12" style="display: block;">
+                                    <div class="form-group ">
+                                        @Html.Label(AccountTransactionRES.Account)
+                                        <input type="text" id="AccountDRP" style="width:100%;" class="form-control" />
+                                        <span id="AccountDRPMSG" hidden class="field-validation-error"><span>@AccountTransactionRES.AccountRequired </span></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box-footer" style="float:left;">
+
+                                <button type="button" onclick="CreateCashReciept()" class="btn btn-primary">@AccountTransactionRES.createCashRecieptPrint</button>
+                                @*<a href="@urlGrid" class="btn btn-default">@AccountTransactionRES.Return</a>*@
+                                @*<a href="@urlGrid" class="btn btn-info">@AccountTransactionRES.Return</a>*@
+
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var AccountDRPPlacholder = '@AccountTransactionRES.AccountDRPPlacholder';
+    var EmplyeeDRPPlacholder = '@AccountTransactionRES.SelectUser';
+    var AccountRES = '@AccountTransactionRES.For';
+    var valueRES = '@AccountTransactionRES.value';
+    var poundsRES = '@AccountTransactionRES.pounds';
+    var EmpployeRes = '@AccountTransactionRES.employee';
+    var ValueVSBalanceMSG = '@AccountTransactionRES.ValueVSBalanceMSG';
+    var codeRes = '@AccountTransactionRES.codeRes';
+    var EmployeeName = '@AccountTransactionRES.employee';
+</script>
+<script src="~/Scripts/MersalScripts/MonthlyCasesManagment/CashReciept.js"></script>
+
+<script>
+
+</script>
+

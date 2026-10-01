@@ -1,0 +1,65 @@
+﻿ @using Resource 
+
+<style>
+    .Progress {
+        width: 100%;
+        background-color: #fffefe;
+        height: 10px;
+        margin-left: 5px;
+        margin-right: 8px;
+        border-radius: 10px;
+    }
+
+    .Bar {
+        width: 45%;
+        height: 10px;
+        background-color: #955a12;
+        padding-left: 10px;
+        padding-right: 10px;
+        line-height: 30px;
+        color: white;
+        display: block;
+        border-radius: 10px;
+    }
+
+    .name {
+        float: left;
+    }
+    .pct {
+        float: right;
+    }
+    .indicator {
+        display: flex;
+        align-items: center;
+    }
+    .persent {
+        color: black;
+        position: absolute;
+        margin-top: -22px;
+        font-size: 10px;
+    }
+</style>
+<section   id="DonationSection">
+  
+ <div class="header">   
+      <div class="title-new">
+        <h1> @DonationResources.Donations</h1>
+        <span></span>
+      </div>
+</div>
+<div class="description">
+<p>
+ 
+ @DonationResources.DonationsDesc
+</p>
+</div>
+<div class="row counter" id="donationsCounters">
+ 
+</div>
+
+
+ <img class="background-image" src="~/images/donationsCounters_background.png"  >
+</section>
+
+ 
+  <script src="~/Scripts/MersalScripts/DonationManagment/AllDonationsAmountStatistics.js"></script>  

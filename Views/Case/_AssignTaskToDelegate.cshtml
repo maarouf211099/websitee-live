@@ -1,0 +1,101 @@
+﻿@model DTO.ReminderDTO
+@using Resource
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+<div class="modal fade" id="AssignTaskToDelegateModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.AssignTaskToDelegate</h4>
+                   
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", id = "AssignTaskForm" }))
+                {
+                    <div class="box-body">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Title)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Description)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label(ReminderRES.Start, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                <input  id="startDate" name="startDate"/>
+                                @Html.ValidationMessageFor(model => model.Start)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label(ReminderRES.End, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                <input  id="EndDate" name="EndDate" />
+                                @Html.ValidationMessageFor(model => model.End)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label(CaseResources.Delegate, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-sm-8">
+                                @(Html.Kendo().ComboBox()
+                                    .Name("usersId")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .HtmlAttributes(new { style = "width:100%", @aria_required = "true" })
+                                    .Filter(FilterType.Contains)
+                                    .Suggest(true)
+                                    .Events(e => e
+                                    .Select("SetEmployeeData")
+                                    .Change("SetEmployeeData")
+                                    )
+                                    .HighlightFirst(true)
+                                    .DataSource(source =>
+                                    {
+                                        source.Custom()
+                                       .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                       .Transport(transport =>
+                                       {
+                                           transport.Read(r => r.Action("GetAllDelegatesKendo", "Case") // .Data("DateTypeId")
+                                           );
+                                       })
+                                       .Schema(schema => { schema.Data("Data").Total("Total");
+                                       });
+                                    }))
+                            <span class="field-validation-error"><span id="Delegatemsg" style="display:none;">@CaseResources.DelegateRequired </span></span>
+                            </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-info pull-right">@LayoutRES.Done</button>
+                        </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+                $(document).ready(function () {
+                    // create DateTimePicker from input HTML element
+                    $("#startDate").kendoDateTimePicker({
+                        value:new Date()
+                    });
+                    $("#EndDate").kendoDateTimePicker({
+                        value: new Date()
+                    });
+                });
+</script>

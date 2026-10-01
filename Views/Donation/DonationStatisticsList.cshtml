@@ -1,0 +1,41 @@
+﻿@using UserUI.Helper
+@using Resource
+@model UserDTO
+@using DTO
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+
+    @{
+        ViewBag.Title = DonationResources.DonationStatistics;
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    }
+
+    <head>
+        <title>@DonationResources.DonationStatistics</title>
+    </head>
+
+
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+    <div id="gridTwo"></div>
+    <div id="DonationStatisticsDetailsDiv"></div>
+    @section Scripts {
+
+        <script src="~/Scripts/MersalScripts/DonationManagment/DonationStatisticsList.js"></script>
+        <script>
+            var NameArabic = "@DonationResources.NameArabic";
+            var NameEnglish = "@DonationResources.NameEnglish";
+            var Value = '@DonationResources.Value';
+            var TargetValue = '@DonationResources.TargetValue';
+            //var Phone = '@DonationResources.Phone';
+            //var DonationCase = '@CaseResources.Case';
+            var UserName = '@AuthorizationHelper.UserName';
+            var ExcelExportPrivilege = '@AuthorizationHelper.UserIsInPrivilege(5372)';
+            var IsGreaterThan = '@CommonRes.IsGreaterThan';
+            var IsLessThan = '@CommonRes.IsLessThan';
+            //var PaymentType = '@DonationResources.PaymentType';
+
+        </script>
+    }
+

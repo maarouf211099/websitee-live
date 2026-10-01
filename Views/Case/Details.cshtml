@@ -1,0 +1,686 @@
+﻿@model DTO.CaseDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@using System.Configuration
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+}
+
+
+
+<div class="modal fade dismissModel" id="DetailsCaseModals" role="dialog" style="overflow-y: auto;">
+    <div class="modal-dialog" style="width: 900px;">
+        <div class="modal-body">
+            <div class="box box-info">
+                @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EditCase) && Model.ScState.Code != CaseState.csRJ.ToString())
+                {
+                    <div>
+                        @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "EditCaseAdminForm" }))
+                        {
+                            <div class="box-header with-border">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title" style="text-align: center;">@Model.Id - @Model.CaseName  [ @CaseResources.RequiredAmount : @Model.RequiredAmount - @CaseResources.CollectedAmount :  @Model.CurrentBalance ]  </h4>
+                                <input id="CaseIdHID" type="hidden" value="@Model.Id" />
+                                @Html.HiddenFor(x => x.Id)
+                                @*@Html.HiddenFor(x => x.CaseName)*@
+                            </div><!-- /.box-header -->
+                            <div class="box-body AccordionDiv" style="margin: 5px;">
+                                <div class="headOfAccordion">
+                                    @CaseResources.BasicData
+                                </div>
+                                <div>
+                                    @if (Model.ScState.Code == CaseState.csCO.ToString() || Model.ScState.Code == CaseState.csUC.ToString())
+                                    {
+                                    <div class="form-group">
+                                        <div class="col-sm-8 @floatToRight">
+                                            Case Link <input class="form-control" onkeypress="return false" type="text" value="@ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/CaseView/@Model.Id">
+                                        </div>
+                                    </div>
+                                    }
+                                    <div class="form-group">
+                                        <div class="col-sm-8">
+                                            @Html.DisplayNameFor(m => m.CaseName)
+                                            <br />
+                                            @Html.TextBoxFor(m => m.CaseName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                                            @Html.ValidationMessageFor(m => m.CaseName)
+                                        </div>
+                                    </div>
+                                    @Html.DisplayNameFor(m => m.Description)
+                                    @Html.TextAreaFor(m => m.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Description), rows = "5" })
+                                    @Html.ValidationMessageFor(m => m.Description)
+                                    <br />
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            @Html.DisplayNameFor(m => m.Age)
+                                            <br />
+                                            @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Age) })
+                                            @Html.ValidationMessageFor(m => m.Age)
+                                        </div>
+                                        <div class="col-sm-4">
+                                            @Html.DisplayNameFor(m => m.Mobile)
+                                            @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Mobile) })
+                                            @Html.ValidationMessageFor(m => m.Mobile)
+                                        </div>
+                                        <div class="col-sm-4">
+                                            @Html.DisplayNameFor(m => m.Phone)
+                                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Phone) })
+                                            @Html.ValidationMessageFor(m => m.Phone)
+                                        </div>
+                                        @*<div class="col-sm-8 @floatToRight">
+                                            @Html.DisplayNameFor(m => m.Email)
+                                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Email) })
+                                            @Html.ValidationMessageFor(m => m.Email)
+                                        </div>*@
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 @floatToRight">
+                                            <input type="hidden" value="@Model.Country" id="caseCountryHID" />
+                                            @Html.DisplayNameFor(m => m.Country)
+                                            @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country adminEditCase-Country form-control" })
+                                            @Html.ValidationMessageFor(m => m.Country)
+                                        </div>
+                                        <div class="col-sm-4 @floatToRight">
+                                            <input type="hidden" value="@Model.Governorate" id="caseGovernorateHID" />
+                                            @Html.DisplayNameFor(m => m.Governorate)
+                                            @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate adminEditCase form-control", id = "GovernorateAdminEditCase" })
+                                            @Html.ValidationMessageFor(m => m.Governorate)
+                                        </div>
+                                        <div class="col-sm-4 @floatToRight">
+                                            <input type="hidden" value="@Model.District" id="caseDistrictHID" />
+                                            @Html.DisplayNameFor(m => m.District)
+                                            @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "District adminEditCase form-control", id = "DistrictAdminEditCase" })
+                                            @Html.ValidationMessageFor(m => m.District)
+                                        </div>
+                                        <div class="col-sm-4 @floatToRight">
+                                            @Html.DisplayNameFor(m => m.Region)
+                                            @Html.TextBoxFor(x => x.Region, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.Region)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12 @floatToRight">
+                                            @Html.DisplayNameFor(m => m.AddressLine1)
+                                            @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                                            @Html.ValidationMessageFor(m => m.AddressLine1)
+                                        </div>
+                                        <div class="col-sm-12 @floatToRight">
+                                            @Html.DisplayNameFor(m => m.AddressLine2)
+                                            @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                                            @Html.ValidationMessageFor(m => m.AddressLine2)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="headOfAccordion">
+                                    @CaseResources.AdministrativeData
+                                </div>
+                                <div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            @Html.DisplayNameFor(m => m.RequiredAmount)
+                                            @Html.TextBoxFor(m => m.RequiredAmount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.RequiredAmount), @type = "number" })
+                                            @Html.ValidationMessageFor(m => m.RequiredAmount)
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <input type="hidden" value="@Model.Category" id="caseCategoryHID" />
+                                            @Html.DisplayNameFor(model => model.Category)
+                                            @Html.DropDownListFor(x => x.Category, new List<SelectListItem>(), new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CurrantState)
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <input type="hidden" value="@Model.Priority" id="casePriorityHID" />
+                                            @Html.DisplayNameFor(model => model.Priority)
+                                            @Html.DropDownListFor(x => x.Priority, new List<SelectListItem>(), new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.Priority)
+                                        </div>
+                                    </div>
+                                    <div id="serviceArea">
+                                        @Html.HiddenFor(x => x.serviceIDs)
+                                        <div class="form-group" dir="@dir">
+                                            <div class="col-sm-12">
+                                                @Html.Label(CaseResources.ServiceType)
+                                            </div>
+                                            <div class="caseServiceDiv">
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group" dir="@dir">
+                                            <div class="col-sm-12">
+                                                @Html.Label(CaseResources.DisesaseType)
+                                            </div>
+                                            <div class="caseDiseaseDiv">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            @Html.DisplayNameFor(m => m.Needed)
+                                            @Html.TextAreaFor(m => m.Needed, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Needed), rows = "3" })
+                                            @Html.ValidationMessageFor(m => m.Needed)
+                                        </div>
+                                    </div>
+                                    @if (Model.ScState.Code == CaseState.csUC.ToString() || Model.ScState.Code == CaseState.csCO.ToString())
+                                    {
+                                        <div class="form-group">
+                                            <div class="col-sm-6">
+                                                @if (Model.PublishAtWebsite)
+                                                {
+                                                    <input type="checkbox" onClick="checkboxPublishWeb()" checked />
+                                                    <input id="PublishAtWebsite" type="hidden" name="PublishAtWebsite" value="true" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" onClick="checkboxPublishWeb()" />
+                                                    <input id="PublishAtWebsite" type="hidden" name="PublishAtWebsite" value="false" />
+                                                }
+                                                @Html.DisplayNameFor(m => m.PublishAtWebsite)
+                                            </div>
+                                            <div class="col-sm-6">
+                                                @if (Model.PublishAtHome)
+                                                {
+                                                    <input id="PublishAtHomeChk" type="checkbox" onClick="checkboxPublishHome()" checked />
+                                                    <input id="PublishAtHome" type="hidden" name="PublishAtHome" value="true" />
+
+                                                }
+                                                else
+                                                {
+                                                    <input id="PublishAtHomeChk" type="checkbox" onClick="checkboxPublishHome()" />
+                                                    <input id="PublishAtHome" type="hidden" name="PublishAtHome" value="false" />
+                                                }
+                                                @Html.DisplayNameFor(m => m.PublishAtHome)
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label>
+                                                @Html.DisplayNameFor(model => model.CurrantState) :
+                                            </label>
+                                            @if (!string.IsNullOrEmpty(Model.ScState.NameAr))
+                                            {
+                                                if (isArabic)
+                                                {
+                                                    @Html.DisplayFor(model => model.ScState.NameAr)
+
+                                                }
+                                                else
+                                                {
+                                                    @Html.DisplayFor(model => model.ScState.NameEn)
+                                                }
+                                            }
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label>
+                                                @Html.DisplayNameFor(model => model.Source) :
+                                            </label>
+
+                                            @if (!string.IsNullOrEmpty(Model.ScSource.NameAr))
+                                            {
+                                                if (isArabic)
+                                                {
+                                                    @Html.DisplayFor(model => model.ScSource.NameAr)
+
+                                                }
+                                                else
+                                                {
+                                                    @Html.DisplayFor(model => model.ScSource.NameEn)
+                                                }
+                                            }
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label>
+                                                @Html.DisplayNameFor(model => model.CreatedOn) :
+                                            </label>
+
+                                            @Html.DisplayFor(model => model.CreatedOnString)
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.employeeName))
+                                        {
+                                            <div class="col-sm-4">
+                                                <label>
+                                                    @Html.DisplayNameFor(model => model.employeeName) :
+                                                </label> 
+                                                @Html.DisplayFor(model => model.employeeName)
+                                            </div>
+                                        }
+                                    </div>
+                                    <div style="max-width:90%;margin: auto;">
+                                        @Html.Partial("~/Views/Case/_CustomeAttribute.cshtml", Model)
+                                    </div>
+                                    <div calss="box-footer">
+                                        <div class="demo-section k-content col-sm-12 @schedulerClass">
+                                            @(Html.Kendo().Upload()
+                                                .Name("CaseImageEdit")
+                                                .Messages(m => m.Select(CaseResources.CaseImage))
+                                                .TemplateId("fileTemplate")
+                                                .HtmlAttributes(new { accept = "image/*" })
+                                                .Async(a => a
+                                                .Save("uploadCaseImageEdit", "Case", new { CaseId = Model.Id })
+                                                .AutoUpload(true))
+                                                .Multiple(false)
+                                            )
+                                        </div>
+                                    </div>
+                                    @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.DeleteCase))
+                                    {
+                                        <div class="col-md-4">
+                                            @Html.Kendo().CheckBoxFor(m => m.IsDeleted)
+                                            @Html.DisplayNameFor(m => m.IsDeleted)
+                                        </div>
+                                    }
+                                    <div class="col-md-4">
+                                        @Html.Kendo().CheckBoxFor(m => m.ServiceIsDone)
+                                        @Html.DisplayNameFor(m => m.ServiceIsDone)
+                                    </div>
+                                </div>
+                                @if (Model.ScState.Code != CaseState.csNE.ToString() && Model.ScState.Code != CaseState.csUN.ToString()
+&& Model.ScState.Code != CaseState.csDA.ToString() && Model.ScState.Code != CaseState.csOP.ToString())
+                                {
+                                    <div class="headOfAccordion">
+                                        @CaseResources.AccountingData
+                                    </div>
+                                    <div>
+                                        <div class="form-group">
+                                            <div class="col-sm-3 @floatToRight">
+                                                <label>@CaseResources.RequiredAmount : </label>
+                                                @Model.RequiredAmount
+                                            </div>
+                                            <div class="col-sm-3 @floatToRight">
+                                                <label>@CaseResources.CollectedAmount : </label>
+                                                @Model.CurrentBalance
+                                            </div>
+                                            @if (Model.ScState.Code != CaseState.csCO.ToString())
+                                            {
+                                                <div class="col-sm-3 @floatToRight">
+                                                    <label>المتبقي : </label>
+                                                    @((Model.RequiredAmount - Model.CurrentBalance))
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                @if (Model.ScState.Code == CaseState.csUN.ToString())
+                                {
+                                    if (Model.caseInvestigatorDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserDetails().Id))
+                                    {
+                                        <div class="headOfAccordion allowToUser" >
+                                            @CaseResources.InvestigationResult
+                                        </div>
+                                        <div>
+                                            <div class="form-group">
+                                                <div class="col-sm-6">
+                                                    @CaseResources.Recommendation
+                                                    @Html.TextArea("Recommendation", new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Recommendation, rows = "5" })
+                                                    <label id="ErrorRecommendationInvestigation"></label>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    @CaseResources.Conclusions
+                                                    @Html.TextArea("Conclusions", new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Conclusions, rows = "5" })
+                                                    <label id="ErrorConclusionsInvestigation"></label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="button" value="@CaseResources.InvestigationDone" onclick="MarkInvestigationDone()" class="btn btn-success " />
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <br />
+                                <div class="box-footer">
+                                    <input type="submit" class="btn btn-info" value="@LayoutRES.SubmitEdit" />
+                                    @if (Model.ScState.Code != CaseState.csAr.ToString())
+                                    {
+                                        if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ArchiveCase))
+                                        {
+                                            <input onclick="ArchivingCase('@Model.Id')" type="button" value="@CaseResources.ArchivingCase" class="btn btn-danger pull-left" />
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="box-body">
+                            <!-- /.dashbord -->
+                            <div class="box-footer">
+                                @if (Model.CountOfComment > 0)
+                                {
+                                    <input type="button" value="@CaseResources.CaseComments + @Model.CountOfComment" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                                }
+                                else
+                                {
+                                    <input type="button" value="@CaseResources.CaseComments" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                                }
+                                <input type="button" value="@CaseResources.CaseAttachment" onclick="GetCaseAttachment('@Model.Id')" class="btn btn-info  " />
+                                @if (Model.ScState.Code == CaseState.csUN.ToString())
+                                {
+                                    if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToInvestigetor))
+                                    {
+                                        <input type="button" value="@CaseResources.AssginToInvestigator" onclick="getCaseInvestigetor('@Model.Id')" class="btn btn-info" />
+                                    }
+                                }
+                                <input type="button" value="@CaseResources.InvestigationReview" onclick="GetInvestigationResult('@Model.Id')" class="btn btn-info  " />
+                                <input type="button" value="@CaseResources.ViewFollowResult" onclick="GetCaseVisitResult('@Model.Id')" class="btn btn-info  " />
+                                <input type="button" value="@CaseResources.ViewCaseHistory" onclick="GetCaseHistory('@Model.Id')" class="btn btn-info  " />
+                                @if (Model.ScState.Code == CaseState.csOP.ToString())
+                                {
+                                    if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.submitCaseFinalApprove))
+                                    {
+                                        <input id="btnGetFinalApprove" type="button" value="@CaseResources.OpenTheCase" onclick="GetFinalApprove('@Model.Id')" class="btn btn-info  " />
+                                    }
+                                }
+                                @if (Model.ScState.Code == CaseState.csUN.ToString())
+                                {
+                                    if (Model.caseInvestigatorDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserId))
+                                    { 
+                                        <input type="button" value="@CaseResources.ScheduleToInvestegate" onclick="showInvestegatorSchedule('@Model.Id','@Model.Id : @Model.CaseName')" class="btn btn-info" />
+                                    }
+                                }
+                                @if (Model.ScState.Code == CaseState.csUC.ToString())
+                                {
+                                    if (Model.caseEmployeeDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserId))
+                                    {
+                                        <input type="button" value="@CaseResources.ScheduleToFollow" onclick="showInvestegatorSchedule('@Model.Id','@Model.Id : @Model.CaseName')" class="btn btn-info" />
+                                        <input type="button" value="@CaseResources.AddCaseFollow" onclick="GetAddFollowResult('@Model.Id')" class="btn btn-info" />
+                                    }
+                                }
+                            </div>
+                            <!-- /.dashbord -->
+                            <!-- /.box-footer -->
+                            @if (Model.ScState.Code == CaseState.csNE.ToString())
+                            {
+                                if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ApproveRequest))
+                                {
+                                    <form class="form-horizontal allowToUser">
+                                        <div class="form-group">
+                                        </div>
+                                        <div class="box-footer">
+                                            <div class="col-sm-12">
+                                                <input id="txtCommentToCaseState" name="Comment" placeholder="@CaseResources.Comment" type="text" class="form-control">
+                                                <label id="ErrorCommentToCaseState"></label>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <input id="btnAccept" onclick="FirstApprove('@CaseState.csUN.ToString()')" type="button" value="@CaseResources.Accept" class="btn btn-success pull-right" />
+                                                <input id="btnReject" onclick="FirstApprove('@CaseState.csRJ.ToString()')" type="button" value="@CaseResources.Reject" class="btn btn-danger pull-left" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                }
+                            }
+                            else if (Model.ScState.Code == CaseState.csDA.ToString())
+                            {
+                                if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ApproveRequest))
+                                {
+                                    <div class="box-footer allowToUser" >
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label @floatToRight">@CaseResources.Comment</label>
+                                            <div class="col-sm-12">
+                                                <input id="txtCommentToCaseState" name="Comment" placeholder="@CaseResources.Comment" type="text" class="form-control">
+                                                <label id="ErrorCommentToCaseState"></label>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="col-sm-12">
+                                            <input id="btnAccept" onclick="SecondApprove('@CaseState.csOP.ToString()')" type="button" value="@CaseResources.Accept" class="btn btn-success pull-right" />
+                                            <input id="btnReject" onclick="SecondApprove('@CaseState.csRJ.ToString()')" type="button" value="@CaseResources.Reject" class="btn btn-danger pull-left" />
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div>
+
+                        <div class="box-header with-border">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title" style="text-align: center;">@Model.Id - @Model.CaseName  [ @CaseResources.RequiredAmount : @Model.RequiredAmount - @CaseResources.CollectedAmount :  @Model.CurrentBalance ]  </h4>
+                        </div>
+                        <div class="box-body AccordionDiv" style="margin: 5px;">
+                            <div class="headOfAccordion">
+                                @CaseResources.BasicData
+                            </div>
+                            <div>
+                                @Html.DisplayNameFor(m => m.Description)
+                                @Html.TextAreaFor(m => m.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Description), rows = "5", onkeypress = "return false" })
+                                <br />
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.Age)
+                                        <br />
+                                        @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Age), onkeypress = "return false" })
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.Mobile)
+                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Mobile), onkeypress = "return false" })
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.Phone)
+                                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Phone), onkeypress = "return false" })
+                                    </div>
+                                    <div class="col-sm-8 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.Email)
+                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Email), onkeypress = "return false" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.Country)
+                                        @if (CultureHelper.IsRighToLeft())
+                                        {
+                                            @Html.TextBoxFor(x => x.ScCountry.NameAr, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.ScCountry.NameEn, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                    </div>
+                                    <div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.Governorate)
+                                        @if (CultureHelper.IsRighToLeft())
+                                        {
+                                            @Html.TextBoxFor(x => x.ScGovernorate.NameAr, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.ScGovernorate.NameEn, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                    </div>
+                                    @*<div class="col-sm-4 @floatToRight">
+                                           <input type="hidden" value="@Model.District" id="caseDistrictHID" />
+                                           @Html.DisplayNameFor(m => m.District)
+                                           @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "District adminEditCase form-control", id = "DistrictAdminEditCase" })
+                                        </div>*@
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.AddressLine1)
+                                        @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine1), onkeypress = "return false" })
+                                    </div>
+                                    <div class="col-sm-12 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.AddressLine2)
+                                        @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine2), onkeypress = "return false" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="headOfAccordion">
+                                @CaseResources.AdministrativeData
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.RequiredAmount)
+                                        @Html.TextBoxFor(m => m.RequiredAmount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.RequiredAmount), onkeypress = "return false" })
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.Category)
+                                        @if (CultureHelper.IsRighToLeft())
+                                        {
+                                            @Html.TextBoxFor(x => x.ScCategory.NameAr, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.ScCategory.NameEn, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @Html.DisplayNameFor(model => model.Priority)
+                                        @if (CultureHelper.IsRighToLeft())
+                                        {
+                                            @Html.TextBoxFor(x => x.ScPriority.NameAr, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(x => x.ScPriority.NameEn, new { @class = "form-control", onkeypress = "return false" })
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        @Html.DisplayNameFor(m => m.Needed)
+                                        @Html.TextAreaFor(m => m.Needed, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Needed), rows = "3", onkeypress = "return false" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.CurrantState) :
+                                        </label>
+                                        @if (!string.IsNullOrEmpty(Model.ScState.NameAr))
+                                        {
+                                            if (isArabic)
+                                            {
+                                                @Html.DisplayFor(model => model.ScState.NameAr)
+
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(model => model.ScState.NameEn)
+                                            }
+                                        }
+                                    </div>
+                                    <div class="col-sm-4">
+
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.Source) :
+                                        </label>
+
+                                        @if (!string.IsNullOrEmpty(Model.ScSource.NameAr))
+                                        {
+                                            if (isArabic)
+                                            {
+                                                @Html.DisplayFor(model => model.ScSource.NameAr)
+
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(model => model.ScSource.NameEn)
+                                            }
+                                        }
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.CreatedOn) :
+                                        </label>
+
+                                        @Html.DisplayFor(model => model.CreatedOnString)
+                                    </div>
+                                </div>
+                                <div style="max-width:90%;margin: auto;">
+                                    @Html.Partial("~/Views/Case/_CustomeAttribute.cshtml", Model)
+                                </div>
+                            </div>
+                            @if (Model.ScState.Code != CaseState.csNE.ToString()
+&& Model.ScState.Code != CaseState.csUN.ToString()
+&& Model.ScState.Code != CaseState.csDA.ToString()
+&& Model.ScState.Code != CaseState.csOP.ToString())
+                            {
+                                <div class="headOfAccordion">
+                                    @CaseResources.AccountingData
+                                </div>
+                                <div>
+                                    <div class="form-group">
+                                        <div class="col-sm-3 @floatToRight">
+                                            <label>@CaseResources.RequiredAmount : </label>
+                                            @Model.RequiredAmount
+                                        </div>
+                                        <div class="col-sm-3 @floatToRight">
+                                            <label>@CaseResources.CollectedAmount : </label>
+                                            @Model.CurrentBalance
+                                        </div>
+                                        @if (Model.ScState.Code != CaseState.csCO.ToString())
+                                        {
+                                            <div class="col-sm-3 @floatToRight">
+                                                <label>المتبقي : </label>
+                                                @((Model.RequiredAmount - Model.CurrentBalance))
+                                            </div>
+                                        }
+                                        @*<div class="col-sm-3 @floatToRight">
+                                                <label>المصروف</label>
+                                                10009
+                                            </div>*@
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="box-body">
+                            <!-- /.dashbord -->
+                            <div class="box-footer">
+                                @if (Model.CountOfComment > 0)
+                                {
+                                    <input type="button" value="@CaseResources.CaseComments + @Model.CountOfComment" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                                }
+                                else
+                                {
+                                    <input type="button" value="@CaseResources.CaseComments" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                                }
+                                <input type="button" value="@CaseResources.CaseAttachment" onclick="GetCaseAttachment('@Model.Id')" class="btn btn-info  " />
+
+                                <input type="button" value="@CaseResources.InvestigationReview" onclick="GetInvestigationResult('@Model.Id')" class="btn btn-info  " />
+                                <input type="button" value="@CaseResources.ViewFollowResult" onclick="GetCaseVisitResult('@Model.Id')" class="btn btn-info  " />
+                                <input type="button" value="@CaseResources.ViewCaseHistory" onclick="GetCaseHistory('@Model.Id')" class="btn btn-info  " />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".AccordionDiv").accordion({
+            collapsible: true,
+            active: true,
+            header: ".headOfAccordion",
+            heightStyle: "content",
+            active: 0,
+        });
+
+
+        $(".AccordionDiv").on("accordionactivate", function (event, ui) {
+            try {
+                $("#scheduler").data("kendoScheduler").refresh();
+            } catch (e) {
+
+            }
+        });
+        $("input[type='checkbox']").change(function () {
+            var elementName = $(this).attr("name");
+            $("[name='" + elementName + "']").val(this.checked);
+        });
+    });
+</script>

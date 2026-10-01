@@ -1,0 +1,124 @@
+﻿
+@model DTO.CaseEmployeeMandateDTO
+@using Resource
+@using Kendo.Mvc.UI
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = CaseResources.CaseEmployeeMandate;
+}
+
+<div class="row">
+    <div class="col-md-10">
+        <section>
+            @using (Html.BeginForm("", "", null, FormMethod.Post, new { @class = "", id = "CaseEmployeeMandateForm" }))
+            {
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.FromEmployee, new { @class = "col-md-1 control-label" })
+                        <div class="col-md-5">
+                            @(Html.Kendo().ComboBox()
+                                    .Name("FromEmployee")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .HtmlAttributes(new { style = "width:70%", @aria_required = "true" })
+                                    .Filter(FilterType.Contains)
+                                    .Suggest(true)
+                                    .HighlightFirst(true)
+                                    .DataSource(source =>
+                                    {
+                                        source.Custom()
+                                       .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                       .Transport(transport =>
+                                       {
+                                           transport.Read(r => r.Action("GetAllInvestigatorKendo", "Case") // .Data("DateTypeId")
+                                           );
+                                       })
+                                       .Schema(schema => { schema.Data("Data").Total("Total"); });
+                                    }))
+                            @Html.ValidationMessageFor(m => m.FromEmployee)
+                        </div>
+                        @Html.LabelFor(m => m.ToEmployee, new { @class = "col-md-1 control-label" })
+                        <div class="col-md-5">
+                            @(Html.Kendo().ComboBox()
+                                    .Name("ToEmployee")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .HtmlAttributes(new { style = "width:70%", @aria_required = "true" })
+                                    .Filter(FilterType.Contains)
+                                    .Suggest(true)
+                                    .HighlightFirst(true)
+                                    .DataSource(source =>
+                                    {
+                                        source.Custom()
+                                       .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                       .Transport(transport =>
+                                       {
+                                           transport.Read(r => r.Action("GetAllInvestigatorKendo", "Case") // .Data("DateTypeId")
+                                           );
+                                       })
+                                       .Schema(schema => { schema.Data("Data").Total("Total"); });
+                                    }))
+                            @Html.ValidationMessageFor(m => m.ToEmployee)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DateFromS, new { @class = "col-md-1 control-label" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(m => m.DateFromS, new { @class = "DatekendoDatePicker" })
+                            @Html.ValidationMessageFor(m => m.DateFromS)
+                        </div>
+                        @Html.LabelFor(m => m.DateToS, new { @class = "col-md-1 control-label" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(m => m.DateToS, new { @class = "DatekendoDatePicker" })
+                            @Html.ValidationMessageFor(m => m.DateToS)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <input value="@LayoutRES.Submit" type="submit" class="btn btn-info" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var datemsg = '@LayoutRES.Datemsg';
+        var CaseEmployeeMandateForm = $("#CaseEmployeeMandateForm");
+        CaseEmployeeMandateForm.submit(function (e) { 
+            var DateFrom = $("#DateFromS").val();
+            var DateTo = $("#DateToS").val();
+            if (DateFrom.toDate("dd/mm/yyyy", "/") > DateTo.toDate("dd/mm/yyyy", "/")) {
+                e.preventDefault();
+                toastr.warning(datemsg);
+                return;
+            }
+
+            $.validator.unobtrusive.parse(CaseEmployeeMandateForm)
+            e.preventDefault();
+            if (!CaseEmployeeMandateForm.valid()) return;
+            var url = MersalWebAPIBaseUrl + "api/Case/CreateEmployeeMandate";
+            var Submitdata = {};
+            CaseEmployeeMandateForm.serializeArray().map(function (x) { Submitdata[x.name] = x.value; });
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: url,
+                crossDomain: true,
+                headers: getHeaders(),
+                data: JSON.stringify(Submitdata),
+                async: false,
+                success: function (result) {
+                    toastr.success(SuccessfulProcess);
+                    $("#CaseEmployeeMandateForm").trigger('reset');
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.error);
+                }
+            });
+        });
+    </script>
+}

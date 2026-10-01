@@ -1,0 +1,41 @@
+﻿@model Components.UserManagement.DTO.UserDTOSessionDetails
+@using System.Globalization
+@using Resource
+@using UserUI.Helper
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var floatRightStyle = isArabic ? "float:right;" : "";
+    var floatNone = isArabic ? "" : "float:none;";
+}
+
+<section>
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9 column">
+                    <div class="blog-detail-page">
+                        <div class="post-intro">
+                            @if (CultureHelper.IsRighToLeft())
+                            { 
+                                <h1 class="post-title" itemprop="headline">@Model.FirstNameOther - @Model.LastNameOther</h1>
+                            }
+                            else
+                            {
+                                <h1 class="post-title" itemprop="headline">@Model.FirstName - @Model.LastName</h1>
+                            }
+                            <ul class="meta">
+                                <li style="@floatRightStyle"><a href="/Account/ChangePassword">@LayoutRES.ChangePassword</a></li>
+                                <li style="@floatRightStyle"><a href="/Account/ResentConfirmationEmail">@LayoutRES.ResentConfirmationEmail</a></li>
+                                @*<li  style="@floatRightStyle" ><a href="#"  > Update My Profile</a></li>*@
+                            </ul>
+                        </div>
+                    </div><!-- Blog Detail -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

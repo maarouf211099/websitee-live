@@ -1,0 +1,77 @@
+﻿@model IEnumerable<DTO.AlbumsDTO>
+@using Kendo.Mvc.UI;
+@using Resource
+@using DTO
+@using UserUI.Helper
+@{
+    int i = 0;
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var dir = isArabic ? "rtl" : "ltr";
+
+}
+@*CaseAttachmentModals*@
+<div class="modal fade" id="ImagesModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button> 
+                    <h4 class="modal-title">Album View</h4>
+                    @*<input type="hidden" id="myCaseId" value="@ViewBag.albumId" />*@ 
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                    @if (Model.Any())
+                    {
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th style="text-align: center;">@AlbumResource.TitleEn</th>
+                                    <th style="width: 40px">@AlbumResource.TitleAr</th>
+                                    <th style="width: 40px">@AlbumResource.Image</th>
+                                    <th style="width: 40px">Details</th>
+                                </tr>
+                                @foreach (var item in Model)
+                                {
+                                    i++;
+                                    <tr>
+                                      
+                                        <td>@i</td>
+                                        <td>@item.TitleEn</td>
+                                        <td>@item.TitleAr</td>
+                                        <td><img src="/ClientFilesLayout/Albums/Main/@item.AlbumId/@item.ImageName" width="100px" height="100px" /></td>
+                            
+                                        <td>
+                                        <button onclick="getImageDetails('@item.Id')" type="button" class="btn btn-info">@AlbumResource.EditImage</button>
+                                        <button onclick="DeleteImage('@item.Id')" type="button" class="btn btn-info">@AlbumResource.DeleteImage</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    <div class="form-group">
+                        <button onclick="AddImageToExistAblum('@ViewBag.albumId')" type="button" class="btn btn-info">@AlbumResource.AddImage</button>
+                    </div>
+                    @*@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AddComment_FileToCase))
+                    {
+                        <div class="demo-section k-content" dir="ltr">
+                            @(Html.Kendo().Upload()
+                            .Name("files")
+                            .TemplateId("fileTemplate")
+                            .HtmlAttributes(new { accept = "image/*,.pdf,.csv,.docx,.doc,.xls,.xlsx,application/vnd.ms-excel" })
+                            .Async(a => a
+                            .Save("UploadCaseAttachment", "Case", new { CaseId = ViewBag.caseId })
+                            //.Remove("Remove", "Upload")
+                            .AutoUpload(false))
+                            )
+                        </div>
+                    }*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+ 

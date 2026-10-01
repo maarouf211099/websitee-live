@@ -1,0 +1,148 @@
+﻿@using Resource
+@using DTO
+@model AccountTransactionDTO
+@{
+    ViewBag.Title = AccountTransactionRES.Transfer;
+    Layout = "";
+}
+<style>
+    .texDisabled
+    {
+        border: 0px;
+    background: transparent;
+    }
+</style>
+@Scripts.Render("~/bundles/jqueryval")
+<script>
+    var fromAccount = '@AccountTransactionRES.fromAccount';
+    var toAccount = '@AccountTransactionRES.toAccount';
+</script>
+<div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-body">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">@ViewBag.Title</h4>
+
+
+
+            </div><!-- /.box-header -->
+            <!-- form start -->
+            <div class="box-body">
+
+
+                <!-- general form elements -->
+                <div class="box box-primary">
+
+                    <!-- form start -->
+                    <form role="form" id="transferForm">
+                        <div class="box-body">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                   
+                                        <label id="AccountFromTXT" style="color:#337ab7; font-size: 23px;"></label>
+                                    </div>
+                                        </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label id="AccountToTXT" style="color:#337ab7;font-size: 23px;"></label>
+
+                                    </div>
+                                </div>
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.value)
+                                                @Html.TextBoxFor(m => m.value, new { @class = "form-control", @onblur = "CheckBalance()" })
+                                                @Html.ValidationMessageFor(m => m.value)
+                                                <span id="validateBalanceMSG" class="field-validation-error" hidden>@AccountTransactionRES.CheckBalance</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.describtion)
+                                                @Html.TextAreaFor(m => m.describtion, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.describtion)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer" style="float:left;">
+
+
+                                    <button type="button" onclick="Transfer()" class="btn btn-primary">@AccountRES.Save</button>
+
+                                </div>
+</form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    DrawAccountsName()
+    var valueValid = true;
+    function CheckBalance() {
+        
+        $value=$("#value");
+        var value = $value.val();
+        var balance = $("#" + transferAccountFrom).attr("balance")
+        if (value > balance && $value.valid())
+        {
+            valueValid = false;
+            $("#validateBalanceMSG").show()//.nextAll('span:first').html("مينفعش")
+        }
+        else {
+            valueValid = true;
+        }
+    }
+    function DrawAccountsName() {
+        $("#AccountToTXT").html(toAccount+" : "+$("#" + transferAccountTo).attr("accountname"))
+        $("#AccountFromTXT").html(fromAccount+" : "+$("#" + transferAccountFrom).attr("accountname"))
+    }
+    function Transfer() {
+        var myForm = $("#transferForm");
+        
+        if (!myForm.valid() || !valueValid) return;
+      
+        var DTO = {
+            accountFromId: transferAccountFrom,
+            value: ($("#value").val()),
+            describtion: $("#describtion").val(),
+            
+            accountToId: transferAccountTo,
+        }
+        var apiurl = MersalWebAPIBaseUrl + "api/AccountTransaction/Transfer";
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: apiurl,
+            crossDomain: true,
+            headers: getHeaders(),
+            data: JSON.stringify(DTO),
+            async: false,
+            success: function (data) {
+
+                if (data > 0) {
+                    GetAndDrawAccountTree()
+
+                    toastr.success(SuccessfullyAdd + " - " + data);
+                    document.getElementById("transferForm").reset();
+                    transactionAccountId = 0;
+                    HideAnyModal();
+                }
+                else {
+                    toastr.error(Error);
+                } 
+            },
+            error: function (xhr) {
+                HideAnyModal();
+                toastr.error(xhr.error); 
+            }
+        });
+
+    }
+</script>
+

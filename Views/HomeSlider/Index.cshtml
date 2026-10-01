@@ -1,0 +1,103 @@
+﻿@model  IEnumerable<DTO.HomeSliderDTO>
+@using UserUI.Helper
+@using Resource
+@using DTO
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = HomeSliderResources.HomeSlider;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var tblTextAlign = isArabic ? "tblText" : "";
+}
+<style>
+    .tblText tr {
+        text-align: right;
+    }
+
+    .tblText th {
+        text-align: right;
+    }
+</style>
+<div class="form-group">
+    <button onclick="getCreateSlide()" type="button" class="btn btn-info">@HomeSliderResources.CreateHomeSlide</button>
+</div>
+
+@*<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">@HomeSliderResources.HomeSlider </h3>
+            </div>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody class="@tblTextAlign">
+                        <tr>
+                            <th>@HomeSliderResources.Title</th>
+                            <th>@HomeSliderResources.TitleAr</th>
+                            <th>@HomeSliderResources.Subtitle</th>
+                            <th>@HomeSliderResources.SubTitleAr</th>
+                            <th>@HomeSliderResources.ImagePath </th>
+                            <th>@HomeSliderResources.Details </th>
+                            <th>@HomeSliderResources.Delete </th>
+                        </tr>
+                        @foreach (var slide in Model)
+                        {
+                            <tr id="S_@slide.Id">
+                                <td>@slide.Title</td>
+                                <td>@slide.TitleAr</td>
+                                <td>@slide.Subtitle</td>
+                                <td>@slide.SubTitleAr</td>
+                                <td><img src="@slide.ImagePath " style="max-width:150px;" /></td>
+                                <td><span class="label label-success" style="cursor: pointer;" onclick="getSlideDetails('@slide.Id')">@HomeSliderResources.Details</span></td>
+                                <th><span class="label label-danger" style="cursor: pointer;" onclick="DeleteSlide('@slide.Id')">@HomeSliderResources.Delete </span> </th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+
+<div class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")">
+    @(Html.Kendo().Grid((List<HomeSliderDTO>)Model)
+              .Name("Grid")
+              .Pageable(pager => pager.Refresh(true))
+              .Sortable().Groupable(g => g.Messages(m => m.Empty(LayoutRES.DragaColumnHeaderAndDropItHereToGroupByThatColumn)))
+              .Columns(columns =>
+              {
+                  columns.Bound(e => e.Title);
+                  columns.Bound(e => e.TitleAr);
+                  columns.Bound(e => e.Subtitle);
+                  columns.Bound(e => e.SubTitleAr);
+                  columns.Bound(e => e.ImagePath).ClientTemplate("<img src='#=ImagePath#' style='max-width:150px;' />") ;
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info'  onclick=getSlideDetails('#=Id#')> " + CampaignResource.Edit + "</a>").Width(50).Title(LayoutRES.Edit);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info'  onclick=DeleteSlide('#=Id#')>" + CampaignResource.Delete + "</a>").Width(50).Title(LayoutRES.Delete);
+              })
+              .DataSource(dataSource => dataSource.Ajax().PageSize(10).Read(read => read.Action("Index", "HomeSlider")))
+    )
+</div>
+<br />
+
+
+
+<div id="CreateSlideDiv">
+    @Html.Partial("~/Views/HomeSlider/_CreateSlide.cshtml", new HomeSliderDTO())
+</div>
+
+<div id="EditHomeSlide">
+
+</div>
+
+@section Scripts {
+    <script>
+        var ConfirmDelete = '@LayoutRES.ConfirmDelete';
+        var sureDelete = '@LayoutRES.sureDelete';
+    </script>
+    @*<script src="~/Scripts/MersalScripts/LayoutManagment/AdminHomeSlider.js"></script>*@
+    @Scripts.Render("~/bundles/HomeSilder")
+}

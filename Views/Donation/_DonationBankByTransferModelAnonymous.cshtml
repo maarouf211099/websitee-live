@@ -1,0 +1,592 @@
+﻿@using Resource
+@using Kendo.Mvc.UI
+@model UserUI.Models.DonationByBankTransferViewModelAnonymous
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+<div id="DonationBankByTransferTabs" class="donation-fields">
+
+    <div class="tabContainer">
+        <strong class="popup-title">
+          @DonationResources.DonationByBankTransferDec
+        </strong>
+        @*<strong class="popup-title">@DonationResources.PERSONALDETAILS</strong>*@
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "DonationbyBankTransferForm" }))
+        {
+    <div class="form">
+        <div class="col-md-12 separator"> <span>@DonationResources.basicData </span> </div>
+
+        <input type="hidden" class="hidAccountIdDonation" name="AccountId" />
+        <input type="hidden" class="hidCaseIdDonation" name="CaseId" />
+        <input type="hidden" class="hidDonationType" name="DonationType" />
+        <div class="col-md-6 FloatRight">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder =@DonationResources.DonationName + '*' })
+                @Html.ValidationMessageFor(x => x.Name)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(x => x.PhoneNumber, new { @class = "form-control", placeholder = @DonationResources.Phone + '*' })
+                @Html.ValidationMessageFor(x => x.PhoneNumber)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(x => x.Address, new { @class = "form-control", placeholder = @DonationResources.Address + '*' })
+                @Html.ValidationMessageFor(x => x.Address)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(x => x.Email, new { placeholder = @DonationResources.Email + '*' })
+                @Html.ValidationMessageFor(x => x.Email)
+            </div>
+        </div>
+        <div class="form-group col-md-12  DonationDestinationTypeDiv" style="display:none;">
+            <label class="col-md-4 control-label FloatRight">@DonationResources.DonationDestination :</label>
+            <div class="col-sm-8">
+                @Html.DropDownListFor(x => x.BankDonationDestinationId, new List<SelectListItem>(), new { @class = "form-control" })
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(x => x.AccountNumber, new { placeholder = @DonationResources.AccountNumber+'*' })
+                @Html.ValidationMessageFor(x => x.AccountNumber)
+            </div>
+        </div>
+ 
+        <div class="col-md-6">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.ValueAmount, new { Value = "", placeholder = DonationResources.EnterTheAmountYouWant+'*', onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                @Html.ValidationMessageFor(x => x.ValueAmount)
+            </div>
+        </div>
+
+        <div class="col-md-6 margenTransferDatebottom ">
+
+            <div class="row">
+                @*<label class="col-md-4 control-label FloatRight">@DonationResources.TransferDate* :</label>*@
+
+                <div class="textfield ">
+
+                    @Html.TextBoxFor(model => model.TransferDate, new { placeholder = DonationResources.TransferDate + "*", @class = "form-control", onfocus = "(this.type = 'datetime-local')" })
+
+                    @Html.ValidationMessageFor(x => x.TransferDate)
+
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            @*<div class="row">*@
+            @*<label class="col-md-4 control-label FloatRight">@DonationResources.DonationDestination :</label>*@
+            <div class="textfield">
+                @Html.DropDownListFor(x => x.DonationDestinationIdd, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationDestinationIdd)َ
+            </div>
+
+            <div class="textfield" id="DonationSubb" style="display:none;">
+                @Html.DropDownListFor(x => x.DonationDestinationSubIdd, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationDestinationSubIdd)َ
+            </div>
+
+            <div class="textfield" id="DonationSubOfSubb" style="display:none;">
+                @Html.DropDownListFor(x => x.DonationDestinationSubOfSubIdd, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationDestinationSubOfSubIdd)
+            </div>
+
+            <div class="textfield" id="DonationByBankCaseCodeContainer" style="display:none;">
+                @Html.TextBoxFor(x => x.DonationByBankCaseCode, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.DonationByBankCaseCode) })
+                @Html.ValidationMessageFor(x => x.DonationByBankCaseCode)
+            </div>
+
+            @*</div>*@
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="textfield" id="AccountBank">
+                @*<label class="col-md-4 control-label FloatRight">@DonationResources.BankAccount :</label>*@
+
+                @Html.DropDownListFor(x => x.DonationAccountId, new List<SelectListItem>(), new { @class = "form-control", placeholder = DonationResources.BankAccount })
+                @Html.ValidationMessageFor(x => x.DonationAccountId)َ
+                @*<span id="DonationAccountMes" class="field-validation-error hidden"><span>@DonationResources.CaseIsRequired</span></span>*@
+
+            </div>
+        </div>
+        <div class="col-md-6">
+
+            @*<label class="col-md-4 control-label FloatRight">@DonationResources.Bank :</label>*@
+            <div class="textfield">
+                @Html.DropDownListFor(x => x.BankId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.BankId)َ
+            </div>
+        </div>
+
+
+<div class="col-md-6  FloatRight">
+            @*style="display:none;"*@
+            <div class="textfield" id="DonationCurrency">
+                @*<label class="col-md-4 control-label FloatRight">@DonationResources.Currency :</label>*@
+
+                @Html.DropDownListFor(x => x.DonationCurrencyId, new List<SelectListItem>(), new { @class = "form-control", placeholder = DonationResources.Currency })
+                @Html.ValidationMessageFor(x => x.DonationCurrencyId)َ
+            </div>
+        </div>
+
+
+     
+                <div class="col-md-12 separator"> <span>@DonationResources.additionalData </span> </div>
+   <div class="col-md-6 FloatRight">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(x => x.TransferNumber, new { placeholder = @DonationResources.TransferNumber })
+                @Html.ValidationMessageFor(x => x.TransferNumber)
+            </div>
+        </div>
+        
+        @* end new added *@
+        @*<div class="col-md-12 d-lg-flex">
+            <ul class="donation-figures col-8">
+                <li><a class="wpdonation-button " id="Donate10Banck" title="">10.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate50Banck" title="">50.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate100Banck" title="">100.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate500Banck" title="">500.00 EGP</a></li>
+                <li><a class="wpdonation-button active" id="OtherAmountBanck" title="Other Amount Online">@DonationResources.OtherAmount</a></li>
+            </ul>
+            <div class="donation-amount  col-4 ">
+                <div>
+
+
+                            @Html.TextBoxFor(x => x.ValueAmount, new { @class = "form-control", Id = "ValueAmountBanck", maxlength = 5, Value = "", placeholder = DonationResources.EnterTheAmountYouWant, onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                            <span>EGP</span>
+
+
+                            @Html.ValidationMessageFor(x => x.ValueAmount)
+
+                </div>
+            </div>
+        </div>*@
+
+        <div class="col-md-6">
+            <div class="demo-section k-content @KendoClass ">
+                @(Html.Kendo().Upload()
+                                    .Name("Image")
+                                     .Messages(m => m.Select(AlbumResource.Image).UploadSelectedFiles(LayoutRES.Submit))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*" })
+                                    .Multiple(false)
+                                    .Async(a => a
+                                    .Save("DonationBankByTransfer", "Donation")
+                                    .AutoUpload(false))
+                                    .Events(c => c
+                                    .Upload("onUploadBankTransferImageCreate").Success("onSuccessUploadDataCreate")
+                                    .Select("onSelectDonationImage")
+
+                                    )
+                        )
+                @Html.ValidationMessageFor(model => model.Image)
+            </div>
+        </div>
+
+        <div class="col-md-12 pt-2 pb-2">
+            <div class="donate-now justfy-align-center"><input type="submit" itemprop="url" class="proceed" value="@LayoutRES.Submit" /></div>
+
+        </div>
+
+    </div>
+        }
+
+    </div>
+</div>
+
+
+<script>
+
+    //$('#Donate10Banck').click(function () {
+    //    $("#ValueAmountBanck").attr("readonly", true).val(10);
+    //    });
+
+    //$('#Donate50Banck').click(function () {
+    //    $("#ValueAmountBanck").attr("readonly", true).val(50);
+    //    });
+
+    //$('#Donate100Banck').click(function () {
+    //    $("#ValueAmountBanck").attr("readonly", true).val(100);
+    //    });
+
+    //$('#Donate500Banck').click(function () {
+    //    $("#ValueAmountBanck").attr("readonly", true).val(500);
+    //    });
+
+    //$('#OtherAmountBanck').click(function () {
+    //    $("#ValueAmountBanck").attr("readonly", false).val('');
+    //    });
+    $("#TransferDate").val();
+    $("#TransferDate").val('');
+    $("#TransferDate").val(null);
+
+
+
+    GetAnyMasterDetalisCode('DoDs', 'DonationDestinationIdd', false, true, "", "", true,'@DonationResources.DonationDestination');
+    GetBanks('DoDs', 'BankId', false, true, "", "", true,'@DonationResources.Bank');
+
+    GetAccountBankByParentId('DonationAccountId', null, 'AccountBank', '@DonationResources.BankAccount');
+
+    GetAllDonationCurencyByAccountId('DonationCurrencyId', null, 'DonationCurrency','@DonationResources.Currency');
+
+
+    $('#DonationDestinationIdd').change(function () {
+
+        $('#DonationSubb').hide();
+        $('#DonationSubOfSubb').hide();
+        $('#DonationByBankCaseCodeContainer').hide();
+
+        $('#DonationDestinationSubOfSubIdd').html('');
+        $('#DonationDestinationSubIdd').html('');
+
+        $("#DonationDestinationSubIdd").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+        $("#DonationDestinationSubOfSubIdd").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+        $("#DonationByBankCaseCode").rules("add", {
+            required: false,
+            messages: {
+                required: requiredCaseCode
+            }
+        });
+
+
+        var id = $('#DonationDestinationIdd').val();
+        var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+        GetByParentIdBankTransfer('DonationDestinationSubIdd', id, 'DonationSubb', placeHolder);
+    });
+
+    $('#DonationDestinationSubIdd').change(function () {
+        $('#DonationSubOfSub').hide();
+        $('#DonationDestinationSubOfSubIdd').html('');
+
+        $("#DonationDestinationSubOfSubIdd").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+        var code = this.options[this.selectedIndex].getAttribute('Code');
+        if (code == "DonZkaCase") {
+            $('#DonationByBankCaseCodeContainer').show();
+            $("#DonationByBankCaseCode").rules("add", {
+                required: true,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+        }
+        else {
+            $('#DonationByBankCaseCodeContainer').hide();
+            $('#DonationByBankCaseCode').val('');
+            $("#DonationByBankCaseCode").rules("add", {
+                required: false,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+            var id = $('#DonationDestinationSubIdd').val();
+            var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+            GetByParentIdBankTransfer('DonationDestinationSubOfSubIdd', id, 'DonationSubOfSubb', placeHolder);
+        }
+    });
+
+    $('#DonationDestinationSubOfSubIdd').change(function (e) {
+        var code = this.options[this.selectedIndex].getAttribute('Code');
+        if (code == "DonGeneralCase") {
+            $('#DonationByBankCaseCodeContainer').show();
+            $("#DonationByBankCaseCode").rules("add", {
+                required: true,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+        }
+        else {
+            $('#DonationByBankCaseCodeContainer').hide();
+            $('#DonationByBankCaseCode').val('');
+            $("#DonationByBankCaseCode").rules("add", {
+                required: false,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+        }
+    });
+
+
+    $('#BankId').change(function () {
+        $('#AccountBank').hide();
+        $('#DonationAccountId').html('');
+
+        $("#DonationAccountId").rules("add", {
+            required: true,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+
+        var id = $('#BankId').val();
+        GetAccountBankByParentId('DonationAccountId', id, 'AccountBank', '@DonationResources.BankAccount');
+        //$("#DonationAccountId").required = true;
+
+
+    });
+
+
+    $('#DonationAccountId').change(function () {
+        $('#DonationCurrency').hide();
+        $('#DonationCurrencyId').html('');
+
+        $("#DonationCurrencyId").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+
+        var id = $('#DonationAccountId').val();
+        GetAllDonationCurencyByAccountId('DonationCurrencyId', id, 'DonationCurrency','@DonationResources.Currency');
+    });
+
+
+
+
+
+
+
+    function GetAnyMasterDetalisCode(MasterCode, dropDownListId, enableAll, async, selectedId, PerantCode, emptyOption ,placeholder) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + MasterCode,
+            async: async,
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                if (PerantCode) {
+                    $.each(data, function (key, value) {
+                        if (value.Parent) {
+                            if (value.Parent.Code == PerantCode) {
+                                var selec = "";
+                                if (value.masterCodeValue == MasterCode) {
+                                    if (value.Id == selectedId) selec = " selected='selected' ";
+                                    if (_cultureIsArabic) {
+                                        html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                                    }
+                                    else {
+                                        html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                else {
+                    $.each(data, function (key, value) {
+                        var selec = "";
+                        if (value.masterCodeValue == MasterCode) {
+                            if (value.Id == selectedId) selec = " selected='selected' ";
+                            if (_cultureIsArabic) {
+                                html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                }
+                $("#" + dropDownListId).html(html);
+                if (emptyOption) {
+                    $("#" + dropDownListId).prepend("<option value='' selected='selected'>" + placeholder +'*'+"</option>");
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+
+
+    }
+
+
+
+    function GetByParentIdBankTransfer(dropDownId, parentId, itemToShow, placeHolder= '') {
+        var url = SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetByParentId?parentId=" + parentId;
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: url,
+            async: true,
+            success: function (data) {
+                var htmlGovernorate = "<option value=''>" + placeHolder + "</option>";
+                $.each(data, function (key, value) {
+                    htmlGovernorate += "<option Code=\"" + value.Code + "\" value=" + value.Id + " >" + value.NameEn + "</option>";
+                });
+                $("#" + dropDownId).html(htmlGovernorate);
+                if (data.length != 0) {
+                    $('#' + itemToShow).show();
+                    $("#" + dropDownId).rules("add", {
+                        required: true,
+                        messages: {
+                            required: requiredDonationDestination
+                        }
+                    });
+                }
+            },
+            error: function (xhr) {
+                //toastr.error(xhr.statusText);
+            }
+        });
+
+    }
+
+
+
+
+    // bank
+
+
+    function GetBanks(MasterCode, dropDownListId, enableAll, async, selectedId, PerantCode, emptyOption,placeholder) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/DonationBanks/GetAllDonationBanks",
+            async: async,
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                if (false) {
+
+                }
+                else {
+                    $.each(data, function (key, value) {
+                        var selec = "";
+                        if (true) {
+                            //if (true) selec = " selected='selected' ";
+                            if (_cultureIsArabic) {
+                                html += "<option Code=" + value.NameAr + " value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                html += "<option Code=" + value.NameEn + " value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                }
+                $("#" + dropDownListId).html(html);
+                if (emptyOption) {
+                    $("#" + dropDownListId).prepend("<option value='' selected='selected'>" + placeholder+'*'+"</option>");
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+
+
+    }
+
+    function GetAccountBankByParentId(dropDownId, parentId, itemToShow, placeholder) {
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/DonationBanks/GetAllDonationAccountByBankId?bankId=" + parentId,
+            async: true,
+            success: function (data) {
+                var htmlGovernorate = "<option value=''>" + placeholder +'*'+ "</option>";
+                $.each(data, function (key, value) {
+                    htmlGovernorate += "<option value=" + value.Id + " >" + value.AccountNumber + "</option>";
+                });
+                $("#" + dropDownId).html(htmlGovernorate);
+                if (data.length != 0) {
+                    $('#' + itemToShow).show();
+                    $("#" + dropDownId).rules("add", {
+                        required: false,
+                        messages: {
+                            required: requiredDonationDestination
+                        }
+                    });
+                }
+
+
+            },
+            error: function (xhr) {
+                //toastr.error(xhr.statusText);
+            }
+        });
+
+    }
+
+
+
+    function GetAllDonationCurencyByAccountId(dropDownId, parentId, itemToShow, placeholder) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/DonationBanks/GetCurenciesByAccountId?donationAccountId=" + parentId,
+            async: true,
+            success: function (data) {
+                var htmlGovernorate = "<option value=''>" + placeholder+'*'+"</option>";
+                $.each(data, function (key, value) {
+                    htmlGovernorate += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                });
+                $("#" + dropDownId).html(htmlGovernorate);
+                if (data.length != 0) {
+                    $('#' + itemToShow).show();
+                    $("#" + dropDownId).rules("add", {
+                        required: false,
+                        messages: {
+                            required: requiredDonationDestination
+                        }
+                    });
+                }
+            },
+            error: function (xhr) {
+                //toastr.error(xhr.statusText);
+            }
+        });
+
+    }
+
+
+
+
+</script>
+

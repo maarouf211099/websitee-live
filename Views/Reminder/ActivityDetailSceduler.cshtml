@@ -1,0 +1,67 @@
+﻿
+
+@using Kendo.Mvc.UI
+@using Notification.DTO
+
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    if (isArabic)
+    {
+        <script src="/Scripts/Kendo/cultures/Scheduler/kendo.culture.ar-SA.js"></script>
+    }
+    else
+    {
+        <script src="/Scripts/Kendo/cultures/Scheduler/kendo.culture.en-US.js"></script>
+
+    }
+}
+
+<html>
+<head>
+    <title></title>
+    @*
+        <script src="js/jquery.min.js"></script>
+    *@
+    <link href="~/Content/Kendo/kendo.common-material.min.css" rel="stylesheet" />
+    <link href="~/Content/Kendo/kendo.material.min.css" rel="stylesheet" />
+    @*<script src="~/Scripts/js/kendo.all.min.js"></script>
+        <script src="~/Scripts/js/kendo.timezones.min.js"></script>*@
+</head>
+<body>
+    <div id="scheduler" class=schedulerClass>
+        @(Html.Kendo().Scheduler<ReminderDTO>()
+               .Name("scheduler")
+               .Date(DateTime.Now)
+               .AutoBind(true)
+               .Height(400)
+               .AllDaySlot(false)
+               .Editable(false)
+               .Views(views =>
+               {
+                   views.DayView(d=>d.Selected(true));
+                   views.WeekView();
+                   views.MonthView();
+                   views.AgendaView();
+               })
+              .DataSource(d => d
+              .Model(m =>
+              {
+                  m.Id(f => f.Id);
+
+              })
+              .Read("ActivityRead", "Reminder")
+              .Create("ActivityCreate", "Reminder")
+              .Destroy("ActivityCreate", "Reminder")
+              .Update("ActivityCreate", "Reminder")
+             )
+        )
+
+    </div>
+
+
+</body>
+</html>
+
+

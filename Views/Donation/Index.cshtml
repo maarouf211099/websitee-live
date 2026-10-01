@@ -1,0 +1,237 @@
+﻿ @using Resource @using UserUI.Helper @using Kendo.Mvc.UI; @using UserUI.Models; @using System.Linq;
+@model IEnumerable<DTO.DonationBanksDto>
+  @{ bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+  var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : ""); var
+  textAlignRight = isArabic ? "text-align: right;" : ""; var dir = isArabic ?
+  "rtl" : "ltr"; } @{ ViewBag.Title = "Index"; }
+
+  <div class="donations-header">
+   @* <h1>@DonationResources.HowDonate</h1>*@
+  </div>
+
+  <div class="donations-tabsets-links">
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+      <li class="active">
+        <a
+          class="nav-link"
+          id="pills-online-payment-tab"
+          data-toggle="pill"
+          href="#pills-online-payment"
+          role="tab"
+          aria-controls="pills-online-payment"
+          aria-selected="false"
+        >
+          @Html.Partial("~/Views/Shared/SharedSvg/ElectronicPayment.cshtml")
+
+          <h2>@DonationResources.Electronicpayment</h2>
+        </a>
+      </li>
+      <li class="">
+        <a
+          class="nav-link"
+          id="bank-accounts-tab"
+          data-toggle="pill"
+          href="#pills-bank-accounts"
+          role="tab"
+          aria-controls="pills-bank-accounts"
+          aria-selected="true"
+        >
+          @Html.Partial("~/Views/Shared/SharedSvg/BankAccounts.cshtml")
+
+          <h2>@DonationResources.BankAccounts</h2>
+        </a>
+      </li>
+
+      @if (AuthorizationHelper.IsAuthenticated()) {
+      <li class="">
+        <a
+          class="nav-link"
+          id="pills-representative-donation-tab"
+          data-toggle="pill"
+          href="#pills-representative-donation"
+          role="tab"
+          aria-controls="pills-representative-donation"
+          aria-selected="false"
+        >
+          @Html.Partial("~/Views/Shared/SharedSvg/OtherChannels.cshtml")
+
+          <h2>@DonationResources.DonationOthermeans</h2>
+        </a>
+      </li>
+      }
+      <li class="">
+        <a
+          class="nav-link"
+          id="pills-donation-bankByTransferModelUser-tab"
+          data-toggle="pill"
+          href="#pills-donation-bankByTransferModelUser"
+          role="tab"
+          aria-controls="pills-donation-bankByTransferModelUser"
+          aria-selected="false"
+        >
+          @Html.Partial("~/Views/Shared/SharedSvg/SpecialPrograms.cshtml")
+
+          <h2>@DonationResources.Specialprograms</h2>
+        </a>
+      </li>
+      <li class="">
+        <a
+          class=""
+          id="pills-DonationOtherMeans-tab"
+          data-toggle="pill"
+          href="#pills-DonationOtherMeans"
+          role="tab"
+          aria-controls="pills-DonationOtherMeans"
+          aria-selected="false"
+        >
+          @*@Html.Partial("~/Views/Shared/SharedSvg/OutOfEgypt.cshtml")*@
+          @Html.Partial("~/Views/Shared/SharedSvg/BankAccounts.cshtml")
+
+          <h2>@DonationResources.DonateThroughOtherMeans</h2>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="d-layout">
+    <div class="col-md-9">
+      <div class="tab-content donations-tabsets" id="pills-tabContent">
+        <div
+          class="tab-pane fade active in"
+          id="pills-online-payment"
+          role="tabpanel"
+          aria-labelledby="pills-online-payment-tab"
+        > 
+          @Html.Partial("~/Views/Donation/_OnlineDonationViewModel.cshtml", new
+          OnlineDonationViewModel())
+        </div>
+
+        <div
+          class="tab-pane fade"
+          id="pills-bank-accounts"
+          role="tabpanel"
+          aria-labelledby="bank-accounts-tab"
+        > 
+            <div>  @*class="d-inline-block"*@
+
+
+                @Html.Partial("~/Views/Donation/firsttap.cshtml",Model.ToList())
+                @Html.Partial("~/Views/Donation/_DonationBankByTransferModelAnonymous.cshtml",
+                new DonationByBankTransferViewModelAnonymous()) @*@if
+        (AuthorizationHelper.IsAuthenticated()) {
+        @Html.Partial("~/Views/Donation/_DonationBankByTransferModelUser.cshtml",
+        new DonationByBankTransferViewModelUser()) } else {
+        @Html.Partial("~/Views/Donation/_DonationBankByTransferModelAnonymous.cshtml",
+        new DonationByBankTransferViewModelAnonymous()) }*@
+
+            </div>
+        </div>
+
+        <div
+          class="tab-pane fade"
+          id="pills-representative-donation"
+          role="tabpanel"
+          aria-labelledby="pills-representative-donation-tab"
+        > 
+         <div class="d-inline-block">
+          @if (AuthorizationHelper.IsAuthenticated()) {
+          @Html.Partial("~/Views/Donation/_ReceptionDonation.cshtml", new
+          CreateReceptionDonationDto()) }
+        </div>
+</div>
+
+        <div
+          class="tab-pane fade"
+          id="pills-donation-bankByTransferModelUser"
+          role="tabpanel"
+          aria-labelledby="pills-donation-bankByTransferModelUser-tab"
+        > 
+                 <div class="d-inline-block">
+
+          @if (AuthorizationHelper.IsAuthenticated()) {
+          @Html.Partial("~/Views/Donation/_RepresentativeDonationViewModelAnonymous.cshtml",
+          new RepresentativeDonationViewModelAnonymous()) } else {
+          @Html.Partial("~/Views/Donation/_RepresentativeDonationViewModelUser.cshtml",
+          new RepresentativeDonationViewModelUser()) }
+        </div>
+ </div>
+
+        <div
+          class="tab-pane fade"
+          id="pills-profile"
+          role="tabpanel"
+          aria-labelledby="pills-profile-tab"
+          style="height: 200px"
+        >
+          <div class="popup-title">
+            * للتبرع من خارج مصر
+            <a href="http://bit.ly/MersalDonations">اضغط هنا </a>
+          </div>
+        </div>
+
+        <div
+          class="tab-pane fade"
+          id="pills-DonationOtherMeans"
+          role="tabpanel"
+          aria-labelledby="pills-DonationOtherMeans-tab"
+        > 
+          @Html.Partial("~/Views/Donation/_DonateThroughOtherMeans.cshtml", new
+          CreateDonateThroughOtherMeansDto())
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="img-adds">
+        <img src="~/images/donate_Imge1.PNG" alt="" />
+        <img src="~/images/mega_5eer.jpg" alt="" />
+        <img src="/images/GLS.jpg" alt="">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $("#bank-accounts-tab").on("click", function (e) {
+      document.getElementById("DonationbyBankTransferForm").reset();
+      $(".field-validation-error").html("");
+
+      var hh = $("#BankId").val(null);
+      $("#BankId").val(null);
+      var sss = $("#BankId").val("");
+      $("#DonationCurrencyId").val(null);
+      $("#DonationAccountId").val(null);
+    });
+
+    $("#pills-online-payment-tab").on("click", function (e) {
+      document.getElementById("OnlineDonationForm").reset();
+      $(".field-validation-error").html("");
+    });
+
+    $("#pills-donation-bankByTransferModelUser-tab").on("click", function (e) {
+      document.getElementById("RepresentativeDonationForm").reset();
+      $(".field-validation-error").html("");
+    });
+
+    $("#pills-DonationOtherMeans-tab").on("click", function (e) {
+      document.getElementById("DonateThroughOtherMeansForm").reset();
+      $(".field-validation-error").html("");
+
+      $("#DonationOtherWayId").val(null);
+    });
+
+    $("#pills-representative-donation-tab").on("click", function (e) {
+      document.getElementById("ReceptionDonationForm").reset();
+      $(".field-validation-error").html("");
+    });
+
+    $(document).ready(function () {
+      const url = document.URL;
+      if (url.includes("/Donation")) {
+        const hideID = document.getElementById("FA_Button");
+        hideID.classList.add("display-none");
+        }
+
+
+    });
+  </script>
+
+

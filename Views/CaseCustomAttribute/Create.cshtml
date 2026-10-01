@@ -1,0 +1,454 @@
+﻿@model CustomAttributesDTO
+@using DTO;
+@using Resource;
+@using Kendo.Mvc.UI;
+
+@{
+
+    ViewBag.Title = CaseCustomAtrributeRes.Title;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; 
+    var sa = System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"];
+    var gridUrl = sa + "CaseCustomAttribute/GetCustomAttrByCaseCategoryId";
+}
+
+<script>
+    function DateTypeId() {
+        return { masterCodeID: '@StaticIDs.DataTypeMasetCodeID' }
+    }
+
+    function CaseCategoryCode() {
+        return { CaseCategoryCode: '@MasterCode.CasC' }
+    }
+</script>
+
+<div id="ConfirmSave" class="modal fade" tabindex="-1" role="dialog" style="background-color: rgba(0, 0, 0, .7);" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <h3>
+                    @CaseCustomAtrributeRes.SaveMessage
+                </h3>
+
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-primary" id="btnCreate" onclick="addRow('@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/create')">@CaseCustomAtrributeRes.Save</button>
+                <button type="button" class="btn btn-primary" hidden id="btnDelete" onclick="SoftDelete('@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/delete',true)">@CaseCustomAtrributeRes.Save</button>
+
+                <button type="button" class="btn btn-default" onclick="hideConfirm()">@CaseCustomAtrributeRes.Cancel</button>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "Form", name = "myform" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class=" panel panel-default">
+                <div class="panel-heading">
+                    <b></b>
+                </div>
+                <div class="panel-body" style="width:100%;">
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.Category, new { @class = "control-label" })
+                                
+                                @(Html.Kendo().ComboBox()
+                                .Name("CaseCategory")
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Placeholder(MessagesRes.Select)
+                                .HtmlAttributes(new { style = "width:100%", @aria_required = "true" })
+                                .Filter(FilterType.Contains)
+                                .Suggest(true)
+                                .Events(e => e.DataBound("Design")
+                                .Change("RefreshGird")
+                                .Open("Design"))
+                                .HighlightFirst(true).DataSource(source =>
+                                {
+                                    source.Custom().ServerFiltering(true)
+                                    .ServerPaging(true)
+                                    .Type("aspnetmvc-ajax").Transport(transport =>
+                                    {
+                                        transport.Read(r => r.Action("GetAllDetailsCodeKendoByCode", "SystemCodeAPI")
+                                        .Data("CaseCategoryCode"));
+                                    }).Schema(schema => { schema.Data("Data").Total("Total"); }); })) 
+
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "CaseCategoryIDerror" })
+                                
+                            </div>   
+                        </div> 
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.description, new { @class = "control-label" })
+
+                                @Html.TextAreaFor(c => c.AttributeDescription, new { @class = "form-control" })
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "AttributeDescriptionerror" })
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.Property, new { @class = "control-label" })
+                                <input type="text" class="form-control" id="Property" />
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "Propertyerror" })
+
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.DateType, new { @class = "control-label" })
+                                @(Html.Kendo().ComboBox()
+                                    .Name("DataTypeId")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .Placeholder(CaseCustomAtrributeRes.SelectCategory)
+                                    .HtmlAttributes(new { style = "width:100%", @aria_required = "true" })
+                                    .Filter(FilterType.Contains)
+                                    .Suggest(true)
+                                    .Events(e => e.DataBound("Design")
+                                    .Open("Design")
+                                    .Change("GetValidateInput"))
+                                    .HighlightFirst(true)
+                                    .DataSource(source => { source.Custom()
+                                        .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                        .Transport(transport => {
+                                            transport.Read(r => r.Action("GetAllDetailsCodeKendo", "SystemCodeAPI")
+                                            .Data("DateTypeId"));})
+                                            .Schema(schema => { schema.Data("Data").Total("Total");});
+                                    }))
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "DataTypeIderror" })
+
+
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <span class="control-label"></span>
+                                <br />
+                                <br />
+                                <input type="checkbox" id="IsRequired" />&nbsp;<b>@CaseCustomAtrributeRes.IsRequired</b>
+
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div hidden id="IntDiv" class="row validate"> 
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.MinValue, new { @class = "control-label"  })
+                                <input type="text" class="form-control" id="MinValue"   onkeypress = "return event.charCode >= 48 && event.charCode <= 57"/>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.MaxValue, new { @class = "control-label" })
+                                <input type="text" class="form-control" id="MaxValue" onkeypress = "return event.charCode >= 48 && event.charCode <= 57" />
+                            </div>
+                        </div>
+                    </div>
+                    <div hidden id="StringDiv" class="row validate">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.MinLength, new { @class = "control-label" })
+                                <input type="text" class="form-control" id="MinLength" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.MaxLength, new { @class = "control-label" })
+                                <input type="text" class="form-control" id="MaxLength" />
+                            </div>
+                        </div>
+                    </div>
+                    <div hidden id="DateDiv" class="row validate">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.MinDate, new { @class = "control-label" })<br />
+                                <input type="text" data-datepicker=true class="form-control" id="MinDate" />
+
+                                <input type="checkbox" id="MinDateNow" />&nbsp;&nbsp;@CaseCustomAtrributeRes.DateNow
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.MaxDate, new { @class = "control-label" })<br />
+                                <input type="text" data-datepicker=true class="form-control" id="MaxDate" />
+
+                                <input type="checkbox" id="MAxDateNow" />&nbsp;&nbsp;@CaseCustomAtrributeRes.DateNow
+
+                            </div>
+                        </div>
+                    </div>
+                    <div hidden id="LookUpDiv" class="row validate">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @Html.Label(CaseCustomAtrributeRes.SysCode, new { @class = "control-label" })<br />
+                                @(Html.Kendo().ComboBox()
+                                  .Name("MasterCodeID")
+                                  .DataTextField("Text")
+                                  .DataValueField("Value")
+                                  .Placeholder(CaseCustomAtrributeRes.Select)
+                                  .HtmlAttributes(new { style = "width:100%", @aria_required = "true" })
+                                  .Filter(FilterType.Contains)
+                                  .Suggest(true)
+                                  .Events(e => e.DataBound("Design").Open("Design"))
+                                  .HighlightFirst(true)
+                                  .DataSource(source => { source.Custom()
+                                      .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                      .Transport(transport => {
+                                          transport.Read(r => r.Action("GetAllMasterCodeKendo", "SystemCodeAPI"));
+                                      }).Schema(schema => { schema.Data("Data").Total("Total");});}))
+                                
+                                @Html.Label(CaseCustomAtrributeRes.Required, new { @id = "MasterCodeIDerror" }) 
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-2" id="btnAdd">
+                            @*<input type="button" style="font-size:95%;" onclick="showConfirm()" class="btn btn-blue btn-block" value="@CaseCustomAtrributeRes.add">*@
+                            <input type="button" style="font-size:95%;" onclick="showConfirm()" class="btn btn-info btn-block" value="@CaseCustomAtrributeRes.add">
+                        </div>
+                        <div id="btnUpdate" hidden>
+                            <div class="col-md-2">
+
+                               @* <input type="button" style="font-size:95%;" onclick="Update('@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/UpdateAttr')" class="btn btn-blue btn-block" value="@CaseCustomAtrributeRes.Save">*@
+                                <input type="button" style="font-size:95%;" onclick="Update('@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/UpdateAttr')" class="btn btn-info btn-block" value="@CaseCustomAtrributeRes.Save">
+                            </div>
+                            <div class="col-md-2" id="btnUpdate">
+
+                                <input type="button" style="font-size:95%;" onclick="cancelUpdate()" class="btn btn-default btn-block" value="@CaseCustomAtrributeRes.Cancel">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class=" panel panel-default">
+                <div class="panel-heading">
+                    <b></b>
+                </div>
+                <div id="panelGrid" class="panel-body" style="width:100%;"> 
+                    <div id="Grid" style="width:100%" class="k-rtl row">
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+ 
+
+<script>
+ 
+    function GetCaseCategory() {
+
+        var id = $("#CaseCategory").val();
+
+        if (id != "") {
+            return id; 
+        }
+        else {
+            return -1;
+        }
+    }
+
+
+    BindGrid()
+    function BindGrid() {
+        $("#Grid").html('')
+         var url = '@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + "CaseCustomAttribute/GetCustomAttrByCaseCategoryId?CaseCategory=" + GetCaseCategory();
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: url,
+                    dataType: "json"
+                },
+                parameterMap: function (options, type) {
+
+                    try {
+                        var result = {
+                            take: options.take,
+                            skip: options.skip
+                        };
+
+                        if (options.sort) {
+                            for (var i = 0; i < options.sort.length; i++) {
+                                result["sort[" + i + "].field"] = options.sort[i].field;
+                                result["sort[" + i + "].dir"] = options.sort[i].dir;
+                            }
+                        }
+
+
+                        if (options.filter != "" && options.filter != undefined) {
+                            if ('filter' in options && options.filter.filters.length > 0) {
+                                result["filter"] = options.filter;
+                            }
+                        }
+
+
+                        return result;
+
+                    } catch (e) { 
+                        toastr.error(e.statusText);
+                    }
+                },
+            },
+            schema: {
+                total: function (data) {
+                    return data.Total;
+
+                },
+                data: function (data) {
+                    return data.Data;
+                },
+            },
+            type: "json",
+            pageSize: 10,
+            serverPaging: true,
+            serverFiltering: true,
+            serverSorting: true
+        });
+        $("#Grid").kendoGrid({
+            dataSource: dataSource,
+            // height: 550, 
+            groupable: {
+                messages: {
+                    empty: DragaColumnHeaderAndDropItHereToGroupByThatColumn,
+                }
+            },
+            sortable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [{
+                field: "AttributeName",
+                title: "@CaseCustomAtrributeRes.Property"
+            }, {
+                field: "AttributeDescription",
+                title: "@CaseCustomAtrributeRes.description"
+            },
+            {
+                filterable: false,
+                sortable: false,
+                title: '@LayoutRES.Edit',
+                template: "<div class='text-center'><a style='cursor: pointer;color: \\#428bca!important' onclick=getEdit(#=ID#)><i class='fa fa-file-text-o fa-fw fa-2x'></i></a></div>"
+
+            },
+            {
+                filterable: false,
+                sortable: false,
+                title: '@LayoutRES.Delete',
+                template: "<div class='text-center'><a style='cursor: pointer;color: \\#428bca!important' onclick=getDelete(#=ID#)><i class='fa fa-trash-o fa-fw fa-2x'></i></a></div>",
+
+            }, ]
+        });
+    }
+    $('[data-datepicker]').kendoDatePicker({
+        culture: "ar-EG",
+
+        format: "{0:yyyy-MM-dd}"
+    });
+    function GetValidateInput() {
+        $('.validate').hide('slow')
+        $('.validate :input').val('')
+  .removeAttr('checked')
+  .removeAttr('selected');
+        var DataTypeId = $("#DataTypeId").val();
+        if (DataTypeId == '@StaticIDs.DataTypeINT' || DataTypeId == '@StaticIDs.DataTypeFloat') {
+            $('#IntDiv').show('slow')
+        } else if (DataTypeId == '@StaticIDs.DataTypeString') {
+            $('#StringDiv').show('slow')
+        } else if (DataTypeId == '@StaticIDs.DataTypeDate') {
+
+            $('#DateDiv').show('slow')
+
+        }
+        else if (DataTypeId == lookupID) {
+            $('#LookUpDiv').show('slow')
+
+        }
+
+
+    }
+    var lookupID = '@StaticIDs.LOKUP';
+    var successMsg = '@CaseCustomAtrributeRes.SuccessaddOperation';
+    var ErrorMsg = '@CaseCustomAtrributeRes.ErrorOperation';
+    var IdDelete = 0;
+    var CategoryMasterCodeID = '@StaticIDs.CategoryMasterCodeID';
+
+    var updatedobject = {};
+
+    function getEdit(id) {
+        url = '@System.Configuration.ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'CaseCustomAttribute/GetById' + '?id=' + id;
+        $.ajax({
+            url: url,
+            type: 'get',
+            //data: { entity: jsonDTo },
+            success: function (res) {
+                updatedobject = res;
+
+                $("#btnAdd").hide()
+                $("#btnUpdate").show()
+
+                $('#Property').val(res.AttributeName)
+                $('#AttributeDescription').val(res.AttributeDescription)
+
+
+                $("#DataTypeId").data("kendoComboBox").value(res.DataTypeId);
+                GetValidateInput()
+                $("#MinLength").val(res.MinLength)
+                $("#MaxLength").val(res.MaxLength)
+                $("#MaxValue").val(res.MaxValue)
+                $("#MinValue").val(res.MinValue)
+                $("#MasterCodeID").val(res.MasterCodeID)
+
+
+                if (res.IsRequired) {
+                    //$("#IsRequired").checked = true;
+                    //$('#IsRequired').prop('checked', true);
+                    $('#IsRequired').attr('checked', true);
+
+
+                }
+                else {
+                    $('#IsRequired').attr('checked', false);
+
+                }
+
+            }
+        })
+
+    };
+
+
+</script>
+
+
+@section Scripts { 
+<script src="~/Scripts/MersalScripts/CasesManagment/CaseCustomAttrController.js"></script>
+ }

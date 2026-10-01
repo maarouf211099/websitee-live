@@ -1,0 +1,55 @@
+﻿
+
+@model DTO.SponsorsDTO
+@using Resource
+@using DTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div class="modal fade" id="CreateSponsorModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@LayoutRES.CreateSponsor</h4>
+                </div>
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "CreateSponsorForm" }))
+                    {
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.href, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.href, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.href)
+                                </div>
+                            </div> 
+                            <div class="demo-section k-content @KendoClass ">
+                                @(Html.Kendo().Upload()
+                                    .Name("Image")
+                                     .Messages(m => m.Select(LayoutRES.UploadImage).UploadSelectedFiles(LayoutRES.Submit))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*" })
+                                    .Multiple(false)
+                                    .Async(a => a
+                                    .Save("CreateSponsor", "SponsorUI")
+                                    .AutoUpload(false))
+                                    .Events(c => c
+                                    .Upload("onUploadSponsorCreate").Success("onSuccessUploadDataCreateSponsor"))
+                                )
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

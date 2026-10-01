@@ -1,0 +1,9 @@
+﻿.notification-div{
+    position:absolute;
+    background: red; 
+   width: 20%; 
+   height: 10%; 
+   float: right; 
+   margin: 20px; 
+       
+}

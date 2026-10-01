@@ -1,0 +1,83 @@
+﻿
+@{
+    //ViewBag.Title = "RenderPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    var culture = '@UserUI.Helper.CultureHelper.IsRighToLeft()'
+</script>
+  
+@using Resource
+    <div class="About-mersal">
+        <div class="about-mersal-header"> </div>
+        <div class="container">
+            <div class="row">
+                        
+                <div class="col-lg-6 col-md-12 img-sections">
+                    <img id="AboutUsFetherImg" src="~/images/AboutUsFetherImg.PNG" alt="" />
+                </div>
+                <div class="col-lg-6 col-md-12 AM-content">
+                    <h1 id="title"> </h1>
+                    <div id="content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dynamic-page">
+        <div class="header"> </div>
+        <div class="container"> 
+                    <!-- <h1 id="title"> </h1> -->
+                    <div id="content"></div>
+             </div>
+        </div>
+    </div>
+
+        <script>
+
+            GetBindData()
+
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+            function GetBindData() { 
+                var Id = getParameterByName('Id');
+                if(Id!=3)
+                  $('.About-mersal').remove();
+                else
+                  $('.dynamic-page').remove();
+
+                var apiurl = MersalWebAPIBaseUrl + "api/DynamicPages/GetPageById?Id=" + Id;
+                $.ajax({
+                    type: "get",
+                    contentType: "application/json",
+                    url: apiurl,
+                    crossDomain: true,
+                    //headers: getHeaders(),
+
+                    //async: false,
+                    success: function (data) { 
+                         
+                        if (culture == "True") {
+                            $("#content").html(data.ContentAR)
+                            $("#title").html(data.TitleAR)
+                        }
+                        else {
+                            $("#content").html(data.ContentEn)
+                            $("#title").html(data.TitleEN)
+                        }
+                    },
+                    error: function (xhr) {
+
+
+                        toastr.error(xhr.error); 
+                    }
+                });
+            }
+        </script>
+        <script src="~/Scripts/js/bootstrap.bundle.min.js"></script>

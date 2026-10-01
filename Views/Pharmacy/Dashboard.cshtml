@@ -1,0 +1,54 @@
+﻿@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    ViewBag.Title = LayoutRES.Admin;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-yellow-gradient">
+        <div class="inner">
+            <h3>0</h3>
+            <p>الأدويه الأسبوعيه</p>
+        </div>
+        <div class="icon">
+            <i class="ion ion-clock"></i>
+        </div>
+        <a href="/Case/Index?state=csNE" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-danger">
+        <div class="inner">
+            <h3>0</h3>
+            <p>الأدويه الشهريه</p>
+        </div>
+        <div class="icon">
+            <i class="ion ion-clock"></i>
+        </div>
+        <a href="/Case/Index?state=csNE" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+
+
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-purple-gradient">
+        <div class="inner">
+            <h3>1</h3>
+            <p>الروشتات المطلوبه</p>
+        </div>
+        <div class="icon">
+            <i class="ion-arrow-up-a"></i>
+        </div>
+        <a href="/Case/Index?state=csNE" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>

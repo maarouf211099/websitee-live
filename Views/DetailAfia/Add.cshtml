@@ -1,0 +1,169 @@
+﻿
+@model DTO.AddDetailAfiaDTO
+@using Resource
+@using Resource.Afia
+@using UserUI.Helper
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+<div class="modal fade" id="AddDetailAfiaModals" role="dialog" dir="@dir">
+    <div class="modal-dialog" style="width: 900px;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@Resource.Afia.DetailAfiaRES.AddNewDetailAfia</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm("Create", "DetailAfia", null, FormMethod.Post, new { @class = "form-horizontal", id = "AddDetailAfiaForm" }))
+                {
+                    <div class="box-body">
+                        <label>@Resource.Afia.DetailAfiaRES.Address</label>
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = @Resource.Afia.DetailAfiaRES.Address })
+                        @Html.ValidationMessageFor(m => m.Address)
+                        <br />
+
+
+                        <label>@Resource.Afia.DetailAfiaRES.Goverment</label>
+
+                        @Html.DropDownListFor(x => x.GovermentId, new List<SelectListItem>(), new { @class = "goverments form-control" })
+                        @Html.ValidationMessageFor(m => m.GovermentId)
+                        <br />
+                        <label>@Resource.Afia.DetailAfiaRES.city</label>
+
+                        @Html.DropDownListFor(x => x.RegionId, new List<SelectListItem>(), new { @class = "Region form-control" })
+                        @Html.ValidationMessageFor(m => m.RegionId)
+                        <br />
+                        <label>@Resource.Afia.DetailAfiaRES.Specialization</label>
+
+                        @Html.DropDownListFor(x => x.specialtyId, new List<SelectListItem>(), new { @class = "subspecialty form-control" })
+                        @Html.ValidationMessageFor(m => m.specialtyId)
+                        <br />
+
+
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.MasterName</label>
+
+                                @Html.DropDownListFor(x => x.MasterId, new List<SelectListItem>(), new { @class = "LargeUnit form-control" })
+                                @Html.ValidationMessageFor(m => m.MasterId)
+                            </div>
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.Discounts</label>
+
+                                <br />
+                                @Html.TextBoxFor(m => m.Discounts, new { @class = "form-control", placeholder = @Resource.Afia.DetailAfiaRES.Discounts })
+                                @Html.ValidationMessageFor(m => m.Discounts)
+                            </div>
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.Phone1</label>
+
+                                @Html.TextBoxFor(m => m.Phone1, new { @class = "form-control", placeholder = @Resource.Afia.DetailAfiaRES.Phone1 })
+                                @Html.ValidationMessageFor(m => m.Phone1)
+                            </div>
+                        </div>
+
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.Phone2</label>
+
+                                @Html.TextBoxFor(x => x.Phone2, new { @class = "MidddleUnit form-control", placeholder = @Resource.Afia.DetailAfiaRES.Phone2 })
+                                @Html.ValidationMessageFor(m => m.Phone2)
+                            </div>
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.Provider</label>
+
+                                <br />
+                                @Html.TextBoxFor(m => m.Provider, new { @class = "form-control", placeholder = @Resource.Afia.DetailAfiaRES.Provider })
+                                @Html.ValidationMessageFor(m => m.Provider)
+                            </div>
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.RegistraionCode</label>
+
+                                <br />
+                                @Html.TextBoxFor(m => m.RegistraionCode, new { @class = "form-control", placeholder = @Resource.Afia.DetailAfiaRES.RegistraionCode })
+                                @Html.ValidationMessageFor(m => m.RegistraionCode)
+                            </div>
+                            <div class="col-sm-4">
+                                <label>@Resource.Afia.DetailAfiaRES.Exceptions</label>
+
+                                <br />
+                                @Html.TextBoxFor(m => m.Exceptions, new { @class = "form-control", placeholder = @Resource.Afia.DetailAfiaRES.Exceptions })
+                                @Html.ValidationMessageFor(m => m.Exceptions)
+                            </div>
+
+                        </div>
+
+
+
+                        @*<div class="form-group" dir="@dir">
+                                <div class="hide col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Country)
+                                    @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country adminAddCase-Country form-control" })
+                                    @Html.ValidationMessageFor(m => m.Country)
+                                </div>
+
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Governorate)
+                                    @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate adminAddCase form-control", id = "GovernorateAdminAddCase" })
+                                    @Html.ValidationMessageFor(m => m.Governorate)
+                                </div>
+
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.District)
+                                    @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "form-control", id = "DistrictAdminAddCase" })
+                                    @Html.ValidationMessageFor(m => m.District)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Region)
+                                    @Html.TextBoxFor(m => m.Region, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Region) })
+                                    @Html.ValidationMessageFor(m => m.Region)
+                                </div>
+                            </div>
+                            @Html.DisplayNameFor(m => m.AddressLine1)
+                            @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                            @Html.ValidationMessageFor(m => m.AddressLine1)
+                            <br />
+                            @Html.DisplayNameFor(m => m.AddressLine2)
+                            @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                            @Html.ValidationMessageFor(m => m.AddressLine2)
+                            <br />
+                            <div class="form-group" dir="@dir">
+                                <div class="col-sm-6 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Source)
+                                    <select id="Source" name="Source" class="form-control"></select>
+                                </div>
+                                <div class="col-sm-6 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Priority)
+                                    <select id="Priority" name="Priority" class="form-control"></select>
+                                </div>
+                            </div>
+                            <br />*@
+                    </div>
+
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var MasterId = @Html.Raw(Json.Encode(Model.MasterId));
+    var GovermentId = @Html.Raw(Json.Encode(Model.GovermentId));
+    var RegionId = @Html.Raw(Json.Encode(Model.RegionId));
+    var subspecialtyId = @Html.Raw(Json.Encode(Model.specialtyId));
+
+
+</script>

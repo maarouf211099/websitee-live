@@ -1,0 +1,103 @@
+﻿
+@model DTO.HomeSliderDTO
+@using Resource
+@using DTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div class="modal fade" id="CreateHomeSlideModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@HomeSliderResources.CreateHomeSlide</h4>
+                </div>
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "CreateHomeSlideForm" }))
+                    {
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Title)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleAr)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Subtitle, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Subtitle, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Subtitle)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SubTitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.SubTitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.SubTitleAr)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.HrefUrl, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.HrefUrl, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.HrefUrl)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.HrefText, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.HrefText, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.HrefText)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.HrefTextAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.HrefTextAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.HrefTextAr)
+                                </div>
+                            </div>
+
+
+                            <div class="demo-section k-content @KendoClass ">
+                                @(Html.Kendo().Upload()
+                                    .Name("Image")
+                                     .Messages(m => m.Select(HomeSliderResources.ImagePath).UploadSelectedFiles(LayoutRES.Submit))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*" })
+                                    .Multiple(false)
+                                    .Async(a => a
+                                    .Save("CreateHomeSlider", "HomeSlider")
+                                    .AutoUpload(false))
+                                    .Events(c => c
+                                    .Upload("onUploadHomeSlideImageCreate").Success("onSuccessUploadDataCreate"))
+                                )
+                                @Html.ValidationMessageFor(model => model.ImagePath)
+                            </div>
+
+                            @*<div class="form-group">
+                                <div class="col-md-offset-2 col-md-8">
+                                    <input type="submit" value="@LayoutRES.Submit" class="btn btn-info" />
+                                </div>
+                            </div>*@
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

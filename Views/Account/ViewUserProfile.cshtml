@@ -1,0 +1,448 @@
+﻿
+@model  Components.UserManagement.DTO.UserDetailsDTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@using Notification.DTO
+@using Resource
+@using Components.UserManagement.Resources
+@{
+     ViewBag.Title =Model.FirstName +" "+Model.MiddleName;
+    List<SelectListItem> emptyList = new List<SelectListItem>();
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var tblTextAlign = isArabic ? "tblText" : "";
+}
+
+   
+
+<div id="AssignTaskToEmployeeDiv"></div>
+
+<div>
+     @Html.AntiForgeryToken()
+        <div class="modal-body">
+            @Html.HiddenFor(x => x.Id)
+            @Html.HiddenFor(x => x.UserName)
+            <div class="form-group">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <b>@UserManagementResources.UserInfo</b>
+                        <span><i class="glyphicon glyphicon-chevron-up"></i></span>
+                    </div>
+                    <div style="padding-top: 10px;" class="panel-body">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.UserName, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.UserName)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.FirstName, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.FirstName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.FirstNameOther, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.FirstNameOther, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.MiddleName, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.MiddleName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.MiddleNameOther, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.MiddleNameOther, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.LastName, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.LastName, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.LastNameOther, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.LastNameOther, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.Email, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.Email, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.LocationId, new { @class = "control-label" })
+                                    @if (isArabic)
+                                    {
+                                        @Html.DisplayFor(model => model.LocationAr)
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(model => model.LocationEn)
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.JobTitleId, new { @class = "control-label" })
+                                    @if (isArabic)
+                                    {
+                                        @Html.DisplayFor(model => model.JobTitleAr)
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(model => model.JobTitleEn)
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.Phone, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.Phone, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.Mobile, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.Mobile, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="form-group">
+                                    @Html.Label(UserManagementResources.Address, new { @class = "control-label" })
+                                    @Html.DisplayFor(model => model.Address, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    
+</div>
+<div class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")">
+    @(Html.Kendo().Scheduler<ReminderDTO>()
+                   .Name("scheduler")
+                   .Date(DateTime.Now)
+                   .AutoBind(true)
+                   .Height(600)
+                   .AllDaySlot(false)
+                   .Editable(d => d.TemplateId("customEditorTemplate"))
+                   .Events(events =>
+                   {
+                       events.Edit("editEvent");
+                       events.Add("AddEvent");
+                       events.Save("onSave");
+                   })
+                   .Views(views =>
+                   {
+                       views.DayView();
+                       views.WorkWeekView();
+                       views.WeekView();
+                       views.MonthView();
+                       views.AgendaView(w => w.Selected(true));
+                       views.TimelineView();
+                   })
+                  .DataSource(d => d
+                  .Model(m =>
+                  {
+                      m.Id(f => f.Id);
+                      m.Field(f => f.Title);
+                  })
+                 .Read("ReadByAdmin", "Reminder",new { userId = ViewBag.userId })
+                 .Create("AddByAdmin", "Reminder",new { userId = ViewBag.userId })
+                 .Destroy("Destroy", "Reminder")
+                 .Update("UpdateByAdmin", "Reminder", new { userId = ViewBag.userId })
+                 )
+    )
+</div>
+
+<!-- edit custom template -->
+<script id="customEditorTemplate" type="text/x-kendo-template">
+    <div class="k-edit-label"><label for="title">@ReminderRES.Title</label></div>
+    <div data-container-for="title" class="k-edit-field">
+        <input type="text" class="k-input k-textbox" name="title" required="required" data-bind="value:title" />
+    </div>
+    <div class="k-edit-label">
+        <label for="start">@ReminderRES.Start</label>
+    </div>
+    <div data-container-for="start" class="k-edit-field">
+        <input type="text"
+               data-role="datetimepicker"
+               data-interval="15"
+               data-type="date"
+               data-bind="value:start,invisible:isAllDay"
+               name="start" />
+        <input type="text" data-type="date" data-role="datepicker" data-bind="value:start,visible:isAllDay" name="start" />
+        <span data-bind="text: startTimezone"></span>
+        <span data-for="start" class="k-invalid-msg" style="display: none;"></span>
+    </div>
+    <div class="k-edit-label">
+        <label for="end">@ReminderRES.End</label>
+    </div>
+    <div data-container-for="end" class="k-edit-field">
+        <input type="text" data-type="date" data-role="datetimepicker" data-bind="value:end,invisible:isAllDay" name="end" data-datecompare-msg="End date should be greater than or equal to the start date" />
+        <input type="text" data-type="date" data-role="datepicker" data-bind="value:end,visible:isAllDay" name="end" data-datecompare-msg="End date should be greater than or equal to the start date" />
+        <span data-bind="text: endTimezone"></span>
+        <span data-bind="text: startTimezone, invisible: endTimezone"></span>
+        <span data-for="end" class="k-invalid-msg" style="display: none;"></span>
+    </div>
+    <div class="k-edit-label">
+        <label for="recurrenceRule">@ReminderRES.Repeat</label>
+    </div>
+    <div data-container-for="recurrenceRule" class="k-edit-field">
+        <div data-bind="value:recurrenceRule" name="recurrenceRule" data-role="recurrenceeditor"></div>
+    </div>
+    <div class="k-edit-label">
+        <label for="description">@ReminderRES.Description</label>
+    </div>
+    <div data-container-for="description" class="k-edit-field">
+        <textarea name="description" class="k-textbox" required="required" data-bind="value:description"></textarea>
+    </div>
+    <div class="k-edit-label">
+        <label for="NotificationType">@ReminderRES.NotificationType</label>
+    </div>
+    <div data-container-for="NotificationType" class="k-edit-field">
+        <select id="NotificationType" data-bind="value:NotificationType" data-role="dropdownlist"
+                data-value-field="value" data-text-field="text">
+            <option value="1">@ReminderRES.Email</option>
+            <option value="2">@ReminderRES.SMS</option>
+            <option value="3">@ReminderRES.UI</option>
+            <option value="4">@ReminderRES.EmailAndSMS</option>
+            <option value="5">@ReminderRES.EmailAndUI</option>
+            <option value="6">@ReminderRES.UIAndSMS</option>
+            <option value="7">@ReminderRES.All</option>
+        </select>
+    </div>
+    @*<input type="button" value="@LayoutRES.Done" class="btn btn-success pull-right" onclick="CaseReminder(2174)" />*@
+</script>
+
+
+@section Scripts {
+    <script>
+        var notificationSubject=' new task -مهمه جديده';
+        var notificationBody='You Have been assigned To new Task By - تم أضافه مهمه جديده لك بواسطه  ::[@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now]  ' ;
+      </script>
+    <script>
+        var editUserManagementForm = $("#editUserManagementForm");
+        editUserManagementForm.submit(function (e) {
+            $.validator.unobtrusive.parse(editUserManagementForm)
+            e.preventDefault();
+            if (!editUserManagementForm.valid()) return;
+            var url = UserNamagementWebAPIBaseUrl + "api/User/UpdateUserDetails";
+            var Submitdata = {};
+            $("#editUserManagementForm").serializeArray().map(function (x) { Submitdata[x.name] = x.value; });
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: url,
+                crossDomain: true,
+                headers: getHeaders(),
+                data: JSON.stringify(Submitdata),
+                async: false,
+                success: function (result) {
+                    toastr.success(SuccessfulProcess);
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.error);
+                }
+            });
+        });
+
+
+        function ConfirmCaseReminderFun(Id) {
+            var url = NotificationAPIBaseUrl + "api/NoticationItem/ConfirmCaseReminder?Id=" + Id
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                headers: getHeaders(),
+                url: url,
+                async: false,
+                success: function (data) {
+                    toastr.success(SuccessfulProcess);
+                    $("#btnIsDone").remove();
+                    setTimeout(function () {
+                        $('#scheduler').data('kendoScheduler').dataSource.read();
+                        $('#scheduler').data('kendoScheduler').refresh();
+                    }, 100);
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText);
+                }
+            });
+        }
+        function scheduler_cancel(e) {
+            console.log("Cancelling", e.event.title);
+        }
+        function AssignTaskToEmployee(Id,rec) {
+            $("#AssignTaskToEmployeeDiv").html("");
+            $.ajax({
+                url: "/Account/AssignTaskToEmployee?Id=" + eventId + "&rec=" + eventRec,
+                type: 'Get',
+                dataType: "html",
+                contentType: 'application/html; charset=utf-8',
+                beforeSend: function () {
+                    //$("#imgAjaxLoader").show();
+                },
+                success: function (result) {
+                    $(".k-scheduler-cancel").click();
+                    $("#AssignTaskToEmployeeDiv").append(result);
+                    //$(".k-overlay").css("display", "none");
+                    //$(".button .k-icon k-i-close").click();
+                    //$('.modal-backdrop').remove();
+                    $('#AssignTaskToEmployeeModals').modal('show');
+                    submitAssignTaskToEmployee();
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText);
+                }
+            });
+        }
+
+        //submit AssignTaskToEmployee
+        function submitAssignTaskToEmployee() {
+            $('#Employeeemsg').hide();
+           //$(".modal-backdrop").attr(z-index,-1)
+            var AssignEmployeeTaskForm = $("#AssignEmployeeTaskForm");
+            AssignEmployeeTaskForm.submit(function (e) {
+                var userval = $("#usersId").val();
+                if (userval == '') {
+                   // $.validator.unobtrusive.parse(AssignEmployeeTaskForm);
+                    $('#Employeeemsg').show();
+                    e.preventDefault();
+                    return;
+                }
+                $.validator.unobtrusive.parse(AssignEmployeeTaskForm);
+                e.preventDefault();
+                if (!AssignEmployeeTaskForm.valid()) return;
+                //var data = {};
+                //$("#AssignEmployeeTaskForm").serializeArray().map(function (x) { data[x.name] = x.value; });
+                //console.log(JSON.stringify(data));
+                var startDate = "";
+                var EndDate = "";
+                if ($("#startDate").val()) {
+                    startDate = $("#startDate").val();
+                }
+                if ($("#EndDate").val())
+                {
+                    EndDate = $("#EndDate").val();
+                }
+                var apiurl = NotificationAPIBaseUrl + "api/NoticationItem/DelegateTaskToEmployeeReminder?OldReminderId=" + $("#OldReminderId").val() + "&StartDate=" + startDate + "&EndDate=" + EndDate + "&EmpId=" + $("#usersId").val();
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: apiurl,
+                    crossDomain: true,
+                    headers: getHeaders(),
+                    data:{},
+                    async: false,
+                    success: function (data) {
+                        $('#AssignTaskToEmployeeModals').modal('hide');
+                        //$('.modal-backdrop').modal('hide');
+
+                        toastr.success(SuccessfulProcess);
+                    },
+                    error: function (xhr) {
+                        //$('#AddCaseModals').modal('hide');
+                        toastr.error(xhr.error);
+                    }
+                });
+            });
+        }
+
+        //function CaseReminder(id) {
+        //    var CallBackFunction = function () { ConfirmCaseReminderFun(id); };
+        //    confirmMessageBootstrap("", "Sure sure", 400, 250, CallBackFunction);
+        //}
+        var isEdit = true;
+        var eventId = "";
+        var eventRec = "";
+        function editEvent(e) {
+            //if (!e.event.isNew()) {
+
+            if (isEdit) {
+                if (!e.event.IsDone) {
+                    $(".k-edit-buttons.k-state-default").prepend('<input id="btnIsDone" type="button" value="@LayoutRES.Done" class="btn btn-success pull-right" onclick="ConfirmCaseReminderFun(' + e.event.Id + ')" />');
+                     eventId = e.event.Id;
+                     eventRec = e.event.recurrenceRule;
+                     $(".k-edit-buttons.k-state-default").prepend('<input id="btnIsDone" type="button" value="@LayoutRES.DelegateTaskToEmployee" class="btn btn-success pull-right" onclick="AssignTaskToEmployee()" />');
+                }
+            }
+            isEdit = true;
+        }
+        function AddEvent(e) {
+            isEdit = false;
+            var NotificationData =
+                      {
+                          ItemType: 1,
+                          NotificationSubject: notificationSubject,
+                          NotificationBody:notificationBody,
+                          Recipients:"@Model.Email",
+                          NotificationType: 7,
+                          NotificationPriority: 4,
+                          CreatedOn: new Date(),
+                          usersId:@ViewBag.userId,
+                      };
+               sentNotification(NotificationData); 
+        }
+        function onSave(e) {
+                setTimeout(function () {
+                    $('#scheduler').data('kendoScheduler').dataSource.read();
+                    $('#scheduler').data('kendoScheduler').refresh();
+                }, 100);
+        }
+        function SetEmployeeData(e) {
+            try {
+                var object = this.dataItem(this.select());
+                $("#CaseEmployee_EmployeeId").val(object.Value);
+                $("#CaseEmployee_EmployeeEmail").val(object.Email);
+            } catch (ex) {
+
+            }
+        }
+    </script>
+
+    @if (isArabic)
+    {
+        <script src="/Scripts/Kendo/cultures/Scheduler/kendo.culture.ar-SA.js"></script>
+    }
+    else
+    {
+        <script src="/Scripts/Kendo/cultures/Scheduler/kendo.culture.en-US.js"></script>
+
+    }
+}
+

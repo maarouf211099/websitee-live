@@ -1,0 +1,108 @@
+﻿
+@model DTO.TempPageBlockDTO
+@using Resource
+@using DTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div class="modal fade" id="CreateTempPageBlockModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@DynamicPagesRES.CreateTempBlockPage</h4>
+                </div>
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "CreateTempPageBlockForm" }))
+                    {
+                        @Html.HiddenFor(x=>x.PerantId)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleEn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleEn, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleEn)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleAr)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SubTitleEn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.SubTitleEn, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.SubTitleEn)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SubTitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.SubTitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.SubTitleAr)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DescriptionEn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.DescriptionEn, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.DescriptionEn)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DescriptionAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.DescriptionAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.DescriptionAr)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Href, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Href, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Href)
+                                </div>
+                            </div>  
+                            <div class="demo-section k-content @KendoClass ">
+                                @(Html.Kendo().Upload()
+                                    .Name("Image")
+                                    .Messages(m => m.Select(DonationSlideResource.Image).UploadSelectedFiles(LayoutRES.Submit))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*", id = "Image" })
+                                    .Multiple(false)
+                                    .Async(a => a
+                                    .Save("AddTempPageBlock", "TempPageUI")
+                                    .AutoUpload(false))
+                                    .Events(c => c
+                                    .Upload("onUploadCreateTempPageBlock")
+                                    .Success("onSuccessCreateTempPageBlock")
+                                    .Select("onSelectImageCreateTempPageBlock")
+                                    )
+                                )
+                            </div>  
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-12">
+                                    <input id="btnSubmitCreateTempPageBlock" type="submit" value="@LayoutRES.Submit" class="btn btn-info" />
+                                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                                </div>
+                            </div>
+                        </div> 
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

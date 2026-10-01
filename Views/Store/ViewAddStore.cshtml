@@ -1,0 +1,351 @@
+﻿@model DTO.StoreDTO
+@using Resource
+@using UserUI.Helper
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<style>
+    .dlg {
+        width: 600px;
+        height: 1200px;
+    }
+
+    .PopUpRow {
+        width: 700px;
+        height: 50px;
+    }
+
+    .Custom-Header {
+        margin-top: 10px;
+        width: 180px;
+        height: 20px;
+        float: left;
+    }
+
+    .Item {
+        margin-top: 10px;
+        width: 400px;
+        height: 30px;
+        float: left;
+    }
+</style>
+
+
+<div class="modal fade" role="dialog" id="dlgAddNewItem">
+    <div class="modal-dialog" style="width: 720px;height:1800px">
+        <span class="close-btn"><i class="fa fa-remove"></i> @LayoutRES.Close</span>
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@StoreRes.AddNewStore</h4>
+                </div>
+                @using (Html.BeginForm("AddNewItem", "InventoryItem", null, FormMethod.Post, new { role = "form", id = "frmAddEditStores", @class = "form-horizontal", }))
+                {
+                    <div class="box-body">
+                        @Html.AntiForgeryToken()
+
+                        <br />
+                        <div @floatToRight>
+                            <div>@Html.DisplayNameFor(m => m.Name)</div>
+                            @Html.TextBoxFor(m => m.Name, new { placeholder = Html.DisplayNameFor(m => m.Name), id = "txtDescription", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name)
+                        </div>
+                        <br />
+
+                        @Html.HiddenFor(m => m.Id, new { value = (Model.Id == 0 || Model.Id == null ? "0" : Model.Id.ToString()) })
+                        <br />
+                        <div dir="@dir">
+                            <div class="col-sm-4 @floatToRight">
+                                <h5 class="h5White">@Html.DisplayNameFor(m => m.CountryId)</h5>
+                                @Html.DropDownListFor(x => x.CountryId, new List<SelectListItem>(), new { @class = "Country request-Country form-control", id= "request-Country" })
+                                @Html.ValidationMessageFor(m => m.CountryId)
+                            </div>
+                            <div class="col-sm-4 @floatToRight">
+                                <h5 class="h5White">@Html.DisplayNameFor(m => m.GovornrateId)</h5>
+                                @Html.DropDownListFor(x => x.GovornrateId, new List<SelectListItem>(), new { @class = "Governorate Request-Governorate form-control", id = "GovernorateRequest" })
+                                @Html.ValidationMessageFor(m => m.GovornrateId)
+                            </div>
+                            <div class="col-sm-4 @floatToRight">
+                                <h5 class="h5White">@Html.DisplayNameFor(m => m.DistrictId)</h5>
+                                @Html.DropDownListFor(x => x.DistrictId, new List<SelectListItem>(), new { @class = "form-control Request-District", id = "DistrictRequest" })
+                                @Html.ValidationMessageFor(m => m.DistrictId)
+                            </div>
+                        </div>
+                        <br />
+
+                        <div @floatToRight>
+                            <div>@Html.DisplayNameFor(m => m.Address)</div>
+                            @Html.TextBoxFor(m => m.Address, new { placeholder = Html.DisplayNameFor(m => m.Address), id = "txtDescription", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                        <br />
+
+                        <div @floatToRight>
+                            <div>@Html.DisplayNameFor(m => m.AdministratorId)</div>
+                            @Html.DropDownListFor(x => x.AdministratorId, new List<SelectListItem>(), new { id = "ddlUsers", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.AdministratorId)
+                        </div>
+                        </div>
+                    <!-- /.box-body -->
+                    <hr />
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function GetStoreCountryMasteCode(ElementId) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=Coun",
+            async: false,
+            success: function (data) {
+                var htmlCountry = "<option value=''></option>";
+                $.each(data, function (key, value) {
+                    if (value.masterCodeValue == "Coun") {
+
+                        var selection='';
+                        if (value.Id == ElementId) selection = "selected";
+                        if (_cultureIsArabic) {
+                            htmlCountry += "<option value=" + value.Id + " " + selection+ " >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlCountry += "<option value=" + value.Id + selection+ " >" + value.NameEn + "</option>";
+                        }
+                    }
+                });
+                $(".Country").html(htmlCountry);
+            },
+            error: function (xhr) { 
+    toastr.error(xhr.statusText);
+            }
+        });
+    }
+    function getStoreGovernrate(countryId, elementId,selectionId) {
+        if (countryId == null || countryId == 0) {
+            $("#" + elementId).html("");
+            $("#" + elementId).val("");
+            return;
+        }
+        var url = SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetByParentId?parentId=" + countryId;// $("#Country").val();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: url,
+            async: false,
+            success: function (data) {
+                // var htmlGovernorate = "<option value='0'></option>";
+
+                var htmlGovernorate = "<option value=''></option>";
+                $.each(data, function (key, value) {
+                    var selection = "";
+                    if(selectionId == value.Id)selection = 'selected';
+                    if (value.masterCodeValue == "Gove") {
+
+                        if (_cultureIsArabic) {
+                            htmlGovernorate += "<option value=" + value.Id + " " +selection+ " >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlGovernorate += "<option value=" + value.Id +" " +selection+ " >" + value.NameEn + "</option>";
+                        }
+                    }
+                });
+                $("#" + elementId).html(htmlGovernorate);
+            },
+            error: function (xhr) { 
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+    function getStoreDistrict(GovernrateId, elementId,selectionId) {
+        if (GovernrateId == null || GovernrateId == 0) {
+            $("#" + elementId).html("");
+            $("#" + elementId).val("");
+            return;
+        }
+        var url = SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetByParentId?parentId=" + GovernrateId;// $("#Country").val();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: url,
+            async: false,
+            success: function (data) {
+                // var htmlGovernorate = "<option value='0'></option>";
+
+                var htmlGovernorate = "<option value=''></option>";
+                $.each(data, function (key, value) {
+                    var selection = "";
+                    if(selectionId == value.Id)selection = 'selected';
+
+                    if (value.masterCodeValue == "Dist") {
+                        if (_cultureIsArabic) {
+                            htmlGovernorate += "<option value=" + value.Id + " " +selection+ " >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlGovernorate += "<option value=" + value.Id +" " +selection+ " >" + value.NameEn + "</option>";
+                        }
+                    }
+                });
+                $("#" + elementId).html(htmlGovernorate);
+            },
+            error: function (xhr) { 
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+    //function CountryStoreChange() {
+    //    $(".Country").change(function () {
+    //        if ($(this).hasClass("request-Country")) {
+    //            getGovernrate($(this).val(), "GovernorateRequest");
+    //        }
+    //        else if ($(this).hasClass("regiser-Country")) {
+    //            getGovernrate($(this).val(), "GovernorateRegister");
+    //        }
+    //        else if ($(this).hasClass("adminAddCase-Country")) {
+    //            getGovernrate($(this).val(), "GovernorateAdminAddCase");
+    //        }
+    //        else if ($(this).hasClass("adminEditCase-Country")) {
+    //            getGovernrate($(this).val(), "GovernorateAdminEditCase");
+    //        }
+    //    });
+    //}
+    //CountryStoreChange();
+</script>
+
+<script id="getusers">
+
+    function LoadUsersList(dropDownListId, enableAll,selectedId)
+    {
+          
+            $.ajax({
+                type: "GET",
+                async: false,
+                contentType: "application/json",
+                url: '@ConfigurationManager.AppSettings["UserNamagementWebAPIBaseUrl"]' + 'api/User/GetAllUsers',
+                success: function (data) {
+                    
+                      
+                    var html = "";
+                    if (enableAll) {
+                        if (_cultureIsArabic) {
+                            html = "<option value='0'>الكل</option>";
+                        }
+                        else {
+                            html = "<option value='0'>All</option>";
+                        }
+                    }
+                    var selec = "";
+                    var textByIdArr = [];
+                    $.each(data, function (key, value) {
+
+                            if (value.Id == selectedId) selec = " selected='selected' ";
+                            if (_cultureIsArabic) {
+                                html += "<option  value=" + value.Id + selec + "  >" + value.UserName + "</option>";
+                                textByIdArr[value.Id.toString()] = value.NameAr;
+                            }
+                            else {
+                                html += "<option  value=" + value.Id + selec + " >" + value.UserName + "</option>";
+                                textByIdArr[value.Id.toString()] = value.NameEn;
+                            }
+                        
+                    });
+                    $("#" + dropDownListId).html(html);        
+                },
+                error: function (xhr) { 
+                    toastr.error(xhr.statusText);
+                }
+            });
+    }
+    LoadUsersList('ddlUsers',false,@(Model.Id != null ? Model.Id :0));
+</script>
+<script id="submit form result">
+    function registerFormSubmitting(){
+          
+        $("#frmAddEditStores").submit(function (e) {
+            var apiurl = "";
+            if($("#Id").val() == "0") // add
+                apiurl = MersalWebAPIBaseUrl + "api/Stores/Create";
+            else // update
+                apiurl = MersalWebAPIBaseUrl + "api/Stores/UpdateStore";
+              
+            
+            $.validator.unobtrusive.parse( $("#frmAddEditStores"))
+            e.preventDefault();
+            if (!$("#frmAddEditStores").valid()) return;
+                            
+            var data = {};
+            $("#frmAddEditStores").serializeArray().map(function (x) { data[x.name] = x.value; });
+                            
+            console.log(JSON.stringify(data));
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: apiurl,
+                crossDomain: true,
+                headers: getHeaders(),
+                data: JSON.stringify(data),
+                async: false,
+                success: function (data) {
+                      
+                    $('#AddOrEditStoreDiv').modal('hide');
+                    data = JSON.parse(data);
+                    if (data > 0) {
+                        toastr.success('@InventoryItemsRes.OperationSucceeded');
+                        RefreshStores();
+                        //$("#grid").data('kendoGrid').dataSource.read();
+                        //$("#grid").data("kendoGrid").refresh();
+                    }
+                    else {
+                        toastr.error('@InventoryItemsRes.OperationFailed' );
+
+                    }
+                },
+                error: function (xhr) {
+                    $('#AddCaseModals').modal('hide');
+                    toastr.error('@InventoryItemsRes.OperationFailed ');
+                 }
+            });
+        });
+
+    };
+    registerFormSubmitting();
+
+
+    function loadAllDDl()
+    {
+          
+
+        GetStoreCountryMasteCode(@Model.CountryId );
+        getStoreGovernrate(@Model.CountryId,"GovernorateRequest",@Model.GovornrateId );
+          
+
+        getStoreDistrict(@Model.GovornrateId,"DistrictRequest",@Model.DistrictId);
+        CountryChange();
+        GovernorateChange();
+        
+    }
+
+
+
+    loadAllDDl();
+</script>

@@ -1,0 +1,18 @@
+﻿@model UserUI.Models.Donation.OnlineDonationResult
+
+@{
+    ViewBag.Title = "ErrorView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>ErrorView</h2>
+
+<div>
+    <dl class="dl-horizontal" style="margin:0 auto;text-align:center;">        
+        <dt>
+            @Html.DisplayNameFor(model => model.Message)
+        </dt>
+
+    </dl>
+</div>
+

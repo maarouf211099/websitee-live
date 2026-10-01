@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Index</h2>
+<div>
+
+    @{Html.RenderPartial("~/Views/Reminder/Create.cshtml", new ViewDataDictionary { { "title", "test"} }); }
+        
+</div>
+
+
+

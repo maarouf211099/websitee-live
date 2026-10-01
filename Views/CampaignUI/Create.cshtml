@@ -1,0 +1,225 @@
+﻿@model DTO.CampaignDTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@using Resource
+@{
+ViewBag.Title = CampaignResource.CreateCampaign;
+Layout = "~/Views/Shared/_AdminLayout.cshtml";
+bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+var textAlignRight = isArabic ? "text-align: right;" : "";
+var dir = isArabic ? "rtl" : "ltr";
+var tblTextAlign = isArabic ? "tblText" : "";
+var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<head>
+    <title>@CampaignResource.CreateCampaign</title>
+</head>
+
+@using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "CreateCampaignForm" }))
+{
+<div class="form-horizontal">
+    <div class="form-group">
+        @Html.LabelFor(m => m.TitleAr, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.TitleAr, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.TitleAr)
+        </div>
+        @Html.LabelFor(m => m.TitleEn, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.TitleEn, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.TitleEn)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DescriptionAr, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextAreaFor(m => m.DescriptionAr, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.DescriptionAr)
+        </div>
+        @Html.LabelFor(m => m.DescriptionEn, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextAreaFor(m => m.DescriptionEn, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.DescriptionEn)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.GoalAr, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.GoalAr, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.GoalAr)
+        </div>
+        @Html.LabelFor(m => m.GoalEn, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.GoalEn, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.GoalEn)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RequiredAmount, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.RequiredAmount, new { @class = "form-control", type = "number" ,min = "0" })
+            @Html.ValidationMessageFor(m => m.RequiredAmount)
+        </div>
+        @Html.LabelFor(m => m.ParentAccountId, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.ParentAccountId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.ParentAccountId)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.StartDate, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.StartDateS, new { @class = "DatekendoDatePicker" })
+            @Html.ValidationMessageFor(m => m.StartDateS)
+        </div>
+        @Html.LabelFor(m => m.EndDate, new { @class = "col-md-2 control-label" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.EndDateS, new { @class = "DatekendoDatePicker" })
+            @Html.ValidationMessageFor(m => m.EndDateS)
+        </div>
+    </div>
+
+
+
+
+    <div class="form-group">
+        @Html.Label(CampaignResource.Governorate, new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.DropDownList("Governorate", new List<SelectListItem>(), new { @class = "form-control" })
+        </div>
+        @Html.Label(CampaignResource.District, new { @class = "control-label col-md-2" })
+
+        <div class="col-md-4">
+            @Html.DropDownList("District", new List<SelectListItem>(), new { @class = "form-control" })
+        </div>
+    </div>
+
+
+
+
+
+    <div class="form-group">
+        @Html.Label(ActivitiesRES.Members, new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @(Html.Kendo().MultiSelect()
+            .Name("membersMulti")
+            .Placeholder(ActivitiesRES.AddMember)
+            .DataTextField("UserName")
+            .DataValueField("Id")
+            .BindTo(new List<int>())
+                .Filter(FilterType.Contains)
+                .DataSource(d => d.Read(r => { r.Action("GetMembers", "CampaignUI"); }))
+                .HtmlAttributes(new { @class = KendoClass })
+
+                )
+        </div>
+
+
+        @Html.Label(CampaignResource.Region, new { @class = "control-label col-md-2" })
+
+        <div class="col-md-4">
+            @Html.TextBox("Region", "", new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <span class="field-validation-error col-md-6 row">
+            <div class="col-md-6">
+                <span id="CampaignDestinationErrorMessage"
+                    style="display: none;">@CampaignResource.PleaseSelectGovernorate</span>
+
+            </div>
+
+            <input value="@CampaignResource.AddDestination" onclick="addDestination()" type="button"
+                class="btn btn-info col-md-4" />
+
+        </span>
+        <div class="row col-md-6 check">
+            <div class="col-md-5">
+
+            </div>
+
+            <div class="col">
+                @Html.LabelFor(m => m.PublishAtWebsite)
+                @Html.Kendo().CheckBoxFor(m => m.PublishAtWebsite)
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.PublishAtHome)
+                @Html.Kendo().CheckBoxFor(model => model.PublishAtHome)
+
+            </div>
+            <div class="col">
+                @Html.LabelFor(m => m.PublishAsMain)
+                @Html.Kendo().CheckBoxFor(model => model.PublishAsMain)
+            </div>
+        </div>
+    </div>
+
+
+    <div id="distinationDiv">
+
+    </div>
+
+    <div class="form-group @KendoClass ">
+        <div class="col-md-5">
+            @(Html.Kendo().Upload()
+            .Name("Images")
+            .Messages(m => m.Select(CampaignResource.SelectImages))
+            .Multiple(true)
+            .Async(a =>
+            {
+            a.Save("UploaderSave", "CampaignUI");
+            a.Remove("UploaderRemove", "CampaignUI");
+            a.AutoUpload(true);
+            }).HtmlAttributes(new { accept = "image/*", id = "CampataignImages" })
+            )
+            <span class="field-validation-error">
+                <span id="CampaignImageErrorMessage" style="display: none;">@CampaignResource.PleaseAddImage</span>
+            </span>
+        </div>
+    </div>
+    <div class="form-group Submit">
+        <div class="col-md-3">
+            <input value="@LayoutRES.Submit" type="submit" class="btn btn-success" />
+        </div>
+    </div>
+</div>
+
+}
+
+
+@section Scripts {
+@*
+<script src="~/Scripts/MersalScripts/CampaignManagment/AdminCreateCampaign.js"></script>*@
+<script>
+    var datemsg = '@LayoutRES.Datemsg';
+</script>
+@Scripts.Render("~/bundles/CreateCampaign")
+
+}
+
+<style>
+    .control-label {
+        text-align: center !important;
+    }
+    .check {
+        display: flex;
+
+    }
+
+    .k-datepicker {
+        width: 100%;
+    }
+    .check .col{
+        margin: 0px 10px;
+    }
+    .Submit{
+    display: flex;
+    justify-content: center;
+}
+   .Submit input {
+            padding: 10px 46px;
+
+    }
+</style>

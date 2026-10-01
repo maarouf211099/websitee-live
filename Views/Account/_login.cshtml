@@ -1,0 +1,57 @@
+﻿@model Components.UserManagement.DTO.LoginViewModel
+@using Resource
+<!-- Sign Up Form -->
+
+@*<div class="login-form popup-form">
+    <span class="close-btn"><i class="fa fa-remove"></i> @LayoutRES.Close</span>
+    <strong>@LayoutRES.Login</strong>
+    <strong><span id="loginErrorMassage"></span></strong>
+    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row">
+            @Html.TextBoxFor(m => m.UserName, new { placeholder = LayoutRES.Email })
+            @Html.ValidationMessageFor(m => m.UserName)
+            <br />
+            @Html.PasswordFor(m => m.Password, new { placeholder = LayoutRES.Password })
+            @Html.ValidationMessageFor(m => m.Password)
+            <br />
+            <div class="col-md-12"><p><a itemprop="url" href="/Account/ForgotPassword"></a></p></div>
+            <div class="col-md-12"><input type="submit" value="@LayoutRES.Login" /></div>
+        </div>
+    }
+</div>*@
+
+
+
+<div id="login-popup" class="n-popup">
+    <div class="container">
+        <div class="popup-centralize">
+            <span class="close"><i class="fa fa-remove"></i></span>
+            <div class="payment-box">
+                <div class="n-popup-c">
+                    <strong>@LayoutRES.Login</strong>
+                    <strong><span id="loginErrorMassage" style="color:#ff0000;"></span></strong>
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="textfield"> 
+                                @Html.TextBoxFor(m => m.UserName, new { placeholder = LayoutRES.UserName })
+                                @Html.ValidationMessageFor(m => m.UserName)
+                            </div>
+                            <div class="textfield">
+                                @Html.PasswordFor(m => m.Password, new { placeholder = LayoutRES.Password })
+                                @Html.ValidationMessageFor(m => m.Password)
+                            </div> 
+                            <a style="margin: 11px 33px; display: inline-block;" href="/Account/ForgotPassword">@LayoutRES.ForgotPassword</a> 
+                             <div class="submit-bar">
+                                <input type="submit" value="@LayoutRES.Login" class="btn">
+                            </div>
+                        </div>
+                    } 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

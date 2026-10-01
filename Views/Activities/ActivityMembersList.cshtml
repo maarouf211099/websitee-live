@@ -1,0 +1,72 @@
+﻿@using DTO
+@using Kendo.Mvc.UI
+@using UserUI.Helper
+@using Resource;
+@using System.Configuration
+@{
+    //ViewBag.Title = ActivitiesRES.CreateActivity;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var mersalapi = ViewBag.mersalApi;
+    var local = Server.MapPath("~").Replace("/", "\\");
+}
+<input type="hidden" value="@ViewBag.ActId" name="ActivityId" id="ActivityId" />
+
+<div>
+    <div class="box">
+        <div class="box-header">
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <th style="text-align: right">
+                        <label>@ActivitiesRES.Count @ActivitiesRES.Participants : </label>
+                        <label class="label label-success" id="lblCountMembers"> </label>
+                    </th>
+                    <th style="text-align: right">
+                        <label>@ActivitiesRES.ValueAmount : </label>
+                        <label class="label label-success" id="lblActivityValueAmount"> </label>
+                    </th> 
+                </table>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+    </div>
+</div>
+
+@*<div class="row">
+    <div class="form-group col-sm-12 ">
+
+        <label class="col-md-1 control-label">@ActivitiesRES.Count @ActivitiesRES.Participants :</label>
+
+        <label class="col-md-1 control-label" id="lblCountMembers"> </label>
+
+        <label class="col-md-1 control-label">@ActivitiesRES.ValueAmount:</label>
+
+        <label class="col-md-5 control-label"  id="lblActivityValueAmount"> </label>
+    </div>
+    </div>*@
+
+<div class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")">
+    @(Html.Kendo().Grid((List<ActivityMembersListDTO>)Model)
+              .Name("Grid")
+              .Pageable(pager => pager.Refresh(true))
+              .Sortable().Groupable(g => g.Messages(m => m.Empty(LayoutRES.DragaColumnHeaderAndDropItHereToGroupByThatColumn)))
+              .Columns(columns =>
+              {
+                  columns.Bound(e => e.ActivityId).Title(ActivitiesRES.ActivityId);
+                  columns.Bound(e => e.ActivityName).Title(ActivitiesRES.ActivityName);
+                  columns.Bound(e => e.UserId).Title(ActivitiesRES.UserId);
+                  columns.Bound(e => e.MemberName).Title(ActivitiesRES.MemberName);
+                  columns.Bound(e => e.MemberPhoneNumber).Title(ActivitiesRES.MemberPhoneNumber);
+                  columns.Bound(e => e.MemberEmail).Title(ActivitiesRES.MemberEmail);
+                  columns.Bound(e => e.ValueAmount).Title(ActivitiesRES.ValueAmount);
+              })
+              .DataSource(dataSource => dataSource.Ajax().PageSize(10).Read(read => read.Url(string.Format("{0}api/Activities/ActivityMembersList?Id={1}", ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"], ViewBag.ActId)).Type(HttpVerbs.Get)))
+
+    )
+</div>
+
+
+@section Scripts {
+    <script src="~/Scripts/MersalScripts/Activity/SpecificActivityScript.js"></script>
+}

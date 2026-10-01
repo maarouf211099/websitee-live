@@ -1,0 +1,36 @@
+﻿@model IEnumerable<UserUI.Controllers.imagesviewmodel>
+@{
+    Layout = null;
+}
+<link rel="stylesheet" href="~/Content/css/"> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="~/Scripts/jquery-ui.min.js"></script>
+@foreach (var image in Model)
+{
+    <a href="#" class="returnImage" data-url="@Request.Url.GetLeftPart(UriPartial.Authority)@image.Url">
+        <img src="@image.Url" alt="Hejsan" id="#image" data-source="@image.Url" width="200" height="200" />
+    </a>
+
+}
+<div id="dialog" title="Basic dialog">
+    <p id="pText"></p>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".returnImage").click("click", function (e) {
+            var urlImage = $(this).attr("data-url");
+            prompt("Image Url", urlImage );
+            //$("#pText").html(urlImage);
+           // $("#dialog").dialog();
+           // prompt(urlImage);
+            //try {
+            //    window.opener.updateValue("cke_222_textInput", urlImage);
+            //} catch (e) {  }
+            //try {
+            //    window.opener.updateValue("cke_361_textInput", urlImage);
+            //} catch (e) {  }
+
+           window.close();
+        });
+    });
+</script>

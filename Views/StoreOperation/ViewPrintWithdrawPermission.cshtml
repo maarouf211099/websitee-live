@@ -1,0 +1,83 @@
+﻿@model DTO.WithdrawPermissionDTO
+@using Resource
+@using UserUI.Helper
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+<div class="modal-dialog" style="border: 3px solid #d2d6de !important;" hidden id="PrintDIV" dir="rtl">
+    <!-- Modal content-->
+    <div class="modal-body" style="border: 3px solid #d2d6de !important;float:right !important;direction:rtl !important;width:100%;">
+        <div class="box box-info" style="">
+            <div class="box-header">
+                <img class="" style="position:fixed;top:10px;left:25px; width:200px;height:100px;" src="~/images/mersalLogo.png" />
+
+                <h2 class="" style="position:relative;top:10px;right:25px; width:50%!important;">إذن صرف مخزن</h2>
+            </div><!-- /.box-header -->
+            <!-- form start -->
+            <div class="box-body">
+                <!-- general form elements -->
+                <div style="float:right !important;direction:rtl !important;">
+                    <div class="row">
+                        
+                        من الصنف <label id="ItemNameLBL"></label> 
+                        يتم صرف عدد   <label id="QuantityLBL"></label> <br />
+                         الوحدة <label id="UnitLBL"></label><br />
+                        للسيد/ <label id="UserNameLBL"></label><br />
+                        لمصلحة الحالة/ <label id="CasecodeLBL"></label><br />
+                        تاريخ الاذن /<label id="CurrentDateLBL"></label>  <br />  
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script id="Show pop up print ">
+
+
+    function PrintElem(elem)
+    {
+        Popup($(elem).html());
+    }
+
+    function Popup(data)
+    {
+        var mywindow = window.open('', '', '');
+        mywindow.document.write('<html><head><title></title>');
+        /*optional stylesheet*/ //mywindow.document.write('<link rel="stylesheet" href="main.css" type="text/css" />');
+        mywindow.document.write('</head><body >');
+        mywindow.document.write(data);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+    }
+    function Print(UserName, Quantity, InventoryItemName,InventoryItemUnit, CaseCode, ServerDate) {
+                $("#UserNameLBL").html( UserName);
+                $("#QuantityLBL").html(Quantity);
+                $("#ItemNameLBL").html(InventoryItemName);
+                $("#UnitLBL").html( InventoryItemUnit);
+                $("#CasecodeLBL").html( CaseCode);
+                $("#CurrentDateLBL").html( ServerDate);
+                PrintElem("#PrintDIV");
+    }
+
+
+</script>

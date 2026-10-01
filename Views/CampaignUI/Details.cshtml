@@ -1,0 +1,148 @@
+﻿@model DTO.CampaignViewDTO
+@using System.Globalization
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var floatRightStyle = isArabic ? "float:right;" : "";
+    var floatNone = isArabic ? "" : "float:none;";
+}
+<script src="~/Scripts/images.slider.min.js"></script>
+<link href="~/Content/Slider_css/imageSlider.css" rel="stylesheet" />
+
+<section>
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column FloatRight">
+                    <div class="blog-detail-page">
+                        <div class="post-intro cause-intro" style="border-radius: 20px;border: 3px solid #D2CFCF;">
+                            <div class="row">
+
+                                <aside class="col-md-4 sidebar column ">
+                                    <div class="post-intro cause-intro" style="margin: 0px 10px; @floatNone">
+                                        <div class="cause-detail" style="margin: auto;">
+                                            <span><i style="font-size: 25px;">@CaseResources.Goal</i>   @Model.RequiredAmount</span>
+                                            @if (Model.RemainingAmount > 0)
+                                            {
+                                                <strong style="cursor: pointer;" onclick="callDonationpopup(3,'@Model.Id','@Model.AccountId','@Model.TitleAr','@Model.RemainingAmount')" CaseId="@Model.Id" AccountId="@Model.AccountId">@CaseResources.NeededDonation<a>@CaseResources.DonateNow</a></strong>
+                                                <span><i style="font-size: 25px;">@CaseResources.Remaining </i> @Model.RemainingAmount</span>
+
+                                            }
+                                            else
+                                            {
+                                                <span><i style="font-size: 25px;">@CaseResources.Completed</i></span>
+                                            }
+                                        </div>
+                                    </div>
+                                </aside>
+                                <div class="col-md-8">
+                                    <ul class="meta">
+                                        <li style="@floatRightStyle ;color:#000"><i class="ti-calendar"></i>@Model.StartDate.Value.ToString("d/MMMM/yyyy", CultureInfo.InvariantCulture)</li>
+                                        @if (Model.EndDate.HasValue)
+                                        {
+                                            <li style="@floatRightStyle  ;color:#000"><i class="ti-calendar"></i>@Model.EndDate.Value.ToString("d/MMMM/yyyy", CultureInfo.InvariantCulture)</li>
+                                        }
+                                    </ul>
+                                    <h1 class="post-title" style="color: #37a1a2;">@Model.TitleAr</h1>
+                                    @if (isArabic)
+                                    {
+                                        <p style="font-size: 20px;">
+                                            @Model.GoalAr
+                                        </p>
+                                        <p style="font-size: 20px;">
+                                            @Model.DescriptionAr
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p style="font-size: 20px;">
+                                            @Model.GoalEn
+                                        </p>
+                                        <p style="font-size: 20px;">
+                                            @Model.DescriptionEn
+                                        </p>
+                                    }
+
+                                </div>
+                            </div>
+
+                            <div id="Campaign_image_slider" style="position: relative; margin: 0 auto; margin-bottom: 40px; top: 0px; left: 2%; width: 1200px; height: 600px; overflow: hidden; visibility: hidden;">
+                                <!-- Loading Screen -->
+                                <div data-u="loading" style="position: absolute; top: 0px; left: 0px;">
+                                    <div style="filter: alpha(opacity=70); opacity: 0.7; position: absolute; display: block; top: 0px; left: 0px; width: 100%; height: 100%;"></div>
+                                    <div style="position:absolute;display:block;background:url('../../Content/slider_Control_Images/loading.gif') no-repeat center center;top:0px;left:0px;width:100%;height:100%;"></div>
+                                </div>
+                                <div id="Slider" data-u="slides" style="cursor: default; position: relative; top: 0px; left: 0px; width: 1200px; height: 600px; overflow: hidden;">
+                                    @foreach (var img in Model.ImagesPathsList)
+                                    {
+                                        <div data-p="112.50" style="display: none;">
+                                            <img data-u="image" src="@img" />
+                                        </div>
+                                    }
+                                </div>
+                                <!-- Bullet Navigator -->
+                                <div data-u="navigator" class="jssorb05" style="bottom:16px;right:16px;" data-autocenter="1">
+                                    <!-- bullet navigator item prototype -->
+                                    <div data-u="prototype" style="width:16px;height:16px;"></div>
+                                </div>
+                                <!-- Arrow Navigator -->
+                                <span data-u="arrowleft" class="jssora12l" style="top:0px;left:0px;width:30px;height:46px;" data-autocenter="2"></span>
+                                <span data-u="arrowright" class="jssora12r" style="top:0px;right:0px;width:30px;height:46px;" data-autocenter="2"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+    $(document).ready(function () {
+        var jssor_1_SlideshowTransitions = [
+               { $Duration: 1200, $Opacity: 2 }
+        ];
+
+        var jssor_1_options = {
+            $AutoPlay: true,
+            $SlideshowOptions: {
+                $Class: $JssorSlideshowRunner$,
+                $Transitions: jssor_1_SlideshowTransitions,
+                $TransitionsOrder: 1
+            },
+            $ArrowNavigatorOptions: {
+                $Class: $JssorArrowNavigator$
+            },
+            $BulletNavigatorOptions: {
+                $Class: $JssorBulletNavigator$
+            }
+        };
+
+        var jssor_1_slider = new $JssorSlider$("Campaign_image_slider", jssor_1_options);
+
+        //responsive code begin
+        //you can remove responsive code if you don't want the slider scales while window resizing
+        function ScaleSlider() {
+            var refSize = jssor_1_slider.$Elmt.parentNode.clientWidth;
+            if (refSize) {
+                refSize = Math.min(refSize, 1100);
+                jssor_1_slider.$ScaleWidth(refSize);
+            }
+            else {
+                window.setTimeout(ScaleSlider, 30);
+            }
+        }
+        ScaleSlider();
+        $(window).bind("load", ScaleSlider);
+        $(window).bind("resize", ScaleSlider);
+        $(window).bind("orientationchange", ScaleSlider);
+        //responsive code end
+
+    });
+</script>

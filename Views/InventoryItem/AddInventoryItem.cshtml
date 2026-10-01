@@ -1,0 +1,194 @@
+﻿@model DTO.InventoryItemDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<style>
+    .dlg {
+        width: 600px;
+        height: 1200px;
+    }
+
+    .PopUpRow {
+        width: 700px;
+        height: 50px;
+    }
+
+    .Custom-Header {
+        margin-top:10px;
+        width: 180px;
+        height: 20px;
+        float:left
+    }
+
+    .Item {
+        margin-top:10px;
+        width: 400px;
+        height: 30px;
+        float:left;
+    }
+</style>
+
+
+<div class="modal fade" role="dialog" id="dlgAddNewItem">
+    <div class="modal-dialog" style="width: 720px;height:1800px">
+        <span class="close-btn"><i class="fa fa-remove"></i> @LayoutRES.Close</span>
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@InventoryItemsRes.AddInventoryItem</h4>
+                </div>
+                @using (Html.BeginForm("AddNewItem", "InventoryItem", null, FormMethod.Post, new { role = "form", id = "frmAddEditInventoryItems",@class = "form-horizontal", }))
+                {
+                    <div class="box-body">
+                        @Html.AntiForgeryToken()
+
+                        <br />
+                        @Html.HiddenFor(m => m.Id, new { value = (Model.Id == 0 ?"0": Model.Id.ToString()) })
+                     <br/>
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.CategoryId)</div>
+                            @Html.DropDownListFor(x => x.CategoryId, new List<SelectListItem>(), new { id = "ddlCategoryId",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CategoryId)
+                        </div>
+
+                        <br />
+
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.TypeId)</div>
+                            @Html.DropDownListFor(x => x.TypeId, new List<SelectListItem>(), new { id = "ddlTypeId",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.TypeId)
+                        </div>
+
+                        <br />
+                        <div >
+                            <div >@Html.DisplayNameFor(m => m.Name)</div>
+                            @Html.TextBoxFor(m => m.Name, new { placeholder = Html.DisplayNameFor(m => m.Name), id = "txtName",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name)
+                        </div>
+                        <br />
+                        <div >
+                            <div >@Html.DisplayNameFor(m => m.Concentration)</div>
+                            @Html.TextBoxFor(m => m.Concentration, new { placeholder = Html.DisplayNameFor(m => m.Concentration), id = "txtConcentration",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Concentration)
+                        </div>
+                        <br />
+
+                        <div  @floatToRight>
+                            <div >@Html.DisplayNameFor(m => m.UnitId)</div>
+                            @Html.DropDownListFor(x => x.UnitId, new List<SelectListItem>(), new { id = "ddlUnitId",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.UnitId)
+                        </div>
+
+                        <br />
+
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.FormulaId)</div>
+                            @Html.DropDownListFor(x => x.FormulaId, new List<SelectListItem>(), new { id = "ddlFormulaId",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.FormulaId)
+                        </div>
+
+                        <br />
+
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.PackingUnitId)</div>
+                            @Html.DropDownListFor(x => x.PackingUnitId, new List<SelectListItem>(), new { id = "ddlPackingUnitId",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PackingUnitId)
+                        </div>
+
+                        <br />
+
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.ExchangeUnitId)</div>
+                            @Html.DropDownListFor(x => x.ExchangeUnitId, new List<SelectListItem>(), new { id = "ddlExchangeUnitId",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ExchangeUnitId)
+                        </div>
+
+                        <br />
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.PackingExchangeUnitsNumber)</div>
+                            @Html.TextBoxFor(m => m.PackingExchangeUnitsNumber, new { placeholder = Html.DisplayNameFor(m => m.PackingExchangeUnitsNumber), id = "txtPackingExchangeUnitsNumber",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PackingExchangeUnitsNumber)
+                        </div>
+                        <br />
+                        <div @floatToRight >
+                            <div >@Html.DisplayNameFor(m => m.Description)</div>
+                            @Html.TextBoxFor(m => m.Description, new { placeholder = Html.DisplayNameFor(m => m.Description), id = "txtDescription",  @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Description)
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                    <hr/>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                }
+                <script id="LoadDropDownLists">
+                    function loadAllDropDownLists() {
+                        LoadDDlFromGlobalArr(GlobalArray['IMTY'], 'ddlTypeId',@((Model.TypeId == null) ? 0 : @Model.TypeId));
+                        LoadDDlFromGlobalArr(GlobalArray['IMF'], 'ddlFormulaId', @((Model.FormulaId == null) ?0: @Model.FormulaId));
+                        LoadDDlFromGlobalArr(GlobalArray['IMC'], 'ddlCategoryId',  @((Model.CategoryId == null) ?0: @Model.CategoryId));
+                        LoadDDlFromGlobalArr(GlobalArray['IMEU'], 'ddlExchangeUnitId',@((Model.ExchangeUnitId == null) ?0: @Model.ExchangeUnitId ));
+                        LoadDDlFromGlobalArr(GlobalArray['IMPU'], 'ddlPackingUnitId',@((Model.PackingUnitId == null) ?0: @Model.PackingUnitId ));
+                        LoadDDlFromGlobalArr(GlobalArray['IMU'], 'ddlUnitId',@((Model.UnitId == null) ?0: @Model.UnitId ));
+                    }
+
+                    function registerFormSubmitting(){ 
+                        $("#frmAddEditInventoryItems").submit(function (e) {
+                            var apiurl = "";
+                            if($("#Id").val() == "0") // add
+                            apiurl = MersalWebAPIBaseUrl + "api/InventoryItems/Create";
+                             else // update
+                                 apiurl = MersalWebAPIBaseUrl + "api/InventoryItems/UpdateInventoryItem"; 
+                            $.validator.unobtrusive.parse( $("#frmAddEditInventoryItems"))
+                            e.preventDefault();
+                            if (!$("#frmAddEditInventoryItems").valid()) return;
+                            
+                            var data = {};
+                            $("#frmAddEditInventoryItems").serializeArray().map(function (x) { data[x.name] = x.value; });
+                            
+                            console.log(JSON.stringify(data));
+                            $.ajax({
+                                type: "POST",
+                                contentType: "application/json",
+                                url: apiurl,
+                                crossDomain: true,
+                                headers: getHeaders(),
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    $('#AddOrEditInventoryItemDiv').modal('hide');
+                                    data = JSON.parse(data);
+                                    if (data > 0) {
+                                        toastr.success('@InventoryItemsRes.OperationSucceeded');
+                                        RefreshInventoryItems();
+                                        //$("#grid").data('kendoGrid').dataSource.read();
+                                        //$("#grid").data("kendoGrid").refresh();
+                                    }
+                                    else {
+                                        toastr.error('@InventoryItemsRes.OperationFailed' );
+                                    }
+                                },
+                                error: function (xhr) {
+                                    $('#AddCaseModals').modal('hide');
+                                    toastr.error('@InventoryItemsRes.OperationFailed '); 
+                                }
+                            });
+                        });
+
+                    };
+                    registerFormSubmitting();
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

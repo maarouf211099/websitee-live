@@ -1,0 +1,86 @@
+﻿@model IEnumerable<DTO.CaseEmployeeDTO>
+@using Resource
+@using System.Globalization
+@using Kendo.Mvc.UI
+<div class="modal fade" id="AssginCaseToDoctorModals" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <div class="box box-info">
+
+
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.AssignCaseToDoctor</h4>
+                </div><!-- /.box-header -->
+              
+                <form class="form-horizontal" id="AssginCaseToDoctorForm">
+                    <div class="box-body">
+                        <input id="CasDoctor_CaseId" type="hidden" name="CaseId" value="@Model.First().CaseId" />
+                        <input id="CaseDoctor_DoctorId" type="hidden" name="UserId" value="0" />
+                        <input id="CaseDoctor_DoctorEmail" type="hidden" name="Email" value="" />
+                          @*<input id="CaseInvestigtor_InvestigtorId" type="hidden" name="UserId" value="0" />
+                        <input id="CaseInvestigtor_InvestigtorEmail" type="hidden" name="Email" value="" />
+                        <input id="isExptionInvestigation" type="hidden" name="IsException" />*@
+                        @if (Model.First().UserId != 0)
+                        {
+                            foreach (var caseDoctor in Model)
+                            {
+                                if (caseDoctor.IsDone)
+                                {
+                                    <label>@caseDoctor.EmployeeName - @LayoutRES.Done - @caseDoctor.UpdatedOn.Value.ToString("d/M/yyyy HH:mm", CultureInfo.InvariantCulture)</label>
+                                }
+                                else if (caseDoctor.IsDeleted)
+                                {
+                                    <label>@caseDoctor.EmployeeName - @CaseResources.Removed - @caseDoctor.UpdatedOn.Value.ToString("d/M/yyyy HH:mm", CultureInfo.InvariantCulture)</label>
+                                }
+                                else
+                                {
+                                    <label>@caseDoctor.EmployeeName - @CaseResources.ActiveNow</label>
+                                }
+                                <br />
+                            }
+                        }
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                @Html.Label(CaseResources.SearchForDoctor, new { @class = "control-label" })
+                                @(Html.Kendo().ComboBox()
+                                    .Name("SearchForDoctor")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    //.Placeholder(CaseCustomAtrributeRes.SelectCategory)
+                                    .HtmlAttributes(new { style = "width:100%", @aria_required = "true" })
+                                    .Filter(FilterType.Contains)
+                                    .Suggest(true)
+                                    .Events(e => e
+                                    //.DataBound("SetInvestegatorData")
+                                    //.Open("SetInvestegatorData")
+                                    .Select("SetDoctorData")
+                                    .Change("SetDoctorData")
+                                    )
+                                    .HighlightFirst(true)
+                                    .DataSource(source =>
+                                    {
+                                        source.Custom()
+                                       .ServerFiltering(true).ServerPaging(true).Type("aspnetmvc-ajax")
+                                       .Transport(transport =>
+                                       {
+                                           transport.Read(r => r.Action("GetAllDoctorKendo", "Case") // .Data("DateTypeId")
+                                           );
+                                       })
+                                       .Schema(schema => { schema.Data("Data").Total("Total"); });
+                                    }))
+                                <span class="field-validation-error"><span id="Doctormsg" style="display:none;">@CaseResources.DoctorRequired </span></span>
+                            </div>
+                         
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <input id="btnAssginInvestigetro" type="submit" value="@LayoutRES.Submit" class="btn btn-info pull-right" />
+                        <button type="button" data-dismiss="modal" class="btn btn-default pull-left">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

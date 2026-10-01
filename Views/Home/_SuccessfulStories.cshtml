@@ -1,0 +1,141 @@
+﻿@using Resource
+@using UserUI.Helper
+
+<section>
+    <div class="block">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div class="title">
+                        @if (CultureHelper.IsRighToLeft())
+                        {
+                            <h2>@LayoutRES.Cases  <span>@LayoutRES.Successful </span></h2>
+                            <span>@LayoutRES.CommittedToProvidingTheBest</span>
+                        }
+                        else
+                        {
+                            <h2>@LayoutRES.Successful <span>@LayoutRES.Cases</span></h2>
+                            <span>@LayoutRES.CommittedToProvidingTheBest</span>
+                        }
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="successfulStoriesContainer">
+
+                            <div class="col-md-4">
+                                <div class="story">
+                                    <div class="story-img">
+                                        <img itemprop="image" src="~/images/resource/story2.jpg" alt="" />
+                                        <a itemprop="url" href="cause-detail.html" title="">+</a>
+                                    </div>
+                                    <div class="story-detail">
+                                        <span>In South Africa</span>
+                                        <h3><a itemprop="url" href="cause-detail.html" title="">Organization You Can Trust Help To Get Education </a></h3>
+                                    </div>
+                                    <div class="spent-bar">
+                                        <span>Money Spent</span>
+                                        <span class="price"><i>$</i>3830</span>
+                                    </div>
+                                </div><!-- Story -->
+                            </div>
+
+                        </div>
+                    </div><!-- Successful Stories -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    var SuccessfulStories = [{
+        imageSRC: "/images/resource/story1.jpg",
+        detailsHref: "/",
+        City: "سوريا",
+        CaseHref: "/",
+        title: "انقاذ 100 طفل فى سوريا",
+        moneySpent: 5555
+    },
+    {
+        imageSRC: "/images/resource/story1.jpg",
+        detailsHref: "/",
+        City: "سوريا",
+        CaseHref: "/",
+        title: "انقاذ 100 طفل فى سوريا",
+        moneySpent: 5555
+    },
+    //{
+    //    imageSRC: "/images/resource/story1.jpg",
+    //    detailsHref: "/",
+    //    City: "مصر",
+    //    CaseHref: "/",
+    //    title: "انقاذ 100 طفل فى مصر",
+    //    moneySpent: 5555
+    //},
+    //{
+    //    imageSRC: "/images/resource/story1.jpg",
+    //    detailsHref: "/",
+    //    City: "مصر",
+    //    CaseHref: "/",
+    //    title: "انقاذ 100 طفل فى مصر",
+    //    moneySpent: 5555
+    //},
+    {
+        imageSRC: "/images/resource/story1.jpg",
+        detailsHref: "/",
+        City: "مصر",
+        CaseHref: "/",
+        title: "انقاذ 100 طفل فى مصر",
+        moneySpent: 5555
+    }]
+    DrawSuccessfulStories(SuccessfulStories)
+    function DrawSuccessfulStories(json) {
+        var html = "";
+        var template = '<div class="col-md-4">   '
+                    + '<div class="story">   '
+                    + '    <div class="story-img">  '
+                    + '        <img itemprop="image" src="#imageSRC#" alt="" />   '
+                    + '        <a itemprop="url" href="#detailsHref#" title="">+</a>    '
+                    + '    </div>                                          '
+                    + '    <div class="story-detail">                      '
+                    + '        <span>#City#</span>                '
+                    + '        <h3><a itemprop="url" href="#CaseHref#" title="">#title# </a></h3>   '
+                    + '    </div>                                                '
+                    + '    <div class="spent-bar">                               '
+                    + '        <span>المبلغ المنفق</span>                          '
+                    + '        <span class="price"><i>$</i>#moneySpent#</span>           '
+                    + '    </div>                                                '
+                    + '</div><!-- Story -->               '
+        '  </div>                       '
+        $("#successfulStoriesContainer").html("")
+        for (var i = 0; i < json.length; i++) {
+
+            var res = template
+                            .replace("#imageSRC#", json[i].imageSRC)
+                            .replace("#detailsHref#", json[i].detailsHref)
+                            .replace("#City#", json[i].City)
+                            .replace("#CaseHref#", json[i].CaseHref)
+                            .replace("#title# ", json[i].title)
+                            .replace("#moneySpent#", json[i].moneySpent);
+
+            html += res;
+            $("#successfulStoriesContainer").append(res);
+        }
+        //console.log(html);
+        //$("#successfulStoriesContainer").html(res)
+    }
+
+    function GetAndDrawSuccessfulStories(url) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: url,
+            async: false,
+            success: function (data) {
+                GetAndDrawSuccessfulStories(data)
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText); 
+            }
+        });
+    }
+
+</script>

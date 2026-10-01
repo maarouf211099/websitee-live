@@ -1,0 +1,29 @@
+﻿
+@model DTO.CaseDetailsDTO
+@using Resource;
+@using Kendo.Mvc.UI;
+@using System.Configuration;
+<div class="row">
+    <div id="CustomAttr">
+
+    </div> 
+</div> 
+
+<script>
+    var caseId = '@Model.Id';
+    var RequiredRES = '@CaseCustomAtrributeRes.Required';
+    var MinLenghtError =  '@CaseCustomAtrributeRes.MinLenghtError';
+    var MaxLenghtError = '@CaseCustomAtrributeRes.MaxLenghtError';
+    var DateNow = '@CaseCustomAtrributeRes.DateNow';
+    var MinDateError = '@CaseCustomAtrributeRes.MinDateError';
+    var MaxDateError = '@CaseCustomAtrributeRes.MaxDateError';
+    var MaxValueError = '@CaseCustomAtrributeRes.MaxValueError';
+    var MinValueError = '@CaseCustomAtrributeRes.MinValueError';
+    var DataTypeINT = '@StaticIDs.DataTypeINT';
+    var DataTypeFloat = '@StaticIDs.DataTypeFloat';
+    var DataTypeString = '@StaticIDs.DataTypeString';
+    var DataTypeDate ='@StaticIDs.DataTypeDate';
+    var LOKUP ='@StaticIDs.LOKUP';
+    var SelectRES =  '@CaseCustomAtrributeRes.Select';
+</script> 
+ 

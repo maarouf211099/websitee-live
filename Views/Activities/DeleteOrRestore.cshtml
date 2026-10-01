@@ -1,0 +1,109 @@
+﻿@using Infrastructure
+@using Resource
+@{
+    Layout = null;
+    var mersapApi = ViewBag.MersalApi;
+    var IsDelete= ViewBag.IsDelete;
+    var Title = IsDelete ? ActivitiesRES.DeleteConfirmationTitle : ActivitiesRES.RestoreConfirmationTitle;
+    var message = IsDelete ? ActivitiesRES.DeleteConfirmationMessage : ActivitiesRES.RestoreConfirmationMessage;
+    var btn_Text = IsDelete ? ActivitiesRES.Delete_btn_text : ActivitiesRES.Restore_btn_text;
+
+}
+
+
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" id="btn_Close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="exampleModalLabel"> @Title </h4>
+        </div>
+        <div class="modal-body">
+
+            <h3>@message</h3>
+
+            @Html.Hidden("Id")
+
+        </div>
+        <div class="modal-footer">
+
+            <button type="button" class="btn btn-info pull-right" id="btnDelete">@btn_Text</button>
+            @*<button type="button" class="btn btn-default" data-dismiss="modal">@ActivitiesRES.Cancel_btn_text</button>*@
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@ActivitiesRES.Cancel_btn_text</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+        if ('@IsDelete'=='True') {
+
+            $("#btnDelete").click(function () {
+                $.ajax({
+                    url: '@mersapApi' + 'api/Activities/DeleteActivity?Id='+$("#Id").val()+'&IsDelete=True',
+                    type: 'Post',
+                    data:{
+                        Id: $("#Id").val(),
+                        IsDelete:true,
+                    },
+                    contentType: 'application/json; charset=utf-8',
+                    beforeSend: function () {
+                        $("#imgAjaxLoader").show();
+                    },
+                    success: function (result) { 
+                        $("#imgAjaxLoader").hide();
+                        var resultCode = result.ResultCode;
+                        switch (resultCode) {
+                            case @((int)ReturnResultCode.Success):
+                                toastr.success(SuccessfulProcess);
+                                $('#ActiivitiesGrid').data('kendoGrid').dataSource.read();
+                                $('#btn_Close').click();
+                                break;
+
+                            default:
+                                toastr.error(ErrorMessage);
+                                $('#btn_Close').click();
+                                break;
+                        }
+                    },
+                    fail: function () {
+                        $("#imgAjaxLoader").hide();
+                        toastr.error(ErrorMessage);
+                        $('#btn_Close').click();
+                    }
+                });
+
+            })
+        }else{
+            $("#btnDelete").click(function () {
+                $.ajax({
+                    url: '@mersapApi' + 'api/Activities/DeleteActivity?Id='+$("#Id").val()+'&IsDelete=False',
+                    type: 'Post',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (result) { 
+                        var resultCode = result.ResultCode;
+                        switch (resultCode) {
+                            case @((int)ReturnResultCode.Success):
+                                toastr.success(SuccessfulProcess);
+                                $('#ActiivitiesGrid').data('kendoGrid').dataSource.read();
+                                $('#btn_Close').click();
+                                break;
+
+                            default:
+                                toastr.error(ErrorMessage);
+                                $('#btn_Close').click();
+                                break;
+                        }
+                    },
+                    fail: function () {
+                        toastr.error(ErrorMessage);
+                        $('#btn_Close').click();
+                    }
+                });
+
+            })
+        }
+
+
+
+
+</script>

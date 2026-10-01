@@ -1,0 +1,29 @@
+﻿# secrets - never commit real configs
+Web.config
+**/Web.config
+*.config.bak
+appsettings.*.json
+# build/runtime junk
+Logger/
+*.log
+packages/
+# data (goes to Azure Blob, not Git)
+ClientFiles/
+ActivityImages/
+
+# allow the safe MVC views config
+!Views/Web.config
+
+# backup configs with secrets
+Web.config.bak*
+*.bak-*
+
+# DAL configs contain DB connection strings - never commit
+*DAL.dll.config
+*DAL.dll.config.example
+
+# large/temp files
+*.zip
+*.rar
+*.7z
+ConfirmOnlineDonationUIfile.txt

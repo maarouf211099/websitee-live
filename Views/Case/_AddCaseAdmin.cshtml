@@ -1,0 +1,171 @@
+﻿@model DTO.CaseDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+<div class="modal fade" id="AddCaseModals" role="dialog" dir="@dir">
+    <div class="modal-dialog" style="width: 900px;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@LayoutRES.AddNewCase</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm("Create", "Case", null, FormMethod.Post, new { @class = "form-horizontal", id = "AddCaseAdminForm" }))
+                {
+                    <div class="box-body">
+                        @Html.DisplayNameFor(m => m.CaseName)
+                        @Html.TextBoxFor(m => m.CaseName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                        @Html.ValidationMessageFor(m => m.CaseName)
+                        <br />
+
+                        @Html.DisplayNameFor(m => m.Description)
+                        @Html.TextAreaFor(m => m.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Description), rows = "5" })
+                        @Html.ValidationMessageFor(m => m.Description)
+                        <br />
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Category)
+                                @Html.DropDownListFor(x => x.Category, new List<SelectListItem>(), new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Category)
+                            </div>
+
+                            <div id="serviceArea">
+                                <input type="hidden" id="caseCategoryHID" />
+                                @Html.HiddenFor(x => x.serviceIDs)
+                                <div class="col-sm-4" dir="@dir">
+                                    @CaseResources.ServiceType
+                                    <div class="caseServiceDiv">
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-sm-4" dir="@dir">
+                                    @CaseResources.DisesaseType
+                                    <div class="caseDiseaseDiv">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.Age)
+                                <br />
+                                @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Age) })
+                                @Html.ValidationMessageFor(m => m.Age)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.Mobile)
+                                @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Mobile) })
+                                @Html.ValidationMessageFor(m => m.Mobile)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.Phone)
+                                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Phone) })
+                                @Html.ValidationMessageFor(m => m.Phone)
+                            </div>
+
+                            @*<div class="col-sm-8 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Email)
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Email) })
+                                    @Html.ValidationMessageFor(m => m.Email)
+                                </div>*@
+                        </div>
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Gender)
+                                @Html.DropDownListFor(x => x.Gender, new List<SelectListItem>(), new { @class = "Gender adminAddCase-Country form-control" })
+                                @Html.ValidationMessageFor(m => m.Gender)
+                            </div>
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.ReligionId)
+                                @Html.DropDownListFor(x => x.ReligionId, new List<SelectListItem>(), new { @class = "ReligionId adminAddCase-Country form-control" })
+                                @Html.ValidationMessageFor(m => m.ReligionId)
+                            </div>
+                            @*<div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.StatusInEgyptId)
+                                @Html.DropDownListFor(x => x.StatusInEgyptId, new List<SelectListItem>(), new { @class = "StatusInEgyptId adminAddCase-Country form-control" })
+                                @Html.ValidationMessageFor(m => m.StatusInEgyptId)
+                            </div>*@
+                        </div>
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Nationality)
+                                @Html.DropDownListFor(x => x.Nationality, new List<SelectListItem>(), new { @class = "Nationality adminAddCase-Country form-control", id = "Nationality" })
+                                @Html.ValidationMessageFor(m => m.Nationality)
+                            </div>
+                            <div class="divStatus col-sm-4 @floatToRight" style="display:none;">
+                                @Html.DisplayNameFor(m => m.StatusInEgyptId)
+                                @Html.DropDownListFor(x => x.StatusInEgyptId, new List<SelectListItem>(), new { @class = "StatusInEgyptId adminAddCase-Country form-control" })
+                                @*@Html.ValidationMessageFor(m => m.StatusInEgyptId)*@
+                            </div>
+                        </div>
+
+
+                        <div class="form-group" dir="@dir">
+                            <div class="hide col-sm-3 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Country)
+                                @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country adminAddCase-Country form-control" })
+                                @Html.ValidationMessageFor(m => m.Country)
+                            </div>
+
+                            <div class="col-sm-3 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Governorate)
+                                @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate adminAddCase form-control", id = "GovernorateAdminAddCase" })
+                                @Html.ValidationMessageFor(m => m.Governorate)
+                            </div>
+
+                            <div class="col-sm-3 @floatToRight">
+                                @Html.DisplayNameFor(m => m.District)
+                                @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "form-control", id = "DistrictAdminAddCase" })
+                                @Html.ValidationMessageFor(m => m.District)
+                            </div>
+                            <div class="col-sm-3 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Region)
+                                @Html.TextBoxFor(m => m.Region, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Region) })
+                                @Html.ValidationMessageFor(m => m.Region)
+                            </div>
+                        </div>
+                        @Html.DisplayNameFor(m => m.AddressLine1)
+                        @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                        @Html.ValidationMessageFor(m => m.AddressLine1)
+                        <br />
+                        @Html.DisplayNameFor(m => m.AddressLine2)
+                        @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                        @Html.ValidationMessageFor(m => m.AddressLine2)
+                        <br />
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-6 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Source)
+                                <select id="Source" name="Source" class="form-control"></select>
+                            </div>
+                            <div class="col-sm-6 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Priority)
+                                <select id="Priority" name="Priority" class="form-control"></select>
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+
+                            <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

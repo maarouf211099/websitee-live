@@ -1,0 +1,71 @@
+﻿ @model DTO.ContactUsDTO
+@using Resource
+ <div class="contact-us-header">
+        <h1>@HomeRES.Contactus</h1>
+</div>
+
+<section>
+    <div class="contact-us-page">
+    
+        <div class="container">
+            <div class="row">
+                <div id="BranchesDiv"></div>
+
+            </div>
+        </div>
+        <div class="bottom-block">
+
+
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "contact-form", id =
+            "ContactUsForm" }))
+            {
+            <div class="row">
+
+
+                <div class="col-md-6">
+                    <div class="textfield">
+                        @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder =
+                        Html.DisplayNameFor(m => m.Email) })
+                        @Html.ValidationMessageFor(x => x.Email)
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="textfield">
+                        @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder =
+                        Html.DisplayNameFor(m => m.Name) })
+                        @Html.ValidationMessageFor(x => x.Name)
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-12">
+                    <div class="textfield">
+                        @Html.TextAreaFor(x => x.Message, new { @class = "form-control", placeholder =
+                        Html.DisplayNameFor(m => m.Message) })
+                        @Html.ValidationMessageFor(x => x.Message)
+                    </div>
+                    @*<textarea name="comments" placeholder="Message"></textarea>*@
+                </div>
+                <div class="col-md-12 submitt">
+                    <button type="submit">@LayoutRES.Submit</button>
+                </div>
+            </div>
+            }
+
+            <div id="MersalmapBranches" class="mapIMPstyle"></div>
+
+        </div>
+
+
+
+    </div>
+</section>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2l5oes21pBsgScCGl6WFrklamZYtRX54"></script>
+
+<script src="~/Scripts/MersalScripts/LayoutManagment/ContactUsScript.js"></script>

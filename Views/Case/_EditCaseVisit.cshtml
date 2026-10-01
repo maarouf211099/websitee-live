@@ -1,0 +1,223 @@
+﻿@model DTO.EditCaseFullVisiteDTO
+@using Resource
+@using System.Configuration
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var systemCode = ConfigurationManager.AppSettings["SystmeCodeWebAPIBaseUrl"] + "/api/";
+}
+<style>
+    .checkBoxService {
+        margin: 5px !important;
+    }
+</style>
+<div class="modal fade" id="CaseVisitResultModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    @if (Model.AllowAddVisit)
+                    {
+                        if (Model.ServiceIsDone)
+                        {
+                            <button onclick="MarkCaseAsServiceIsDoneNotDone(false)" type="button" class="btn btn-info pull-left">@CaseResources.MarkCaseAsServiceIsDone</button>
+                        }
+                        else
+                        {
+                            <button onclick="MarkCaseAsServiceIsDoneNotDone(true)" type="button" class="btn btn-info pull-left">@CaseResources.MarkCaseAsServiceIsNotDone</button>
+                        }
+                    }
+
+                    <a href="@ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=@Model.CaseId&allowToUser=false" target="_blank"><h3 class="modal-title">@Model.CaseName </h3></a>
+                    <h4 class="modal-title">@CaseResources.CurrantState : @Model.CaseStateName</h4>
+                    <h4 class="modal-title">@CaseResources.Category : @Model.CaseCategoryName</h4>
+                    @if (string.IsNullOrEmpty(Model.VisitorName))
+                    {
+                        <h4 class="modal-title">@CaseResources.ThereIsNoResponsibleEmployee</h4>
+                    }
+                    else
+                    {
+                        <h4 class="modal-title">@CaseResources.responsibleEmployee : @Model.VisitorName</h4>
+                    }
+                </div><!-- /.box-header -->
+                @if (true) //(Model.AllowAddVisit)
+                {
+                    <div class="box-body">
+                        @Html.HiddenFor(x => x.CaseId)
+                        @Html.HiddenFor(x => x.CaseName)
+                        <div class="row form-group">
+                            <div class="col-md-7">
+                                @Html.DisplayNameFor(m => m.FamilyMemberId)
+                                <input type="hidden" value="@Model.FamilyMemberId" id="FamilyMemberIdValueId" />
+                                <br />
+                                @Html.DropDownListFor(x => x.FamilyMemberId, new List<SelectListItem>(), new { @class = "form-control" })
+                                <label class="text-danger" id="VisitFamilyMemberErrorMassage"></label>
+                            </div>
+                        </div>
+
+                        @*<div class="row form-group familydetails">
+                            <div class="col-md-2">
+                                @Html.DisplayNameFor(m => m.FamilyMemberAge)
+                                <br />
+                                @Html.TextBoxFor(m => m.FamilyMemberAge, " ", new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-2">
+                                @Html.DisplayNameFor(m => m.FamilyMemberGenderId)
+                                <br />
+                                @Html.DropDownListFor(x => x.FamilyMemberGenderId, new List<SelectListItem>(), new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-4">
+                                @Html.DisplayNameFor(m => m.FamilyMemberNationalityId)
+                                <br />
+                                @Html.DropDownListFor(x => x.FamilyMemberNationalityId, new List<SelectListItem>(), new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-4">
+                                @Html.DisplayNameFor(m => m.FamilyMemberReligionId)
+                                <br />
+                                @Html.DropDownListFor(x => x.FamilyMemberReligionId, new List<SelectListItem>(), new { @class = "form-control" })
+                            </div>
+                        </div>*@
+
+                        <div class="form-group">
+
+                            <div class="col-md-4">
+                                @Html.DisplayNameFor(m => m.Amount)
+                                <br />
+                                @Html.TextBoxFor(m => m.Amount, new { @type = "number", @class = "form-control" })
+                            </div>
+
+                            <div class="col-md-4">
+                                @Html.DisplayNameFor(m => m.VisitDateString)
+                                <br />
+                                @Html.TextBoxFor(m => m.VisitDateString, new { @class = "DateTillNow form-control" })
+                                <label class="text-danger" id="VisitDateErrorMassage"></label>
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="row">
+                            <br />
+                            @Html.HiddenFor(x => x.VisiteServiceIDs)
+                            @if (Model.CaseServices.Any())
+                            {
+                                <div class="form-group" dir="@dir">
+                                    <div class="col-sm-12">
+                                        @Html.Label(CaseResources.ServiceType)
+                                    </div>
+                                    <div id="VisiteServiceDiv">
+                                        @foreach (var serv in Model.CaseServices)
+                                        {
+                                            <div class="col-sm-3"><input onclick="changeService('@serv.Id')" type="checkbox" @(Model.SelectedCaseServices.Any(x=>x.Id == serv.Id) ? "checked":"") class="checkBoxService">@serv.Name</div>
+                                        }
+                                    </div>
+
+                                </div>
+                            }
+                            @if (Model.CaseDisesases.Any())
+                            {
+
+                                <div class="form-group" dir="@dir">
+                                    <div class="col-sm-12">
+                                        @Html.Label(CaseResources.DisesaseType)
+                                    </div>
+                                    @*<div id="VisiteDiseaseDiv">
+                                            @foreach (var Dise in Model.CaseDisesases)
+                                            {
+                                                <div class="col-sm-3"><input onclick="changeService('@Dise.Id')" type="checkbox" class="checkBoxService">@Dise.Name</div>
+                                            }
+                                        </div>*@
+                                    <div class="col-md-12">
+                                        <div id="multiselectDisease"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            @Html.TextAreaFor(m => m.VisitResult, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.VisitResult), rows = "5" })
+                            <label class="text-danger" id="VisitResultErrorMassage"></label>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button type="button" onclick="submitEditVisitResult()" class="btn btn-info pull-right">@CaseResources.AddCaseFollow</button>
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="box-footer">
+                        <h4 class="modal-title">Sorry You Can't Add Follow To This Case</h4>
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var json = @Html.Raw(Json.Encode(Model.CaseDisesases));
+
+    function prepareMultiSelect(id) {
+        $('#' + id).kendoMultiSelect({
+            dataTextField: 'NameAr',
+            dataValueField: 'Id',
+            autoBind: false,
+            dataSource: {
+                serverFiltering: true,
+                type: "json",
+                schema: {
+                    data: "Data",
+                    total: "Total"
+                },
+                transport: {
+                    read: {
+                        url: SystmeCodeWebAPIBaseUrl + '/api/DetailCode/GetDetailedCodesByNameForKendo',
+                        data: function (e) {
+                            // get your widget.
+                            let widget = $('#' + id).data('kendoMultiSelect');
+                            // get the text input
+                            let text = widget.input.val();
+                            if (text == null || text == undefined)
+                                text = '';
+                            // what you return here will be in the query string
+                            return {
+                                detailCodeName: text,
+                                code: "cDisSubCategory",
+                                parentMasterCode: "cDis"
+                            };  
+                        }
+                    },
+                }
+            },
+            value: setValues()
+        });
+    }
+
+    function setValues() {
+        let result = [];
+        let ss = @Html.Raw(Json.Encode(Model.SelectedCaseDisesases));
+        
+        for (var i = 0; i < ss.length; i++) {
+            result.push({ Id: ss[i].Id, NameAr: ss[i].Name });
+        }
+        return result;   
+    }
+
+    prepareMultiSelect("multiselectDisease");
+    setValues();
+    function onSelect(e) {
+            var dataItem = e.dataItem;
+            changeService(dataItem.value);
+    };
+
+    function onDeselect(e) {
+        changeService(dataItem.value);
+    };
+
+</script>

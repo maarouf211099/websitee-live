@@ -1,0 +1,126 @@
+﻿@using Resource
+@model UserUI.Models.RepresentativeDonationViewModelAnonymous
+<div id="RepresentativeDonationTabs" class="donation-fields pt-2">
+    <div class="tabContainer">
+        <strong class="popup-title text-center pt-3">
+            @DonationResources.RepresentativeDonationDescription
+
+        </strong>
+        @*<strong class="popup-title">@DonationResources.PERSONALDETAILS</strong>*@
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "RepresentativeDonationForm" }))
+        {
+    <div class="form">
+
+        <input type="hidden" class="hidAccountIdDonation" name="AccountId" />
+        <input type="hidden" class="hidCaseIdDonation" name="CaseId" />
+        <input type="hidden" class="hidDonationType" name="DonationType" />
+
+
+        <div class="col-md-6 FloatRight">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.NameAnonymous, new { @class = "form-control  textfield", placeholder = @DonationResources.DonationName + '*' })
+                @Html.ValidationMessageFor(x => x.NameAnonymous)
+            </div>
+        </div>
+        <div class="col-md-6 FloatRight">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.PhoneNumberAnonymous, new { @class = "form-control textfield", placeholder = @DonationResources.Phone + '*' })
+                @Html.ValidationMessageFor(x => x.PhoneNumberAnonymous)
+            </div>
+        </div>
+        <div class="col-md-6 FloatRight">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.AddressAnonymous, new { @class = "form-control textfield", placeholder = @DonationResources.Address + '*' })
+                @Html.ValidationMessageFor(x => x.AddressAnonymous)
+            </div>
+        </div>
+        <div class="col-md-6 FloatRight">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.EmailAnonymous, new { placeholder = @DonationResources.Email + '*' })
+                @Html.ValidationMessageFor(x => x.EmailAnonymous)
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.Amount, new { Value = "", placeholder = DonationResources.EnterTheAmountYouWant+'*', onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                @Html.ValidationMessageFor(x => x.Amount)
+            </div>
+        </div>
+        @*<div class="form-group col-md-12 DonationDestinationTypeDiv" style="display:none;">
+            <label class="col-md-4 control-label FloatRight">@DonationResources.DonationDestination :</label>
+            <div class="col-sm-8">
+                @Html.DropDownListFor(x => x.DonationDestinationId, new List<SelectListItem>(), new { @class = "form-control" })
+            </div>
+        </div>*@
+        @* new added *@
+
+        @*<div class="col-md-12 d-lg-flex">
+            <ul class="donation-figures col-8">
+                <li><a class="wpdonation-button " id="Donate10OtherRep" title="">10.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate50OtherRep" title="">50.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate100OtherRep" title="">100.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate500OtherRep" title="">500.00 EGP</a></li>
+                <li><a class="wpdonation-button active" id="OtherAmountOtherRep" title="Other Amount Online">@DonationResources.OtherAmount</a></li>
+            </ul>
+            <div class="donation-amount  col-4 ">
+                <div>
+
+
+                    @Html.TextBoxFor(x => x.Amount, new { @class = "form-control", Id = "ValueAmountOtherRep", maxlength = 5, Value = "", placeholder = DonationResources.EnterTheAmountYouWant, onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                    <span>EGP</span>
+
+
+                    @Html.ValidationMessageFor(x => x.Amount)
+
+                </div>
+            </div>
+        </div>*@
+
+        <div class="donate-now col-md-12 justfy-align-center"><input type="submit" itemprop="url" class="proceed" value="@LayoutRES.Submit" /></div>
+
+
+
+        <div class="col-md-12" id="codeDiv">
+            <h1 class="text-center" style="color: #009091">
+                @DonationResources.MessageCode <span id="CodeValue"></span>
+            </h1>
+
+        </div>
+    </div>
+        }
+    </div>
+</div>
+
+<script>
+    $('#EmailAnonymous').on("keypress", function (e) {
+        $(this).val($(this).val().trim());
+        if (e.which === 32)
+            return false;
+    });
+
+    $('#EmailAnonymous').on("blur", function (e) {
+        $(this).val($(this).val().trim());
+    });
+    //$('#Donate10OtherRep').click(function () {
+    //    $("#ValueAmountOtherRep").attr("readonly", true).val(10);
+    //});
+
+    //$('#Donate50OtherRep').click(function () {
+    //    $("#ValueAmountOtherRep").attr("readonly", true).val(50);
+    //});
+
+    //$('#Donate100OtherRep').click(function () {
+    //    $("#ValueAmountOtherRep").attr("readonly", true).val(100);
+    //});
+
+    //$('#Donate500OtherRep').click(function () {
+    //    $("#ValueAmountOtherRep").attr("readonly", true).val(500);
+    //});
+
+    //$('#OtherAmountOtherRep').click(function () {
+    //    $("#ValueAmountOtherRep").attr("readonly", false).val('');
+    //});
+    $('#codeDiv').hide();
+
+</script>

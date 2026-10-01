@@ -1,0 +1,350 @@
+﻿@model UserDTO
+@using Resource
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@{
+    ViewBag.Title = "ReviewPendingVolunteers";
+    Layout = "~/Views/Volunteer/Container.cshtml";
+}
+
+<h2>@VolunteerResources.ReviewPendingVolunteers</h2>
+
+<head>
+    <title>@UserManagementResources.UserManagement</title>
+</head>
+
+@{
+    ViewBag.Title = UserManagementResources.UserManagement;
+    var culture = System.Globalization.CultureInfo.CurrentCulture.ToString();
+
+    var layoutPath = ConfigurationManager.AppSettings["LayoutPath"] != null ?
+        ConfigurationManager.AppSettings["LayoutPath"] : "~/Views/Shared/_AdminLayout.cshtml";
+
+    Layout = layoutPath;
+
+}
+<script src="~/Scripts/MersalScripts/Volunteers/searchObjectBuilder.js"></script>
+
+<style>
+    #Grid .k-grid-header .k-header {
+        color: white;
+    }
+</style>
+<div id="_Index_User" class="_Index">
+    <div class="modal-body">
+        <div id="searchBox_User" class="form-group">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@UserManagementResources.Search</h3>
+                            <span class="@(true ? "pull-right clickable" : "pull-left clickable")"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-role">
+                                        @Html.Label(UserManagementResources.UserName, new { @class = "control-label" })
+                                        @Html.TextBox("UserName", "", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-role">
+                                        @Html.Label(UserManagementResources.FirstName, new { @class = "control-label" })
+                                        @Html.TextBox((true ? UserManagementResources.FirstNameOtherCol : UserManagementResources.FirstNameCol), "", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-role">
+                                        @Html.Label(UserManagementResources.MiddleName, new { @class = "control-label" })
+                                        @Html.TextBox((true ? UserManagementResources.MiddleNameOtherCol : UserManagementResources.MiddleNameCol), "", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-role">
+                                        @Html.Label(UserManagementResources.LastName, new { @class = "control-label" })
+                                        @Html.TextBox((true ? UserManagementResources.LastNameOtherCol : UserManagementResources.LastNameCol), "", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="inline col-md-12">
+                                            <input id="IsActiveUser" type="checkbox" class="ace col-md-1" checked="checked" />
+                                            <span style="@(true ? "margin-right:9px;" : "margin-left:9px;")">@UserManagementResources.IsActive</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="inline col-md-12">
+                                            <input id="IsActiveDirectoryUser" type="checkbox" class="ace col-md-1" />
+                                            <span style="@(true ? "margin-right:9px;" : "margin-left:9px;")">@UserManagementResources.IsActiveDirectoryUser</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <br style="clear: both;" />
+                            <div class="modal-footer" style="float: @(true ? "left" : "right"); width: 100%;">
+                                @*<button type="button" class="btn btn-blue" id="btnSearch_User">@UserManagementResources.Search</button>*@
+                                <button type="button" class="btn btn-info" id="btnSearch_User">@UserManagementResources.Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width: 100%;">
+        <div style="float: @(true ? "right" : "left");">
+            <h4 class="title">@UserManagementResources.SearchResults</h4>
+        </div>
+    </div>
+    <hr style="clear: both;">
+    <div class="@(true ? "k-rtl" : "")">
+        <div id="users_Grid"></div>
+    </div>
+</div>
+
+<div id="deleteView_User" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+
+@Html.HiddenFor(model => model.Id, new { @id = "hfUserId" })
+@Html.HiddenFor(model => model.Id, new { @id = "hfRestoreId" })
+<script type="text/javascript">
+    $(document).ready(function () {
+        function onSelect(e) {
+            switch ($(e.item).index()) {
+                case 1:
+                    //bind Privileges
+                    bindPrivileges();
+                    break;
+                case 2:
+                    //bind Groups
+                    bindGroups();
+                    break;
+                case 3:
+                    //bind Roles
+                    bindRoles();
+                    break;
+                case 4:
+                    bindMenus();
+                    break;
+            }
+        }
+
+        $("#tabstrip").kendoTabStrip({
+            select: onSelect,
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            }
+        });
+    });
+
+    function initialzeUserTabs() {
+        var tabStrip = $("#tabstrip").kendoTabStrip().data("kendoTabStrip");
+        tabStrip.select(0);
+    }
+</script>
+<script type="text/javascript">
+    $(function () {
+        searchUsers();
+
+        $('#btnSearch_User').click(function (evt) {
+            searchUsers();
+        });
+    });
+
+    function searchUsers() {
+        var jsonObject = searchObjectBuilder.getJsonSearchObj('searchBox_User input');
+        var strJSON = JSON.stringify(jsonObject);
+
+        $.ajax({
+            url: '@ConfigurationManager.AppSettings["UserNamagementWebAPIBaseUrl"]'+'api'+ '@(Url.Action("SearchPendingUsers", "User"))',
+            cache: false,
+            type: "POST",
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: strJSON,
+            beforeSend: function () {
+                $("#imgAjaxLoader").show();
+            },
+            success: function (data) {
+                bindUsersGrid(data);
+                $("#imgAjaxLoader").hide();
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+                $("#imgAjaxLoader").hide();
+            },
+            async: true,
+            processData: false
+        });
+    }
+
+    </script>
+<script type="text/javascript">
+    function bindUsersGrid(jsonData) {
+
+        var firstDeleteRequest = 1;
+
+        var isHidden = !$("#IsActiveUser").is(":checked");
+
+        var commands = [
+        {
+            name: "Confirm",
+            text: "",
+            iconClass: "fa fa-pencil fa-fw fa-2x",
+            hidden: true,
+            click: function (e) {
+                var tr = $(e.target).closest("tr");
+                var id = tr.find('.id-cell').text();
+
+                if (firstDeleteRequest == 1) {
+                    toastr.clear();
+
+                    var CallBackFunction = function () { confirmUser(id, tr); };
+                    confirmMessage("Confirmation", "are you sure you want to confirm", 400, 250, CallBackFunction);
+
+                    
+
+                }
+            }
+        }];
+
+        $("#users_Grid").html("");
+        $("#users_Grid").kendoGrid({
+            groupable: false,
+            scrollable: true,
+            sortable: true,
+            pageable: {
+                pageSize: 10,
+                refresh: false
+            },
+            selectable: "multiple cell",
+            allowCopy: {
+                delimeter: ",",
+            },
+            columns: [
+                { field: "LocationId", filterable: false, hidden: true, attributes: { "class": "LocationId-cell" } },
+                { field: "Id", filterable: false, hidden: true, attributes: { "class": "id-cell" } },
+                { field: "UserName", title: "@UserManagementResources.UserName", filterable: true },
+            {
+                template: "#= @(true ? UserManagementResources.FirstNameOtherCol : UserManagementResources.FirstNameCol)# "
+                    + "#= @(true ? UserManagementResources.MiddleNameOtherCol : UserManagementResources.MiddleNameCol)# "
+                    + "#= @(true ? UserManagementResources.LastNameOtherCol : UserManagementResources.LastNameCol)#",
+                title: "@UserManagementResources.FullName",
+                filterable: true
+            },
+            {
+                title: "@UserManagementResources.IsActive", filterable: false,
+                template: "<img src=#= IsActiveUser ? '../Content/images/icon_Active.png' : '../Content/images/icon_Inactive.png' # />",
+                width: 125
+            },
+            {
+                title: "@UserManagementResources.ActiveDirectoryUser", filterable: false,
+                template: "<img src=#= IsActiveDirectoryUser ? '../Content/images/icon_Active.png' : '../Content/images/icon_Inactive.png' # />",
+                width: 160
+            },
+            {
+                title: "Confirm",
+                command: commands,
+                width: 100
+            }],
+            filterable: {
+                extra: false,
+                messages: {
+                    filter: "@CommonRes.Filter", // sets the text for the "Filter" button
+                    clear: "@CommonRes.Clear", // sets the text for the "Clear" button
+
+                    // when filtering boolean numbers
+                    isTrue: "@CommonRes.IsTrue", // sets the text for "isTrue" radio button
+                    isFalse: "@CommonRes.IsFalse", // sets the text for "isFalse" radio button
+
+                    //changes the text of the "And" and "Or" of the filter menu
+                    and: "@CommonRes.And",
+                    or: "@CommonRes.Or",
+                    itemsPerPage: "@CommonRes.ItemsPerPage",
+                    of: "@CommonRes.Of",
+                    items: "@CommonRes.Items"
+
+                }
+                , operators: {
+                    //filter menu for "string" type columns
+                    string: {
+                        EqualsTo:"@CommonRes.EqualsTo",
+                        NotEqualTo: "@CommonRes.NotEqualTo",
+                        StartsWith: "@CommonRes.StartsWith",
+                        EndsWith: "@CommonRes.EndsWith",
+                        Contain: "@CommonRes.Contain",
+                        doesNotContain: "@CommonRes.DoesNotContain",
+                        IsGreaterThan: "@CommonRes.IsGreaterThan",
+                        IsLessThan: "@CommonRes.IsLessThan",
+                        IsGreaterThanOrEqualTo: "@CommonRes.IsGreaterThanOrEqualTo",
+                        IsLessThanOrEqualTo: "@CommonRes.IsLessThanOrEqualTo"
+                    },
+
+                }
+            },
+            dataSource: {
+                data: jsonData,
+                schema: {
+                    model: { id: "Id" }
+                }
+            }
+        });
+
+
+        var confirmingButtons = $('.k-grid-Confirm');
+        $.each(confirmingButtons, function (index, confirmitionButton) {
+            var tr = $(confirmingButtons[index]).closest("tr");
+
+            var locationIdCell = tr.find(".LocationId-cell");
+            var locationId = locationIdCell.text()
+           if (locationId < 1000000) // متبرع او متطوع لابد من تغيرها
+               $(confirmingButtons[index]).remove();
+        });
+
+    }
+</script>
+
+<script type="text/javascript">
+    
+    function confirmUser(userId,tr)
+    {
+        var url = '@Url.Action("ConfirmUser", "User")';
+
+        $.ajax({
+            url: '@ConfigurationManager.AppSettings["UserNamagementWebAPIBaseUrl"]'+'api' + url + '?id=' + userId,
+            type: 'Post',
+            contentType: 'application/json; charset=utf-8',
+            crossOrigin: false,
+            success: function (result) {
+               
+                if (result == true) {
+                    toastr.success("success");
+                    tr.remove();
+                }
+                else {
+                    toastr.error('unable to confirm now');
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+    });
+</script>
+<script type="text/javascript">
+</script>

@@ -1,0 +1,264 @@
+﻿@using System.Configuration;
+@model DTO.CaseDTO
+@{
+    ViewBag.Title = "Create";
+}
+<h2>Create</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            @using (Html.BeginForm("Create", "Case", null, FormMethod.Post, new { @class = "", id = "createForm" }))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CaseName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.CaseName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.CaseName)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Category, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        <select class="form-control" data-val="true" data-val-number="The field Category must be a number." data-val-required="Category Required" id="Category" name="Category"></select>
+                        @Html.ValidationMessageFor(m => m.Category)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Source, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        <select class="form-control" data-val="true" data-val-number="The field Source must be a number." data-val-required="The Source field is required." id="Source" name="Source"></select>
+                        @Html.ValidationMessageFor(m => m.Source)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.BirthDate, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.BirthDate, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.BirthDate)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Priority, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        <select class="form-control" data-val="true" data-val-number="The field Priority must be a number." data-val-required="The Priority field is required." id="Priority" name="Priority"></select>
+                        @Html.ValidationMessageFor(m => m.Priority)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Description)
+                    </div>
+                </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Mobile, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Mobile)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Phone, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Phone)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Comment, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Comment, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Comment)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Needed, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Needed, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Needed)
+                        </div>
+                    </div> 
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Country, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            <select class="form-control valid" id="Country" name="Country"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Governorate, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            <select class="form-control valid" id="Governorate" name="Governorate"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.District, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.District, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.District)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.PostalCode, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PostalCode)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.AddressLine1, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.AddressLine1)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.AddressLine2, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.AddressLine2)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            @*<input type="submit" value="Create" class="btn btn-default" />*@
+                            <input type="submit" value="Create" class="btn btn-info" />
+                        </div>
+                    </div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: SystmeCodeWebAPIBaseUrl+"api/DetailCode/GetMasterCodeByMultiCode?masterCode=CasC,CasS,CasP,Coun",
+            async: false,
+            success: function (data) {
+                var htmlCategory = "";
+                var htmlSource = "";
+                var htmlPriority = "";
+                var htmlCountry = "<option value='0'></option>";
+                $.each(data, function (key, value) {
+                    if (value.masterCodeValue == "CasC") {
+                        if (_cultureIsArabic) {
+                            htmlCategory += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlCategory += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                        }
+                    }
+                    else if (value.masterCodeValue == "CasS") {
+                        if (_cultureIsArabic) {
+                            htmlSource += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlSource += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                        }
+                    }
+                    else if (value.masterCodeValue == "CasP") {
+                        if (_cultureIsArabic) {
+                            htmlPriority += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlPriority += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                        }
+                    }
+                    else if (value.masterCodeValue == "Coun") {
+                        if (_cultureIsArabic) {
+                            htmlCountry += "<option value=" + value.Id + "  >" + value.NameAr + "</option>";
+                        }
+                        else {
+                            htmlCountry += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                        }
+                    }
+                });
+                $("#Category").html(htmlCategory);
+                $("#Source").html(htmlSource);
+                $("#Priority").html(htmlPriority);
+                $("#Country").html(htmlCountry);
+            },
+            error: function (xhr) {  
+                toastr.error(xhr.statusText);
+            }
+        });
+        $("#Country").change(function () {
+            var countryId = $("#Country").val();
+            if (countryId == null || countryId == 0) {
+                $("#Governorate").html("");
+                $("#Governorate").val("");
+                return;
+            }
+            var url = SystmeCodeWebAPIBaseUrl+"api/DetailCode/GetByParentId?parentId=" + $("#Country").val();
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: url,
+                async: false,
+                success: function (data) {
+                    var htmlGovernorate = "<option value='0'></option>";
+                    $.each(data, function (key, value) {
+                        if (value.masterCodeValue == "Gove") {
+                            if (_cultureIsArabic) {
+                                htmlGovernorate += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                htmlGovernorate += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                    $("#Governorate").html(htmlGovernorate);
+                },
+                error: function (xhr) { 
+                    toastr.error(xhr.statusText);
+                }
+            });
+        });
+
+        //submit
+        var myForm = $("#createForm");
+        myForm.submit(function (e) {
+            e.preventDefault();
+            if (!myForm.valid()) return;
+
+            var apiurl = MersalWebAPIBaseUrl+"api/Case/AddCase";
+            var data = {};
+            $("#createForm").serializeArray().map(function (x) { data[x.name] = x.value; });
+            console.log(JSON.stringify(data));
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: apiurl,
+                crossDomain: true,
+                headers: getHeaders(),
+                data: JSON.stringify(data),
+                async: false,
+                success: function (data) { 
+                    toastr.success("success");
+                },
+                error: function (xhr) { 
+                    toastr.error(xhr.statusText);
+                }
+            });
+        });
+    });
+
+
+</script>

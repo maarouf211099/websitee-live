@@ -1,0 +1,39 @@
+﻿
+@using Resource;
+<section>
+    <div class="block">
+        <div class="container">
+            <div class="row">
+                <div id="AlbumsSection"  class="gray col-md-6 column" style="border-right: 3pt solid #fff;border-radius: 20px;display:none;">
+                    <div class="title2">
+                        <h1>@AlbumResource.Albums</h1>
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="albumContainerDiv"> 
+
+                        </div>
+
+                        <div class="showMore" style="margin:20px;">
+                             <a href="/Album/ListOfAlbumView" class="btn" >@LayoutRES.ShowMore</a>
+                        </div>
+
+                    </div> 
+                </div>
+                <div id="VideosSection" class="gray col-md-6 column" style="border-left: 3pt solid #fff;border-radius: 20px;display:none;">
+                    <div class="title2">
+                        <h1>@LayoutRES.Videos</h1>
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="containerVideos">
+                            
+                        </div>
+                        <div class="showMore" style="margin:20px;">
+                            <a href="/InnerVideos/Index" class="btn">@LayoutRES.ShowMore</a>
+                         </div> 
+                    </div><!-- Successful Stories -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

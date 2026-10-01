@@ -1,0 +1,50 @@
+﻿@using Resource;
+@{
+    //ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    //Layout = "";
+
+}
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Cabin:400,700,600" />
+
+<link href="~/Content/Tree/style.css" rel="stylesheet" />
+@*<script src="~/Content/Tree/jquery-1.11.1.min.js"></script>*@
+<script src="~/Content/Tree/jquery-migrate-1.2.1.min.js"></script>
+<script src="~/Content/Tree/jquery-ui.js"></script>
+<script src="~/Content/Tree/jquery.tree.js"></script>
+<script>
+    var name = '@AccountRES.AccountName';
+    var currentBalance = '@AccountRES.CurrentBalanc';
+</script>
+<script src="~/Scripts/MersalScripts/Account/AccountController.js"></script>
+<style>
+    .hrefPopup {
+        padding-top: 6px;
+        color: white;
+    }
+</style>
+
+
+@*@Html.Partial("~/Views/MersalAccount/Create.cshtml")*@
+<div class="modal fade" style="float:right;padding-right: 9%;" id="AddAccountModal" role="dialog">
+</div>
+<div class="overflow" >
+    <div>
+        <ul class="tree">
+            <li>
+                <div>Mersal Accounts<br /> <a href='#' class='hrefPopup'  onclick='AddAccountNode(null)'>@AccountRES.Add</a></div>
+                <ul id="TreeTop">
+                   
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+    var transferAccountFrom = 0;
+    var transferAccountTo = 0;
+    var AddSTR = '@AccountRES.Add';
+    var AddTransactionSTR = '@AccountRES.AddTranstion';
+    var EditSTR = '@AccountRES.Edit';
+
+</script>

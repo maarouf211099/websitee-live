@@ -1,0 +1,102 @@
+﻿@model TempPageDTO
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = Model.TitleEn + " - " + Model.TitleAr;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var tblTextAlign = isArabic ? "tblText" : "";
+}
+<style>
+    .tblText tr {
+        text-align: right;
+    }
+
+    .tblText th {
+        text-align: right;
+    }
+</style>
+
+<div class="form-group">
+    <button onclick="$('#CreateTempPageBlockModals').modal('show');" type="button" class="btn btn-info">@DynamicPagesRES.CreateNew</button>
+    <a class="btn btn-info" href="/TempPageUI/Index?isdeleted=false">@DynamicPagesRES.BackList </a>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">@Model.TitleEn   -   @Model.TitleAr</h3>
+            </div>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody class="@tblTextAlign">
+                        <tr>
+                            <th>@DynamicPagesRES.TitleEN</th>
+                            <th>@DynamicPagesRES.TitleAR</th>
+                            <th>@DynamicPagesRES.SubTitleEn</th>
+                            <th>@DynamicPagesRES.SubTitleAr</th>
+                            <th>@DynamicPagesRES.DescriptionEn</th>
+                            <th>@DynamicPagesRES.DescriptionAr</th>
+                            <th>@DynamicPagesRES.Href </th>
+                            <th></th>
+                            <th>@DynamicPagesRES.Edit </th>
+                            <th>@DynamicPagesRES.Delete </th>
+                        </tr>
+                        @if (Model != null)
+                        {
+                            if (Model.TempPageBlockDTOList.Any())
+                            {
+                                foreach (var page in Model.TempPageBlockDTOList)
+                                {
+                                    <tr id="S_@page.Id">
+                                        <td>@page.TitleEn</td>
+                                        <td>@page.TitleAr</td>
+                                        <td>@page.SubTitleEn</td>
+                                        <td>@page.SubTitleAr</td>
+                                        <td>@page.DescriptionEn</td>
+                                        <td>@page.DescriptionAr</td>
+                                        <td><a href="@page.Href">@page.Href</a></td>
+                                        @if (string.IsNullOrEmpty(page.ImagePath))
+                                        {
+                                            <td  class="label"></td>
+                                        }
+                                        else
+                                        { 
+                                            <td><img src="~/ClientFilesLayout/TempPageBlock/@page.ImagePath" style="max-width: 100px;max-height: 100px;" /></td> 
+                                        } 
+                                        <td><span class="label label-success" style="cursor: pointer;" onclick="GetTempPageBlockDetails('@page.Id')">@LayoutRES.Edit</span></td>
+                                        <th><span class="label label-danger" style="cursor: pointer;" onclick="DeleteTempPageBlock('@page.Id')">@DonationSlideResource.Delete </span> </th>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    @Html.Partial("~/Views/TempPageUI/_CreateTempPageBlock.cshtml", new TempPageBlockDTO() { PerantId = Model.Id })
+</div>
+
+<div id="EditTempPageBlockDiv">
+
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/MersalScripts/LayoutManagment/AdminTempPageBlock.js"></script>
+    @*@Scripts.Render("~/bundles/TempPage")*@
+}
+
+
+
+
+
+

@@ -1,0 +1,212 @@
+/*=========== BACKGROUND COLOR ================ */
+.circular > a:before,
+.cause-img > span,
+.cause-img > a.donate-btn,
+.volunteer-inner > a:hover,
+.title.style3 > h2 span:before,
+.donate-btn > span,
+.progress-border .progress .progress-bar,
+
+.deal-countdown .button,
+.toggle-item h2:after,
+.don-amt > strong,
+.post-img > span,
+.product-img > a:hover,
+.gallery-widget .row > div a:before,
+.page-gallery-img::before, .page-gallery-img::after,
+.page-gallery-img a::before,
+.heading h3::before,
+.tagclouds > a:hover span::before,
+.comment > a:hover,
+.button:hover, 
+.cause-detail > strong a,
+.contact-form button,
+.member-social::before,
+#team-detail-img p,
+.wpdonation-button, .donation-figures li a.active,
+.proceed,
+.payment-type .nav li.active a,
+.social a:hover,
+.slide-button,
+.popup-form > form input[type="submit"],
+.blog-img a i:after,
+.donate-btn:after,
+.upcoming-eventbar::before,
+.video-title > h3:before,
+.mod-gallery-info > a i,
+/*============= Version 3.0 ===============*/
+.gallery-box > span:before,
+.option-set li a.selected{
+    background-color: #edb71f; 
+
+}
+
+
+.frequency li a i{
+    margin: 10px;
+}
+.frequency li a.active{
+    color: #fff; 
+}
+
+
+
+.frequency li a.active:before{
+     background-color: #37a1a2; 
+}
+/*=========== TEXT COLOR ================ */
+.urgentcause-detail > span,
+.amount > i,
+.circular > div:before,
+.video > a,
+.cause-detail > strong i,
+.cause-detail > h3 a:hover,
+.countdown-amount,
+.event-bar h3 a:hover,
+ul.meta li a:hover,
+.volunteer-inner > strong i,
+.active .event-bar h3,
+.event-intro h3 a:hover,
+.theme-btn:hover,
+.counter-box > span,
+.blog-detail > h3 a:hover,
+ul.meta li i,
+.about-service-inner h2,
+.service-box-inner h3 a:hover,
+.collected-donation > strong i,
+.collected-donation > span,
+.who-we-detail > p span,
+.help-detail > h3 a:hover,
+.goal > span i,
+.enter-amount > a,
+.product > span ins,
+.collected-amount i,
+.cause-donation > i,
+.review > span,
+.urgent-parallax > strong,
+.urgent-parallax > p strong,
+.big-btn:hover,
+.fancy-cause-detail > span,
+.help-us i,
+.banner-text > strong i,
+.counting > span,
+.story-detail > span,
+.spent-bar > span strong i,
+.story-detail h3 a:hover,
+.deal-desc > ul li,
+.deal-desc > ul li a,
+.deal-desc > h4 a:hover,
+.deal-desc > span i,
+.deal-countdown .button:hover,
+.toggle-item h2:hover,
+.toggle-item h2.active,
+.upcoming-detail > h4 a:hover,
+.spent-bar > span.date,
+.service-box > h3 a:hover,
+.service-carousel .owl-nav > div:hover:before,
+.service-block-inner h3 a:hover,
+.product > h4 a:hover,
+.post-img > span a:hover,
+.widget-post h5 a:hover,
+.page-title > ul li a:hover,
+.page-top h2 strong,
+.gallery-detail h3 a:hover,
+.gallery-detail > ul li,
+.gallery-detail > ul li a,
+.gallery-popup a,
+.spent-bar > span.price i,
+.project-info .goal > i,
+.project-hover > h3 a:hover,
+.volunteer-inner > strong,
+.overlay-donation > span i,
+.event-overlay-inner span,
+.event-overlay-inner h5 a:hover,
+.service-ways .service-box > h3,
+.title.style3 h2 span,
+.blog-detail-page blockquote i,
+.heading span,
+.tagclouds > a span:hover:after,
+.comment h6 a,
+.comment > i,
+.cause-detail > span,
+.cart-item i,
+.cart-price span,
+.product-desc > span ins,
+.contact-info strong i,
+.team-member > h4 a:hover,
+.skills > span,
+.skills h5,
+.event-org > h4 span,
+.sidebar .widget li i,
+.make-donation h5 i,
+.circular span,
+.select-cause .amount > span,
+footer .widget ul li i,
+.contact-widget h5 span,
+footer .widget ul li a:hover,
+.tweet blockquote a,
+.footer-bar-title span,
+.blackbox i,
+.inline-list > li i,
+nav > ul > li:hover > a,
+nav > ul > li ul li:hover > a,
+nav > ul > li.menu-item-has-children > a:before,
+header.dark-header nav > ul > li:hover > a,
+header.dark-header nav > ul > li ul li:hover > a,
+.sideheader-menu > ul li:hover > a,
+.sideheader-menu > ul li a.active,
+.sideheader.fancy .sideheader-menu > ul li:hover > a,
+.sideheader.fancy .sideheader-menu > ul li a.active,
+.sideheader-bottom > p i,
+.popup-form > strong span,
+.popup-form > span.close-btn,
+.popup-form > form p a,
+.title.light h2 span,
+.banner-inner > strong i,
+.banner-inner > h5 strong,
+.urgentcause-detail > p a,
+/*============= Version 1.1 ===============*/
+.simple-info h5 i,
+.news-title > span,
+.news-title > h3 a:hover,
+.message-by > strong,
+.simple-parallax-text > p strong,
+.simple-parallax-text h6 i,
+.fancy-counter-box > h5,
+.single-donate-info > h4,
+.donatees-info > h4,
+.donatees-info > a:hover,
+.menu-item-has-children.all-demos > a,
+.menu-item-has-children.all-demos > a:hover,
+header.dark-header nav > ul > li.menu-item-has-children.all-demos > a,
+.sideheader.fancy .sideheader-menu > ul li.menu-item-has-children.all-demos > a,
+/*============= Version 3.0 ===============*/
+.mod-gallery-detail h3 a:hover,
+.gallery-box > a,
+.service-detail h3 a:hover,
+.service-detail > span,
+.service-img > span,
+.service-features-wrapper h3 span{
+    color: #009091;
+}
+
+
+/*=========== BORDERS COLOR ================ */
+
+
+
+.wpdonation-button, .donation-figures li a.active, .proceed,
+.contact-us-page  .bottom-block .submitt button
+{
+    background-color: #edb71f; 
+ 
+}
+.video > a,
+.toggle-item h2:after,
+.service-carousel .owl-nav > div:hover,
+.comment h6,
+.skills > span,
+.big-btn,
+.theme-btn {
+    border-color: #e47257; 
+}

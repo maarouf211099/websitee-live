@@ -1,0 +1,16 @@
+﻿
+
+@using Resource;
+@{
+    ViewBag.Title = "Facebook App";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+} 
+<button  class="btn btn-info" onclick="JoinApp()" id="JoinApp">Join Mersal App</button>
+<!--<button onclick="SendNotifications('100010672207374')" id="SendNotification">SendNotification</button>-->
+<button  class="btn btn-info" onclick="SendNotificationsFacebook('Test Notifications')" id="SendNotification">Send Notification</button> 
+
+
+@section Scripts {
+    <script src="~/Scripts/Facebook/FacebookMersalAdminApp.js"></script>
+}
+

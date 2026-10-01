@@ -1,0 +1,83 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource
+@using Resource.Emergency
+@using DTO
+@{
+    ViewBag.Title = EmergencyCaseRES.EmergecyCases;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+@*<style>
+        .k-grid-content {
+            max-height: 360px;
+        }
+    </style>*@
+<head>
+    <title>@EmergencyCaseRES.EmergecyCases</title>
+</head>
+
+<div class="form-group col-sm-6 @floatToRight">
+    <label class="col-md-3 control-label">@CaseResources.ChooseCase </label>
+    <div class="col-sm-9">
+        <select onchange="SetCaseState(value)" class="form-control" id="casestateSelect">
+            <optgroup label="@CaseResources.Cases">
+                <option value="" selected> @EmergencyCaseRES.AllEmergencyCases</option>
+                <option value="@EmergencyCaseState.EmcNew.ToString()"> @LayoutRES.NewCases</option>
+                <option value="@EmergencyCaseState.EmcPending.ToString()"> @EmergencyCaseRES.EmergencyCasePending</option>
+                <option value="@EmergencyCaseState.EmcMedicalReject.ToString()"> @EmergencyCaseRES.EmergencyMedicalReject</option>
+                <option value="@EmergencyCaseState.EmcPendingEmTeam.ToString()"> @EmergencyCaseRES.EmergencyTeamPending</option>
+                <option value="@EmergencyCaseState.EmcRequireOxygen"> @EmergencyCaseRES.EmergencyCasesRequireOxygen</option>
+                <option value="@EmergencyCaseState.EmcNeedIsolation"> @EmergencyCaseRES.EmergencyCasesNeedIsolation</option>
+                <option value="@EmergencyCaseState.EmcWaittingHospital"> @EmergencyCaseRES.EmergencyCasesWaittingHospital</option>
+                <option value="@EmergencyCaseState.EmcRefusedFromEmcTeam"> @EmergencyCaseRES.EmergencyTeamRefusedEmergencyCase</option>
+                <option value="@EmergencyCaseState.EmcCL"> @EmergencyCaseRES.ClosedCases</option>
+                <option value="@EmergencyCaseState.EmcDone"> @EmergencyCaseRES.CaseDone</option>
+            </optgroup>
+        </select>
+    </div>
+</div>
+<br />
+<br />
+
+
+<input id="IsFilters" type="hidden" value="NoFilter" />
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var CaseStatus = '@CaseResources.CaseStatus'
+        var ArchivingCaseTitle = '@CaseResources.ArchivingCase';
+        var ConfirmArchived = '@CaseResources.ConfirmArchived';
+        var Mobile = '@CaseResources.PhoneNumberAnonymous';
+        var State = "@CaseResources.State";
+        var CaseName = "@CaseResources.CaseName";
+        var Diagnosis = "@EmergencyCaseRES.DiagnosisId";
+        var NameAnonymous = "@CaseResources.NameAnonymous";
+        var PhoneNumberAnonymous = "@CaseResources.PhoneNumberAnonymous";
+        var CreatedOn = '@CaseResources.CreatedOn';
+        var CreatedBy = '@CaseResources.Employee';
+        var Age = '@CaseResources.Age';
+        var OtherEmergency = '@EmergencyCaseRES.OtherEmergency';
+        var CoronaSuspicion = '@EmergencyCaseRES.CoronaSuspicion';
+    </script>
+    @Scripts.Render("~/bundles/Cases")
+
+    <script src="~/Scripts/MersalScripts/EmergencyCase/emergency-case-index.js?version=1.1"></script>
+    <script>
+        $(document).ready(function () {
+            SetCaseState('@ViewBag.caseState');
+            let state = '@ViewBag.caseState';
+            if (state)
+                $("#casestateSelect").val('@ViewBag.caseState');
+        });
+    </script>
+}
+

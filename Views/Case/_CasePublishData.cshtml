@@ -1,0 +1,125 @@
+﻿@model DTO.CaseHomeViewDTO
+@using Resource
+@using Kendo.Mvc.UI
+
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div class="modal fade" id="CasePublishDataModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.PublishData</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", id = "CasePublishDataForm" }))
+                {
+                    @Html.HiddenFor(m => m.Id)
+                    <div class="box-body">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @Html.LabelFor(m => m.CaseName, new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.CaseName, "", new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                                @Html.ValidationMessageFor(m => m.CaseName)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @Html.LabelFor(m => m.Description, new { @class = "control-label" })
+                                @Html.TextAreaFor(m => m.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Description), rows = "5" })
+                                @Html.ValidationMessageFor(m => m.Description)
+                            </div>
+                        </div>
+                        @*<div class="form-group"> 
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.RequiredAmount)
+                                @Html.TextBoxFor(m => m.RequiredAmount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.RequiredAmount), @type = "number" })
+                                @Html.ValidationMessageFor(m => m.RequiredAmount)
+                            </div>
+                        </div>*@
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            @Html.DisplayNameFor(m => m.RequiredAmount)
+                            @Html.TextBoxFor(m => m.RequiredAmount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.RequiredAmount), @type = "number" })
+                            @Html.ValidationMessageFor(m => m.RequiredAmount)
+                        </div>
+                        <div class="col-sm-4">
+                            @if (Model.PublishAtWebsite)
+                            {
+                                <input type="checkbox" onClick="checkboxPublishWeb()" checked />
+                                <input id="PublishAtWebsite" type="hidden" name="PublishAtWebsite" value="true" />
+                            }
+                            else
+                            {
+                                <input type="checkbox" onClick="checkboxPublishWeb()" />
+                                <input id="PublishAtWebsite" type="hidden" name="PublishAtWebsite" value="false" />
+                            }
+                            @Html.DisplayNameFor(m => m.PublishAtWebsite)
+                        </div>
+                        <div class="col-sm-4">
+                            @if (Model.PublishAtHome)
+                            {
+                                <input id="PublishAtHomeChk" type="checkbox" onClick="checkboxPublishHome()" checked />
+                                <input id="PublishAtHome" type="hidden" name="PublishAtHome" value="true" />
+
+                            }
+                            else
+                            {
+                                <input id="PublishAtHomeChk" type="checkbox" onClick="checkboxPublishHome()" />
+                                <input id="PublishAtHome" type="hidden" name="PublishAtHome" value="false" />
+                            }
+                            @Html.DisplayNameFor(m => m.PublishAtHome)
+                        </div>
+                        <div class="col-sm-4">
+                            @if (Model.PublishAsMain!= null && (bool)Model.PublishAsMain)
+                            {
+                                <input id="PublishAsMainChk" type="checkbox" onClick="checkboxPublishAsMain()" checked />
+                                <input id="PublishAsMain" type="hidden" name="PublishAsMain" value="true" />
+
+                            }
+                            else
+                            {
+                                <input id="PublishAsMainChk" type="checkbox" onClick="checkboxPublishAsMain()" />
+                                <input id="PublishAsMain" type="hidden" name="PublishAsMain" value="false" />
+                            }
+                            @Html.DisplayNameFor(m => m.PublishAsMain)
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.PublishPriority)
+                                @Html.TextBoxFor(m => m.PublishPriority, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.PublishPriority), @type = "number" })
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="demo-section k-content col-sm-12 @KendoClass">
+                            @(Html.Kendo().Upload()
+                                .Name("CaseImageEdit")
+                                .Messages(m => m.Select(CaseResources.CaseImage))
+                                .TemplateId("fileTemplate")
+                                .HtmlAttributes(new { accept = "image/*" })
+                                .Async(a => a
+                                .Save("uploadCaseImageEdit", "Case", new { CaseId = Model.Id })
+                                .AutoUpload(true))
+                                .Multiple(false)
+                            ) 
+                        </div> 
+                        <!-- /.box-body -->
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">@LayoutRES.Submit</button>
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                        </div><!-- /.box-footer -->
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

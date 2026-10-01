@@ -1,0 +1,56 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource.Pharmacy
+@using DTO
+@{
+    ViewBag.Title = MedicineRES.Medicines;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>@MedicineRES.Medicines</title>
+</head>
+@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.CreateCasesAdmin))
+{
+    <button id="btnPopupCreateCase" onclick="AddNewMedicine()" type="button" class="btn btn-info">@MedicineRES.AddNewMedicine</button>
+}
+
+<br />
+<br />
+
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+<div id="createMedicineDiv"></div>
+
+
+
+@section Scripts {
+    <script>
+        var ScientificName = '@MedicineRES.ScientificName';
+        var CommercialName = '@MedicineRES.CommercialName';
+        var SmallUnit = '@MedicineRES.SmallUnit';
+        var SmallUnitCount = '@MedicineRES.SmallUnitCount';
+        var SmallUnitPrice = '@MedicineRES.SmallUnitPrice';
+        var MidddleUnit = '@MedicineRES.MidddleUnit';
+        var MidddleUnitCount = '@MedicineRES.MidddleUnitCount';
+        var MidddleUnitPrice = '@MedicineRES.MidddleUnitPrice';
+        var LargeUnit = '@MedicineRES.LargeUnit';
+        var LargeUnitCount = '@MedicineRES.LargeUnitCount';
+        var LargeUnitPrice = '@MedicineRES.LargeUnitPrice';
+    </script>
+    <script src="~/Scripts/PharmacyScripts/medicine/addMedicine.js"></script>
+    <script src="~/Scripts/PharmacyScripts/medicine/medicineIndex.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            RefreshGird();
+        });
+    </script>
+}
+

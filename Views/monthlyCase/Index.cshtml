@@ -1,0 +1,29 @@
+﻿@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = CaseResources.MonthlyCases;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div id="RequestDetails"></div>
+
+
+<div>
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var Title = "@LayoutRES.Title";
+        var Description = "@LayoutRES.Description";
+        var Type = "@LayoutRES.Type";
+        var CaseCount = "@CaseResources.CountMonthlyCases";
+        var Total = "@LayoutRES.Amount";
+        var RequestCases = "@CaseResources.MonthlyCases";
+        var Details = '@LayoutRES.Details';
+        var Cases='@AccountTransactionRES.CashRecieptTitle';
+    </script>
+  <script src="~/Scripts/MersalScripts/MonthlyCasesManagment/RequestsListIndex.js"></script>
+}
+

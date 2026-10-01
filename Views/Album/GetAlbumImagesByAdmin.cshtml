@@ -1,0 +1,83 @@
+﻿@model DTO.AlbumListViewDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <title>Album Images</title>
+    <link rel="stylesheet" href="~/LigthBoxcss/lightbox.min.css">
+</head>
+
+<section>
+
+    <div class="row" id="imagelistDivforMore">
+        <div class="col-md-12 column">
+            <div class="title">
+                @Html.HiddenFor(x => x.CurrantCountOfAlbums)
+                <h2>@AlbumResource.Images</h2>
+            </div>
+            <div class="form-group">
+                <button onclick="AddImageToExistAblum('@ViewBag.albumId')" type="button" class="btn btn-info">@AlbumResource.AddImage</button>
+            </div>
+            <div id="ImageListDiv">
+                @if (Model.AlbumHomeViewList.Any())
+            {
+                foreach (var _Image in Model.AlbumHomeViewList)
+                {
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+
+                            @if (isArabic)
+                            {
+                                <div class="col-md-12">
+                                    <a class="example-image-link" href="@_Image.ImagePath" data-lightbox="example-set" data-title="@_Image.TitleAr"><img width="250" height="150" class="example-image" src="@_Image.ImagePathThumbnail" alt="" /></a>
+                                    <div class="col-md-6" style="float: none;margin: 0 auto;">
+                                        <button onclick="getImageDetails('@_Image.Id')" type="button" class="btn btn-info"><i class="fa fa-pencil-square-o"></i></button>
+                                        <button onclick="DeleteImage('@_Image.Id')" type="button" class="btn btn-info"><i class="fa fa-trash-o"></i></button>
+                                    </div>
+                                </div>
+                            }
+                            else {
+                                <div class="col-md-12">
+                                    <a class="example-image-link" href="@_Image.ImagePath" data-lightbox="example-set" data-title="@_Image.TitleEn"><img width="250" height="150" class="example-image" src="@_Image.ImagePathThumbnail" alt="" /></a>
+                                    <div class="col-md-6" style="float: none;margin: 0 auto;">
+                                        <button onclick="getImageDetails('@_Image.Id')" type="button" class="btn btn-info"><i class="fa fa-pencil-square-o"></i></button>
+                                        <button onclick="DeleteImage('@_Image.Id')" type="button" class="btn btn-info"><i class="fa fa-trash-o"></i></button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <button id="btnShowMore" onclick="getMoreImagesbyadmin(@ViewBag.albumId)"   class="btn btn-info" >@LayoutRES.ShowMore</button>
+    </div>
+   
+</section>
+<div id="EditImage"></div>
+<div id="CreateAlbumDiv">
+    @Html.Partial("~/Views/Album/_CreateAlbum.cshtml", new AlbumsDTO())
+</div>
+@section Scripts {
+    <script>
+        var TitleEnglish = "@AlbumResource.TitleEn";
+        var TitleArabic = "@AlbumResource.TitleAr";
+        var images = "@AlbumResource.Images";
+
+    </script>
+    @Scripts.Render("~/bundles/GetAlbumImagesByAdmin")
+    @*<script src="~/Scripts/MersalScripts/AlbumScript/ImageInnerScr.js"></script>
+    <script src="~/Scripts/LightBoxScr/lightbox.min.js"></script>
+    <script src="~/Scripts/MersalScripts/AlbumScript/Albumjavascript.js"></script>
+    <script src="~/Scripts/MersalScripts/LayoutManagment/AlbumController.js"></script>*@
+}

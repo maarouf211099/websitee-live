@@ -1,0 +1,181 @@
+﻿@model DTO.Pharmacy.Receipt.AddPharmacyReceiptItemDto
+@using UserUI.Helper
+@using Resource
+@using System.Configuration;
+@using Kendo.Mvc.UI;
+@using Resource.Pharmacy.PharmacyReceipt;
+@{
+    ViewBag.Title = "اضافه دواء للمخزن";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var SystmeCodeWebAPIBaseUrl = ConfigurationManager.AppSettings["SystmeCodeWebAPIBaseUrl"];
+}
+
+
+<div class="box box-info">
+
+    <div class="box-body">
+
+        @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "AddRecieptItemForm" }))
+        {
+
+            <div class="form-group" dir="@dir">
+
+                <div class="col-sm-4 @floatToRight">
+                    @Html.DisplayNameFor(m => m.MedicineId)
+                    <br />
+                    @Html.DropDownListFor(x => x.MedicineId, new List<SelectListItem>(), new { @class = "MedicineId form-control" })
+                    @Html.ValidationMessageFor(m => m.MedicineId)
+
+                </div>
+            </div>
+
+            <div class="form-group" dir="@dir">
+
+
+                <div class="col-sm-4 @floatToRight">
+                    @Html.DisplayNameFor(m => m.MedicinePrice)
+                    <br />
+                    @Html.TextBoxFor(m => m.MedicinePrice, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.MedicinePrice) })
+                    @Html.ValidationMessageFor(m => m.MedicinePrice)
+                </div>
+
+                <div class="col-sm-4 @floatToRight">
+                    @Html.DisplayNameFor(m => m.MersalMedicinePrice)
+                    <br />
+                    @Html.TextBoxFor(m => m.MersalMedicinePrice, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.MersalMedicinePrice) })
+                    @Html.ValidationMessageFor(m => m.MersalMedicinePrice)
+                </div>
+
+
+                <div class="col-sm-4 @floatToRight">
+                    @Html.DisplayNameFor(m => m.ExpiryDate)
+                    <br />
+                    @Html.TextBoxFor(m => m.ExpiryDate, new { @class = "form-control", @type = "date" })
+                    @Html.ValidationMessageFor(m => m.ExpiryDate)
+                </div>
+
+            </div>
+
+
+            <div class="form-group" dir="@dir">
+
+                <div class="col-sm-4 @floatToRight">
+                    @Html.DisplayNameFor(m => m.Unit)
+                    <br />
+                    @Html.DropDownListFor(x => x.Unit, new List<SelectListItem>(), new { @class = "Unit form-control" })
+                    @Html.ValidationMessageFor(m => m.Unit)
+                </div>
+
+                <div class="col-sm-4 @floatToRight">
+                    الكميه
+                    <br />
+                    @Html.TextBox("Quantity", "Quantity", "1", new { Type = "number", @class = "form-control", placeholder = "الكميه" })
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+            </div>
+        }
+    </div>
+
+</div>
+
+
+@using (Html.BeginForm("Create", "Reciept", null, FormMethod.Post, new { @class = "form-horizontal", id = "AddRecieptForm" }))
+{
+    <div class="box box-info">
+
+        <div class="box-body">
+            <div class="form-group" dir="@dir">
+
+                <div class="col-sm-4 @floatToRight">
+                    @ReceiptRES.Supplier
+                    <br />
+                    @(Html.Kendo().ComboBox()
+                                    .Name("supplier")
+                                    .Placeholder(ReceiptRES.SelectSupplier)
+                                    .DataTextField("NameAr")
+                                    .DataValueField("Id")
+                                    .HtmlAttributes(new { style = "width:100%;" })
+                                    .Filter("contains")
+                                    .AutoBind(false)
+                                    .DataSource(source =>
+                                    {
+                                        source.Read(r =>
+                                        {
+                                            r.Url(SystmeCodeWebAPIBaseUrl+"/api/DetailCode/GetMasterCodeByMultiCode?masterCode=MedSupplier")
+                                            .Type(HttpVerbs.Get);
+                                        })
+                                        .ServerFiltering(true);
+                                    })
+                    )
+                </div>
+
+                <div class="col-sm-4 @floatToRight">
+                    رقم الفاتوره
+                    <br />
+                    @Html.TextBox("ReceiptNumber", "", new { @class = "form-control", placeholder = "رقم الفاتوره", required = "required" })
+                </div>
+
+
+                <div class="col-sm-4 @floatToRight">
+                    المخزن
+                    <br />
+                    @Html.DropDownList("Stock", new List<SelectListItem>() {
+                                                  new SelectListItem(){ Text="مخزن مرسال" , Value= "1" }
+                                                  ,new SelectListItem(){ Text="مخزن التبرعات" , Value= "2" }
+                                                  }, new { @class = "form-control" })
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div id="panelGrid" class="form-horizontal">
+            <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+        </div>
+
+        <div class="box-footer">
+            <button type="button" class="btn btn-info" onclick="SubmitPharmacyReceiptItem()">@LayoutRES.Submit</button>
+        </div>
+    </div>
+
+}
+
+@section Scripts {
+
+    <script>
+        var savedSuccessfully = '@LayoutRES.SuccessfullyAdd';
+    </script>
+    <script src="~/Scripts/PharmacyScripts/pharmacyReceipt/receiptIndex.js"></script>
+
+    <script>
+        var apiurl = MersalWebAPIBaseUrl + "api/Medicine/GetMedicinesLookup"
+        $(document).ready(function () {
+            RefreshGird();
+
+            $("#MedicineId").kendoDropDownList({
+                dataTextField: "CommercialName",
+                dataValueField: "Id",
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: apiurl,
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+}
+
+
+

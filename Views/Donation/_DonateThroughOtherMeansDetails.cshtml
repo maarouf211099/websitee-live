@@ -1,0 +1,547 @@
+﻿@model DTO.DonateThroughOtherMeansDto
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+@functions {
+    object getHtmlAttributes(bool? @disabled, string CssClass, string type = "", string min = "", string placeHolder = "")
+    {
+        if (@disabled != null && @disabled == true)
+        {
+            return new { type = type, min = min, placeholder = placeHolder, @class = CssClass, @disabled = "@disabled" };
+        }
+        return new { type = type, min = min, placeholder = placeHolder, @class = CssClass };
+    }
+}
+
+<div class="modal fade" id="DonateThroughOtherMeansModel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+
+                        <input type="hidden" class="hidDonationType" name="DonationType" />
+
+                        @if (isArabic)
+                        {
+                            <label>@Model.HeaderTitleAr</label>
+
+                        }
+                        else
+                        {
+                            <label>@Model.HeaderTitleEn</label>
+                        }
+                    </h4>
+
+                </div><!-- /.box-header -->
+                @using (Html.BeginForm(null, null, null, FormMethod.Post, new { id = "EditDonationByOthersTransfareForm" }))
+                {
+                    @Html.HiddenFor(x => x.Id, new { id = "TransferIdHID" })
+                    @Html.HiddenFor(x => x.IsDeleted, new { IsDeleted = "IsDeleted" })
+
+                    @Html.HiddenFor(x => x.IsDone, new { IsDone = "IsDone" })
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <div class="col-md-6 row @floatToRight">
+
+                                <div class="col-md-3">
+                                    @DonationResources.DonationName*
+                                </div>
+
+                                <div class="col-md-9">
+                                    @Html.TextBoxFor(m => m.DonationName, @getHtmlAttributes(Model.IsDone, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.DonationName)
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-md-6 row @floatToRight">
+                                <div class="col-md-3">
+                                    @DonationResources.Phone*
+                                </div>
+
+                                <div class="col-md-9">
+                                    @*@Html.DisplayFor(model => model.PhoneNumber)*@
+                                    @Html.TextBoxFor(m => m.Phone, @getHtmlAttributes(Model.IsDone, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.Phone)
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-6 row">
+                                <div class="col-md-3">
+                                    @DonationResources.Amount*
+                                </div>
+
+                                <div class="col-md-9">
+                                    @Html.TextBoxFor(m => m.Amount, @getHtmlAttributes(Model.IsDone, "form-control", "number", "0"))
+                                    @Html.ValidationMessageFor(x => x.Amount)
+                                </div>
+
+
+                            </div>
+                            @if (Model.IsDone == true)
+                            {
+                                <div class="col-md-6 row form-group">
+                                    <div class="col-md-3">
+                                        @Html.Label(DonationResources.OriginalAmount + "*", htmlAttributes: new { @class = "control-label" })
+
+                                    </div>
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(model => model.OriginalAmount, @getHtmlAttributes(Model.IsDone, "form-control", "number", "0"))
+                                        @Html.ValidationMessageFor(model => model.Amount)
+                                    </div>
+                                </div>
+                            }
+
+
+                            <div class="col-md-6 row">
+
+
+                                <div class="col-md-3">
+                                    @DonationResources.TransferDate*
+                                </div>
+
+                                <div class="col-md-9">
+                                    @Html.TextBoxFor(model => model.TransferDate, "{0:s}", @getHtmlAttributes(Model.IsDone, "form-control",
+                                    "datetime-local"))
+                                    @Html.ValidationMessageFor(x => x.TransferDate)
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6 row">
+
+
+                                <div class="col-md-3">
+                                    @DonationResources.Currency*
+                                </div>
+
+                                <div class="col-md-9">
+                                    @Html.DropDownListFor(x => x.CurencyId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsDone,
+                                      "form-control"))
+                                    @Html.ValidationMessageFor(x => x.CurencyId)
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 row form-group" id="BBFCYRate">
+                                <div class="col-md-3">
+                                    @DonationResources.FCYRate*
+                                </div>
+                                <div class=" col-md-9">
+                                    @if (Model.IsDone == null || Model.IsDone == false)
+                                    {
+                                        @Html.TextBoxFor(m => m.FCYRate, new { @type = "number",@step="0.01", @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.FCYRate)
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.FCYRate, new { @type = "number", @step = "0.01", @class = "form-control", @disabled = Model.IsDone })
+                                        @Html.ValidationMessageFor(m => m.FCYRate)
+                                    }
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6 row">
+                                <div class="col-md-3">
+                                    @DonationResources.TransferNumber
+                                </div>
+                                <div class="col-md-9">
+                                    @Html.TextBoxFor(m => m.TransferNumber, @getHtmlAttributes(Model.IsDone, "form-control", "number", "0"))
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row">
+                                <div class="col-md-3">
+                                    @DonationResources.DonationOtherWayId
+                                </div>
+                                <div class="col-md-9">
+                                    @Html.DropDownListFor(x => x.DonationOtherWayId, new List<SelectListItem>(),
+                                      @getHtmlAttributes(Model.IsDone, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.DonationOtherWayId)
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-6 row donation-destination-container">
+                                <div class="col-md-12">
+                                    <div class="col-md-3" style="padding: 0px;">
+                                        @DonationResources.DonationDestination*
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="textfield">
+                                            @Html.DropDownListFor(x => x.DonationDestinationOtherId, new List<SelectListItem>(),
+                                              @getHtmlAttributes(Model.IsDone, "form-control"))
+                                            @Html.ValidationMessageFor(x => x.DonationDestinationOtherId)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <div class="col-md-3">
+
+                                    </div>
+
+                                    <div class="col-md-9">
+                                        <div class="textfield" id="DonationSubb" style="display:none;">
+
+                                            @Html.DropDownListFor(x => x.DonationDestinationSubOtherId, new List<SelectListItem>(),
+                                              @getHtmlAttributes(Model.IsDone, "form-control"))
+                                            @Html.ValidationMessageFor(x => x.DonationDestinationSubOtherId)
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <div class="col-md-3">
+
+                                    </div>
+
+                                    <div class="col-md-9">
+                                        <div class="textfield" id="DonationSubOfSubb" style="display:none;">
+
+                                            @Html.DropDownListFor(x => x.DonationDestinationSubOfSubOtherId, new List<SelectListItem>(),
+                                              @getHtmlAttributes(Model.IsDone, "form-control"))
+                                            @Html.ValidationMessageFor(x => x.DonationDestinationSubOfSubOtherId)
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12">
+
+                                    <div class="col-md-3">
+
+                                    </div>
+
+                                    <div class="col-md-9">
+                                        <div class="textfield" id="DonationByBankCaseCodeContainer" style="display:none;">
+
+                                            @Html.TextBoxFor(x => x.CaseId, @getHtmlAttributes(Model.IsDone,
+                                            "form-control","","",@DonationResources.CaseCode))
+                                            @Html.ValidationMessageFor(x => x.CaseId)
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="box-footer">
+
+
+                                <div id="showApprove" class="col-md-12 justify-fotter-center">
+
+                                    <button type="submit" class="btn btn-primary">@DonationResources.Edit</button>
+
+
+                                    @if (AuthorizationHelper.UserIsInPrivilege(5377))
+                                    {
+                                        <input type="button" onclick="confirmedByAccountsDonateThroughOtherMeans(@Model.Id)"
+                                               class="btn btn-success" value="@DonationResources.Confirm" />
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+    var done = $('input[name="ridIsDone"]:checked').val();
+    if (done == 'true') {
+      $("#showApprove").hide();
+    } else {
+      $("#showApprove").show();
+    }
+    var model = @Html.Raw(Json.Encode(Model));
+        var currancyList = [];
+    //$("#TransferDate").val();
+    //$("#TransferDate").val('');
+    //$("#TransferDate").val(null);
+
+    $('#CaseId').on("keypress", function (e) {
+      $(this).val($(this).val().trim());
+      if (e.which === 32)
+        return false;
+    });
+
+    $('#CaseId').on("blur", function (e) {
+      $(this).val($(this).val().trim());
+    });
+
+    GetAnyMasterDetalisCode('DoDs', 'DonationDestinationOtherId', false, true, "", "", true, '@DonationResources.DonationDestination');
+    GetAnyMasterDetalisCode('DonateThroughOtherMeansCurency', 'CurencyId', false, true, "", "", true);
+
+    GetAllDonationOtherWays('DoDs', 'DonationOtherWayId', false, true, "", "", true, '@DonationResources.DonationOtherWayId');
+    $('#DonationDestinationOtherId').change(function () {
+
+      $('#DonationSubb').hide();
+      $('#DonationSubOfSubb').hide();
+      $('#DonationByBankCaseCodeContainer').hide();
+
+      $('#DonationDestinationSubOfSubIdd').html('');
+      $('#DonationDestinationSubIdd').html('');
+
+      var id = $('#DonationDestinationOtherId').val();
+      var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+
+      GetByParentId('DonationDestinationSubOtherId', id, 'DonationSubb', placeHolder);
+    });
+
+    $('#DonationDestinationSubOtherId').change(function () {
+      $('#DonationSubOfSub').hide();
+      $('#DonationDestinationSubOfSubIdd').html('');
+
+      var code = this.options[this.selectedIndex].getAttribute('Code');
+      if (code == "DonZkaCase") {
+        $('#DonationByBankCaseCodeContainer').show();
+      }
+      else {
+        $('#DonationByBankCaseCodeContainer').hide();
+        $('#DonationByBankCaseCode').val('');
+        var id = $('#DonationDestinationSubOtherId').val();
+        var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+        GetByParentId('DonationDestinationSubOfSubOtherId', id, 'DonationSubOfSubb', placeHolder);
+      }
+    });
+
+    $('#DonationDestinationSubOfSubOtherId').change(function (e) {
+      var code = this.options[this.selectedIndex].getAttribute('Code');
+      if (code == "DonGeneralCase") {
+        $('#DonationByBankCaseCodeContainer').show();
+      }
+      else {
+        $('#DonationByBankCaseCodeContainer').hide();
+        $('#DonationByBankCaseCode').val('');
+      }
+    });
+        $('#CurencyId').change(function () {
+            var selected = currancyList.find(({ Id }) => Id == $('#CurencyId').val());
+            if (selected.NameEn.trim() != 'EGP') {
+                $('#BBFCYRate').show();
+            } else {
+                $('#BBFCYRate').hide();
+            }
+
+        });
+    function GetAnyMasterDetalisCode(MasterCode, dropDownListId, enableAll, async, selectedId, PerantCode, emptyOption, placeholder) {
+      $.ajax({
+        type: "GET",
+        contentType: "application/json",
+        url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + MasterCode,
+        async: async,
+        success: function (data) {
+          var html = "";
+          if (enableAll) {
+            if (_cultureIsArabic) {
+              html = "<option value='0'>الكل</option>";
+            }
+            else {
+              html = "<option value='0'>All</option>";
+            }
+          }
+          if (PerantCode) {
+            $.each(data, function (key, value) {
+              if (value.Parent) {
+                if (value.Parent.Code == PerantCode) {
+                  var selec = "";
+                  if (value.masterCodeValue == MasterCode) {
+                    if (value.Id == selectedId) selec = " selected='selected' ";
+                    if (_cultureIsArabic) {
+                      html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                    }
+                    else {
+                      html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                    }
+                  }
+                }
+              }
+            });
+          }
+          else {
+            $.each(data, function (key, value) {
+              var selec = "";
+              if (value.masterCodeValue == MasterCode) {
+                if (value.Id == selectedId) selec = " selected='selected' ";
+                if (_cultureIsArabic) {
+                  html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                }
+                else {
+                  html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                }
+              }
+            });
+          }
+          $("#" + dropDownListId).html(html);
+          if (emptyOption) {
+            $("#" + dropDownListId).prepend("<option value='' selected='selected'>" + placeholder + '*' + "</option>");
+          }
+
+          if (MasterCode == 'DoDs') {
+            $('#DonationDestinationOtherId').val(model.DonationDestinationOtherId);
+
+            if (model.DonationDestinationSubOtherId != null)
+              GetByParentId('DonationDestinationSubOtherId', model.DonationDestinationOtherId, 'DonationSubb');
+
+            if (model.DonationDestinationSubOfSubOtherId != null)
+              GetByParentId('DonationDestinationSubOfSubOtherId', model.DonationDestinationSubOtherId, 'DonationSubOfSubb');
+
+            if (model.CaseId != null && (model.DonationDestinationSubOfSubOtherId != null || model.DonationDestinationSubOtherId != null)) {
+              $('#DonationByBankCaseCodeContainer').show();
+              $('#CaseId').val(model.CaseId);
+            }
+
+          }
+            if (MasterCode == 'DonateThroughOtherMeansCurency') {
+                currancyList = data;
+              $('#CurencyId').val(model.CurencyId);
+              var selected = currancyList.find(({ Id }) => Id == $('#CurencyId').val());
+              if (selected.NameEn.trim() != 'EGP') {
+                  $('#BBFCYRate').show();
+              } else {
+                  $('#BBFCYRate').hide();
+              }
+          }
+
+        },
+        error: function (xhr) {
+          toastr.error(xhr.statusText);
+        }
+      });
+
+
+    }
+
+    function GetByParentId(dropDownId, parentId, itemToShow, placeHolder = '') {
+
+      var url = SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetByParentId?parentId=" + parentId;
+      $.ajax({
+        type: "GET",
+        contentType: "application/json",
+        url: url,
+        async: true,
+        success: function (data) {
+          var htmlGovernorate = "<option value=''>" + placeHolder + "</option>";
+          $.each(data, function (key, value) {
+            htmlGovernorate += "<option Code=\"" + value.Code + "\" value=" + value.Id + " >" + value.NameEn + "</option>";
+          });
+          $("#" + dropDownId).html(htmlGovernorate);
+          if (data.length != 0) {
+            $('#' + itemToShow).show();
+
+          }
+          if (itemToShow == 'DonationSubb' && model.DonationDestinationSubOtherId != null) {
+            $('#DonationDestinationSubOtherId').val(model.DonationDestinationSubOtherId);
+          }
+
+          if (itemToShow == 'DonationSubOfSubb' && model.DonationDestinationSubOfSubOtherId != null) {
+            $('#DonationDestinationSubOfSubOtherId').val(model.DonationDestinationSubOfSubOtherId);
+          }
+        },
+        error: function (xhr) {
+          toastr.error(xhr.statusText);
+        }
+      });
+
+    }
+
+    function GetAllDonationOtherWays(MasterCode, dropDownListId, enableAll, async, selectedId, PerantCode, emptyOption, placeholder) {
+      debugger;
+      $.ajax({
+        type: "GET",
+        contentType: "application/json",
+        url: MersalWebAPIBaseUrl + "api/DonationBanks/GetAllDonationOtherWays",
+        async: async,
+        success: function (data) {
+          var html = "";
+          if (enableAll) {
+            if (_cultureIsArabic) {
+              html = "<option value='0'>الكل</option>";
+            }
+            else {
+              html = "<option value='0'>All</option>";
+            }
+          }
+          if (false) {
+
+          }
+          else {
+            $.each(data, function (key, value) {
+              var selec = "";
+              if (true) {
+                if (true) selec = " selected='selected' ";
+                if (_cultureIsArabic) {
+                  html += "<option Code=" + value.NameAr + " value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                }
+                else {
+                  html += "<option Code=" + value.NameEn + " value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                }
+              }
+            });
+          }
+          $("#" + dropDownListId).html(html);
+          if (emptyOption) {
+            $("#" + dropDownListId).prepend("<option value='' selected='selected'>" + placeholder + "</option>");
+            //+ "<span style='color:red'>" + '*</span>' +
+          }
+          if (model.DonationOtherWayId != null) {
+            $('#DonationOtherWayId').val(model.DonationOtherWayId);
+          }
+        },
+        error: function (xhr) {
+          toastr.error(xhr.statusText);
+        }
+      });
+
+
+    }
+    </script>
+    <style>
+        .justify-fotter-center {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+            .justify-fotter-center button {
+                margin: 0px 10px;
+            }
+
+        .modal-dialog {
+            width: 1000px;
+        }
+
+        input {
+            margin-bottom: 10px;
+        }
+
+        .donation-destination-container input, .donation-destination-container select {
+            width: 108% !important;
+            position: relative;
+            left: 8px;
+            margin-bottom: 10px;
+        }
+    </style>

@@ -1,0 +1,344 @@
+﻿@using Resource
+@using System.Configuration
+@using UserUI.Helper
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = CaseResources.FollowCases;
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<input id="SearchCaseId" type="text" class="form-control pull-right" style="width: 250px;" placeholder="@CaseResources.Code" />
+<input id="btnGetCase" type="button" class="btn btn-info" value="@CaseResources.SearchForCase" onclick="GetAddCaseVisiteFull()" />
+<div id="AddCaseVisiteFullDiv">
+
+</div>
+@section Scripts {
+    <script>
+
+        var AddFollowToCaseSubject = 'Add Follow to  Case -  أضافه متابعه للحاله [#CaseCode# - #CaseName#]';
+        var AddFollowToCaseBody = 'Add Follow to  Case -  أضافه متابعه للحاله [#CaseName#] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=#CaseCode#&allowToUser=false';
+
+        var DateError = '@LayoutRES.DateRequired';
+        var VisitResultError = '@LayoutRES.VisitResultError';
+        $('#SearchCaseId').bind('keypress', function (e) {
+            if (e.keyCode == 13) {
+                GetAddCaseVisiteFull();
+            }
+        });
+
+        function GetAddCaseVisiteFull() {
+            if ($("#SearchCaseId").val() == "") {
+                return; 
+            }
+            $("#AddCaseVisiteFullDiv").html("");
+            $.ajax({
+                url: "/Case/GetAddCaseFullVisite?caseId=" + $("#SearchCaseId").val(),
+                type: 'Get',
+                dataType: "html",
+                contentType: 'application/html; charset=utf-8',
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (result) {
+                    $("#imgAjaxLoader").hide();
+                    $("#AddCaseVisiteFullDiv").append(result);
+                    $('#CaseVisitResultModals').modal('show');
+                    $("#VisitDateString").kendoDatePicker({
+                        max: new Date(),
+                        format: "d/M/yyyy",
+                    }).attr("readonly", "readonly");
+                    
+                    $("#FamilyMemberId").prop("disabled", true);
+
+                    $("#imgAjaxLoader").show();
+                    fillDropDown('NAT', '#FamilyMemberNationalityId', undefined, function () {
+                        $("#FamilyMemberId").prop("disabled", false);
+                        $("#imgAjaxLoader").hide();
+                    });
+                    fillDropDown('RLG', '#FamilyMemberReligionId');
+                    fillDropDown('GEND', '#FamilyMemberGenderId');
+                    GetCaseFamilyMembers($("#SearchCaseId").val());
+                },
+                error: function (xhr) {
+                    $("#imgAjaxLoader").hide();
+                    confirmMessageBootstrap("", "لا يوجد حالة بهذا الكود او الحالة مغلقة", 400, 250);
+                    $("#btnsubmitConfirmationDialog").hide();
+                }
+            });
+        }
+        
+        var familyArray = [];
+
+        function GetCaseFamilyMembers(caseId) {
+            familyArray = [{ Name: $("#CaseName").val(), Id: $("#CaseId").val(), CaseId: $("#CaseId").val() }]
+            console.log(familyArray);
+            var apiurl = MersalWebAPIBaseUrl + "api/Case/GetCaseFamilyMember";
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: apiurl + "?Id=" + caseId,
+                crossDomain: true,
+                headers: getHeaders(),
+                beforeSend: function () {
+                  //  $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    if (data != undefined && data.length != 0)
+                        Array.prototype.push.apply(familyArray, data);
+                  
+                    var html = "<option></option>";
+                    $.each(familyArray, function (key, value) {
+                      
+                            if (_cultureIsArabic) {
+                                html += "<option value=" + value.Id + " >" + value.Name + "</option>";
+                            }
+                            else {
+                                html += "<option value=" + value.Id + " >" + value.Name + "</option>";
+                            }
+                    });
+                    //$("#imgAjaxLoader").hide();
+                    $("#FamilyMemberId").html(html);
+                    $('.familydetails').hide();
+                    addChangeEvent();
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.error);
+                }
+            });
+
+        }
+
+        function addChangeEvent() {
+            $("#FamilyMemberId").change(function (e) {
+                $('.familydetails').hide("slow");
+                if ($('#CaseId').val() != $("#FamilyMemberId").val()) {
+                    familyArray.forEach(function (element) {
+                        if (element.Id == $("#FamilyMemberId").val()) {
+                            $('#FamilyMemberReligionId').val(""); $('#FamilyMemberReligionId').prop("disabled", false);
+                            $('#FamilyMemberNationalityId').val(""); $('#FamilyMemberNationalityId').prop("disabled", false);
+                            $('#FamilyMemberAge').val(""); $('#FamilyMemberAge').removeAttr('readonly');
+                            $('#FamilyMemberGenderId').val(""); $('#FamilyMemberGenderId').prop("disabled", false);
+
+                            if (element.Age != null) {
+                                $('#FamilyMemberAge').val(element.Age);
+                                $('#FamilyMemberAge').attr('readonly', true);
+                            }
+                            if (element.FamilyMemberReligionId != null) {
+                                $('#FamilyMemberReligionId').val(element.FamilyMemberReligionId);
+                                $('#FamilyMemberReligionId').prop("disabled", true);
+                            }
+                            if (element.FamliyMemberNationality != null) {
+                                $('#FamilyMemberNationalityId').val(element.FamliyMemberNationality);
+                                $('#FamilyMemberNationalityId').prop("disabled", true);
+                            }
+                            if (element.FamilyMemberGenderId != null) {
+                                $('#FamilyMemberGenderId').val(element.FamilyMemberGenderId);
+                                $('#FamilyMemberGenderId').prop("disabled", true);
+                            }
+                        }
+                        return;
+                    });
+                    $('.familydetails').show("slow");
+                }
+            });
+        }
+
+        function GetMultiSelectValues(id)
+        {
+            var multiselect = $("#" + id).data("kendoMultiSelect");
+            var selectedData = [];
+            var items = multiselect.value();
+            for (var i = 0; i < items.length; i++) {
+                selectedData.push(items[i]);
+            }
+            return selectedData;
+        }
+        function getServices()
+        {
+            var multiSelectResult = GetMultiSelectValues("multiselectDisease");
+            var resultStr = multiSelectResult.join(',');
+            var services = $("#VisiteServiceIDs").val();
+
+            var result = resultStr + ',' + services;
+
+            if (result.lastIndexOf(',') == (result.length - 1))
+                result = result.substring(0, result.length - 1);
+
+            if (result.indexOf(',') == 0)
+                result = result.substring(1, result.length);
+
+
+            console.log(result);
+            return result;
+        }
+
+        function submitVisitResult() {
+            $("#VisitDateErrorMassage,#VisitResultErrorMassage,#VisitFamilyMemberErrorMassage").html("");
+            if ($("#FamilyMemberId").val() == "") {
+                $("#VisitFamilyMemberErrorMassage").html("الحاله مطلوبه");
+                return;
+            }
+            else if ($("#VisitDateString").val() == "") {
+                $("#VisitDateErrorMassage").html(DateError);
+                return;
+            }
+            else if ($("#VisitResult").val() == "") {
+                $("#VisitResultErrorMassage").html(VisitResultError);
+                return;
+            }
+            
+            var result = {
+                CaseId: $("#CaseId").val(),
+                VisitDateString: $("#VisitDateString").val(),
+                VisitResult: $("#VisitResult").val(),
+                VisiteServiceIDs: getServices(), // $("#VisiteServiceIDs").val(),
+                FamilyMemberNationalityId: $("#FamilyMemberNationalityId").val(),
+                FamilyMemberReligionId: $("#FamilyMemberReligionId").val(),
+                FamilyMemberGenderId: $('#FamilyMemberGenderId').val(),
+                FamilyMemberId: $("#FamilyMemberId").val(),
+                FamilyMemberAge: $("#FamilyMemberAge").val(),
+                Amount: $("#Amount").val()
+            };
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json; charset=utf-8',
+                url: "/Case/AddCaseVisiteResult ",
+                data: JSON.stringify(result),
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.success(SuccessfulProcess);
+                    var mailSubject = AddFollowToCaseSubject.replace("#CaseCode#", $("#CaseId").val()).replace("#CaseName#", $("#CaseName").val())
+                    var mailBody = AddFollowToCaseBody.replace("#CaseCode#", $("#CaseId").val()).replace("#CaseName#", $("#CaseName").val())
+                    sentNotificationToGroupFun(mailSubject, mailBody, sessionStorage.getItem("Id"), 13);
+                    $('#CaseVisitResultModals').modal('hide');
+                },
+                error: function (xhr) {
+                    $('#CaseVisitResultModals').modal('hide');
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.statusText);
+                }
+            });
+           
+        }
+
+        ///-----ServiceVisite----///
+        function checkIfServiceVisiteExsist(id) {
+            var servIds = $("#VisiteServiceIDs").val();
+            var servIdArray = servIds.split(",");
+            if (servIdArray.indexOf(id) == -1) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        function changeService(id) {
+            if (checkIfServiceVisiteExsist(id)) {
+                removeSerivceVisiteId(id);
+            }
+            else {
+                appendServiceVisiteId(id);
+            }
+        }
+
+        function removeSerivceVisiteId(serviceid) {
+            var servIds = $("#VisiteServiceIDs").val();
+            var servIdArray = servIds.split(",");
+            servIdArray.deleteElem(serviceid)
+            servIds = servIdArray.toString();
+            $("#VisiteServiceIDs").val(servIds);
+        }
+
+        function appendServiceVisiteId(serviceid) {
+            var servIds = $("#VisiteServiceIDs").val();
+            if (servIds != "") {
+                servIds += ",";
+            }
+            servIds += serviceid;
+            $("#VisiteServiceIDs").val(servIds);
+        }
+        ///-----ServiceVisite----///
+
+
+        function MarkCaseAsServiceIsDoneNotDone(MarkAs) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: MersalWebAPIBaseUrl + "api/Case/MarkCaseAsServiceIsDoneNotDone?caseId=" + $("#CaseId").val() + "&MarkAs=" + MarkAs,
+                crossDomain: true,
+                headers: getHeaders(),
+                async: true,
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.success(SuccessfulProcess); 
+                },
+                error: function (xhr) { 
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.statusText);
+                }
+            });
+        } 
+
+
+        function fillDropDown(code, dropDownId, filterArr,f) {
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + code,
+                async: true,
+                beforeSend: function () {
+                    //$("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                   
+                    var html = "<option></option>";
+                    $.each(data, function (key, value) {
+                        if (filterArr != undefined) {
+                            if ($.inArray(value.Code, filterArr) != -1) {
+                                if (_cultureIsArabic) {
+                                    html += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                                }
+                                else {
+                                    html += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                                }
+                            }
+                        }
+                        else {
+                            if (_cultureIsArabic) {
+                                html += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                html += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                    //$("#imgAjaxLoader").hide();
+                    $(dropDownId).html(html);
+                    if (typeof f == 'function') {
+                        f();
+                    }
+                  
+                },
+                error: function (xhr) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.error);
+                }
+            });
+
+
+        }
+
+     
+    </script>
+}
+
+

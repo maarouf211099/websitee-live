@@ -1,0 +1,214 @@
+﻿@model List<DTO.getCasesOverViewDTO>
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    ViewBag.Title = LayoutRES.EmergancyDashboard;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (item.code== "EmcNew")
+        {
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                        {
+                            <h3>@item.CaseCount</h3>
+                        }
+                        else
+                        {
+                            <h3>0</h3>
+                        }
+                        @if (isArabic)
+                        {
+                            <p>@item.NameAr</p>
+                        }
+                        else
+                        {
+                            <p>@item.NameEn</p>
+                        }
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="/EmergencyCase/Index?state=@item.code" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+        
+        if (item.code== "EmcMedicalReject")
+        {
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-red">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                        {
+                            <h3>@item.CaseCount</h3>
+                        }
+                        else
+                        {
+                            <h3>0</h3>
+                        }
+                        @if (isArabic)
+                        {
+                            <p>@item.NameAr</p>
+                        }
+                        else
+                        {
+                            <p>@item.NameEn</p>
+                        }
+                    </div>
+                    <div class="icon">
+                        <i class="ion  ion-locked"></i>
+                    </div>
+                    <a href="/EmergencyCase/Index?state=@item.code" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+
+         
+        if (item.code== "EmcPending")
+        {
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-purple-gradient">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                        {
+                            <h3>@item.CaseCount</h3>
+                        }
+                        else
+                        {
+                            <h3>0</h3>
+                        }
+                        @if (isArabic)
+                        {
+                            <p>@item.NameAr</p>
+                        }
+                        else
+                        {
+                            <p>@item.NameEn</p>
+                        }
+                    </div>
+                    <div class="icon">
+                       <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="/EmergencyCase/Index?state=@item.code" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+
+        if (item.code== "EmcPendingEmTeam")
+        {
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-yellow-gradient">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                        {
+                            <h3>@item.CaseCount</h3>
+                        }
+                        else
+                        {
+                            <h3>0</h3>
+                        }
+                        @if (isArabic)
+                        {
+                            <p>@item.NameAr</p>
+                        }
+                        else
+                        {
+                            <p>@item.NameEn</p>
+                        }
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-clock"></i>
+                    </div>
+                    <a href="/EmergencyCase/Index?state=@item.code" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+
+        if (item.code=="EmcNeedIsolation")
+        {
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-aqua-gradient">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                        {
+                            <h3>@item.CaseCount</h3>
+                        }
+                        else
+                        {
+                            <h3>0</h3>
+                        }
+                        @if (isArabic)
+                        {
+                            <p>@item.NameAr</p>
+                        }
+                        else
+                        {
+                            <p>@item.NameEn</p>
+                        }
+                    </div>
+                    <div class="icon">
+                      <i class="ion ion-locked"></i>
+                    </div>
+                    <a href="/EmergencyCase/Index?state=@item.code" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+
+ if (item.code=="EmcWaittingHospital")
+        {
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box  bg-blue-gradient">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                        {
+                            <h3>@item.CaseCount</h3>
+                        }
+                        else
+                        {
+                            <h3>0</h3>
+                        }
+                        @if (isArabic)
+                        {
+                            <p>@item.NameAr</p>
+                        }
+                        else
+                        {
+                            <p>@item.NameEn</p>
+                        }
+                    </div>
+                    <div class="icon">
+                      <i class="ion ion-android-archive"></i>
+                    </div>
+                    <a href="/EmergencyCase/Index?state=@item.code" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+
+  
+
+
+    }
+}

@@ -1,0 +1,13 @@
+﻿
+
+@{
+    ViewBag.Title = "AddEmergencyCase";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="block">
+    <div class="container">
+
+        @Html.Partial("~/Views/EmergencyCase/_AddEmergencyCase.cshtml", new DTO.Emergency.EmergencyCaseDto())
+    </div>
+</div>

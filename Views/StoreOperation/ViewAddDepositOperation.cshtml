@@ -1,0 +1,278 @@
+﻿@model DTO.StoreOperationDTO
+@using Resource
+@using UserUI.Helper
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+
+<div class="modal fade" role="dialog" id="dlgAddNewItem">
+    <div class="modal-dialog" style="width: 720px;height:1800px">
+        <span class="close-btn"><i class="fa fa-remove"></i> @LayoutRES.Close</span>
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@StoreOperationsRes.AddDepositOperation</h4>
+                </div>
+                @using (Html.BeginForm("AddNewItem", "InventoryItem", null, FormMethod.Post, new { role = "form", id = "frmAddEditStores", @class = "form-horizontal", }))
+                {
+                    <div class="box-body">
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Id, new { value = (Model.Id == 0 || Model.Id == null ? "0" : Model.Id.ToString()) })
+                       @Html.HiddenFor(m => m.IsDeposit, new { value=true})
+                        @Html.HiddenFor(m => m.ArrivalOrExchangeDate , new { value = ""})
+
+
+                         <div style="display:inline-block">
+                            <div class="" floatToRight style="visibility:collapse">
+                                <div class="col-md-1">
+                                    <input id="VolunteerRadioId" type="radio" checked style="width:25px;height:25px" name="IsDeposit" floatToRight value=true />
+                                </div>
+                                <div style="position:relative;top:0;right:0;">
+                                    <label class="WhiteLable"  color="white"> @StoreOperationsRes.Deposit</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div dir="@dir">
+
+                            <div class="h5White">@Html.DisplayNameFor(m => m.StoreId)</div>
+                            @Html.DropDownListFor(x => x.StoreId, new List<SelectListItem>(), new { @class = "form-control", id = "ddlStoreId" })
+                            @Html.ValidationMessageFor(m => m.StoreId)
+
+                        </div>
+                        <br />
+                        <div dir="@dir">
+
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.InventoryItemId)</h5>
+                            @Html.DropDownListFor(x => x.InventoryItemId, new List<SelectListItem>(), new { @class = "form-control", id = "ddlInventoryItemId" })
+                            @Html.ValidationMessageFor(m => m.InventoryItemId)
+
+                        </div>
+
+                        <br />
+                        <div @floatToRight>
+                            <div>@Html.DisplayNameFor(m => m.Quantity)</div>
+                            @Html.TextBoxFor(m => m.Quantity, new { placeholder = Html.DisplayNameFor(m => m.Quantity), id = "txtQuantity", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Quantity)
+                        </div>
+
+                        <br />
+
+                        <div @floatToRight class="col-md-6">
+                            <div>@Html.DisplayNameFor(m => m.ProductionDate)</div>
+                            <input id="datepicker" class="KendoDatePicker" name="ProductionDate" value="@Model.ProductionDateString" style="width: 100%" placeholder="@StoreOperationsRes.ProductionDate" />
+                            @Html.ValidationMessageFor(m => m.ProductionDate)
+                        </div>
+                        <div @floatToRight class="col-md-6">
+                            <div>@Html.DisplayNameFor(m => m.ExpirationDate)</div>
+                            <input id="datepicker" class="KendoDatePicker" name="ExpirationDate" value="@Model.ExpirationDateString" style="width: 100%" placeholder="@StoreOperationsRes.ExpirationDate" />
+                            @Html.ValidationMessageFor(m => m.ExpirationDate)
+                        </div>
+                        <br />
+                        @*<div @floatToRight>
+                            <div>@Html.DisplayNameFor(m => m.ArrivalOrExchangeDate)</div>
+                            <input id="datepicker" class="KendoDatePicker" name="ArrivalOrExchangeDate" value="@Model.ArrivalOrExchangeDateString" style="width: 100%" placeholder="@StoreOperationsRes.ArrivalOrExchangeDate" />
+                            @Html.ValidationMessageFor(m => m.ArrivalOrExchangeDate)
+                        </div>*@
+                    </div>
+                    <!-- /.box-body -->
+                    <hr />
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                        </div><!-- /.box-footer -->
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="form submit">
+    function registerFormSubmitting() {
+        
+        $("#frmAddEditStores").submit(function (e) {
+             
+            var apiurl = "";
+            if ($("#Id").val() == "0") // add
+                apiurl = MersalWebAPIBaseUrl + "api/StoreOperations/Create";
+            else // update
+                apiurl = MersalWebAPIBaseUrl + "api/StoreOperations/UpdateStoreOperation";
+            
+            
+            $.validator.unobtrusive.parse($("#frmAddEditStores"))
+            e.preventDefault();
+            if (!$("#frmAddEditStores").valid()) return;
+
+            var data = {};
+    $("#frmAddEditStores").serializeArray().map(function (x) { data[x.name] = x.value; });
+
+    console.log(JSON.stringify(data));
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: apiurl,
+        crossDomain: true,
+        headers: getHeaders(),
+        data: JSON.stringify(data),
+        async: false,
+        success: function (data) {
+            
+            $('#AddOrEditWithdrawPermissionDiv').modal('hide');
+            data = JSON.parse(data);
+            if (data > 0) {
+                toastr.success('@InventoryItemsRes.OperationSucceeded');
+                RefreshStoreOperations() ;
+                //$("#grid").data('kendoGrid').dataSource.read();
+                //$("#grid").data("kendoGrid").refresh();
+            }
+            else {
+                toastr.error('@InventoryItemsRes.OperationFailed' );
+            }
+        },
+        error: function (xhr) {
+            $('#AddCaseModals').modal('hide');
+            toastr.error('@InventoryItemsRes.OperationFailed '); 
+        }
+    });
+    });
+
+    };
+    registerFormSubmitting();
+</script>
+<script id="load drop down lists">
+    var InventoryItemsArr = [];
+    var StoresArr=[];
+    function loadStoresList(dropDownListId, enableAll, async, selectedId) {
+        $.ajax({
+            type: "Post",
+            async: false,
+            headers: getHeaders(),
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/stores/GetAllStores",
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                StoresArr=data;
+                var selec = "";
+                var textByIdArr = [];
+                $.each(data, function (key, value) {
+
+
+                        if (value.Id == selectedId) selec = " selected='selected' ";
+                        if (_cultureIsArabic) {
+                            html += "<option  value=" + value.Id + selec + "  >" + value.Name + "</option>";
+
+                        }
+                        else {
+                            html += "<option  value=" + value.Id + selec + " >" + value.Name + "</option>";
+                         }
+
+                });
+                $("#" + dropDownListId).html(html);
+                GlobalArray[MasterCode] = textByIdArr;
+            },
+            error: function (xhr) { 
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+    function loadInventoryItemsList(dropDownListId, enableAll, async, selectedId)
+    {
+        $.ajax({
+            type: "Post",
+            async: false,
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/InventoryItems/GetAllInventoryItems",
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                InventoryItemsArr=data;
+                var selec = "";
+                var textByIdArr = [];
+                $.each(data, function (key, value) {
+
+
+                    if (value.Id == selectedId) selec = " selected='selected' ";
+                    if (_cultureIsArabic) {
+                        html += "<option  value=" + value.Id + selec + "  >" + value.Name + "</option>";
+
+                    }
+                    else {
+                        html += "<option value=" + value.Id + selec + " >" + value.Name + "</option>";
+                    }
+
+                });
+                $("#" + dropDownListId).html(html);
+                GlobalArray[MasterCode] = textByIdArr;
+            },
+            error: function (xhr) { 
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+    loadStoresList("ddlStoreId",false,false,@(Model.StoreId == null ?0: Model.StoreId));
+    loadInventoryItemsList("ddlInventoryItemId", false, false,@(Model.InventoryItemId == null ? 0: Model.InventoryItemId ));
+</script>
+<script id="loadKendDatePicker">
+
+//$(".KendoDatePicker").kendoDatePicker({
+//  animation: false
+//});
+
+if (_cultureIsArabic) {
+    kendo.culture("ar-EG");
+}
+    $(".KendoDatePicker").kendoDatePicker({
+   // max: new Date(),
+    format: "MM/dd/yyyy",
+    }).attr("readonly", "readonly");
+    $(".KendoDatePicker").removeClass("KendoDatePicker");
+</script>
+
+<script id="load kendo drop down list">
+    $("#ddlInventoryItemId").kendoDropDownList({
+        dataTextField: "Name",
+        dataValueField: "Id",
+        dataSource: InventoryItemsArr,
+        filter: "contains",
+        width:"100%",
+        
+    });
+     
+</script>
+<style>    .k-dropdown
+     {
+        display:inline-block;
+        width:100%;
+    }
+    .k-icon.k-i-calendar {
+        background-image: url('../../images/icon.png');
+    }
+</style>

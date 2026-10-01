@@ -1,0 +1,336 @@
+﻿@using Resource
+@model UserUI.Models.OnlineDonationViewModel
+<script>
+    var confirmDocationMessage = 'تأكيد تبرعك بمبلغ {0} لمؤسسه مرسال الخيرية';
+   
+</script>
+<script src="~/Scripts/MersalScripts/DonationManagment/FawryOnlineDonation.js"></script>
+@*<div id="ovarlay" class="ovarlay"></div>*@
+<div id="OnlineDonationTabs">
+     
+    <strong class="popup-title">@DonationResources.OnlineDonationDescription</strong>
+
+
+
+
+    <div class="row">
+      @*<div class="col-lg-3 col-md-12 ">
+  <div class="hot-chanel">
+      <div class="popup-title">
+          <div class="col-md-12">
+              <input class="form-control" type="checkbox" id="OutSideChecked" value="1">
+              <label class="form-control" for="OutSideChecked"> Donate Outside Egypt</label> 
+              <button id="OutSideChecked" type="button" class="btn btn-light"  >Donate Outside Egypt</button>
+          </div>
+         
+          <a href="http://bit.ly/MersalDonations">@DonationResources.DonateOutsideEg <span> @DonationResources.pressHere</span></a> 
+      </div>
+    <img src="~/images/sa5en.PNG" alt="" />
+  </div>
+</div>*@
+
+<div id="OutSideChecked" class="outSide-checke col-md-12 ">
+    <div class="custom-switch">
+     
+      <div id="inside" class="inside active">
+        <span>@DonationResources.InsidEg   </span>
+      </div>
+       <div id="outside" class="outside"  >
+        <span>@DonationResources.OutsidEg </span>
+      </div>
+    </div>
+    
+     
+    </div>
+
+
+  <div class="col-md-12 ">
+    @using (Html.BeginForm("AddOnlineDonation", "Donation", FormMethod.Post, new { id = "OnlineDonationForm" }))
+    {
+
+      <div class="form">
+          @*<div class="col-md-12 separator"> <span>@DonationResources.basicData </span> </div>*@
+
+
+          <input type="hidden" class="hidCaseIdDonation" name="CaseId" />
+          <div class="col-md-6 FloatRight">
+              <div class="textfield">
+                  @Html.TextBoxFor(x => x.NameAnonymous, new { @class = "form-control  textfield", placeholder = @DonationResources.DonationName + '*' })
+                  @Html.ValidationMessageFor(x => x.NameAnonymous)
+              </div>
+          </div>
+
+          <div class="col-md-6 FloatRight">
+              <div class="textfield">
+                  @Html.TextBoxFor(x => x.PhoneNumberAnonymous, new { @class = "form-control textfield", placeholder = @DonationResources.Phone + '*' })
+                  @Html.ValidationMessageFor(x => x.PhoneNumberAnonymous)
+              </div>
+          </div>
+          <div class="col-md-6 FloatRight">
+              <div class="textfield">
+                  @Html.TextBoxFor(x => x.AddressAnonymous, new { @class = "form-control textfield", placeholder = @DonationResources.Address + '*' })
+                  @Html.ValidationMessageFor(x => x.AddressAnonymous)
+              </div>
+          </div>
+          <div class="col-md-6 FloatRight">
+              <div class="textfield">
+                  @Html.TextBoxFor(x => x.EmailAnonymous, new { placeholder = @DonationResources.Email + '*', id = "emailAnonymous" })
+                  @Html.ValidationMessageFor(x => x.EmailAnonymous)
+              </div>
+          </div>
+          <div class="col-md-12 d-lg-flex">
+              <ul class="donation-figures  ">
+                  <li><a class="wpdonation-button " id="Donate10" title="">10.00 <span id="curr">EGP</span></a></li>
+                  <li><a class="wpdonation-button" id="Donate50" title="">50.00 <span id="curr1">EGP</span></a></li>
+                  <li><a class="wpdonation-button" id="Donate100" title="">100.00 <span id="curr2">EGP</span></a></li>
+                  <li><a class="wpdonation-button" id="Donate500" title="">500.00 <span id="curr3">EGP</span></a></li>
+                  <li><a class="wpdonation-button active" id="OtherAmount" title="Other Amount Online">@DonationResources.OtherAmount</a></li>
+              </ul>
+              <div class="donation-amount ">
+                  <div class="filed">
+                      @Html.TextBoxFor(x => x.Amount, new { Id = "AmountTextArea", maxlength = 5, Value = "", placeholder = DonationResources.EnterTheAmountYouWant + '*', onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                      <span id="curr4">EGP</span>
+                      <span id="mesageAmount">@Html.ValidationMessageFor(x => x.Amount)</span>
+
+                  </div>
+              </div>
+          </div><!-- Your Donation -->
+
+          <hr>
+          <div class="form-group col-md-6 DonationDestinationTypeDiv FloatRight">
+              <label class="col-md-6 control-label FloatRight">@DonationResources.DonationDestination :</label>
+
+              <div class="col-sm-12">
+                  @Html.DropDownListFor(x => x.DonationDestinationId, new List<SelectListItem>(), new { @class = "form-control increase-width", placeholder = "test" })
+                  @Html.ValidationMessageFor(x => x.DonationDestinationId)َ
+              </div>
+
+              <div class="col-sm-12" id="DonationSub" style="display:none;">
+                  @Html.DropDownListFor(x => x.DonationDestinationSubId, new List<SelectListItem>(), new { @class = "form-control increase-width" })
+                  @Html.ValidationMessageFor(x => x.DonationDestinationSubId)َ
+              </div>
+
+              <div class="col-sm-12" id="DonationSubOfSub" style="display:none;">
+                  @Html.DropDownListFor(x => x.DonationDestinationSubOfSubId, new List<SelectListItem>(), new { @class = "form-control increase-width" })
+                  @Html.ValidationMessageFor(x => x.DonationDestinationSubOfSubId)َ
+              </div>
+              <div class="col-sm-12" id="OnlineDonationCaseCodeContainer" style="display:none; ">
+                  @Html.TextBoxFor(x => x.OnlineDonationCaseCode, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.OnlineDonationCaseCode) })
+                  @Html.ValidationMessageFor(x => x.OnlineDonationCaseCode)
+              </div>
+
+          </div>
+
+
+          @*@Html.EnumDropDownListFor(
+        x => x.YourEnumField,
+        "Select My Type",
+        new { @class = "form-control" })*@
+
+
+
+
+
+
+
+
+
+
+          <br /><br />
+          @*<div class="row col-md-12">
+
+            في حاله وجود مشكله في الدفع اون لاين برجاء الانصال بالدعم الفني * <a href="tel:01099316592">01099316592</a>
+
+        </div>*@
+      </div>
+
+    }
+  </div>
+  <div class="row col-md-12 bottom_btn Cib-fawry">
+      <div id="OnlineSection" class="col-md-12 ">
+          <button id="onlineDonationSubmitBtn" class="proceed" type="button"> @DonationResources.SubmitDonationOnline </button>
+      </div>
+
+      <div id="FawerySection" class="col-md-12">
+          <button id="FawryCardonlineDonationSubmitBtn" class="proceed" type="button"> @LayoutRES.fawryPaymentButton <img itemprop="image"     width="140px" src="~/images/Fawry.png" /></button>
+      </div>
+      <div id="OutsideSection" class="col-md-12" style="display: none; justify-content: space-evenly;">
+          <button id="outsideDonationSubmitBtn" class="proceed" style="font-size:16px;" type="button" > @DonationResources.DonateOutsideEg </button>
+      </div>
+    </div>
+  </div> 
+  
+    <script src="~/Scripts/MersalScripts/DonationManagment/OnlineDonation.js?version=1.3"></script>
+</div>
+
+<div class="modal fade" id="confirmOnlineDonation" role="dialog" data-backdrop="static" data-keyboard="false" style="z-index:10610000000;">
+    <div class="modal-dialog">
+        <div class="modal-body" style="background-color: #fff;text-align: center;">
+            <h4></h4>
+        </div>
+        <div class="modal-footer" style="background-color: whitesmoke;">
+            <button type="button" class="btn btn-info" id="ConfirmOnlineDonation">
+                تأكيد
+                @*@DonationResources.Ok*@
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelConfirmation">
+                الغاء
+                @*@DonationResources.Cancel*@
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="outsideOnlineDonation" role="dialog" data-backdrop="static" data-keyboard="false" style="z-index:10610000000;">
+    <div class="modal-dialog">
+        <div class="modal-body" style="background-color: #fff;text-align: center;">
+            <h4></h4>
+        </div>
+        <div class="modal-footer" style="background-color: whitesmoke;">
+            <button type="button" class="btn btn-info" id="confirmoutsideOnlineDonation">
+                تأكيد
+                @*@DonationResources.Ok*@
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelConfirmation">
+                الغاء
+                @*@DonationResources.Cancel*@
+            </button>
+        </div>
+    </div>
+</div>
+
+@*Fawry Card*@
+<div class="modal fade" id="confirmOnlineDonationFawryCardModal" role="dialog" data-backdrop="static" data-keyboard="false" style="z-index:10610000000;">
+    <div class="modal-dialog">
+        <h5>Fawry</h5>
+        <div class="modal-body" style="background-color: #fff;text-align: center;">
+            <h4></h4>
+        </div>
+        <div class="modal-footer" style="background-color: whitesmoke;">
+            <button type="button" class="btn btn-info" id="confirmOnlineDonationFawryCard">
+               
+                @DonationResources.Ok
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="confirmOnlineDonationFawryCard">
+                 
+                @DonationResources.Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const param_x = urlParams.get('donationDestID');
+        console.log(param_x);
+        var result = {};
+        var intervalId = 0;
+        if (param_x != null && param_x != undefined) {
+            var apiurl = MersalWebAPIBaseUrl + "api/Donation/GetDonateHierarchy?id=" + param_x;
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: apiurl,
+                async: true,
+                success: function (data) {
+                    result = data;
+                    var startTime = new Date().getTime();
+                    var interval = setInterval(function () {
+                        if (new Date().getTime() - startTime > 10000) {
+                            clearInterval(interval);
+                            return;
+                        }
+                        mapDropDown();
+                    }, 1000);  
+
+                   /// intervalId = setInterval(mapDropDown, 1000);
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText);
+                }
+            });
+        }
+        
+
+        function mapDropDown() {
+            debugger;
+            if (!$('#DonationDestinationId').val())
+                $('#DonationDestinationId').val(result.DonationDestinationId).change();
+            if (!$('#DonationDestinationSubId').val())
+                $('#DonationDestinationSubId').val(result.DonationDestinationSubId).change();
+            if (!$('#DonationDestinationSubOfSubId').val())
+                $('#DonationDestinationSubOfSubId').val(result.DonationDestinationSubOfSubId);
+            console.log($('#DonationDestinationId').val());
+            //if ($('#DonationDestinationId').val()) {
+            //    clearInterval(intervalId);
+            //}
+
+        }
+        
+
+    });
+
+    $('#Donate10').click(function () {
+        $("#mesageAmount").addClass("hidden");
+
+        $("#AmountTextArea").attr("readonly", true).val(10);
+    });
+
+    $('#Donate50').click(function () {
+        $('#mesageAmount').addClass('hidden');
+
+        $("#AmountTextArea").attr("readonly", true).val(50);
+    });
+
+    $('#Donate100').click(function () {
+        $('#mesageAmount').addClass('hidden');
+
+        $("#AmountTextArea").attr("readonly", true).val(100);
+    });
+
+    $('#Donate500').click(function () {
+        $('#mesageAmount').addClass('hidden');
+
+        $("#AmountTextArea").attr("readonly", true).val(500);
+    });
+
+    $('#OtherAmount').click(function () {
+        $("#AmountTextArea").attr("readonly", false).val('');
+    });
+
+
+</script>
+
+
+
+
+
+
+
+
+<style>
+    #AmountTextArea {
+        border: 1px solid #D2CFCF;
+        color: #A8A8A8;
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        height: 49px;
+        padding: 10px 20px;
+        width: 300px;
+        text-align: center;
+        background: #F9F8F8 none repeat scroll 0% 0%
+    }
+
+    .bottom_btn {
+        padding-bottom: 3rem;
+    }
+</style>
+ 

@@ -1,0 +1,156 @@
+﻿@using Kendo.Mvc.UI
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = ActivitiesRES.ActivityAdminIndexTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml ";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var mersalApi = ViewBag.mersalAPi;
+
+}
+
+@*<h2>@ActivitiesRES.ActivityAdminIndexTitle</h2>
+<head>
+    <title>@ActivitiesRES.ActivityAdminIndexTitle</title>
+</head>*@
+
+<div id="deleteView" class="modal fade" tabindex="-1" style="background-color:rgba(0, 0, 0, .7);" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+<div >
+    @Html.Hidden("IsDeleted", "False")
+
+    <br />
+    <div class="row">
+
+        <div class="form-group col-lg-3">
+            <button type="button" class="btn btn-info info" onclick="changeDelete()" id="btn_showDelete">@ActivitiesRES.ShowDeleted</button>
+        </div>
+    </div>
+
+ 
+
+    <div class="@schedulerClass">
+        @(Html.Kendo().Grid((List<ActivityDTO>)Model)
+              .Name("ActiivitiesGrid")
+              .Filterable()
+              .Pageable(pager => pager.Refresh(true))
+              .Sortable()
+              .Groupable(g => g.Messages(m => m.Empty(LayoutRES.DragaColumnHeaderAndDropItHereToGroupByThatColumn)))
+              .Columns(columns =>
+              {
+                  columns.Bound(e => e.Title) ;
+                  columns.Bound(e => e.Address) ;
+                  columns.Bound(e => e.MaxCapacity)  ;
+                  columns.Template(e => e.IsFree).ClientTemplate("<p eventId='#=Id#' eventPrice='#=Fees#' class='freeEvent'>#=IsFree#</p>") .Title(ActivitiesRES.Fees);
+                  columns.Template(e => e.IsAcademia).ClientTemplate("<p isAcademia='#=IsAcademia#' class='academia'></p>").Title(ActivitiesRES.IsAcademia+ "/"+ActivitiesRES.IsPublic);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info' onclick=editActivity(#=Id#)><center><i class='glyphicon glyphicon-edit'></i></center></a>").Width(50).Title(ActivitiesRES.KendoEditTitle);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info' onclick=deleteActivity(#=Id#)><center><i class='glyphicon glyphicon-trash'></center></i></a>").Width(50).Title(LayoutRES.Delete);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info' onclick=restoreActivity(#=Id#)><center><i class='glyphicon glyphicon-share-alt'></center></i></a>").Width(50).Title(LayoutRES.Restore);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info' href='/Activities/ActivityMembersList?Id=#=Id#' ><center><i class='glyphicon glyphicon-th-list'></center></i></a>").Width(50).Title(ActivitiesRES.Participants);
+
+              })
+              .Events(e => e.DataBound("DataBound"))
+              .Pageable(pageable => pageable.Refresh(true).PageSizes(true))
+              .DataSource(dataSource => dataSource.Ajax().PageSize(10).Read(read => read.Url(string.Format("{0}api/Activities/getAllActivityDataSourceAdmin", mersalApi)).Type(HttpVerbs.Get).Data("gridParameters")))
+        )
+    </div>
+</div>
+
+@*<script>
+
+    function DataBound() {
+        $(".freeEvent").each(function (i) {
+            var data = $(this).attr("eventPrice");
+            if (isNumber(data)) {
+                $(this).html(data);
+            }
+            else {
+                $(this).html("@ActivitiesRES.Free");
+            }
+        });
+        $(".academia").each(function (i) {
+            var data = $(this).attr("isAcademia");
+            if (data =="true") {  
+                $(this).html("@ActivitiesRES.IsAcademia");
+            }
+            else {
+                $(this).html("@ActivitiesRES.IsPublic");
+            }
+        });
+    }
+    function deleteActivity(Id) {
+        $.ajax({
+            url: '@Url.Action("DeleteOrRestore", "Activities")',
+            type: 'GET',
+            data: {
+                Id: Id,
+                IsDelete: true
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                $('#deleteView').html(result);
+                $('#deleteView').modal('show');
+            }
+        });
+    }
+
+    function gridParameters() {
+        if ($("#IsDeleted").val() == "True") {
+            $('#ActiivitiesGrid').data('kendoGrid').hideColumn(5);
+            $('#ActiivitiesGrid').data('kendoGrid').hideColumn(6);
+            $('#ActiivitiesGrid').data('kendoGrid').showColumn(7);
+        } else {
+            $('#ActiivitiesGrid').data('kendoGrid').showColumn(5);
+            $('#ActiivitiesGrid').data('kendoGrid').showColumn(6);
+            $('#ActiivitiesGrid').data('kendoGrid').hideColumn(7);
+        }
+        return { 'IsDeleted': $("#IsDeleted").val() };
+    }
+
+    function changeDelete() {
+        if ($("#IsDeleted").val() == "True") {
+            $("#IsDeleted").val("False");
+            $('#btn_showDelete').text("@ActivitiesRES.ShowDeleted");
+        } else {
+            $("#IsDeleted").val("True");
+            $('#btn_showDelete').text("@ActivitiesRES.ShowAll");
+        }
+        $('#ActiivitiesGrid').data('kendoGrid').dataSource.read();
+    }
+
+    function editActivity(Id) {
+        window.location.href = '@Url.Action("Edit", "Activities")' + "?Id=" + Id;
+    }
+
+    function restoreActivity(Id) {
+        $.ajax({
+            url: '@Url.Action("DeleteOrRestore", "Activities")',
+            data: {
+                Id: Id,
+                IsDelete: false
+            },
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                $('#deleteView').html(result);
+                $('#deleteView').modal('show');
+            }
+        });
+    }
+
+
+</script>*@
+
+@section Scripts {
+    <script>
+            //resourses
+            var Free = '@ActivitiesRES.Free';
+            var IsAcademia = '@ActivitiesRES.IsAcademia';
+            var IsPublic = '@ActivitiesRES.IsPublic';
+            var ShowDeleted = '@ActivitiesRES.ShowDeleted';
+            var ShowAll = '@ActivitiesRES.ShowAll';
+    </script>
+   <script src="~/Scripts/MersalScripts/Activity/AdminIndexScript.js"></script>
+    }

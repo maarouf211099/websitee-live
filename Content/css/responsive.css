@@ -1,0 +1,196 @@
+@media (max-width:1200px){
+nav > ul > li > a{padding:40px 15px;}
+.donation-popup .container{width:100%;}
+.fancy-overlay {float: left;padding: 20px 0;position: relative;width: 100%;}
+.block.overlap .container {border: 0 none;margin-top: 0;padding-top: 30px; width: 100%;}
+.ask-question {padding: 90px 15px;}
+.white-bg {padding: 40px 0 0;}
+
+} 
+
+
+@media (min-width:768px) and (max-width:980px){
+.block .container,.container {padding: 0 15px;}
+.column {float: left;width: 100%;margin-bottom: 30px;}
+.column:last-child{margin-bottom: 0;}
+#responsive-header{display:block;}
+header,.sideheader{display:none;}
+body.move{margin-left:-200px;}
+.event-inner {float: left;padding: 20px;text-align: center;}
+.event-intro {display: unset;float: left;margin-top: 20px;padding: 0;text-align: center;width: 100%;}
+.start-time {display: unset;float: left;margin-top: 20px;width: 100%;}
+.join-us {float: left;margin-top: 20px;text-align: center;width: 100%;}
+.urgent-progress .row > div {width: 33.334%;}
+.urgentcause-gallery > div {float: left;margin: 0;padding: 0;width: 100%;}
+.gallery-widget .row > div {float: left;width: 16.666%;}
+.popup-centralize { padding: 60px 20px;}
+.video.overlap {margin: 0;}
+.service-carousel {padding: 0 20px;}
+.about-service {margin-left:0;width: 100%;}
+.services-list {padding: 50px 0;width: 100%;}
+.urgent-parallax > h2 {font-size: 30px;margin-bottom: 10px;}
+.urgent-parallax > strong {font-size: 15px;line-height: 20px;}
+.urgent-parallax > p { margin: 25px 0 0;width: 100%;}
+.urgent-parallax > p strong {font-size: inherit;}
+.fancy-overlay {float: left;padding: 20px 0;position: relative;width: 100%;}
+.banner-text {display: block;float: left;margin-bottom: 20px;text-align: center;width: 100%;}
+.banner-info {display: block;float: left;margin-bottom: 20px;width: 100%;}
+.banner-button {display: block;float: left;text-align: center;width: 100%;}
+.deal-desc {float: left;margin-top: 30px;width: 100%;}
+.deal-detail .row > div { margin: 0;width: 100%;}
+.deal-selector {margin: 0 35%;width: 30%;}
+.title > p{margin:15px 0 0;width:100%;}
+.deal-selector{width:100%;margin:0;}
+.list-style .post-listview > div {float: left; width: 100%;}
+.post-detail {padding: 30px 20px;}
+.form > div {float: left;width: 100%;}
+.services-list > ul li {width: 50% !important;}
+.ask-question {padding: 90px 15px;}
+.white-bg {padding: 40px 0 0;}
+}
+
+
+@media (max-width:767px){
+.block .container,.container {padding: 0 15px;}
+.column {float: left;width: 100%;margin-bottom: 30px;}
+.column:last-child{margin-bottom: 0;}
+#responsive-header{display:block;}
+header,.sideheader{display:none;}
+.inline-list > li a {float: left;width: 100%;line-height: 25px;}
+body.move{margin-left:-200px;}
+#responsive-menu {padding-top: 40px;}
+.event-inner {float: left;padding: 20px;text-align: center;}
+.event-intro {display: unset;float: left;margin-top: 20px;padding: 0;text-align: center;width: 100%;}
+.start-time {display: unset;float: left;margin-top: 20px;width: 100%;}
+.join-us {float: left;margin-top: 20px;text-align: center;width: 100%;}
+.upcoming-eventbar.overlap{margin:0;}
+.event-inner h3 {font-size: 15px;line-height: 20px;}
+.urgentcause-detail h3 {font-size: 18px;}
+.urgent-progress .row > div {width: 33.334%;}
+.urgentcause-gallery > div {float: left;margin: 0;padding: 0;width: 100%;}
+.title h2 {font-size: 25px;}
+.title > span {font-size: 12px;margin-bottom: 5px;}
+.popup-form {width: 80%;padding:70px 20px;}
+.popup-form > strong {font-size: 18px;}
+.popup-form > p {line-height: 20px;}
+.gallery-widget .row > div {float: left;width: 16.666%;}
+.event-date {
+    top: 30px;
+    left: 50%;
+    -webkit-transform:translateY(0) translateX(-50%);
+    -moz-transform:translateY(0) translateX(-50%);
+    -ms-transform:translateY(0) translateX(-50%);
+    -o-transform:translateY(0) translateX(-50%);
+    transform:translateY(0) translateX(-50%);
+}
+.event-toggle::after {display: none;}
+.event-toggle {padding: 120px 40px 30px;}
+.upcoming-eventbar{padding:125px 0 0 10px}
+.event-intro h3{width:100%;}
+.event-bar > div {float: left;width: 100%;}
+.event-bar h3 {padding: 0;}
+.event-toggle {padding: 110px 30px 30px;}
+.event-bar > div {float: left;width: 100%;}
+.event-bar h3 {padding: 0;}
+.event-toggle {padding: 110px 30px 30px;}
+.volunteer-inner > span {font-size: 20px;margin-bottom: 10px;}
+.volunteer-inner > strong {font-size: 30px;line-height: 30px;margin-bottom: 10px;}
+.volunteer-inner > p {margin-bottom: 10px;}
+.join h3 {font-size: 40px;line-height: 40px;margin-bottom: 20px;}
+.blog-detail > h3 {padding: 0 20px;}
+.video.overlap {margin: 0;}
+.service-carousel {padding: 0 20px;}
+.gallery-widget .row > div{width:25%;}
+.about-service {margin-left:0;width: 100%;}
+.services-list {padding: 50px 0;width: 100%;}
+.services-list > ul li{width:50%;}
+.video {min-height: 0;}
+.help-detail {padding: 45px 35px 45px 25px;}
+.urgent-parallax > h2 {font-size: 30px;margin-bottom: 10px;}
+.urgent-parallax > strong {font-size: 15px;line-height: 20px;}
+.urgent-parallax > p { margin: 25px 0 0;width: 100%;}
+.urgent-parallax > p strong {font-size: inherit;}
+.urgent-progress .goal, 
+.urgent-progress .goal.raised {text-align: center;width: 100%;}
+.percent {width: 100%;}
+.urgent-detail {float: left;height: auto; padding: 30px;position: relative;text-align: center;width: 100%;}
+.cause-title {float: left;margin-bottom: 20px;padding: 0; position: relative;width: 100%;}
+.cause-donation {float: left;padding: 0;position: relative;width: 50%;}
+.urgent-detail > a {bottom: 0;position: relative;right: 0;width: 50%;}
+.fancy-overlay {float: left;padding: 20px 0;position: relative;width: 100%;}
+.banner-text {display: block;float: left;margin-bottom: 20px;text-align: center;width: 100%;}
+.banner-info {display: block;float: left;margin-bottom: 20px;width: 100%;}
+.banner-button {display: block;float: left;text-align: center;width: 100%;}
+.counting{width:100%;}
+.deal-desc {float: left;margin-top: 30px;width: 100%;}
+.deal-detail .row > div { margin: 0;width: 100%;}
+.deal-selector {margin: 0 35%;width: 30%;}
+.title > p{margin:15px 0 0;width:100%;}
+.deal-selector{width:100%;margin:0;}
+.list-style .post-listview > div {float: left; width: 100%;}
+.post-detail {padding: 30px 20px;}
+.urgent-cause-overlay {position: relative;float: left;width: 100%;background: #303030;padding: 30px 0;}
+.sponsors-carousel .owl-nav > div.owl-prev {margin-left: 0;}
+.sponsors-carousel .owl-nav > div.owl-next {margin-right: 0;}
+.newsletter-signup form {width: 100%;}
+.newsletter-signup form input {margin: 10px 0;width: 100%;}
+.newsletter-signup form button {width: 100%;}
+.footer-bar-title {float: left;max-width: none;padding: 0;width: 100%;}
+.blog-detail-page h1.post-title{font-size:15px;}
+.blog-detail-page blockquote {font-size: 14px;padding: 40px 20px;}
+.comment {padding: 30px 30px 0 0;}
+.comment img {margin-bottom: 10px;margin-right: 10px;width: 100px;}
+.comment h6,.comment > i,.comment > p {float: left;width: 100%;}
+.comments-thread ul ul{padding:0;}
+.join-team {padding: 40px;}
+.team-desc { padding: 30px;}
+.team-detail .member-social {bottom: 0;float: left;left: 0;position: relative;width: 100%;}
+.skills h5, .skills p {float: left;width: 100%;}
+.skills > span {margin-bottom: 10px;}
+.banner-inner > h5 {font-size: 20px;margin-bottom: 10px;}
+.banner-subtitle {font-size: 16px;}
+.banner-inner > strong {font-size: 70px;line-height: 40px;margin: 0 0 20px;}
+.big-banner .theme-btn {margin-top: 10px;}
+.circular > div,
+.circular > div canvas {
+    width: 170px !important;
+    float: none;
+    margin: 0px auto;
+    height: auto !important;
+    display: table !important;
+}
+.footer-social-btns {text-align: left;float: left;}
+.footer-bar-title{margin-bottom:10px;}
+.bottom-bar p{text-align:center;}
+
+.popup-centralize {padding: 40px;}
+.make-donation h5 {font-size: 34px;margin-bottom: 10px;}
+.make-donation span {font-size: 14px;margin-bottom: 6px;}
+.frequency li {width: 50% !important;}
+.frequency li a {font-size: 13px;padding: 10px 20px;}
+.payment-type .nav li a, .payment-type .nav li.active a, .payment-type .nav li a:hover {margin: 0 0 7px;padding: 12px 30px;}
+.select-payment, .personal-detail {padding: 0 20px;}
+.form > div {float: left;width: 100%;}
+.services-list > ul li {width: 50% !important;}
+.ask-question {padding: 90px 15px;}
+.white-bg {padding: 40px 0 0;}
+}
+
+
+@media (max-width:480px){
+#responsive-header .topbar ul.inline-list li {float: left;margin: 0;padding: 0;text-align: left;width: 50%;}
+#responsive-header .topbar ul.inline-list li::before {display: none;}
+#responsive-header .topbar {padding: 10px 20px;}
+.urgent-progress .row > div{width: 100%;margin:20px 0;}
+#responsive-header .topbar ul.inline-list li {line-height: 30px;width: 100%;}
+.inline-list.registration-btn > li a{font-size:11px;}
+.gallery-widget .row > div{width:33.334%;}
+.services-list > ul li{width:100%;}
+.cause-title h5 {font-size: 16px;line-height: 25px;margin: 0;}
+.cause-donation {width: 100%;}
+.collected-amount {font-size: 20px;line-height: 20px;}
+.cause-donation > i {font-size: 11px;}
+.urgent-detail > a {margin-top: 20px;width: 100%;}
+.banner-inner > strong{font-size:40px;}
+.services-list > ul li {width:100% !important;}
+}

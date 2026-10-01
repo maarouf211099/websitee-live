@@ -1,0 +1,397 @@
+﻿@*@model DTO.CaseDTO*@
+@model DTO.CaseDTOAnonymousRequest
+@using Resource
+@using UserUI.Helper
+@using DTO
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var KendoClass = isArabic ? "k-rtl" : "";
+
+}
+
+<style>
+    /*.h5White {
+        color: #fff;
+    }
+
+    .textArea {
+        min-width: 100%;
+        min-height: 130px;
+        padding: 10px 20px;
+        border-radius: 3px;
+    }
+
+    .border-radius3px {
+        border-radius: 3px;
+    }*/
+
+    .demo-section {
+        background-color: rgba(0, 0, 0, 0);
+        float: left;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .gender-drp {
+        margin-top: 10px;
+    }
+</style>
+
+<!-- Request For Help -->
+@*<div class="help-request popup-form" id="helpRequestPopup">
+        <span class="close-btn"><i class="fa fa-remove"></i> @LayoutRES.Close</span>
+        <strong>@LayoutRES.RequestForHelp</strong>
+        <p>@LayoutRES.WeReceiveOnlyMedicalCases</p>
+        @using (Html.BeginForm("Create", "Case", null, FormMethod.Post, new { @class = "", id = "createRequestForHelpForm", enctype = "multipart/form-data" }))
+        {
+            <div class="row">
+                <input type="hidden" id="Source" name="Source" value="@((int)CaseSource.CWeb)" />
+                <h5 class="h5White">@Html.DisplayNameFor(m => m.CaseName)</h5>
+                @Html.TextBoxFor(m => m.CaseName, new { placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                @Html.ValidationMessageFor(m => m.CaseName)
+                <h5 class="h5White">@Html.DisplayNameFor(m => m.Description)</h5>
+                @Html.TextAreaFor(m => m.Description, new { dir = dir, style = textAlignRight, @class = "textArea", placeholder = Html.DisplayNameFor(m => m.Description) })
+                @Html.ValidationMessageFor(m => m.Description)
+                <div class="row" dir="@dir">
+                    <input type="hidden" name="Category" value="@((int)CaseCategory.medc)" />
+                    <div class="col-sm-6 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.DisesaseType)</h5>
+                         @Html.DropDownListFor(x => x.DisesaseType, new List<SelectListItem>(), new { @class = "border-radius3px select2 select2-hidden-accessible" })
+                        <input id="txtDisesaseType" type="text" list="DisesaseType">
+                        <datalist id="DisesaseType" name="DisesaseType" class="border-radius3px select2 select2-hidden-accessible"></datalist>
+                        @Html.ValidationMessageFor(m => m.DisesaseType)
+                    </div>
+                    <div class="col-sm-6 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.ServiceType)</h5>
+                        @Html.DropDownListFor(x => x.ServiceType, new List<SelectListItem>(), new { @class = "border-radius3px select2 select2-hidden-accessible" })
+                        @Html.ValidationMessageFor(m => m.ServiceType)
+                    </div>
+                </div>
+                <div class="row" dir="@dir">
+                    <div class="col-sm-6 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Age)</h5>
+                        @Html.TextBoxFor(m => m.Age, new { placeholder = Html.DisplayNameFor(m => m.Age) })
+                        @Html.ValidationMessageFor(m => m.Age)
+                    </div>
+                    <div class="col-sm-6 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Mobile)</h5>
+                        @Html.TextBoxFor(m => m.Mobile, new { placeholder = Html.DisplayNameFor(m => m.Mobile) })
+                        @Html.ValidationMessageFor(m => m.Mobile)
+                    </div>
+                </div>
+                <div class="row" dir="@dir">
+                    <div class="col-sm-6 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Phone)</h5>
+                        @Html.TextBoxFor(m => m.Phone, new { placeholder = Html.DisplayNameFor(m => m.Phone) })
+                        @Html.ValidationMessageFor(m => m.Phone)
+                    </div>
+                    <div class="col-sm-6 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Email)</h5>
+                        @Html.TextBoxFor(m => m.Email, new { placeholder = Html.DisplayNameFor(m => m.Email) })
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+                </div>
+
+                <div class="row" dir="@dir">
+                    <div class="col-sm-4 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Country)</h5>
+                        @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country request-Country border-radius3px select2 select2-hidden-accessible" })
+                        @Html.ValidationMessageFor(m => m.Country)
+                    </div>
+                    <div class="col-sm-4 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Governorate)</h5>
+                        @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate Request-Governorate border-radius3px select2 select2-hidden-accessible", id = "GovernorateRequest" })
+                        @Html.ValidationMessageFor(m => m.Governorate)
+                    </div>
+                    <div class="col-sm-4 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.District)</h5>
+                        @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "select2 border-radius3px select2-hidden-accessible", id = "DistrictRequest" })
+                        @Html.ValidationMessageFor(m => m.District)
+                    </div>
+                    <div class="col-sm-12 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.Region)</h5>
+                        @Html.TextBoxFor(x => x.Region, new { placeholder = Html.DisplayNameFor(m => m.Region) })
+                        @Html.ValidationMessageFor(m => m.Region)
+                    </div>
+                </div>
+                <div dir="@dir" class="row">
+                    <div class="col-sm-12 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.AddressLine1)</h5>
+                        @Html.TextBoxFor(m => m.AddressLine1, new { placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                        @Html.ValidationMessageFor(m => m.AddressLine1)
+                    </div>
+
+                    <div class="col-sm-12 @floatToRight">
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.AddressLine2)</h5>
+                        @Html.TextBoxFor(m => m.AddressLine2, new { placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                        @Html.ValidationMessageFor(m => m.AddressLine2)
+                    </div>
+                    <div dir="@dir">
+                        <div class="col-sm-6 @floatToRight">
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.OrganizationType)</h5>
+                            @Html.DropDownListFor(x => x.OrganizationType, new List<SelectListItem>(), new { @class = "border-radius3px select2 select2-hidden-accessible" })
+                            @Html.ValidationMessageFor(m => m.OrganizationType)
+                        </div>
+                        <div class="col-sm-6 @floatToRight">
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.OrganizationName)</h5>
+                            @Html.TextBoxFor(m => m.OrganizationName, new { placeholder = Html.DisplayNameFor(m => m.OrganizationName) })
+                            @Html.ValidationMessageFor(m => m.OrganizationName)
+                        </div>
+                    </div>
+                </div>
+
+                @if (!AuthorizationHelper.IsAuthenticated())
+                    {
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="h5White">@CaseResources.SenderData</h4>
+                    </div>
+                    <div dir="@dir">
+                        <div class="col-sm-6 @floatToRight">
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.NameAnonymous)</h5>
+                            @Html.TextBoxFor(m => m.NameAnonymous, new { placeholder = Html.DisplayNameFor(m => m.NameAnonymous) })
+                            @Html.ValidationMessageFor(m => m.NameAnonymous)
+                        </div>
+                        <div class="col-sm-6 @floatToRight">
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.AddressAnonymous)</h5>
+                            @Html.TextBoxFor(m => m.AddressAnonymous, new { placeholder = Html.DisplayNameFor(m => m.AddressAnonymous) })
+                            @Html.ValidationMessageFor(m => m.AddressAnonymous)
+                        </div>
+                    </div>
+                    <div dir="@dir">
+                        <div class="col-sm-6 @floatToRight">
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.EmailAnonymous)</h5>
+                            @Html.TextBoxFor(m => m.EmailAnonymous, new { placeholder = Html.DisplayNameFor(m => m.EmailAnonymous) })
+                            @Html.ValidationMessageFor(m => m.EmailAnonymous)
+                        </div>
+                        <div class="col-sm-6 @floatToRight">
+                            <h5 class="h5White">@Html.DisplayNameFor(m => m.PhoneNumberAnonymous)</h5>
+                            @Html.TextBoxFor(m => m.PhoneNumberAnonymous, new { placeholder = Html.DisplayNameFor(m => m.PhoneNumberAnonymous) })
+                            @Html.ValidationMessageFor(m => m.PhoneNumberAnonymous)
+                        </div>
+                    </div>
+                </div>
+                }
+                <div class="col-sm-12">
+                    <input type="hidden" id="CaseHaseFile" />
+                    <div class="demo-section k-content @KendoClass ">
+                        @(Html.Kendo().Upload()
+                                        .Name("file")
+                                         .Messages(m => m.Select(CaseResources.CaseAttachment).UploadSelectedFiles(""))
+                                        .TemplateId("fileTemplate")
+                                        .HtmlAttributes(new { id = "CaseFile" })
+                                        .Multiple(false)
+                                        .Async(a => a
+                                        .Save("Create", "Case")
+                                        .AutoUpload(false))
+                                        .Events(c => c
+                                        .Upload("onUploadNewCase").Success("onSuccessUploadNewCase")
+                                        .Select("onSelectCaseFile")
+                                        )
+                        )
+                    </div>
+                </div>
+                <div class="col-md-12"><input type="submit" value="@LayoutRES.Send" /></div>
+            </div>
+        }
+        <strong id="requestMessage">
+
+        </strong>
+    </div>*@
+
+
+
+<div id="addCase-popup" class="n-popup">
+    <div class="container marg">
+        <div class="popup-centralize">
+            <span class="close"><i class="fa fa-remove"></i></span>
+            <div class="payment-box">
+                <div class="n-popup-c">
+                    <strong>@LayoutRES.RequestForHelp</strong>
+                    <h5>@LayoutRES.WeReceiveOnlyMedicalCases</h5>
+                    @using (Html.BeginForm("Create", "Case", null, FormMethod.Post, new { @class = "", id = "createRequestForHelpForm", enctype = "multipart/form-data" }))
+                    {
+                        <div class="row">
+                            <input type="hidden" id="Source" name="Source" value="@((int)CaseSource.CWeb)" />
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.CaseName, new { placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                                @Html.ValidationMessageFor(m => m.CaseName)
+                            </div>
+                            <div class="textfield">
+                                @Html.TextAreaFor(m => m.Description, new { rows = "5", placeholder = Html.DisplayNameFor(m => m.Description) })
+                                @Html.ValidationMessageFor(m => m.Description)
+                            </div>
+
+                            <div class="textfield">
+                                <div class="col-md-6">
+                                    <h5>@Html.DisplayNameFor(m => m.DisesaseType)</h5>
+                                    @Html.DropDownListFor(x => x.DisesaseType, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible" })
+                                    @Html.ValidationMessageFor(m => m.DisesaseType)
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>@Html.DisplayNameFor(m => m.ServiceType)</h5>
+                                    @Html.DropDownListFor(x => x.ServiceType, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible" })
+                                    @Html.ValidationMessageFor(m => m.ServiceType)
+                                </div>
+                            </div>
+
+                            <div class="textfield">
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(m => m.Age, new { placeholder = Html.DisplayNameFor(m => m.Age) })
+                                    @Html.ValidationMessageFor(m => m.Age)
+                                </div>
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(m => m.Mobile, new { placeholder = Html.DisplayNameFor(m => m.Mobile) })
+                                    @Html.ValidationMessageFor(m => m.Mobile)
+                                </div>
+                            </div>
+
+                            <div class="textfield">
+                                <div class="col-sm-6">
+                                    @Html.TextBoxFor(m => m.Phone, new { placeholder = Html.DisplayNameFor(m => m.Phone) })
+                                    @Html.ValidationMessageFor(m => m.Phone)
+                                </div>
+                                @*<div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Email, new { placeholder = Html.DisplayNameFor(m => m.Email) })
+                                        @Html.ValidationMessageFor(m => m.Email)
+                                    </div>*@
+                                <div class="col-sm-6">
+                                    @Html.DropDownListFor(x => x.Gender, new List<SelectListItem>(), new { @class = "gender-drp request-Country select2 select2-hidden-accessible" })
+                                    @Html.ValidationMessageFor(m => m.Gender)
+                                </div>
+                            </div>
+
+                            <div class="textfield">
+                                <div class="hide col-sm-4 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.Country)</h5>
+                                    @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country request-Country select2 select2-hidden-accessible" })
+                                    @Html.ValidationMessageFor(m => m.Country)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.Governorate)</h5>
+                                    @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate Request-Governorate select2 select2-hidden-accessible", id = "GovernorateRequest" })
+                                    @Html.ValidationMessageFor(m => m.Governorate)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.District)</h5>
+                                    @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible", id = "DistrictRequest" })
+                                    @Html.ValidationMessageFor(m => m.District)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.ReligionId)</h5>
+                                    @Html.DropDownListFor(x => x.ReligionId, new List<SelectListItem>(), new { @class = "select2 Request-Governorate select2 select2-hidden-accessible", id = "Religion" })
+                                    @Html.ValidationMessageFor(m => m.ReligionId)
+                                </div>
+                            </div>
+
+                            <div class="textfield">
+                                <div class="col-sm-6 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.Nationality)</h5>
+                                    @Html.DropDownListFor(x => x.Nationality, new List<SelectListItem>(), new { @class = "Nationality select2 Request-Governorate select2 select2-hidden-accessible", id = "Nationality" })
+                                    @Html.ValidationMessageFor(m => m.Nationality)
+                                </div>
+
+                                <div class="divStatus col-sm-6 @floatToRight" style="display:none;">
+                                    <h5>@Html.DisplayNameFor(m => m.StatusInEgyptId)</h5>
+                                    @Html.DropDownListFor(x => x.StatusInEgyptId, new List<SelectListItem>(), new { @class = "select2 Request-Governorate select2 select2-hidden-accessible", id = "StatusInEgypt" })
+                                    @*@Html.ValidationMessageFor(m => m.StatusInEgyptId)*@
+                                </div>
+                                
+                            </div>
+
+
+
+                            <div class="textfield">
+                                @Html.TextBoxFor(x => x.Region, new { placeholder = Html.DisplayNameFor(m => m.Region) })
+                                @Html.ValidationMessageFor(m => m.Region)
+                            </div>
+
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.AddressLine1, new { placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                                @Html.ValidationMessageFor(m => m.AddressLine1)
+                            </div>
+
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.AddressLine2, new { placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                                @Html.ValidationMessageFor(m => m.AddressLine2)
+                            </div>
+
+                            <div class="textfield">
+                                <div class="col-sm-6 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.OrganizationType)</h5>
+                                    @Html.DropDownListFor(x => x.OrganizationType, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible" })
+                                    @Html.ValidationMessageFor(m => m.OrganizationType)
+                                </div>
+                                <div class="col-sm-6 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.OrganizationName)</h5>
+                                    @Html.TextBoxFor(m => m.OrganizationName, new { placeholder = Html.DisplayNameFor(m => m.OrganizationName), style = "margin-top: 0px;" })
+                                    @Html.ValidationMessageFor(m => m.OrganizationName)
+                                </div>
+                            </div>
+
+                            @if (!AuthorizationHelper.IsAuthenticated())
+                            {
+                                <strong style="float: left;width: 100%;text-align: center;margin-top: 10px;color:#37a1a2">@CaseResources.SenderData</strong>
+                                <div class="textfield">
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.NameAnonymous, new { placeholder = Html.DisplayNameFor(m => m.NameAnonymous) })
+                                        @Html.ValidationMessageFor(m => m.NameAnonymous)
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.PhoneNumberAnonymous, new { placeholder = Html.DisplayNameFor(m => m.PhoneNumberAnonymous) })
+                                        @Html.ValidationMessageFor(m => m.PhoneNumberAnonymous)
+                                    </div>
+                                </div>
+                                <div class="textfield">
+                                    @*<div class="col-sm-6">
+                                            @Html.TextBoxFor(m => m.EmailAnonymous, new { placeholder = Html.DisplayNameFor(m => m.EmailAnonymous) })
+                                            @Html.ValidationMessageFor(m => m.EmailAnonymous)
+                                        </div>*@
+                                    <div class="col-sm-12">
+                                        @Html.TextBoxFor(m => m.AddressAnonymous, new { placeholder = Html.DisplayNameFor(m => m.AddressAnonymous) })
+                                        @Html.ValidationMessageFor(m => m.AddressAnonymous)
+                                    </div>
+                                </div>
+                            }
+                            <div class="textfield">
+                                <input type="hidden" id="CaseHaseFile" />
+                                <div class="demo-section k-content @KendoClass ">
+                                    @(Html.Kendo().Upload()
+                                        .Name("file")
+                                         .Messages(m => m.Select(CaseResources.CaseAttachment).UploadSelectedFiles(""))
+                                        .TemplateId("fileTemplate")
+                                        .HtmlAttributes(new { id = "CaseFile" })
+                                        .Multiple(false)
+                                        .Async(a => a
+                                        .Save("Create", "Case")
+                                        .AutoUpload(false))
+                                        .Events(c => c
+                                        .Upload("onUploadNewCase").Success("onSuccessUploadNewCase")
+                                        .Select("onSelectCaseFile")
+                                        )
+                                    )
+                                </div>
+                            </div>
+                            <div class="submit-bar">
+                                <input type="submit" value="@LayoutRES.Send" class="btn">
+                            </div>
+                        </div>
+                    }
+                    @*<strong id="requestMessage" style="margin-bottom: 25px;width: 80%;display:none;">*@
+                    <strong id="requestMessage" style="margin-bottom: 25px;width: 80%;display:none;">
+
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>

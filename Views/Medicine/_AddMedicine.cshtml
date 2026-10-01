@@ -1,0 +1,155 @@
+﻿
+@model DTO.Pharmacy.MedicineDtos.AddMedicineDto
+@using Resource
+@using Resource.Pharmacy
+@using UserUI.Helper
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+<div class="modal fade" id="AddMedicineModals" role="dialog" dir="@dir">
+    <div class="modal-dialog" style="width: 900px;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@MedicineRES.AddNewMedicine</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm("Create", "Medicine", null, FormMethod.Post, new { @class = "form-horizontal", id = "AddMedicineForm" }))
+                {
+                    <div class="box-body">
+                        @Html.DisplayNameFor(m => m.ScientificName)
+                        @Html.TextBoxFor(m => m.ScientificName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.ScientificName) })
+                        @Html.ValidationMessageFor(m => m.ScientificName)
+                        <br />
+
+                        @Html.DisplayNameFor(m => m.CommercialName)
+                        @Html.TextBoxFor(m => m.CommercialName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CommercialName) })
+                        @Html.ValidationMessageFor(m => m.CommercialName)
+                        <br />
+
+                        @Html.DisplayNameFor(m => m.Description)
+                        @Html.TextAreaFor(m => m.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Description), rows = "5" })
+                        @Html.ValidationMessageFor(m => m.Description)
+                        <br />
+
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.LargeUnit)
+                                @Html.DropDownListFor(x => x.LargeUnit, new List<SelectListItem>(), new { @class = "LargeUnit form-control" })
+                                @Html.ValidationMessageFor(m => m.LargeUnit)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.LargeUnitCount)
+                                <br />
+                                @Html.TextBoxFor(m => m.LargeUnitCount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.LargeUnitCount) })
+                                @Html.ValidationMessageFor(m => m.LargeUnitCount)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.LargeUnitPrice)
+                                @Html.TextBoxFor(m => m.LargeUnitPrice, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.LargeUnitPrice) })
+                                @Html.ValidationMessageFor(m => m.LargeUnitPrice)
+                            </div>
+                        </div>
+
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.MidddleUnit)
+                                @Html.DropDownListFor(x => x.MidddleUnit, new List<SelectListItem>(), new { @class = "MidddleUnit form-control" })
+                                @Html.ValidationMessageFor(m => m.MidddleUnit)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.MidddleUnitCount)
+                                <br />
+                                @Html.TextBoxFor(m => m.MidddleUnitCount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.MidddleUnitCount) })
+                                @Html.ValidationMessageFor(m => m.MidddleUnitCount)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.MidddleUnitPrice)
+                                @Html.TextBoxFor(m => m.MidddleUnitPrice, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.MidddleUnitPrice) })
+                                @Html.ValidationMessageFor(m => m.MidddleUnitPrice)
+                            </div>
+                        </div>
+
+                        <div class="form-group" dir="@dir">
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.SmallUnit)
+                                @Html.DropDownListFor(x => x.SmallUnit, new List<SelectListItem>(), new { @class = "SmallUnit form-control" })
+                                @Html.ValidationMessageFor(m => m.SmallUnit)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.SmallUnitCount)
+                                <br />
+                                @Html.TextBoxFor(m => m.SmallUnitCount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.SmallUnitCount) })
+                                @Html.ValidationMessageFor(m => m.SmallUnitCount)
+                            </div>
+                            <div class="col-sm-4">
+                                @Html.DisplayNameFor(m => m.SmallUnitPrice)
+                                @Html.TextBoxFor(m => m.SmallUnitPrice, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.SmallUnitPrice) })
+                                @Html.ValidationMessageFor(m => m.SmallUnitPrice)
+                            </div>
+                        </div>
+
+
+                        @*<div class="form-group" dir="@dir">
+                                <div class="hide col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Country)
+                                    @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country adminAddCase-Country form-control" })
+                                    @Html.ValidationMessageFor(m => m.Country)
+                                </div>
+
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Governorate)
+                                    @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate adminAddCase form-control", id = "GovernorateAdminAddCase" })
+                                    @Html.ValidationMessageFor(m => m.Governorate)
+                                </div>
+
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.District)
+                                    @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "form-control", id = "DistrictAdminAddCase" })
+                                    @Html.ValidationMessageFor(m => m.District)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Region)
+                                    @Html.TextBoxFor(m => m.Region, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Region) })
+                                    @Html.ValidationMessageFor(m => m.Region)
+                                </div>
+                            </div>
+                            @Html.DisplayNameFor(m => m.AddressLine1)
+                            @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                            @Html.ValidationMessageFor(m => m.AddressLine1)
+                            <br />
+                            @Html.DisplayNameFor(m => m.AddressLine2)
+                            @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                            @Html.ValidationMessageFor(m => m.AddressLine2)
+                            <br />
+                            <div class="form-group" dir="@dir">
+                                <div class="col-sm-6 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Source)
+                                    <select id="Source" name="Source" class="form-control"></select>
+                                </div>
+                                <div class="col-sm-6 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Priority)
+                                    <select id="Priority" name="Priority" class="form-control"></select>
+                                </div>
+                            </div>
+                            <br />*@
+                    </div>
+
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

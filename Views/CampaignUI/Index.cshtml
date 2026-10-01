@@ -1,0 +1,42 @@
+﻿@model IEnumerable<DTO.CampaignDTO>
+@using UserUI.Helper
+@using Resource
+@using DTO
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = CampaignResource.Campaigns;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var tblTextAlign = isArabic ? "tblText" : "";
+}
+<head>
+    <title>@CampaignResource.Campaigns</title>
+</head>
+<div class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")">
+    @(Html.Kendo().Grid((List<CampaignDTO>)Model)
+              .Name("Grid")
+              .Pageable(pager => pager.Refresh(true))
+              .Sortable().Groupable(g => g.Messages(m => m.Empty(LayoutRES.DragaColumnHeaderAndDropItHereToGroupByThatColumn)))
+              .Columns(columns =>
+              {
+                  columns.Bound(e => e.TitleAr);
+                  columns.Bound(e => e.TitleEn);
+                  columns.Bound(e => e.RequiredAmount);
+                  columns.Bound(e => e.StartDate);
+                  columns.Bound(e => e.EndDate);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info' href='/CampaignUI/edit/#=Id#'>" + CampaignResource.Edit + "</a>").Width(50).Title(LayoutRES.Edit);
+                  columns.Template(e => e.Id).ClientTemplate("<a class='btn btn-info' onclick=getDelete(#=Id#)>" + CampaignResource.Delete + "</a>").Width(50).Title(LayoutRES.Delete);
+              })
+              .DataSource(dataSource => dataSource.Ajax().PageSize(10).Read(read => read.Action("GetAllCampaigns", "CampaignUI")))
+    )
+</div>
+<br/>
+<a class='btn btn-info' href='/CampaignUI/ArchievedCampaignsList'>@CampaignResource.ArchivedCampaign</a>
+
+    @section Scripts {
+        @*<script src="~/Scripts/MersalScripts/CampaignManagment/AdminIndexCampaign.js"></script>*@
+        @Scripts.Render("~/bundles/AdminIndexCampaign")
+    }

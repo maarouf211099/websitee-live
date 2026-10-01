@@ -1,0 +1,944 @@
+﻿@model DTO.Emergency.EmergencyCaseDetailsDTO
+
+@using Resource.Emergency
+@using Resource
+@using UserUI.Helper
+@using DTO
+@using System.Configuration
+@using Kendo.Mvc.UI
+@using System.Globalization
+@{
+    if (Model != null)
+    {
+        ViewBag.Title = Model.Code + " : " + Model.CaseName;
+    }
+    else
+    {
+        ViewBag.Title = "No Date Available";
+    }
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+
+}
+
+@if (Model == null)
+{
+    return;
+}
+
+
+<div class="modal fade" id="MedicalCoordinatorApprovalBox" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@EmergencyCaseRES.MedicalOpinion</h4>
+                </div>
+
+                <div class="box-body AccordionDiv">
+
+                </div>
+                <div class="box-body" id="CaseVisitResultText">
+                    @Html.TextAreaFor(x => x.Notes, new { style = textAlignRight, @class = "form-control", placeholder = EmergencyCaseRES.Notes, rows = "5", id = "AcceptanceNote" })
+                </div>
+                <div class="box-footer">
+                    <button type="button" class="btn btn-info pull-right" onclick="AddNotes(@Model.EmergencyCaseId,true)">@CaseResources.Accept</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="MedicalCoordinatorRejectionBox" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@EmergencyCaseRES.RejectionReason</h4>
+                </div>
+
+                <div class="box-body AccordionDiv">
+
+                </div>
+                <div class="box-body" id="CaseVisitResultText">
+                    @Html.TextAreaFor(x => x.Notes, new { style = textAlignRight, @class = "form-control", placeholder = EmergencyCaseRES.Notes, rows = "5", id = "RejectionNote" })
+                </div>
+                <div class="box-footer">
+                    <button type="button" class="btn btn-info pull-right" onclick="AddNotes(@Model.EmergencyCaseId,false)">@EmergencyCaseRES.DataMissing</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ChangeEmergencyCaseStateBox" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "ChangeEmergencyCaseStateForm" }))
+            {
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">@EmergencyCaseRES.ChangeEmergencyCaseState</h4>
+                    </div>
+
+                    <div class="box-body AccordionDiv">
+                        <div class="col-sm-8">
+                            @Html.DropDownList("ChangeCaseState", new List<SelectListItem>() {
+                             new SelectListItem() { Value = ((int)EmergencyCaseState.EmcRequireOxygen).ToString() , Text = EmergencyCaseRES.EmergencyCaseRequireOxygen}
+                           , new SelectListItem() { Value = ((int)EmergencyCaseState.EmcNeedIsolation).ToString(), Text = EmergencyCaseRES.EmergencyCaseNeedIsolation}
+                          }, "", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="box-body" id="CaseVisitResultText">
+                        @Html.TextAreaFor(x => x.Notes, new { style = textAlignRight, @class = "form-control", placeholder = EmergencyCaseRES.Notes, rows = "5", id = "ChangeStateNote", name = "ChangeStateNote" })
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right">@EmergencyCaseRES.ChangeEmergencyCaseState</button>
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ChangeEmergencyCaseStateByEmergencyDoctorBox" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "ChangeEmergencyCaseStateByEmergencyDoctorForm" }))
+            {
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">@EmergencyCaseRES.ChangeEmergencyCaseState</h4>
+                    </div>
+
+                    <div class="box-body AccordionDiv">
+                        <div class="col-sm-8">
+                            @Html.DropDownList("ChangeCaseStateByEmergencyDoctor", new List<SelectListItem>() {
+                                 new SelectListItem() { Value = ((int)EmergencyCaseState.EmcWaittingHospital).ToString(),  Text = EmergencyCaseRES.EmergencyCaseWaittingHospital }
+                               ,  new SelectListItem() { Value = ((int)EmergencyCaseState.EmcRefusedFromEmcTeam).ToString(), Text = EmergencyCaseRES.EmergencyTeamRefusedEmergencyCase }
+                                , new SelectListItem() { Value = ((int)EmergencyCaseState.EmcCL).ToString(), Text = EmergencyCaseRES.Closed }
+                            }, "", new { @class = "form-control" })
+                        </div>
+
+                    </div>
+                    <div class="box-body" id="CaseVisitResultText">
+                        @Html.TextAreaFor(x => x.Notes, new { style = textAlignRight, @class = "form-control", placeholder = EmergencyCaseRES.Notes, rows = "5", id = "ChangeStateNoteByEmergencyDoctor" })
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right">@EmergencyCaseRES.ChangeEmergencyCaseState</button>
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ChangeEmergencyCaseStateToDoneBox" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "ChangeEmergencyCaseStateToDoneForm" }))
+            {
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">@EmergencyCaseRES.ChangeEmergencyCaseState</h4>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <div class="col-md-5">
+                                @EmergencyCaseRES.ExactHospitalName
+                                <br />
+                                @Html.TextBoxFor(x => x.HospitalName, new { style = textAlignRight, @class = "form-control" })
+                            </div>
+
+                            <div class="col-md-5">
+                                @EmergencyCaseRES.HospitalAttendDate
+                                <br />
+                                @Html.TextBoxFor(x => x.HospitalEntryDate, new { style = textAlignRight, @class = "dates form-control" })
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-5">
+                                @EmergencyCaseRES.Amount
+                                <br />
+                                @Html.TextBoxFor(x => x.RequiredAmount, new { style = textAlignRight, @class = "form-control" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right">@EmergencyCaseRES.CaseDone</button>
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-body">
+    <div class="box box-info">
+
+        <div>
+            @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "EditEmergencyCaseForm" }))
+            {
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="text-align: center;">@Model.Code - @Model.CaseName   </h4>
+                    <input id="CaseIdHID" type="hidden" value="@Model.EmergencyCaseId" />
+                    <input id="CaseState" type="hidden" value="@Model.State" />
+                    @Html.HiddenFor(x => x.EmergencyCaseId)
+                </div><!-- /.box-header -->
+                <div class="box-body AccordionDiv" style="margin: 5px;">
+                    <div class="headOfAccordion">
+                        @CaseResources.BasicData
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @Html.DisplayNameFor(m => m.CaseName)
+                                <br />
+                                @Html.TextBoxFor(m => m.CaseName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                                @Html.ValidationMessageFor(m => m.CaseName)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.Age)
+                                @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Age) })
+                                @Html.ValidationMessageFor(m => m.Age)
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.NameAnonymous)
+                                @Html.TextBoxFor(m => m.NameAnonymous, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.NameAnonymous) })
+                                @Html.ValidationMessageFor(m => m.NameAnonymous)
+                            </div>
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.PhoneNumberAnonymous)
+                                @Html.TextBoxFor(m => m.PhoneNumberAnonymous, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.PhoneNumberAnonymous) })
+                                @Html.ValidationMessageFor(m => m.PhoneNumberAnonymous)
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="headOfAccordion">
+                        @EmergencyCaseRES.MedicalData
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <div class="col-sm-4 ">
+                                @Html.HiddenFor(x => x.State)
+                                <label>
+                                    @Html.DisplayNameFor(model => model.StateString) :
+                                </label>
+                                @Html.DisplayFor(model => model.StateString)
+                            </div>
+                            <div class="col-sm-4 ">
+                                @Html.HiddenFor(x => x.DiagnosisId)
+                                <label>
+                                    @Html.DisplayNameFor(model => model.DiagnosisString) :
+                                </label>
+                                @Html.DisplayFor(model => model.DiagnosisString)
+                            </div>
+                        </div>
+
+                        @if (Model.CoronaForm != null)
+                        {
+
+                            <div class="form-group">
+                                <div class="col-sm-4 @floatToRight">
+                                    <input type="hidden" value="@Model.CoronaForm.NeedId" id="coronaNeedId" />
+                                    @Html.DisplayNameFor(m => m.CoronaForm.NeedId)
+                                    @Html.DropDownListFor(x => x.CoronaForm.NeedId, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.NeedId)
+                                </div>
+
+                                <div class="col-sm-2 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.DiseaseStartDateString)
+                                    @Html.TextBoxFor(m => m.CoronaForm.DiseaseStartDateString, new { @class = "dates form-control"
+                                                                         , placeholder = Html.DisplayNameFor(m => m.CoronaForm.DiseaseStartDateString) })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.DiseaseStartDateString)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.PCRTest)
+                                    @Html.DropDownListFor(x => x.CoronaForm.PCRTest, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                    },"", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.PCRTest)
+                                </div>
+                                <div class="PCRTestContainer" style="@(!Model.CoronaForm.PCRTest ? "display:none":"")">
+                                    <div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.CoronaForm.PCRLocation)
+                                        @Html.TextBoxFor(m => m.CoronaForm.PCRLocation, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CoronaForm.PCRLocation) })
+                                        @Html.ValidationMessageFor(m => m.CoronaForm.PCRLocation)
+                                    </div>
+                                    <div class="col-sm-2 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.CoronaForm.PCRTestDateString)
+                                        @Html.TextBoxFor(m => m.CoronaForm.PCRTestDateString, new { @class = "dates form-control"
+                                                                             , placeholder = Html.DisplayNameFor(m => m.CoronaForm.PCRTestDateString) })
+                                        @Html.ValidationMessageFor(m => m.CoronaForm.PCRTestDateString)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.IsTheTempertureHigh)
+                                    @Html.DropDownListFor(x => x.CoronaForm.IsTheTempertureHigh, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                    }, "", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.IsTheTempertureHigh)
+                                </div>
+                                <div class="tempertureContainer" style="@(!Model.CoronaForm.IsTheTempertureHigh ? "display:none":"")">
+                                    <div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.CoronaForm.Temperture)
+                                        @Html.TextBoxFor(m => m.CoronaForm.Temperture, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CoronaForm.Temperture) })
+                                        @Html.ValidationMessageFor(m => m.CoronaForm.Temperture)
+                                    </div>
+                                    <div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.CoronaForm.IsTempertureDescreseByMedicine)
+                                        @Html.DropDownListFor(x => x.CoronaForm.IsTempertureDescreseByMedicine, new List<SelectListItem>() {
+                                                                                        new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                        new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                        }, "", new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.CoronaForm.IsTempertureDescreseByMedicine)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.HasChronicDiseases)
+                                    @Html.DropDownListFor(x => x.CoronaForm.HasChronicDiseases, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                    }, "", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.HasChronicDiseases)
+                                </div>
+                                <div class="chronicDiseasesNamesContainer" style="@(!Model.CoronaForm.HasChronicDiseases ? "display:none":"")">
+                                    <div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.CoronaForm.ChronicDiseasesNames)
+                                        @Html.TextBoxFor(m => m.CoronaForm.ChronicDiseasesNames, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CoronaForm.ChronicDiseasesNames) })
+                                        @Html.ValidationMessageFor(m => m.CoronaForm.ChronicDiseasesNames)
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.Medicines)
+                                    @Html.TextBoxFor(m => m.CoronaForm.Medicines, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CoronaForm.Medicines) })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.Medicines)
+                                </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 @floatToRight">
+                                @Html.DisplayNameFor(m => m.CoronaForm.UseOxygen)
+                                @Html.DropDownListFor(x => x.CoronaForm.UseOxygen, new List<SelectListItem>() {
+                                                                                new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                }, "", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.CoronaForm.UseOxygen)
+                            </div>
+
+                            <div class="usOxygenContainer" style="@(!Model.CoronaForm.UseOxygen ? "display:none":"")">
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.IsStillUseOxygen)
+                                    @Html.DropDownListFor(x => x.CoronaForm.IsStillUseOxygen, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                    }, "", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.IsStillUseOxygen)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.PercentageOfOxygen)
+                                    @Html.TextBoxFor(m => m.CoronaForm.PercentageOfOxygen, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CoronaForm.PercentageOfOxygen) })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.PercentageOfOxygen)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 @floatToRight">
+                                <input type="hidden" value="@Model.CoronaForm.CanEatAndDrink" id="coronaCanEatAndDrinkId" />
+                                @Html.DisplayNameFor(m => m.CoronaForm.CanEatAndDrink)
+                                @Html.DropDownListFor(x => x.CoronaForm.CanEatAndDrink, new List<SelectListItem>(), new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.CoronaForm.CanEatAndDrink)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 @floatToRight">
+                                <input type="hidden" value="@Model.CoronaForm.CaseLocationId" id="coronaCaseLocationId" />
+                                @Html.DisplayNameFor(m => m.CoronaForm.CaseLocationId)
+                                @Html.DropDownListFor(x => x.CoronaForm.CaseLocationId, new List<SelectListItem>(), new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.CoronaForm.CaseLocationId)
+                            </div>
+                            <div class="hospitalLocationContainer" style="@(Model.CoronaForm.CaseLocationId == (int)CaseLocationType.EmerHospital ? "display:none":"")">
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.CoronaForm.HospitalName)
+                                    @Html.TextBoxFor(m => m.CoronaForm.HospitalName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CoronaForm.PercentageOfOxygen) })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.HospitalName)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    <input type="hidden" value="@Model.CoronaForm.HospitalLocationId" id="coronaHospitalLocationId" />
+                                    @Html.DisplayNameFor(m => m.CoronaForm.HospitalLocationId)
+                                    @Html.DropDownListFor(x => x.CoronaForm.HospitalLocationId, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CoronaForm.HospitalLocationId)
+                                </div>
+                            </div>
+                        </div>
+                        <div id="serviceArea">
+                            @Html.HiddenFor(x => x.CoronaForm.SymptomsIDs)
+                            <div class="form-group" dir="@dir">
+                                <div class="col-sm-12 @floatToRight">
+                                    <label>
+                                        @Html.DisplayNameFor(m => m.CoronaForm.SymptomsIDs)
+                                    </label>
+                                </div>
+                                <br />
+                                <div class="SymptomsIDsDiv @floatToRight">
+
+                                </div>
+
+                                @Html.ValidationMessageFor(m => m.CoronaForm.SymptomsIDs)
+                            </div>
+
+                            <div class="form-group otherContainer" style="@(string.IsNullOrEmpty(Model.CoronaForm.AddSymptomOtherText.OtherText) ? "display:none":"")">
+                                @Html.HiddenFor(x => x.CoronaForm.AddSymptomOtherText.Id)
+                                <div class="form-group" dir="@dir">
+                                    <div class="col-sm-6 @floatToRight">
+                                        @Html.TextBoxFor(x => x.CoronaForm.AddSymptomOtherText.OtherText, new { placeholder = EmergencyCaseRES.OtherEmergencyText })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            @Html.HiddenFor(x => x.CoronaForm.CoronaTestIDs)
+                            <div class="form-group" dir="@dir">
+                                <div class="col-sm-12 @floatToRight">
+                                    <label>
+                                        @Html.DisplayNameFor(m => m.CoronaForm.CoronaTestIDs)
+                                    </label>
+                                </div>
+                                <br />
+                                <div class="CoronaTestIdsDiv @floatToRight">
+
+                                </div>
+
+                                @Html.ValidationMessageFor(m => m.CoronaForm.CoronaTestIDs)
+                            </div>
+                            <div class="form-group" dir="@dir">
+                                <div class="col-sm-12">
+                                    @Html.Label(EmergencyCaseRES.PCRAndAnalysisAttachment)
+                                </div>
+                                <div class="attachment">
+                                    @if (Model.EmergencyCaseAttachment.Any())
+                                    {
+                                        foreach (var item in Model.EmergencyCaseAttachment)
+                                        {
+                                            <a target="_blank" href="~/ClientFilesLayout/EmergencyCases/@item.EmergencyCaseId/@item.FileName">
+                                                <img class="img-fluid" width="70" height="70" src="~/ClientFilesLayout/EmergencyCases/@item.EmergencyCaseId/@item.FileName" />
+                                            </a>
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                            @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EditEmergencyCase))
+                            {
+                                <div class="form-group">
+                                    <input type="hidden" id="CaseHaseFile" />
+                                    <div class="demo-section k-content @schedulerClass">
+                                        @(Html.Kendo().Upload()
+                                                                                                                                                                                                                                                      .Name("files")
+                                                                                                                                                                                                                                                       .Messages(m => m.Select(EmergencyCaseRES.PCRAndAnalysisAttachment).UploadSelectedFiles(""))
+                                                                                                                                                                                                                                                      .TemplateId("fileTemplate")
+                                                                                                                                                                                                                                                      .HtmlAttributes(new { id = "CaseFile" })
+                                                                                                                                                                                                                                                      .Multiple(true)
+                                                                                                                                                                                                                                                      .Async(a => a
+                                                                                                                                                                                                                                                      .Save("UploadCaseAttachment", "EmergencyCase")
+                                                                                                                                                                                                                                                      .AutoUpload(false)
+                                                                                                                                                                                                                                                      .Batch(true)
+                                                                                                                                                                                                                                                      )
+                                                                                                                                                                                                                                                      .Events(c => c
+                                                                                                                                                                                                                                                      .Upload("onUploadEmergencyNewCase").Success("onSuccessUploadNewEmergencyCase")
+                                                                                                                                                                                                                                                      .Select("onEmergencySelectCaseFile")
+                                                                                                                                                                                                                                                      )
+                                        )
+                                    </div>
+                                    <div class="divStatus"></div>
+                                </div>
+                            }
+                        </div>
+
+                    }
+                    else if (Model.EmergencyForm != null)
+                    {
+                        <div class="form-group">
+                            <div class="col-sm-6 @floatToRight">
+                                <label>
+                                    @Html.DisplayNameFor(model => model.EmergencyForm.Description) :
+                                </label>
+                                @Html.TextAreaFor(m => m.EmergencyForm.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.EmergencyForm.Description), rows = "4" })
+                                @Html.ValidationMessageFor(m => m.EmergencyForm.Description)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6 @floatToRight">
+                                <label>
+                                    @Html.DisplayNameFor(model => model.EmergencyForm.Requirements) :
+                                </label>
+                                @Html.TextAreaFor(m => m.EmergencyForm.Requirements, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.EmergencyForm.Requirements), rows = "4" })
+                                @Html.ValidationMessageFor(m => m.EmergencyForm.Requirements)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6 @floatToRight">
+                                <label>
+                                    @Html.DisplayNameFor(model => model.EmergencyForm.Notes) :
+                                </label>
+                                @Html.TextAreaFor(m => m.EmergencyForm.Notes, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.EmergencyForm.Notes), rows = "4" })
+                                @Html.ValidationMessageFor(m => m.EmergencyForm.Notes)
+                            </div>
+                        </div>
+                    }
+
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @*@Html.DisplayNameFor(m => m.CurrentSituation)
+                                    @Html.TextAreaFor(m => m.CurrentSituation, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CurrentSituation), rows = "4" })
+                                    @Html.ValidationMessageFor(m => m.CurrentSituation)*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @*@Html.DisplayNameFor(m => m.Needed)
+                                    @Html.TextAreaFor(m => m.Needed, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Needed), rows = "4" })
+                                    @Html.ValidationMessageFor(m => m.Needed)*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3">
+                                <label>
+                                    @*@Html.DisplayNameFor(model => model.Source) :*@
+                                </label>
+
+                                @*@if (!string.IsNullOrEmpty(Model.ScSource.NameAr))
+                                    {
+                                        if (isArabic)
+                                        {
+                                            @Html.DisplayFor(model => model.ScSource.NameAr)
+
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(model => model.ScSource.NameEn)
+                                        }
+                                    }*@
+                            </div>
+                            <div class="col-sm-3">
+                                <label>
+                                    @Html.DisplayNameFor(model => model.CreatedByName) :
+                                </label>
+                                @Html.DisplayFor(model => model.CreatedByName)
+                            </div>
+                            <div class="col-sm-3">
+                                <label>
+                                    @Html.DisplayNameFor(model => model.CreatedOnString) :
+                                </label>
+                                @Html.DisplayFor(model => model.CreatedOnString)
+                            </div>
+
+                            @*@if (!string.IsNullOrEmpty(Model.InvestigatorName))
+                                {
+                                    <div class="col-sm-3">
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.InvestigatorName) :
+                                        </label>
+                                        @Html.DisplayFor(model => model.InvestigatorName)
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.employeeName))
+                                {
+                                    <div class="col-sm-3">
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.employeeName) :
+                                        </label>
+                                        @Html.DisplayFor(model => model.employeeName)
+                                    </div>
+                                }*@
+                        </div>
+                        <div style="max-width:90%;margin: auto;">
+                        </div>
+
+                    </div>
+
+
+                    @if (Model.EmergencyCaseComments != null && Model.EmergencyCaseComments.Any())
+                    {
+                        <div class="headOfAccordion">
+                            @CaseResources.MedicalComments
+                        </div>
+                        <div>
+                            @foreach (var item in Model.EmergencyCaseComments)
+                            {
+                                <div class="form-group">
+                                    <div class="col-sm-3 @floatToRight">
+                                        <label>@EmergencyCaseRES.ActionType : </label>
+                                        @if (!string.IsNullOrEmpty(item.CommentTypeName))
+                                        {
+                                            @item.CommentTypeName
+                                        }
+                                        else
+                                        {
+                                            @item.ActionName
+                                        }
+                                    </div>
+                                    <div class="col-sm-3 @floatToRight">
+                                        <label>@CaseResources.CommentBy : </label>
+                                        @item.CreatedByUserName
+                                    </div>
+                                    <div class="col-sm-3 @floatToRight">
+                                        <label>@EmergencyCaseRES.Comment : </label>
+                                        @item.Comment
+                                    </div>
+                                    <div class="col-sm-3 @floatToRight">
+                                        <label>@LayoutRES.CreatedOn : </label>
+                                        @item.CreatedOnString
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.HospitalName) || Model.HospitalEntryDate.HasValue)
+                    {
+                        <div class="headOfAccordion">
+                            @CaseResources.CaseDetails
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <div class="col-sm-4 @floatToRight">
+                                    <label>@EmergencyCaseRES.ExactHospitalName : </label>
+                                    @Model.HospitalName
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 @floatToRight">
+                                    <label>@EmergencyCaseRES.HospitalAttendDate : </label>
+                                    @if (Model.HospitalEntryDate.HasValue)
+                                    {
+                                        @Model.HospitalEntryDateString
+                                    }
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 @floatToRight">
+                                    <label>@EmergencyCaseRES.Amount : </label>
+                                    @Model.RequiredAmount
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 @floatToRight">
+                                    <label>@EmergencyCaseRES.MersalCode : </label>
+                                    @Model.MersalCaseId
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+
+                    @*@if (Model.caseInvestigatorDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserDetails().Id))
+                        {
+                            <div class="headOfAccordion allowToUser">
+                                @CaseResources.InvestigationResult
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        @CaseResources.Recommendation
+                                        @Html.TextArea("Recommendation", new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Recommendation, rows = "5" })
+                                        <label id="ErrorRecommendationInvestigation"></label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @CaseResources.Conclusions
+                                        @Html.TextArea("Conclusions", new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Conclusions, rows = "5" })
+                                        <label id="ErrorConclusionsInvestigation"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    تاريخ التحقيق
+                                    @Html.TextBox("InvestigationDate", DateTime.Now.ToString("M/d/yyyy", CultureInfo.InvariantCulture), new { @class = "DateTillNow form-control" })
+                                </div>
+                                <div class="form-group">
+                                    <input type="button" value="@CaseResources.InvestigationDone" onclick="MarkInvestigationDone()" class="btn btn-success " />
+                                </div>
+                            </div>
+                        }*@
+
+                    <br />
+                    @if (
+                        (Model.State == (int)EmergencyCaseState.EmcNew
+                        || Model.State == (int)EmergencyCaseState.EmcPending
+                        || Model.State == (int)EmergencyCaseState.EmcMedicalReject)
+                       && AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EditEmergencyCase))
+                    {
+                        <input type="submit" class="btn btn-info" value="@LayoutRES.SubmitEdit" />
+                    }
+                    <div class="box-footer">
+                        @if (Model.State == (int)EmergencyCaseState.EmcPending && AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AddEmergencyMedicalNotes))
+                        {
+                            <input type="button" class="btn btn-info" onclick="OpenConfirmationPopup(true)" value="@CaseResources.Accept" />
+                            <input type="button" class="btn btn-info" onclick="OpenConfirmationPopup(false)" value="@EmergencyCaseRES.DataMissing" />
+                        }
+
+                        @if (Model.State == (int)EmergencyCaseState.EmcPendingEmTeam && AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EmergencyTeamDoctor))//&& AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EmergencyTeamCaseCheck))
+                        {
+                            <input type="button" class="btn btn-info" onclick="OpenChangeEmergencyCaseStatePopup('ChangeEmergencyCaseStateBox')" value="@EmergencyCaseRES.ChangeEmergencyCaseState" />
+                        }
+
+                        @if (Model.State == (int)EmergencyCaseState.EmcNeedIsolation && AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EmergencyTeamDoctor))
+                        {
+                            <input type="button" class="btn btn-info" onclick="OpenChangeEmergencyCaseStatePopup('ChangeEmergencyCaseStateByEmergencyDoctorBox')" value="@EmergencyCaseRES.ChangeEmergencyCaseState" />
+                        }
+
+                        @if (Model.State == (int)EmergencyCaseState.EmcWaittingHospital && AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssignEmergencyCaseToHospital))
+                        {
+                            <input type="button" class="btn btn-info" onclick="OpenChangeEmergencyCaseStatePopup('ChangeEmergencyCaseStateToDoneBox')" value="@EmergencyCaseRES.ChangeEmergencyCaseState" />
+                        }
+
+                        @if (Model.State == (int)EmergencyCaseState.EmcDone && AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.FollowUpTeam) && ((bool)ViewBag.FollowUp) && Model.RequiredFollowUp.HasValue && Model.RequiredFollowUp.Value)
+                        {
+                            <input type="button" class="btn btn-info" onclick="DoneFollowUp()" value="@EmergencyCaseRES.DoneFollowUp" />
+                        }
+
+
+
+
+
+
+                        @*<input type="submit" class="btn btn-info" value="@LayoutRES.SubmitEdit" />*@
+                        @*@if (Model.ScState.Code == CaseState.csNE.ToString() || Model.ScState.Code == CaseState.csUN.ToString() || Model.ScState.Code == CaseState.csDA.ToString())
+                            {
+                                if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.submitCaseFinalApprove))
+                                {
+                                    <input id="btnGetFinalApprove" type="button" value="@CaseResources.ExceptionCase" onclick="GetFinalApprove('@Model.Id')" class="btn btn-warning" />
+                                }
+                            }*@
+
+                        @*@if (Enum.IsDefined(typeof(CaseArchive), Model.ScState.Code) == false)
+                            {
+                                if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ArchiveCase))
+                                {
+                                    <input onclick="ArchivingCase('@Model.Id')" type="button" value="@CaseResources.ArchivingCase" class="btn btn-warning pull-left" />
+                                }
+                            }*@
+                        @*@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ExclusionCase))
+                            {
+                                if (Model.ScState.Code != CaseState.csNE.ToString()
+                                      && Enum.IsDefined(typeof(CaseArchive), Model.ScState.Code) == false
+                                    && Model.ScState.Code != CaseState.csDA.ToString())
+                                {
+                                    if (Model.caseRejectHistoryDTOList.Any(x => x.CreatedBy == AuthorizationHelper.UserId))
+                                    {
+                                        if (Model.caseRejectHistoryDTOList.Where(x => x.CreatedBy == AuthorizationHelper.UserId
+                                                                                   && Enum.IsDefined(typeof(CaseArchive), x.NewStateId) == true).Count() > 0
+
+                                                                                                                    )
+
+                                        {
+                                            <input id="btnRestoreCase" onclick="RestoreCase()" type="button" value="@CaseResources.RestoreCase" class="btn btn-danger pull-left" />
+                                        }
+
+                                    }
+
+                                }
+                                else if (Enum.IsDefined(typeof(CaseArchive), Model.ScState.Code) == true)
+                                {
+                                    <input id="btnRestoreCase" onclick="RestoreCase()" type="button" value="@CaseResources.RestoreCase" class="btn btn-danger pull-left" />
+                                }
+                            }*@
+                    </div>
+                </div>
+            }
+
+            <div class="box-body">
+                <!-- /.dashbord -->
+                <div class="box-footer">
+
+                    @*@if (Model.CountOfComment > 0)
+                        {
+                            <input type="button" value="@CaseResources.CaseComments + @Model.CountOfComment" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                        }
+                        else
+                        {
+                            <input type="button" value="@CaseResources.CaseComments" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                        }
+
+                        <input type="button" value="@CaseResources.CallResult" onclick="GetCaseCallResult('@Model.Id')" class="btn btn-info" />
+
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ViewMedicalComments))
+                        {
+                            if (Model.CountOfMedicalComment > 0)
+                            {
+                                <input type="button" value="@CaseResources.MedicalComments + @Model.CountOfMedicalComment" onclick="GetMedicalComments('@Model.Id')" class="btn btn-info" />
+                            }
+                            else
+                            {
+                                <input type="button" value="@CaseResources.MedicalComments" onclick="GetMedicalComments('@Model.Id')" class="btn btn-info" />
+                            }
+                        }
+
+                        <input type="button" value="@CaseResources.CaseAttachment" onclick="GetCaseAttachment('@Model.Id')" class="btn btn-info  " />
+                        @if (Model.ScState.Code == CaseState.csUC.ToString())
+                        {
+                            if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToDoctor))
+                            {
+                                <input type="button" value="@CaseResources.AssignCaseToDoctor" onclick="getCaseDoctor('@Model.Id','false')" class="btn btn-info" />
+                            }
+                        }
+                        @if (Model.ScState.Code == CaseState.csUN.ToString())
+                        {
+                            if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToInvestigetor))
+                            {
+
+                                <input type="button" value="@CaseResources.AssginToInvestigator" onclick="getCaseInvestigetor('@Model.Id','false')" class="btn btn-info" />
+                            }
+                        }
+                        <input type="button" value="@CaseResources.InvestigationReview" onclick="GetInvestigationResult('@Model.Id')" class="btn btn-info  " />
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToInvestigetor) && Model.ScState.Code == CaseState.csUC.ToString())
+                        {
+                            <input type="button" value="@CaseResources.AssginToEmployee" onclick="getCaseEmployee('@Model.Id')" class="btn btn-info" />
+                        }
+                        <input type="button" value="@CaseResources.ViewFollowResult" onclick="GetCaseVisitResult('@Model.Id')" class="btn btn-info  " />
+                        <input type="button" value="@CaseResources.ViewCaseHistory" onclick="GetCaseHistory('@Model.Id')" class="btn btn-info  " />
+                        @if (Model.ScState.Code == CaseState.csOP.ToString())
+                        {
+                            if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.submitCaseFinalApprove))
+                            {
+                                <input id="btnGetFinalApprove" type="button" value="@CaseResources.OpenTheCase" onclick="GetFinalApprove('@Model.Id')" class="btn btn-info  " />
+                            }
+                        }
+                        @if (Model.ScState.Code == CaseState.csUN.ToString())
+                        {
+                            if (Model.caseInvestigatorDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserId))
+                            {
+                                <input type="button" value="@CaseResources.ScheduleToInvestegate" onclick="showInvestegatorSchedule('@Model.Id','@Model.Id : @Model.Name')" class="btn btn-info" />
+                            }
+                        }
+                        @if (Model.ScState.Code == CaseState.csUC.ToString())
+                        {
+                            //if (Model.caseEmployeeDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserId))
+                            if (Model.AllowAddFollowToCase)
+                            {
+                                <input type="button" value="@CaseResources.ScheduleToFollow" onclick="showInvestegatorSchedule('@Model.Id','@Model.Id : @Model.Name')" class="btn btn-info" />
+                                <input type="button" value="@CaseResources.AddCaseFollow" onclick="GetAddFollowResult('@Model.Id')" class="btn btn-info" />
+                            }
+                        }
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ReInvestigateCase))
+                        {
+                            if (Model.ScState.Code != CaseState.csUN.ToString() && Model.ScState.Code != CaseState.csNE.ToString())
+                            {
+                                <input type="button" value="@CaseResources.ReInvestegateCase" onclick="getCaseInvestigetor('@Model.Id','true')" class="btn btn-info" />
+                            }
+                        }
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssignTaskToDelegate))
+                        {
+                            <input type="button" value="@CaseResources.AssignTaskToDelegate" onclick="AssignTaskToDelegate()" class="btn btn-info" />
+                        }
+                        @if (Model.ScState.Code == CaseState.csUC.ToString() || Model.ScState.Code == CaseState.csCO.ToString())
+                        {
+                            <input type="button" value="@CaseResources.PublishData" onclick="getCasePublishData()" class="btn btn-info" />
+                        }
+                        <input id="btnGetCase" type="button" class="btn btn-info" value="@CaseResources.AddCaseFollow" onclick="GetAddCaseVisiteFull(@Model.Id)" />*@
+                </div>
+                <!-- /.dashbord -->
+                <!-- /.box-footer -->
+                @*@if (Model.ScState.Code == CaseState.csNE.ToString())
+                    {
+                        if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ApproveRequest))
+                        {
+                            <form class="form-horizontal allowToUser">
+                                <div class="form-group">
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-sm-12">
+                                        <input id="txtCallResultToCaseState" name="CallResult" placeholder="@CaseResources.CallResult" type="text" class="form-control">
+                                        <input id="txtCommentToCaseState" name="Comment" placeholder="@CaseResources.Comment" type="text" class="form-control">
+                                        <label id="ErrorCommentToCaseState"></label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input id="btnAccept" onclick="FirstApprove('@CaseState.csUN.ToString()')" type="button" value="@CaseResources.Accept" class="btn btn-success pull-right" />
+
+                                    </div>
+                                </div>
+                            </form>
+                        }
+                    }
+                    else if (Model.ScState.Code == CaseState.csDA.ToString())
+                    {
+                        if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ApproveRequest))
+                        {
+                            <div class="box-footer allowToUser">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label @floatToRight">@CaseResources.Comment</label>
+                                    <div class="col-sm-12">
+                                        <input id="txtCommentToCaseState" name="Comment" placeholder="@CaseResources.Comment" type="text" class="form-control">
+                                        <label id="ErrorCommentToCaseState"></label>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="col-sm-12">
+                                    <input id="btnAccept" onclick="SecondApprove('@CaseState.csOP.ToString()')" type="button" value="@CaseResources.Accept" class="btn btn-success pull-right" />
+                                </div>
+                            </div>
+                        }
+                    }*@
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+
+    @section Scripts {
+        <script>
+        var emcNeedIsolation = @((int) EmergencyCaseState.EmcNeedIsolation);
+        var ArchivingCaseTitle = '@CaseResources.ArchivingCase';
+        var SuccessfullyAdd = '@LayoutRES.SuccessfullyAdd';
+        var CaseState = '@ViewBag.CaseState';
+
+        </script>
+
+        <script src="~/Scripts/MersalScripts/EmergencyCase/emergency-case-details.js?version=1.7"></script>
+    }
+

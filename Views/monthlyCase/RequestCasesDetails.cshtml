@@ -1,0 +1,58 @@
+﻿@model DTO.CasesMonthlyRequestDTO
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div>
+    <div class="box">
+        <div class="box-header">
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody>
+                        <tr>
+                            <th>@Model.Description</th>
+                            @if (isArabic)
+                            {
+                                <th>@Model.TypeNameAr</th>
+                            }
+                            else
+                            {
+                                <th>@Model.TypeNameEn</th>
+                            }
+                            <th>@CaseResources.CountMonthlyCases
+                            <span class="label label-success">@Model.CaseCount</span>
+                            </th>
+                             <th>
+                            @LayoutRES.Amount
+                            <span class="label label-success">@Model.Total</span>
+                            </th>
+                             
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+    </div>
+</div> 
+
+    <div>
+        <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+    </div>
+
+
+@section Scripts {
+    <script>
+        var CaseCode = "@CaseResources.CaseCode";
+        var CaseName = "@LayoutRES.CaseName";
+        var Amount = "@LayoutRES.Amount";
+        var RequestId = "@ViewBag.RequestId";
+    </script>
+    <script src="~/Scripts/MersalScripts/MonthlyCasesManagment/MonthlyCasesDetails.js"></script>
+}

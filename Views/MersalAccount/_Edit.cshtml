@@ -1,0 +1,226 @@
+﻿@using Resource
+@using DTO
+@model AccountDTO
+@{
+    ViewBag.Title = @AccountRES.Title;
+    Layout = "";
+}
+
+    <div class="modal fade" id="AddAccountModal" role="dialog">
+    <div class="modal-dialog" style="width: 70%;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Case Comment - @Html.DisplayFor(m => m.CaseName)</h4>*@
+                    <h4 class="modal-title">@ViewBag.Title</h4>
+
+                    <input type="hidden" id="myCaseId" value="@ViewBag.caseId" />
+
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+
+
+                    <!-- general form elements -->
+                    <div class="box box-primary">
+                     
+                        <!-- form start -->
+                        <form role="form" id="CreateAccountForm">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Name)
+                                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.Name)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.ProjectId)
+
+                                            <select data-val-required="Required" name="ProjectId" id="ProjectId" class="form-control select2 select2-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                                                @* <option >@AccountRES.select</option>*@
+
+                                            </select>
+
+                                            @Html.ValidationMessageFor(m => m.ProjectId)
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.TypeId)
+
+                                            <select data-val-required="Required" onchange="CheckBankAccount(this)" name="TypeId" id="TypeId" class="form-control select2 select2-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                                                @* <option >@AccountRES.select</option>*@
+
+                                            </select>
+
+                                            @Html.ValidationMessageFor(m => m.TypeId)
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.OpeningBalance)
+                                            @Html.TextBoxFor(m => m.OpeningBalance, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.OpeningBalance)
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Description)
+                                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.Description)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label style="margin-top:22px;">
+                                                <input id="IsActive" checked type="checkbox">&nbsp;&nbsp;&nbsp; @AccountRES.IsActive
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="bankDetails" hidden>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.BankDetailsDTO.Name)
+                                                @Html.TextBoxFor(m => m.BankDetailsDTO.Name, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.BankDetailsDTO.Name)
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.BankDetailsDTO.AccountNumber)
+                                                @Html.TextBoxFor(m => m.BankDetailsDTO.AccountNumber, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.BankDetailsDTO.AccountNumber)
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.BankDetailsDTO.Location)
+                                                @Html.TextBoxFor(m => m.BankDetailsDTO.Location, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.BankDetailsDTO.Location)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.BankDetailsDTO.Details)
+                                                @Html.TextBoxFor(m => m.BankDetailsDTO.Details, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.BankDetailsDTO.Details)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <button type="button" onclick="CreateAccount()" class="btn btn-primary">@AccountRES.Save</button>
+                                    </div>
+                                </div>
+                        </form>
+                        <!-- /.box -->
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <script>
+            var parentAccountID = 0;
+            GetAnyMasterDetalisCode("PROJ", "ProjectId")
+            GetAnyMasterDetalisCode("ACCTYP", "TypeId")
+            var isBank = false;
+            function CheckBankAccount(obj) {
+             
+                if ($('#TypeId').find(":selected").attr("code") == "BANK") {
+                    $("#bankDetails").show("slide")
+                    isBank = true;
+                }
+                else {
+                    $("#bankDetails").hide("slide")
+                    isBank = false;
+                }
+            }
+            function CreateAccount() {
+                
+                var myForm = $("#CreateAccountForm");
+           
+                    $.validator.unobtrusive.parse(myForm)
+              
+                    if (!myForm.valid()) return;
+                    if (parentAccountID == 0) {
+                        parentAccountID = null;
+                    }
+                    var apiurl = MersalWebAPIBaseUrl + "api/Accounts/CreateAccount";
+                    var DTO = {
+                        Name: $("#Name").val(),
+                        Description: $("#Description").val(),
+                        OpeningBalance: $("#OpeningBalance").val(),
+                        ProjectId: $("#ProjectId").val(),
+                        IsActive:true,
+                        TypeId: $("#TypeId").val(),
+                        ParentId:parentAccountID,
+                        BankDetailsDTO :{
+                            Name: $("#BankDetailsDTO_Name").val(),
+                            AccountNumber: $("#BankDetailsDTO_AccountNumber").val(),
+                            Location: $("#BankDetailsDTO_Location").val(),
+                            Details: $("#BankDetailsDTO_Details").val(),
+                        }
+                    };
+                    if ($("#IsActive").prop("checked")==false) {
+                        DTO.IsActive = false;
+                    }
+                    if (isBank == false) {
+                        DTO.BankDetailsDTO = null;
+                    }
+                    
+                    //console.log(JSON.stringify(data));
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json",
+                        url: apiurl,
+                        crossDomain: true,
+                        headers: getHeaders(),
+                        data: JSON.stringify(DTO),
+                        async: false,
+                        success: function (data) {
+                  
+                            if (data > 0) {
+                                GetAndDrawAccountTree()
+
+                                toastr.success(SuccessfullyAdd + " - " + data);
+                                document.getElementById("CreateAccountForm").reset();
+                                parentAccountID = 0;
+                                HideAnyModal();
+                            }
+                            else {
+                                toastr.error(Error);
+                            } 
+                        },
+                        error: function (xhr) {
+                            $(".popup-form").removeClass("active").slideUp();
+                            $("body").find(".popup").fadeOut();
+                            toastr.error(xhr.error); 
+                        }
+                    });
+            
+            }
+        </script>
+

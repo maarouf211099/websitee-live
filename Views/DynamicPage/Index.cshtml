@@ -1,0 +1,289 @@
+﻿@using Resource
+@using UserUI.Helper
+@using Components.UserManagement.Resources
+@{
+    ViewBag.Title = DynamicPagesRES.indexTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="modal fade" style="float:right;padding-right: 9%;" id="DeleteModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Case Comment - @Html.DisplayFor(m => m.CaseName)</h4>*@
+                    <h4 class="modal-title">@DynamicPagesRES.Confrimation</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                    <h2>@DynamicPagesRES.ConfrimationMSG</h2>
+
+
+                </div>
+                <div class="box-footer">
+                    <button type="button" onclick="DeleteRestor(true)" id="btnDelete" class="btn btn-info">@AccountRES.Save</button>
+                    <button type="button" onclick="DeleteRestor(false)" id="btnRestore" class="btn btn-info">@AccountRES.Save</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-2">
+        <a href="@Url.Action("Create")" class="btn btn-info">@DynamicPagesRES.CreateTitle</a>
+    </div>
+    <div class="col-lg-8">
+
+    </div>
+    <div class="col-lg-2">
+        <input type="checkbox" id="showdeletde" />  @DynamicPagesRES.showDeleted
+    </div>
+</div>
+<br />
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+
+<script>
+        deltedId = 0;
+        function getDelete(Id, deleted) {
+
+            if (deleted==true) {
+                $("#btnDelete").show();
+                $("#btnRestore").hide();
+            }
+            else {
+                $("#btnDelete").hide();
+                $("#btnRestore").show();
+
+            }
+            deltedId = Id;
+            $("#DeleteModal").modal("show");
+        }
+        function DeleteRestor(isdelete) {
+            var apiurl = MersalWebAPIBaseUrl + "api/DynamicPages/DeleteRestore?Id=" + deltedId + "&Isdeleted=" + isdelete;
+            $.ajax({
+                type: "get",
+                contentType: "application/json",
+                url: apiurl,
+                crossDomain: true,
+                headers: getHeaders(),
+                //data: JSON.stringify(EditObject),
+                async: false,
+                success: function (data) {
+
+                    if (data > 0) {
+                        toastr.success(SuccessfulProcess);
+                        refesh()
+                    }
+                    else {
+                        toastr.error(Error);
+                    }
+                    $(".modal").modal("hide");
+
+                },
+                error: function (xhr) {
+
+                    toastr.error(xhr.error);
+                }
+            });
+        }
+        $("#showdeletde").change(function () {
+            refesh()
+
+
+
+        })
+    debugger;
+        var titleNameGrid = '@DynamicPagesRES.Name';
+        var titleTitleARGrid = '@DynamicPagesRES.TitleAR';
+        var EditTitleGrid = "@DynamicPagesRES.Edit";
+        var EditTitleGrid = "@DynamicPagesRES.Edit";
+        var DeleteTitleGrid = "@DynamicPagesRES.Delete";
+    var RestoreTitleGrid = "@DynamicPagesRES.Restore";
+    var _culture = getCookie("_culture");
+    if (_culture == null) {
+        _culture = "ar-SA";
+    }
+    var _cultureIsArabic = true;
+    if (_culture === "en-US") {
+        _cultureIsArabic = false;
+    }
+        function refesh() {
+            $("#grid").hide("slow");
+            $("#grid").html("");
+            $("#grid").show("slow");
+
+            var isDeleted = $("#showdeletde").prop("checked")
+            BindGrid(isDeleted)
+            var grid = $("#grid").data("kendoGrid");
+            if (isDeleted) {
+                grid.hideColumn(4);
+                grid.hideColumn(5);
+                grid.showColumn(6);
+            }
+
+        }
+
+        BindGrid(false)
+        function BindGrid(IsDeleted) {
+            var GetAllTransactionsUrl = MersalWebAPIBaseUrl + "api/DynamicPages/GetAllPages?IsDelete=" + IsDeleted;
+
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: GetAllTransactionsUrl,
+                        dataType: "json",
+                        headers: getHeaders(),
+                    },
+                    parameterMap: function (options, operation) {
+                        //var caseStateURL = getUrlParameter("Cstate");
+                        //console.log(caseStateURL);
+                        //var filterByState = { filterByState: caseStateURL };
+                        //$.extend(options, filterByState);
+                        //$.extend(options, filterByState);
+                        //console.log(options);
+                        return options;
+                    }
+                },
+                schema: {
+                    total: function (data) {
+                        return data.Total;
+                    },
+                    data: function (data) {
+                        return data.Data;
+                    },
+                    model: {
+                        Id: "Id",
+                        fields: {
+                            Id: { type: "number" },
+                            CreateOn: { type: "date" },
+                            AccountName: { type: "string" },
+                            Details: { type: "string" },
+                        }
+                    }
+                },
+                type: "json",
+                pageSize: 10,
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true
+            });
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                filterable: {
+                    extra: false,
+                    operators: {
+                        string: {
+                            eq: IsEqualTo,
+                            neq: IsNotEqualTo,
+                            startswith: StartsWith,
+                            contains: Contains,
+                            doesnotcontain: doesnotcontain,
+                            endswith: endswith,
+
+                        }
+                    },
+                    messages: {
+                        info: "",
+                        filter: Filter,
+                        clear: Clear,
+
+                    }
+
+                },
+                sortable: true,
+                pageable: {
+                    messages: {
+                        itemsPerPage: itemsPerPage,
+                        display: display,
+                        page: page,
+                        of: of,
+                        empty: empty
+                    },
+
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                resizable: true,
+                width: '100%',
+                sortable: false,
+
+                columns: [
+                    {
+                        field: "Id",
+                        title: 'Id',
+                        filterable: false,
+                        hidden: true,
+                    },
+                    {
+                        field: "Name",
+                        title: titleNameGrid,
+                    },
+                    {
+                        field: "TitleAR",
+                        title: titleTitleARGrid,
+                    },
+                    {
+                        field: "CreateOn",
+                        title: CreatedOn,
+                        type: "date",
+                        format: "{0:d/M/yyyy h:mm tt}",
+                        parseFormats: ["MM/dd/yyyy h:mm:ss tt"],
+                       
+                        filterable: {
+                            messages: {
+                                and: AndOperator,
+                                or: OrOperator
+                            },
+                            extra: true,
+                            operators: {
+                                date: {
+                                    gt: After,
+                                    lt: Before,
+                                }
+                            },
+                            ui: function (element) {
+                                debugger;
+                                if (_cultureIsArabic) {
+                                    kendo.culture("ar-EG");
+                                }
+                                element.kendoDatePicker({
+                                    format: "0:d/M/yyyy h:mm"
+                                });
+                            }
+                        }
+                    },
+
+                {
+                    filterable: false,
+                    sortable: false,
+                    title: EditTitleGrid,
+                    template: "<div class='text-center'><a style='cursor: pointer;color: \\#3c8dbc!important' onclick=getEdit(#=Id#)><i class='fa  fa-edit fa-fw fa-2x'></i></a></div>"
+
+                },
+
+                {
+                    filterable: false,
+                    sortable: false,
+                    title: DeleteTitleGrid,
+                    template: "<div class='text-center'><a style='cursor: pointer;color: \\#3c8dbc!important' onclick=getDelete(#=Id#,true)><i class='fa  fa-trash fa-fw fa-2x'></i></a></div>"
+
+                },
+                   {
+                       filterable: false,
+                       sortable: false,
+                       title: RestoreTitleGrid,
+                       template: "<div class='text-center'><a style='cursor: pointer;color: \\#3c8dbc!important' onclick=getDelete(#=Id#,false)><i class='fa  fa-reply fa-fw fa-2x'></i></a></div>",
+                       hidden: true,
+                   }
+                ]
+            });
+        }
+        function getEdit(Id) {
+            window.location = "@Url.Action("Edit")" + "?Id=" + Id
+        }
+
+</script>

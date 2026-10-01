@@ -1,0 +1,92 @@
+﻿@using Resource
+@using UserUI.Helper
+@{
+    ViewBag.Title = AccountTransactionRES.TransactionTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<script>
+    var dexriptionTitle = '@AccountTransactionRES.describtion';
+    var valueTitle = '@AccountTransactionRES.value';
+    var reverseTitle = '@AccountTransactionRES.Reverse';
+    var AccountDRPPlacholder = '@AccountTransactionRES.AccountDRPPlacholder';
+    var typeColume = '@AccountTransactionRES.type';
+    var typeTitle = '@AccountTransactionRES.TranactionType'
+</script>
+<div class="modal fade" style="float:right;padding-right: 9%;" id="ReverseModal" role="dialog">
+
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Case Comment - @Html.DisplayFor(m => m.CaseName)</h4>*@
+                    <h4 class="modal-title">@AccountTransactionRES.ConfimationReverse</h4>
+
+
+
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+
+
+                    <!-- general form elements -->
+                    <div class="box box-primary">
+                        <form role="form" id="CreateAccountForm">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.Label(AccountTransactionRES.describtion)
+                                            <textarea style="min-height:150px;" type="text" id="reverseDescription" class="form-control" ></textarea>
+                                            <span id="descriptionValid" hidden class="field-validation-error">
+                                            <span for="value" class="">@AccountTransactionRES.descriptionRequired</span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                            <div class="box-footer">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    <button type="button" style="width: 45%;" onclick="reverseExecute()" class="btn btn-primary">@AccountRES.Save</button>
+                                    @*<button type="button" style="width: 45%;" class="btn btn-default" data-dismiss="modal">@AccountTransactionRES.Cancel&times;</button>*@
+                                    <button type="button" style="width: 45%;" class="btn btn-info" data-dismiss="modal">@AccountTransactionRES.Cancel&times;</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group ">
+            @Html.Label(AccountTransactionRES.Account)
+            <input type="text" id="AccountDRP" style="width:100%;" class="form-control" />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            @Html.Label(AccountTransactionRES.describtion)
+            <input type="text" id="describtion" class="form-control" />
+        </div>
+    </div>
+ 
+    <div class="col-md-2">
+        <br />
+        <input type="button" class="btn btn-primary" onclick="BindGrid()" value="@AccountTransactionRES.Search" />
+    </div>
+</div>
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<script src="~/Scripts/MersalScripts/AccounTransaction/AccountTransactionController.js"></script>
+<script>
+ 
+
+</script>
+

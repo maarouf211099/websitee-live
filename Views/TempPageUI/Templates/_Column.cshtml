@@ -1,0 +1,88 @@
+﻿@model TempPageDTO
+@using DTO
+@using Resource
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    int i = 0;
+}
+
+
+<!--Column Template-->
+<section>
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div class="title2">
+                        @if (!string.IsNullOrEmpty(Model.TitleAr) || !string.IsNullOrEmpty(Model.TitleEn))
+                        {
+                            <h1>@(isArabic ? Model.TitleAr : Model.TitleEn)</h1>
+                        }
+                        <span>@(isArabic ? Model.SubTitleAr : Model.SubTitleEn)</span>
+                    </div>
+                    <div class="successful-stories">
+                        @if (Model.TempPageBlockDTOList.Any())
+                        {
+
+                            foreach (var block in Model.TempPageBlockDTOList)
+                            {
+                                i++;
+                                if ((i % 3) == 0)
+                                {
+                                    @Html.Raw("<div class='row'>")
+                                }
+
+                                <div class="col-md-4">
+                                    <div class="product">
+                                        @if (!string.IsNullOrEmpty(block.ImagePath))
+                                        {
+                                            <div class="product-img ActivityImg clearBefore">
+                                                <img src="~/ClientFilesLayout/TempPageBlock/@block.ImagePath" />
+                                            </div>
+                                        }
+                                        <div class="story-Header">
+                                            @if (!string.IsNullOrEmpty(block.TitleAr) || !string.IsNullOrEmpty(block.TitleEn))
+                                            {
+                                                <h4>
+                                                    <a style="color: #37a1a2;">
+                                                        @(isArabic ? block.TitleAr : block.TitleEn)
+                                                    </a>
+                                                </h4>
+                                            }
+                                            @if (!string.IsNullOrEmpty(block.SubTitleAr) || !string.IsNullOrEmpty(block.SubTitleEn))
+                                            {
+                                                <h3 style="color: #999;">
+                                                    @(isArabic ? block.SubTitleAr : block.SubTitleEn)
+                                                </h3>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(block.DescriptionAr) || !string.IsNullOrEmpty(block.DescriptionEn))
+                                        {
+                                            <div class="story-detail">
+                                                <h3>
+                                                    @(isArabic ? block.DescriptionAr : block.DescriptionEn)
+                                                </h3>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(block.Href))
+                                        {
+                                            <div class="spent-bar">
+                                                <a href="@block.Href" class="btn">@LayoutRES.ShowMore</a>
+                                            </div>
+                                        }
+                                    </div><!-- Story -->
+                                </div>
+                                if ((i % 3) == 0)
+                                {
+                                    @Html.Raw("</div>")
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!--Column Template-->

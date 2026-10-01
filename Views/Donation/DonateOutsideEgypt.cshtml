@@ -1,0 +1,292 @@
+﻿
+@model DTO.DonateOutsideDonationDto
+@using System.Configuration
+
+@{
+    ViewBag.Title = "DonateOutsideDonation";
+    Layout = null;
+}
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+@Styles.Render("~/Content/css")
+@Styles.Render("~/Content/WebsiteDesgin2/style.css")
+@Scripts.Render("~/bundles/modernizr")
+
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/toastrScript")
+
+<script src="~/Scripts/MersalScripts/DonationManagment/OnlineDonation.js?version=1.3"></script>
+@Html.Partial("~/Views/Shared/Partial/_ResoursePartial.cshtml")
+@if (ViewBag.donationModel != null)
+{
+    <div class="outSide-donation">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="outSide-page-title">
+                    <h2>Mersal</h2>
+                </div>
+                <div class="personal-info-card">
+                    <div class="form-group">
+                        <label>Contact</label> @ViewBag.donationModel.EmailAnonymous
+                    </div>
+                    <div class="form-group">
+                        <label>PaymentMethod</label> credit card
+                    </div>
+                </div>
+                <h3>Credit Detials</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="credit-card-container">
+                            <div class="credit-content">
+                                <div class="jp-card-shiny"></div>
+                                <p id="visaNumbers"> •••• •••• •••• •••• </p>
+                                <div class="card-expiry">
+                                    <span id="cardExpiry"></span>
+                                </div>
+
+                            </div>
+                            <div class="pass-content hide-pass-content">
+                                <div class="black-div"> </div>
+
+                                <div class="pass-field">
+                                    <div class="white-div">
+
+                                    </div>
+                                    <span id="SecrtNoOnCard"></span>
+                                </div>
+
+                                <div class="card-footer">
+                                    <div class="jp-card-shiny"></div>
+                                    <p>
+                                        That piece of plastic in your wallet can be a blessing, depending on how you use it. It can get you
+                                        great deals. It can let you monitor your spending and thus help with budgeting. It can be a savior in
+                                        a cash emergency
+                                    </p>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 box box-info">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "DonateOutsideEgyptForm" }))
+                        {
+                            <div class="form">
+                                <div class="box-body">
+                                    @Html.HiddenFor(x => x.Amount, new { id = "Amount" })
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label>
+                                                @Html.DisplayNameFor(model => model.CardNo) * :
+                                            </label>
+
+                                            @*@Html.DisplayFor(model => model.Name)*@
+                                            @Html.TextBoxFor(m => m.CardNo, new { @class = "form-control", placeholder = "4*** **** **** ****", type = "phone" })
+                                            @Html.ValidationMessage("CardNo", "Enter valid card no")
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label>
+                                                @Html.DisplayNameFor(model => model.EndDate) * :
+                                            </label>
+
+                                            @*@Html.DisplayFor(model => model.Name)*@
+                                            @*@Html.TextBoxFor(model => model.ExpirationDate, new { placeholder = "ExpirationDate" + "*", @class = "form-control", onfocus = "(this.type = 'datetime-local')" })*@
+                                            @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control", placeholder = "MM/YY", maxlength = '5' })
+                                            @Html.ValidationMessage("EndDate", "This field is requird")
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label>
+                                                @Html.DisplayNameFor(model => model.SecrtNo) * :
+                                            </label>
+
+                                            @*@Html.DisplayFor(model => model.Name)*@
+                                            @Html.TextBoxFor(m => m.SecrtNo, new { @class = "form-control", @maxlength = '4', placeholder = "xxxx", autocomplete = "off" })
+                                            @Html.ValidationMessage("SecrtNo", "This field is requird")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <div>
+                                    <div class="col-sm-6">
+                                        <br>
+                                        <input type="submit" itemprop="url" class="proceed" value="Donate" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="col-md-3 values">
+
+                <div class="sub-total">
+                    <span>Sub Total </span>
+                    <span>@ViewBag.donationModel.Amount.ToString()  $ USD</span>
+                </div>
+                <div class="service-fees">
+                    <span>Service Fees </span>
+                    <span>0.00  USD</span>
+                </div>
+
+                <div class="total-value">
+                    <span>Total</span>
+                    <span><b>@ViewBag.donationModel.Amount.ToString()</b>  $ USD</span>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <img src="~/images/loading2.gif" id="imgAjaxLoader" class="AjexLoader" style="display: none;">
+
+    <div class="modal fade" id="successOnlineDonation" role="dialog" data-backdrop="static" data-keyboard="false" style="z-index:10610000000;">
+        <div class="modal-dialog">
+            <div class="modal-body" style="background-color: #fff;text-align: center;">
+                <h3>Successful Transaction</h3>
+                <h4>Thanks For Your Donation</h4>
+            </div>
+            <div class="modal-footer" style="background-color: whitesmoke;">
+                <button type="button" class="btn btn-info" id="confirmsuccessOnlineDonation">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+
+}
+<script>
+
+    var succssfullTransaction = false;
+
+    $('#confirmsuccessOnlineDonation').click(function (e) {
+
+        $('#successOnlineDonation').modal('hide');
+        e.preventDefault();
+        if (succssfullTransaction) {
+            window.history.back();
+        }
+    });
+
+    var DonateOutsideEgyptForm = $("#DonateOutsideEgyptForm");
+
+    DonateOutsideEgyptForm.submit(function (e) {
+        $.validator.unobtrusive.parse(DonateOutsideEgyptForm);
+        e.preventDefault();
+        if (!DonateOutsideEgyptForm.valid()) return;
+
+        var apiurl = MersalUIBaseUrl + "Donation/DonateOutsideEgypt";
+        var data = {};
+        $("#DonateOutsideEgyptForm").serializeArray().map(function (x) { data[x.name] = x.value; });
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: apiurl,
+            crossDomain: true,
+
+            data: JSON.stringify(data),
+            async: true,
+            beforeSend: function () {
+                $("#imgAjaxLoader").show();
+            },
+            success: function (data) {
+                $("#imgAjaxLoader").hide();
+                if (data == "ok") {
+                    succssfullTransaction = true;
+                    $("#visaNumbers").text("");
+                    $("#SecrtNoOnCard").text("");
+                    document.getElementById("DonateOutsideEgyptForm").reset();
+                    $('#successOnlineDonation').find('h3').html("Successful Transaction");
+                    $('#successOnlineDonation').find('h4').html("Thanks For Your Donation");
+
+                    $('#successOnlineDonation').modal('show');
+
+                } else {
+                    succssfullTransaction = false;
+                    $('#successOnlineDonation').find('h3').html("Field Transaction");
+                    $('#successOnlineDonation').find('h4').html("Unfortunately Something went wrong");
+
+                    $('#successOnlineDonation').modal('show');
+                }
+
+            },
+            error: function (xhr) {
+                $("#imgAjaxLoader").hide();
+                toastr.error(xhr.error);
+            }
+        });
+    });
+
+
+    $(document).ready(function () {
+        $('#EndDate').keypress(function () {
+            var d = $('#EndDate').val();
+            if (d.length > 3) {
+                return;
+            }
+            if (d.length > 1 && d.includes("/") == false) {
+                d = d + "/";
+                $('#EndDate').val(d);
+            }
+        });
+
+        $("#CardNo").attr('maxlength', '16');
+
+        $('#CardNo').keyup(function () {
+
+            var x = $('#CardNo').val();
+            $("#visaNumbers").text(numberWithSpaces(x));
+
+        });
+
+        $('#CardEndDate').keyup(function () {
+            var x = $('#CardEndDate').val();
+            $("#cardExpiry").text(x);
+        });
+        $('#SecrtNo').keyup(function () {
+            var x = $('#SecrtNo').val();
+
+            $("#SecrtNoOnCard").text(x);
+
+        });
+
+        $('#CardNo').click(function (e) {
+            $(".credit-content").removeClass("hide-credit-content");
+            $(".pass-content").addClass("hide-pass-content");
+
+
+        });
+        $('#CardEndDate').click(function (e) {
+            $(".credit-content").removeClass("hide-credit-content");
+            $(".pass-content").addClass("hide-pass-content");
+
+
+        });
+
+        $('#SecrtNo').click(function (e) {
+            $(".credit-content").addClass("hide-credit-content");
+            $(".pass-content").removeClass("hide-pass-content");
+
+        });
+
+    });
+    function numberWithSpaces(x) {
+        let dummyTxt = x;
+        let joy = dummyTxt.match(/.{1,4}/g);
+        if (joy != null) {
+            return joy.join(' ');
+        }
+        return joy;
+    }
+
+</script>
+
+<style>
+    body {
+        height: 100%;
+    }
+</style>

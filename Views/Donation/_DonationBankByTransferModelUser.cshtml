@@ -1,0 +1,128 @@
+﻿@using Resource
+@using Kendo.Mvc.UI
+@model UserUI.Models.DonationByBankTransferViewModelUser
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+<div id="DonationBankByTransferTabs" class="donation-fields">
+    <div class="tabContainer">
+        <strong class="popup-title">
+            @DonationResources.DonationBankByTransferDescription
+        </strong>
+        @*<strong class="popup-title">@DonationResources.PERSONALDETAILS</strong>*@
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "DonationbyBankTransferForm" }))
+        {
+            <div class="form-group col-md-12 DonationDestinationTypeDiv" style="display:none;">
+                <label class="col-md-4 control-label FloatRight">@DonationResources.DonationDestination :</label>
+                <div class="col-sm-8">
+                    @Html.DropDownListFor(x => x.BankDonationDestinationId, new List<SelectListItem>(), new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form">
+                <input type="hidden" class="hidAccountIdDonation" name="AccountId" />
+                <input type="hidden" class="hidCaseIdDonation" name="CaseId" />
+                <input type="hidden" class="hidDonationType" name="DonationType" />
+
+                <div class="col-md-6">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.ValueAmount, new { Value = "", placeholder = DonationResources.EnterTheAmountYouWant+'*', onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                @Html.ValidationMessageFor(x => x.ValueAmount)
+            </div>
+        </div>
+                @*<div class="col-md-12 d-lg-flex">
+                    <ul class="donation-figures col-8">
+                        <li><a class="wpdonation-button " id="Donate10BankLogin" title="">10.00 EGP</a></li>
+                        <li><a class="wpdonation-button" id="Donate50BankLogin" title="">50.00 EGP</a></li>
+                        <li><a class="wpdonation-button" id="Donate100BankLogin" title="">100.00 EGP</a></li>
+                        <li><a class="wpdonation-button" id="Donate500BankLogin" title="">500.00 EGP</a></li>
+                        <li><a class="wpdonation-button active" id="OtherAmountBankLogin" title="Other Amount Online">@DonationResources.OtherAmount</a></li>
+                    </ul>
+                    <div class="donation-amount donation-amount-1  col-4 ">
+                        <div>
+
+
+                            @Html.TextBoxFor(x => x.ValueAmount, new { @class = "form-control amount_w", Id = "ValueAmountBankLogin", maxlength = 5, Value = "", placeholder = DonationResources.EnterTheAmountYouWant, onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+
+                            <span>EGP</span>
+
+                            <span id="validationBankLogin">
+                                @Html.ValidationMessageFor(x => x.ValueAmount)
+
+                            </span>
+
+                        </div>
+                    </div>
+                </div>*@
+                <div class="col-md-6">
+
+                    <div class="demo-section k-content @KendoClass ">
+                        @(Html.Kendo().Upload()
+                                    .Name("Image")
+                                     .Messages(m => m.Select(AlbumResource.Image).UploadSelectedFiles(LayoutRES.Submit))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*" })
+                                    .Multiple(false)
+                                    .Async(a => a
+                                    .Save("DonationBankByTransfer", "Donation")
+                                    .AutoUpload(false))
+                                    .Events(c => c
+                                    .Upload("onUploadBankTransferImageCreate").Success("onSuccessUploadDataCreate")
+                                     .Select("onSelectDonationImage"))
+                        )
+                        @Html.ValidationMessageFor(model => model.Image)
+                    </div>
+                </div>
+
+            </div>
+
+
+                <div class="row col-md-12 bottom_btn donate-now"><input type="submit" itemprop="url" class="proceed" value="@LayoutRES.Submit" /></div>
+
+        }
+    </div>
+</div>
+<style>
+    .amount_w {
+        width: 300px;
+    }
+
+    .donation-amount-1 .field-validation-error {
+        color: red !important;
+        font-weight: bold;
+        text-align: initial;
+        width: 100%;
+        float: left;
+    }
+</style>
+@*<script>
+
+    $('#Donate10BankLogin').click(function () {
+        $('#validationBankLogin').addClass('hidden');
+
+        $("#ValueAmountBankLogin").attr("readonly", true).val(10);
+    });
+
+    $('#Donate50BankLogin').click(function () {
+        $('#validationBankLogin').addClass('hidden');
+
+        $("#ValueAmountBankLogin").attr("readonly", true).val(50);
+    });
+
+    $('#Donate100BankLogin').click(function () {
+        $('#validationBankLogin').addClass('hidden');
+
+        $("#ValueAmountBankLogin").attr("readonly", true).val(100);
+    });
+
+    $('#Donate500BankLogin').click(function () {
+        $('#validationBankLogin').addClass('hidden');
+
+        $("#ValueAmountBankLogin").attr("readonly", true).val(500);
+    });
+
+    $('#OtherAmountBankLogin').click(function () {
+
+        $("#ValueAmountBankLogin").attr("readonly", false).val('');
+    });
+</script>*@

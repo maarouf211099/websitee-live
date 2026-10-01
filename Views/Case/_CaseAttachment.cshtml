@@ -1,0 +1,95 @@
+﻿@model IEnumerable<DTO.CaseAttachmentDTO>
+@using Kendo.Mvc.UI;
+@using Resource
+@using DTO
+@using UserUI.Helper
+@{
+    int i = 0;
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var dir = isArabic ? "rtl" : "ltr";
+
+}
+
+<div class="modal fade" id="CaseAttachmentModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Case Comment - @Html.DisplayFor(m => m.CaseName)</h4>*@
+                    <h4 class="modal-title">@CaseResources.CaseAttachment</h4>
+                    <input type="hidden" id="myCaseId" value="@ViewBag.caseId" />
+
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                    @if (Model.Any())
+                    {
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th style="text-align: center;">@CaseResources.FileName</th>
+                                    <th style="text-align: center;">@CaseResources.Download</th>
+
+                                    <th style="text-align: center;"></th>
+                                    @*<th style="width: 40px">@CaseResources.Download</th>*@
+                                </tr>
+                                @foreach (var item in Model)
+                                {
+                                    i++;
+                                    <tr id="@item.Id">
+                                        <td>@i</td>
+                                        <td>
+                                            <a target="_blank" href="/Case/ViewFile?caseId=@item.PerantId&FileName=@item.FileName">@item.FileName</a>
+                                            @*@item.FileName*@
+                                        </td>
+                                        <td class="text-center">
+
+                                            <a class="text-green" href="/Case/getFile?caseId=@item.PerantId&FileName=@item.FileName">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                            @if (item.CreatedBy == AuthorizationHelper.UserDetails().Id)
+                                            {
+                                                <a class="text-red" style="cursor:pointer" onclick="DeleteCaseAttachment('@item.Id')">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            }
+                                        </td>
+                                        <td class="text-center ImagePreviewBox">
+                                            <img class="img-fluid" width="70" height="70" src="~/ClientFilesLayout/Cases/@item.PerantId/@item.FileName" />
+                                        </td>
+                                        @*<td>
+                                                <span class="badge bg-green">
+                                                    <a href="/Case/getFile?caseId=@item.PerantId&FileName=@item.FileName">@CaseResources.Download</a>
+                                                </span>
+                                            </td>*@
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AddComment_FileToCase))
+                    {
+                        <div class="demo-section k-content" dir="ltr">
+                            @(Html.Kendo().Upload()
+                                    .Name("files")
+                                    .Messages(m => m.Select(CaseResources.Attachment))
+                                    .TemplateId("fileTemplate")
+                                    .HtmlAttributes(new { accept = "image/*,.pdf,.csv,.docx,.doc,.xls,.xlsx,application/vnd.ms-excel" })
+                                    .Async(a => a
+                                    .Save("UploadCaseAttachment", "Case", new { CaseId = ViewBag.caseId })
+                                    //.Remove("Remove", "Upload")
+                                    .AutoUpload(false))
+                            )
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

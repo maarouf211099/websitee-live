@@ -1,0 +1,160 @@
+﻿
+@model DTO.InventoryItemDTO
+@using Resource
+@using DTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+}
+
+<div class="modal fade" id="InventoryItemModals" role="dialog">
+    <div class="modal-dialog" style="width: 700px;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <div class="modal-title">
+                        <h3 class="modal-title">@Model.Id -  @Model.Name</h3>
+                    </div>
+                </div>
+                <div class="box-body">
+                        <div class="form-horizontal">
+                            <div class="form-group" @floatToRight>
+                                @Html.Label("" + InventoryItemsRes.ItemName + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(X=>X.Name)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label("" + InventoryItemsRes.CategoryId + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                @if (isArabic)
+                                {
+                                        <div class="col-md-8">
+                                            @Html.DisplayFor(x=>x.CategoryNameAr)
+                                        </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.CategoryNameEn)
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group">
+                                @Html.Label("" + InventoryItemsRes.TypeId + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                @if (isArabic)
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.TypeNameAr)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.TypeNameEn)
+                                    </div>
+                                }
+                            </div>
+                         
+                            <div class="form-group">
+                                @Html.Label("" + InventoryItemsRes.UnitId + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                @if (isArabic)
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.UnitStringAr)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.UnitStringEn)
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group">
+                                @Html.Label("" + InventoryItemsRes.FormulaId + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                @if (isArabic)
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.FormulaNameAr)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.FormulaNameEn)
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group">
+                                @Html.Label("" + InventoryItemsRes.PackingUnitId + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                @if (isArabic)
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.PackingUnitNameAr)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.PackingUnitNameEn)
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group">
+                                @Html.Label("" + InventoryItemsRes.ExchangeUnitId + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                @if (isArabic)
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=> x.ExchangeUnitNameAr)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-8">
+                                        @Html.DisplayFor(x=>x.ExchangeUnitNameEn)
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(""+InventoryItemsRes.PackingExchangeUnitsNumber+"", htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(x=>x.PackingExchangeUnitsNumber)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(""+ InventoryItemsRes.Description + "", htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(x=>x.Description)
+                                </div>
+                            </div>
+                        </div>
+                    <table class="table table-bordered textAligndir">
+                        <tbody>
+                            <tr>
+                                <th class="textAligndir">@InventoryItemsRes.Inventory</th>
+                                <th class="textAligndir">@InventoryItemsRes.Amount</th> 
+                            </tr>
+                            @foreach (var item in Model.storeItemList)
+                            {
+                                <tr>
+                                    <td>@item.StoreName</td>
+                                    <td>@item.Quantity</td> 
+                                </tr>
+                            } 
+                            <tr>
+                                <th class="textAligndir">@InventoryItemsRes.Total</th>
+                                <th class="textAligndir">@ViewBag.Total</th> 
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+﻿@model Components.UserManagement.DTO.UserDTORegister
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<!-- Sign Up Form -->
+<div class="signup-form popup-form">
+    <span class="close-btn"><i class="fa fa-remove"></i> @LayoutRES.Close</span>
+    @*<strong>@LayoutRES.joinFor<span>@LayoutRES.donation</span></strong>*@
+    <strong>@LayoutRES.CreateNewDonorAccount</strong> 
+    @* <p>Quis autem velum iure reprehe nderit. Lorem ipsum dolor sit nulla or narjusto laoreet onse ctetur adipisci.</p>*@
+    @using (Html.BeginForm("Register", "Account", null, FormMethod.Post, new { role = "form", id = "RegisterForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row">
+     <div> 
+         <div class="col-md-6" floatToRight style="align-items:center">
+             <div class="col-md-6">
+                 <label  for="BenefactorRadioId" style="margin-top:25%;position:relative;">متبرع </label>
+             </div>
+             <div class="col-md-6">
+                 <input type="radio" name="LocationId" id="BenefactorRadioId"  checked value="@((int)UserType.PendingAddedValue + (int)UserType.Donar )" />
+             </div>
+    </div>
+         <div class="col-md-6"  floatToRight>
+             <div class="col-md-6">
+                 <label for="@((int)UserType.PendingAddedValue + (int)UserType.Volunteer)" style="margin-top:25%;position:relative;"> متطوع </label>
+             </div> 
+             <div class="col-md-6">
+                 <input id="VolunteerRadioId" type="radio" name="LocationId"  floatToRight value="@((int)UserType.PendingAddedValue + (int)UserType.Donar)" />
+             </div>
+         </div>       
+     </div>
+    @Html.TextBoxFor(m => m.FirstName, new { placeholder = Html.DisplayNameFor(m => m.FirstName) })
+    @Html.ValidationMessageFor(m => m.FirstName)
+    <br />
+    @Html.TextBoxFor(m => m.LastName, new { placeholder = Html.DisplayNameFor(m => m.LastName) })
+    @Html.ValidationMessageFor(m => m.LastName)
+    <br />
+    @Html.TextBoxFor(m => m.Email, new { placeholder = Html.DisplayNameFor(m => m.Email) })
+    @Html.ValidationMessageFor(m => m.Email)
+    <br />
+    @Html.TextBoxFor(m => m.Phone, new { placeholder = Html.DisplayNameFor(m => m.Phone) })
+    @Html.ValidationMessageFor(m => m.Phone)
+    <br />
+    @Html.PasswordFor(m => m.Password, new { placeholder = Html.DisplayNameFor(m => m.Password) })
+    @Html.ValidationMessageFor(m => m.Password)
+    <br />
+    @Html.TextBoxFor(m => m.ConfirmPassword, new { placeholder = Html.DisplayNameFor(m => m.ConfirmPassword), type = "password" })
+    @Html.ValidationMessageFor(m => m.ConfirmPassword)
+    <br />
+    <div dir="@dir">
+        <div class="col-sm-4 @floatToRight">
+            <h5 class="h5White">@Html.DisplayNameFor(m => m.Country)</h5>
+            @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country regiser-Country border-radius3px select2 select2-hidden-accessible" })
+            @Html.ValidationMessageFor(m => m.Country)
+        </div>
+        <div class="col-sm-4 @floatToRight">
+            <h5 class="h5White">@Html.DisplayNameFor(m => m.Governorate)</h5>
+            @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate regiser-Governorate border-radius3px select2 select2-hidden-accessible", id = "GovernorateRegister" })
+            @Html.ValidationMessageFor(m => m.Governorate)
+        </div>
+        <div class="col-sm-4 @floatToRight">
+            <h5 class="h5White">@Html.DisplayNameFor(m => m.District)</h5>
+            @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "select2 border-radius3px select2-hidden-accessible", id = "DistrictRegister" })
+            @Html.ValidationMessageFor(m => m.District)
+        </div>
+    </div>
+    @Html.TextBoxFor(m => m.AddressLine1, new { placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+    @Html.ValidationMessageFor(m => m.AddressLine1)
+    <br />
+    @Html.TextBoxFor(m => m.AddressLine2, new { placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+    @Html.ValidationMessageFor(m => m.AddressLine2)
+    <br />
+    <div class="col-md-12"><p>@LayoutRES.ByCreatingAnAccountYouAgreeToOur <a itemprop="url" href="#" title="">@LayoutRES.Terms_Conditions</a></p></div>
+    <div class="col-md-12"><input type="submit" value="@LayoutRES.CreateAccount" /></div>
+</div>
+    }
+</div> 

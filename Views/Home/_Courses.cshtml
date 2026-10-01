@@ -1,0 +1,74 @@
+﻿@using Resource
+
+<input type="hidden" value="false" id="publicActData" />
+<input type="hidden" value="false" id="academicActData" />
+  
+<section style="display:none;" id="academiaActivitySection">
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div>
+                        <img itemprop="image" style="position: absolute;left: 0;top: 0;" src="~/images/graySmile.png" alt="" />
+                    </div>
+                </div>
+                <div class="col-md-12 column">
+                    <div class="title2">
+                        <h1>@LayoutRES.AcademiaEvents</h1>
+                        <span>@LayoutRES.CommittedToProvidingTheBest</span>
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="academiaActivitiesContainerDiv">
+                         
+                        </div><!-- Successful Stories -->
+                        <div class="showMore">
+                            <a href="/Activities?IsAcademia=true" class="btn">@LayoutRES.ShowMore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section style="display:none;" id="ActivitySection">
+    <div class="block">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div> 
+                        <img itemprop="image" style="position: absolute;left: 0;top: 0;" src="~/images/graySmile.png" alt="" />
+                    </div>
+                </div>
+                <div class="col-md-12 column">
+                    <div class="title2">
+                        <h1>@LayoutRES.PublicEvents</h1>
+                        <span>@LayoutRES.CommittedToProvidingTheBest</span>
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="publicactivitiesContainerDiv">
+
+
+                        </div><!-- Successful Stories --> 
+                        <div class="showMore">
+                            <a href="/Activities?IsAcademia=false" class="btn">@LayoutRES.ShowMore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script>
+    $(document).ready(function () {
+     
+        drawPublicActivities.start(MersalWebAPIBaseUrl, '@Url.Action("Details", "Activities")' + '?Id=',3,0);
+        drawAcademiaActivities.start(MersalWebAPIBaseUrl, '@Url.Action("Details", "Activities")' + '?Id=',3,0);
+
+    })
+</script>
+ 

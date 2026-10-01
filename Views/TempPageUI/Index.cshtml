@@ -1,0 +1,110 @@
+﻿@model  IEnumerable<TempPageDTO>
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = @DynamicPagesRES.HeaderTitle  ;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var tblTextAlign = isArabic ? "tblText" : "";
+}
+<style>
+    .tblText tr {
+        text-align: right;
+    }
+
+    .tblText th {
+        text-align: right;
+    }
+</style>
+
+<div class="form-group">
+    <button onclick="$('#TempPageModals').modal('show');" type="button" class="btn btn-info">@DynamicPagesRES.Createpage</button>
+    <a id="ViewTempPageDeleted" href="/TempPageUI/Index?isdeleted=true" class="btn btn-info">@DynamicPagesRES.ViewDeleted </a>
+    <a id="ViewTempPageActive" href="/TempPageUI/Index?isdeleted=false" class="btn btn-info" style="display:none;">@DynamicPagesRES.Showeffective</a> 
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">@DynamicPagesRES.HeaderTitle </h3>
+            </div>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody class="@tblTextAlign">
+                        <tr>
+                            <th>@DynamicPagesRES.TitleEN</th>
+                            <th>@DynamicPagesRES.TitleAR</th>
+                            <th>@DynamicPagesRES.SubTitleEn</th>
+                            <th>@DynamicPagesRES.SubTitleAr</th>
+                            <th>@DynamicPagesRES.TemplateId</th>
+                            <th>@DynamicPagesRES.Href </th>
+                            <th>@DynamicPagesRES.Content</th>
+                            <th>@DynamicPagesRES.Edit </th>
+                            <th>@DynamicPagesRES.Delete </th>
+                        </tr>
+                        @if (Model != null)
+                        {
+                            if (Model.Any())
+                            {
+
+                                foreach (var page in Model)
+                                {
+                                    <tr id="S_@page.Id">
+                                        <td>@page.TitleEn</td>
+                                        <td>@page.TitleAr</td>
+                                        <td>@page.SubTitleEn</td>
+                                        <td>@page.SubTitleAr</td> 
+                                        @switch (page.TemplateId)
+                                        {
+                                            case 1:
+                                                <td>Column</td>
+                                                break;
+                                            case 2:
+                                                <td>Rows</td>
+                                                break;
+                                            case 3:
+                                                <td>Tabs</td>
+                                                break;
+                                            case 4:
+                                                <td>Accordion</td> 
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        
+                                        <td><a href="~/TempPageUI/pageview/@page.Id" target="_blank">/TempPageUI/pageview/@page.Id</a></td>
+                                        <th><a class="label label-primary" href="/TempPageUI/TempPageDetails/@page.Id">@DynamicPagesRES.Content </a> </th>
+                                        <td><span class="label label-success" style="cursor: pointer;" onclick="getTempPageDetails('@page.Id')">@DonationSlideResource.Details</span></td>
+                                        <th><span class="label label-danger" style="cursor: pointer;" onclick="DeleteTempPage('@page.Id')">@DonationSlideResource.Delete </span> </th>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="CreateTempPageDiv">
+    @Html.Partial("~/Views/TempPageUI/_CreateTempPage.cshtml", new TempPageDTO())
+</div>
+
+<div id="EditTempPageDiv">
+
+</div>
+
+@section Scripts {
+     <script src="~/Scripts/MersalScripts/LayoutManagment/AdminTempPage.js"></script> 
+    @*@Scripts.Render("~/bundles/TempPage")*@
+}
+
+
+
+

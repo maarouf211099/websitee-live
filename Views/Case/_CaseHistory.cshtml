@@ -1,0 +1,45 @@
+﻿@model IEnumerable<DTO.CaseStateHistoryDTO>
+@using System.Globalization;
+@using Resource
+@using DTO
+@using UserUI.Helper
+
+<div class="modal fade" id="CaseHistoryModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button> 
+                    <h4 class="modal-title">@CaseResources.CaseHistory</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body AccordionDiv"> 
+                        @if (Model.Any())
+                        {
+                            foreach (var hist in Model)
+                            {
+                                <h3>
+                                    @hist.UserName  - @hist.CreatedOn.ToString("d/M/yyyy HH:mm", CultureInfo.InvariantCulture)
+                                </h3>
+                                <div>@hist.CodeNameAr - @hist.CodeNameEn  </div>
+                                <br />
+
+                            }
+                        } 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".AccordionDiv").accordion({
+            collapsible: true,
+            active: true,
+            header: "h3",
+            heightStyle: "content",
+        });
+    });
+</script>

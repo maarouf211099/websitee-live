@@ -1,0 +1,80 @@
+﻿@model TempPageDTO
+@using DTO
+@using Resource
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+}
+
+
+
+<!--Tabs Template-->
+<section>
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div class="title2">
+                        @if (!string.IsNullOrEmpty(Model.TitleAr) || !string.IsNullOrEmpty(Model.TitleEn))
+                        {
+                            <h1>@(isArabic ? Model.TitleAr : Model.TitleEn)</h1>
+                        }
+                        <span>@(isArabic ? Model.SubTitleAr : Model.SubTitleEn)</span>
+                    </div>
+                    @if (Model.TempPageBlockDTOList.Any())
+                    {
+                        <div id="accordionTemp">
+                            @foreach (var block in Model.TempPageBlockDTOList)
+                            {
+                                <div class="accordionHeader">
+                                    <i class="fa fa-minus"></i>
+                                    @if (!string.IsNullOrEmpty(block.TitleAr) || !string.IsNullOrEmpty(block.TitleEn))
+                                    {
+                                        <a href="#">@(isArabic ? block.TitleAr : block.TitleEn)</a>
+                                    }
+                                </div>
+                                <div class="RowsTemp accordionBody">
+                                    <div class="row">
+                                        @if (!string.IsNullOrEmpty(block.ImagePath))
+                                        {
+                                            <div class="col-md-4">
+                                                <div style="min-height: 200px;">
+                                                    <img src="~/ClientFilesLayout/TempPageBlock/@block.ImagePath" style="width:100%;" />
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class='@(string.IsNullOrEmpty(block.ImagePath)? "col-md-12" :  "col-md-8" )'>
+                                            @if (!string.IsNullOrEmpty(block.SubTitleAr) || !string.IsNullOrEmpty(block.SubTitleEn))
+                                            {
+                                                <h4>
+                                                    @(isArabic ? block.SubTitleAr : block.SubTitleEn)
+                                                </h4>
+                                            }
+                                            @if (!string.IsNullOrEmpty(block.DescriptionAr) || !string.IsNullOrEmpty(block.DescriptionEn))
+                                            {
+                                                <h5>
+                                                    @(isArabic ? block.DescriptionAr : block.DescriptionEn)
+                                                </h5>
+                                            }
+                                        </div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(block.Href))
+                                    {
+                                        <div class="showMore">
+                                            <a href="@block.Href" class="btn">@LayoutRES.ShowMore</a>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!--Tabs Template-->
+
+

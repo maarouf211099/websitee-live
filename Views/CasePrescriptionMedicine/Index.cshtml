@@ -1,0 +1,37 @@
+﻿@using UserUI.Helper
+@using Resource.Pharmacy.CasePrescription
+@{
+    ViewBag.Title = CasePrescriptionRES.CasePrescriptions;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>@CasePrescriptionRES.CasePrescriptions</title>
+</head>
+
+<br />
+<br />
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+@section Scripts {
+    <script>
+        var CaseId =  '@CasePrescriptionRES.CaseId';
+        var CaseName = '@CasePrescriptionRES.CaseName';
+        var Prescription = '@CasePrescriptionRES.Prescription';
+        var CreatedOn = '@CasePrescriptionRES.CreatedOn';
+    </script>
+
+
+    <script src="~/Scripts/PharmacyScripts/casePrescriptionMedicine/prescriptionMedicineIndex.js"></script>
+    <script>
+        $(document).ready(function () {
+            RefreshGird();
+        });
+    </script>
+}

@@ -1,0 +1,56 @@
+﻿
+@model DTO.Pharmacy.RepresentativeDtos.AddRepresentativeDto
+@using Resource
+@using Resource.Pharmacy
+@using UserUI.Helper
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<div class="modal fade" id="AddRepresentativeModals" role="dialog" dir="@dir">
+    <div class="modal-dialog" style="width: 900px;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@StoreRes.Add</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                @using (Html.BeginForm("Create", "Representative", null, FormMethod.Post, new { @class = "form-horizontal", id = "AddRepresentativeForm" }))
+                {
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.Id)
+                <div class="box-body">
+                    @Html.DisplayNameFor(m => m.Code)
+                    @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Code), disabled = "true" })
+                    @Html.ValidationMessageFor(m => m.Code)
+                    <br />
+                    @Html.DisplayNameFor(m => m.Name)
+                    @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Name) })
+                    @Html.ValidationMessageFor(m => m.Name)
+                    <br />
+
+
+                    @Html.DisplayNameFor(m => m.IsActive)
+                    @Html.CheckBoxFor(m => m.IsActive)
+                    @Html.ValidationMessageFor(m => m.IsActive)
+                    <br />
+                </div>
+
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                    </div><!-- /.box-footer -->
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,121 @@
+﻿
+@using Kendo.Mvc.UI
+@using Notification.DTO
+@using Resource
+@{
+    var DefaultTitle = ViewData["title"];
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    if (isArabic)
+    {
+       <script src = "/Scripts/Kendo/cultures/Scheduler/kendo.culture.ar-SA.js" ></script >
+    }
+    else
+    {
+         <script src = "/Scripts/Kendo/cultures/Scheduler/kendo.culture.en-US.js" ></script >
+        
+    }
+} 
+    <script src="~/Scripts/js/kendo.timezones.min.js"></script>
+    <div id="scheduler" class="@schedulerClass">
+        @(Html.Kendo().Scheduler<ReminderDTO>()
+               .Name("scheduler")
+               .Date(DateTime.Now)
+               .AutoBind(true)
+               .Height(600)
+               .AllDaySlot(false)
+               .Editable(d => d.TemplateId("customEditorTemplate"))
+               //.Editable(true)
+               .Views(views =>
+               {
+                   views.DayView();
+                   views.WorkWeekView(w => w.Selected(true).WorkWeekStart(7));
+                   views.WeekView();
+                   views.MonthView();
+                   views.AgendaView();
+                   views.TimelineView();
+               })
+              .DataSource(d => d
+              .Model(m =>
+              {
+                  m.Id(f => f.Id);
+                  m.Field(f => f.Title).DefaultValue(DefaultTitle);
+
+              })
+             .Read("Read", "Reminder")
+             .Create("Add", "Reminder", new { PId = ViewBag.ReminderPerant })
+             .Destroy("Destroy", "Reminder")
+             .Update("Update", "Reminder")
+             )
+        )
+
+    </div>
+
+
+    <!-- edit custom template -->
+    <script id="customEditorTemplate" type="text/x-kendo-template">
+        <div class="k-edit-label"><label for="title">@ReminderRES.Title</label></div>
+        <div data-container-for="title" class="k-edit-field">
+            <input type="text" class="k-input k-textbox" name="title" required="required" data-bind="value:title"/>
+        </div>
+        <div class="k-edit-label">
+            <label for="start">@ReminderRES.Start</label>
+        </div>
+        <div data-container-for="start" class="k-edit-field">
+            <input type="text"
+                   data-role="datetimepicker"
+                   data-interval="15"
+                   data-type="date"
+                   data-bind="value:start,invisible:isAllDay"
+                   name="start" />
+            <input type="text" data-type="date" data-role="datepicker" data-bind="value:start,visible:isAllDay" name="start" />
+            <span data-bind="text: startTimezone"></span>
+            <span data-for="start" class="k-invalid-msg" style="display: none;"></span>
+        </div>
+        <div class="k-edit-label">
+            <label for="end">@ReminderRES.End</label>
+        </div>
+        <div data-container-for="end" class="k-edit-field">
+            <input type="text" data-type="date" data-role="datetimepicker" data-bind="value:end,invisible:isAllDay" name="end" data-datecompare-msg="End date should be greater than or equal to the start date" />
+            <input type="text" data-type="date" data-role="datepicker" data-bind="value:end,visible:isAllDay" name="end" data-datecompare-msg="End date should be greater than or equal to the start date" />
+            <span data-bind="text: endTimezone"></span>
+            <span data-bind="text: startTimezone, invisible: endTimezone"></span>
+            <span data-for="end" class="k-invalid-msg" style="display: none;"></span>
+        </div>
+        <div class="k-edit-label">
+            <label for="recurrenceRule">@ReminderRES.Repeat</label>
+        </div>
+        <div data-container-for="recurrenceRule" class="k-edit-field">
+            <div data-bind="value:recurrenceRule" name="recurrenceRule" data-role="recurrenceeditor"></div>
+        </div>
+        <div class="k-edit-label">
+            <label for="Recipients">@ReminderRES.Recipients</label>
+        </div>
+        <div class="k-edit-field" data-container-for="Recipients">
+            <input type="text" class="k-input k-textbox" name="Recipients" data-bind="value:Recipients" style="width:100%" />
+        </div>
+        <div class="k-edit-label">
+            <label for="description">@ReminderRES.Description</label>
+        </div>
+        <div data-container-for="description" class="k-edit-field">
+            <textarea name="description" class="k-textbox" required="required" data-bind="value:description"></textarea>
+        </div>
+        <div class="k-edit-label">
+            <label for="NotificationType">@ReminderRES.NotificationType</label>
+        </div>
+        <div data-container-for="NotificationType" class="k-edit-field">
+            <select id="NotificationType" data-bind="value:NotificationType" data-role="dropdownlist"
+                    data-value-field="value" data-text-field="text">
+                <option value="1">@ReminderRES.Email</option>
+                <option value="2">@ReminderRES.SMS</option>
+                <option value="3">@ReminderRES.UI</option>
+                <option value="4">@ReminderRES.EmailAndSMS</option>
+                <option value="5">@ReminderRES.EmailAndUI</option>
+                <option value="6">@ReminderRES.UIAndSMS</option>
+                <option value="7">@ReminderRES.All</option>
+            </select>
+        </div>  
+    </script>
+
+ 

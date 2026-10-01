@@ -1,0 +1,1241 @@
+﻿@model DTO.CaseDetailsDTO
+
+@using Resource
+@using UserUI.Helper
+@using DTO
+@using System.Configuration
+@using Kendo.Mvc.UI
+@using System.Globalization
+@{
+    if (Model != null)
+    {
+        ViewBag.Title = Model.Id + " : " + Model.Name;
+    }
+    else
+    {
+        ViewBag.Title = "No Date Available";
+    }
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+
+}
+
+@if (Model == null)
+{
+    return;
+}
+<div class="modal-body">
+    <div class="box box-info">
+        @*<input type="hidden" value="@AuthorizationHelper.UserId" id="LoginUserId"/>*@
+        @*@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EditCase) && Model.ScState.Code != CaseState.csRJ.ToString())*@
+        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EditCase))
+        {
+            <div>
+                @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "EditCaseAdminForm" }))
+                {
+                    <div class="box-header with-border">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" style="text-align: center;">@Model.Id - @Model.Name  [ @CaseResources.RequiredAmount : @Model.RequiredAmount - @CaseResources.CollectedAmount :  @Model.CurrentBalance ]  </h4>
+                        <input id="CaseIdHID" type="hidden" value="@Model.Id" />
+                        <input id="CaseState" type="hidden" value="@Model.ScState.Code" />
+                        @Html.HiddenFor(x => x.Id)
+                        @*@Html.HiddenFor(x => x.Name)*@
+                    </div><!-- /.box-header -->
+                    <div class="box-body AccordionDiv" style="margin: 5px;">
+                        <div class="headOfAccordion">
+                            @CaseResources.BasicData
+                        </div>
+                        <div>
+                            @if (Model.ScState.Code == CaseState.csCO.ToString() || Model.ScState.Code == CaseState.csUC.ToString())
+                            {
+                                <div class="form-group">
+                                    <div class="col-sm-8 @floatToRight">
+                                        Case Link <input class="form-control" onkeypress="return false" type="text" value="@ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/CaseView/@Model.Id">
+                                    </div>
+                                </div>
+                            }
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    @Html.DisplayNameFor(m => m.Name)
+                                    <br />
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Name) })
+                                    @Html.ValidationMessageFor(m => m.Name)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.DisplayNameFor(m => m.Description)
+                                @Html.TextAreaFor(m => m.Description, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Description), rows = "5" })
+                                @Html.ValidationMessageFor(m => m.Description)
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    @Html.DisplayNameFor(m => m.Phone)
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Phone) })
+                                    @Html.ValidationMessageFor(m => m.Phone)
+                                </div>
+                                <div class="col-sm-4">
+                                    @Html.DisplayNameFor(m => m.Mobile)
+                                    @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Mobile) })
+                                    @Html.ValidationMessageFor(m => m.Mobile)
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="hidden" value="@Model.Nationality" id="nationalityHID" />
+                                    @Html.DisplayNameFor(m => m.Nationality)
+                                    @Html.DropDownListFor(x => x.Nationality, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Nationality)
+                                </div>
+                                @*<div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.NickName)
+                                        @Html.TextBoxFor(m => m.NickName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.NickName) })
+                                        @Html.ValidationMessageFor(m => m.Phone)
+                                    </div>*@
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <input type="hidden" value="@Model.StatusInEgyptId" id="statusInEgyptHID" />
+                                    @Html.DisplayNameFor(m => m.StatusInEgyptId)
+                                    @Html.DropDownListFor(x => x.StatusInEgyptId, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.StatusInEgyptId)
+                                </div>
+                                @*<div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.Email)
+                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Email) })
+                                        @Html.ValidationMessageFor(m => m.Email)
+                                    </div>*@
+                                <div class="col-sm-4">
+                                    @Html.DisplayNameFor(m => m.Age)
+                                    @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Age) })
+                                    @Html.ValidationMessageFor(m => m.Age)
+                                </div>
+                                <div class="col-sm-4">
+                                    @Html.DisplayNameFor(m => m.Job)
+                                    @Html.TextBoxFor(m => m.Job, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Job) })
+                                    @Html.ValidationMessageFor(m => m.Job)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    @Html.DisplayNameFor(m => m.Education)
+                                    @Html.TextBoxFor(m => m.Education, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Education) })
+                                    @Html.ValidationMessageFor(m => m.Education)
+                                </div>
+                                <div class="col-sm-4">
+                                    @Html.DisplayNameFor(m => m.NationalId)
+                                    @Html.TextBoxFor(m => m.NationalId, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.NationalId) })
+                                    @Html.ValidationMessageFor(m => m.NationalId)
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="hidden" value="@Model.ReligionId" id="religionHID" />
+                                    @Html.DisplayNameFor(m => m.ReligionId)
+                                    @Html.DropDownListFor(x => x.ReligionId, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.ReligionId)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4  @floatToRight">
+                                    <input type="hidden" value="@Model.Gender" id="GenderHID" />
+                                    @Html.DisplayNameFor(m => m.Gender)
+                                    @Html.DropDownListFor(x => x.Gender, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Gender)
+                                </div>
+                                <div class="col-sm-4  @floatToRight">
+                                    <input type="hidden" value="@Model.SocialStatus" id="socialStatusHID" />
+                                    @Html.DisplayNameFor(m => m.SocialStatus)
+                                    @Html.DropDownListFor(x => x.SocialStatus, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.SocialStatus)
+                                </div>
+                                <div class="col-sm-4  @floatToRight">
+                                    @Html.DisplayNameFor(m => m.NumberOfChildren)
+                                    @Html.TextBoxFor(m => m.NumberOfChildren, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.NumberOfChildren) })
+                                    @Html.ValidationMessageFor(m => m.NumberOfChildren)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="hide col-sm-3 @floatToRight">
+                                    <input type="hidden" value="@Model.Country" id="caseCountryHID" />
+                                    @Html.DisplayNameFor(m => m.Country)
+                                    @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country adminEditCase-Country form-control" })
+                                    @Html.ValidationMessageFor(m => m.Country)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    <input type="hidden" value="@Model.Governorate" id="caseGovernorateHID" />
+                                    @Html.DisplayNameFor(m => m.Governorate)
+                                    @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate adminEditCase form-control", id = "GovernorateAdminEditCase" })
+                                    @Html.ValidationMessageFor(m => m.Governorate)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    <input type="hidden" value="@Model.District" id="caseDistrictHID" />
+                                    @Html.DisplayNameFor(m => m.District)
+                                    @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "District adminEditCase form-control", id = "DistrictAdminEditCase" })
+                                    @Html.ValidationMessageFor(m => m.District)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.Region)
+                                    @Html.TextBoxFor(x => x.Region, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Region)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.AddressLine1)
+                                    @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                                    @Html.ValidationMessageFor(m => m.AddressLine1)
+                                </div>
+                                <div class="col-sm-6 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.AddressLine2)
+                                    @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                                    @Html.ValidationMessageFor(m => m.AddressLine2)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.NameAnonymous)
+                                    @Html.TextBoxFor(m => m.NameAnonymous, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.NameAnonymous) })
+                                    @Html.ValidationMessageFor(m => m.NameAnonymous)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.AddressAnonymous)
+                                    @Html.TextBoxFor(m => m.AddressAnonymous, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressAnonymous) })
+                                    @Html.ValidationMessageFor(m => m.AddressAnonymous)
+                                </div>
+                                <div class="col-sm-4 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.PhoneNumberAnonymous)
+                                    @Html.TextBoxFor(m => m.PhoneNumberAnonymous, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.AddressAnonymous) })
+                                    @Html.ValidationMessageFor(m => m.PhoneNumberAnonymous)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @*<div class="col-sm-4 @floatToRight">
+                                        @Html.DisplayNameFor(m => m.EmailAnonymous)
+                                        @Html.TextBoxFor(m => m.EmailAnonymous, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.EmailAnonymous) })
+                                        @Html.ValidationMessageFor(m => m.EmailAnonymous)
+                                    </div>*@
+                                @if (!string.IsNullOrEmpty(Model.OrganizationName))
+                                {
+                                    <div class="col-sm-4">
+                                        <label>
+                                            @Html.DisplayNameFor(m => m.OrganizationName):
+                                        </label>
+
+                                        @Html.DisplayFor(m => m.OrganizationName)
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.ScOrgnization.NameAr))
+                                {
+                                    <div class="col-sm-4">
+                                        <label>
+                                            @Html.DisplayNameFor(m => m.OrganizationType):
+                                        </label>
+                                        @if (isArabic)
+                                        {
+                                            @Html.DisplayFor(model => model.ScOrgnization.NameAr)
+
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(model => model.ScOrgnization.NameEn)
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 @floatToRight">
+                                    <input type="hidden" value="@Model.HomeType" id="caseHomeTypeHID" />
+                                    @Html.DisplayNameFor(m => m.HomeType)
+                                    @Html.DropDownListFor(x => x.HomeType, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.HomeType)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.ContractDuration)
+                                    @Html.TextBoxFor(m => m.ContractDuration, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.ContractDuration) })
+                                    @Html.ValidationMessageFor(m => m.ContractDuration)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.ContractValue)
+                                    @Html.TextBoxFor(m => m.ContractValue, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.ContractValue) })
+                                    @Html.ValidationMessageFor(m => m.ContractValue)
+                                </div>
+                                <div class="col-sm-3 @floatToRight">
+                                    @Html.DisplayNameFor(m => m.RoomCount)
+                                    @Html.TextBoxFor(m => m.RoomCount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.RoomCount) })
+                                    @Html.ValidationMessageFor(m => m.RoomCount)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.DisplayNameFor(m => m.Furniture)
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-2 @floatToRight">
+                                    <input type="hidden" value="@Model.Furniture" id="caseFurnitureHID" />
+                                    @Html.DropDownListFor(x => x.Furniture, new List<SelectListItem>(), new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.BathRoom)
+                                    @Html.DisplayNameFor(m => m.BathRoom)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.SharedBathroom)
+                                    @Html.DisplayNameFor(m => m.SharedBathroom)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.Kitchen)
+                                    @Html.DisplayNameFor(m => m.Kitchen)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.ReceptionRoom)
+                                    @Html.DisplayNameFor(m => m.ReceptionRoom)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.HealthyHome)
+                                    @Html.DisplayNameFor(m => m.HealthyHome)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.CleanHome)
+                                    @Html.DisplayNameFor(m => m.CleanHome)
+                                </div>
+
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.Refrigerator)
+                                    @Html.DisplayNameFor(m => m.Refrigerator)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.Washer)
+                                    @Html.DisplayNameFor(m => m.Washer)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.Cooker)
+                                    @Html.DisplayNameFor(m => m.Cooker)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.TV)
+                                    @Html.DisplayNameFor(m => m.TV)
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.Kendo().CheckBoxFor(m => m.AirConditioning)
+                                    @Html.DisplayNameFor(m => m.AirConditioning)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input onclick="GetCaseFamilyMember('@Model.Id')" type="button" value="@CaseResources.CaseFamilyMember" class="btn btn-info" />
+                                <input onclick="GetCaseFamilyBudget('@Model.Id')" type="button" value="@CaseResources.CaseFamilyBudget" class="btn btn-info" />
+                                <input onclick="GetCaseAssistantDetails('@Model.Id')" type="button" value="@CaseResources.CaseAssistantDetails" class="btn btn-info" />
+                            </div>
+                        </div>
+                        <div class="headOfAccordion">
+                            @CaseResources.AdministrativeData
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label>
+                                        @Html.DisplayNameFor(model => model.CurrantState) :
+                                    </label>
+                                    @if (!string.IsNullOrEmpty(Model.ScState.NameAr))
+                                    {
+                                        if (isArabic)
+                                        {
+                                            @Html.DisplayFor(model => model.ScState.NameAr)
+
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(model => model.ScState.NameEn)
+                                        }
+                                    }
+                                </div>
+
+                                @*<div class="col-sm-4">
+                                        @Html.DisplayNameFor(m => m.RequiredAmount)
+                                        @Html.TextBoxFor(m => m.RequiredAmount, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.RequiredAmount), @type = "number" })
+                                        @Html.ValidationMessageFor(m => m.RequiredAmount)
+                                    </div>*@
+                                <div class="col-sm-4">
+                                    <input type="hidden" value="@Model.Category" id="caseCategoryHID" />
+                                    @Html.DisplayNameFor(model => model.Category)
+                                    @Html.DropDownListFor(x => x.Category, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Category)
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="hidden" value="@Model.Priority" id="casePriorityHID" />
+                                    @Html.DisplayNameFor(model => model.Priority)
+                                    @Html.DropDownListFor(x => x.Priority, new List<SelectListItem>(), new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Priority)
+                                </div>
+                            </div>
+                            <div id="serviceArea">
+                                @Html.HiddenFor(x => x.serviceIDs)
+                                <div class="form-group" dir="@dir">
+                                    <div class="col-sm-12">
+                                        @Html.Label(CaseResources.ServiceType)
+                                    </div>
+                                    <div class="caseServiceDiv">
+
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group" dir="@dir">
+                                    <div class="col-sm-12">
+                                        @Html.Label(CaseResources.DisesaseType)
+                                    </div>
+                                    <div class="caseDiseaseDiv">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    @Html.DisplayNameFor(m => m.CurrentSituation)
+                                    @Html.TextAreaFor(m => m.CurrentSituation, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CurrentSituation), rows = "4" })
+                                    @Html.ValidationMessageFor(m => m.CurrentSituation)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    @Html.DisplayNameFor(m => m.Needed) @*- @Html.DisplayFor(m => m.NeededDateString)*@
+                                    @Html.TextAreaFor(m => m.Needed, new { style = textAlignRight, @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Needed), rows = "4" })
+                                    @Html.ValidationMessageFor(m => m.Needed)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label>
+                                        @Html.DisplayNameFor(model => model.Source) :
+                                    </label>
+
+                                    @if (!string.IsNullOrEmpty(Model.ScSource.NameAr))
+                                    {
+                                        if (isArabic)
+                                        {
+                                            @Html.DisplayFor(model => model.ScSource.NameAr)
+
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(model => model.ScSource.NameEn)
+                                        }
+                                    }
+                                </div>
+                                <div class="col-sm-3">
+                                    <label>
+                                        @Html.DisplayNameFor(model => model.CreatedOn) :
+                                    </label>
+
+                                    @Html.DisplayFor(model => model.CreatedOnString)
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.InvestigatorName))
+                                {
+                                    <div class="col-sm-3">
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.InvestigatorName) :
+                                        </label>
+                                        @Html.DisplayFor(model => model.InvestigatorName)
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.employeeName))
+                                {
+                                    <div class="col-sm-3">
+                                        <label>
+                                            @Html.DisplayNameFor(model => model.employeeName) :
+                                        </label>
+                                        @Html.DisplayFor(model => model.employeeName)
+                                    </div>
+                                }
+                            </div>
+                            <div style="max-width:90%;margin: auto;">
+                                @Html.Partial("~/Views/Case/_CustomeAttribute.cshtml", Model)
+                            </div>
+                            @*if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.DeleteCase))
+                                {
+                                    <div class="col-md-3">
+                                        @Html.Kendo().CheckBoxFor(m => m.IsDeleted)
+                                        @Html.DisplayNameFor(m => m.IsDeleted)
+                                    </div>
+                                }*@
+                            @*<div class="col-md-3">
+                                    @Html.Kendo().CheckBoxFor(m => m.ServiceIsDone)
+                                    @Html.DisplayNameFor(m => m.ServiceIsDone)
+                                </div>*@
+                        </div>
+                        @if (Model.ScState.Code != CaseState.csNE.ToString() && Model.ScState.Code != CaseState.csUN.ToString()
+&& Model.ScState.Code != CaseState.csDA.ToString() && Model.ScState.Code != CaseState.csOP.ToString())
+                        {
+                            <div class="headOfAccordion">
+                                @CaseResources.AccountingData
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <div class="col-sm-3 @floatToRight">
+                                        <label>@CaseResources.RequiredAmount : </label>
+                                        @Model.RequiredAmount
+                                    </div>
+                                    <div class="col-sm-3 @floatToRight">
+                                        <label>@CaseResources.CollectedAmount : </label>
+                                        @Model.CurrentBalance
+                                    </div>
+                                    @if (Model.ScState.Code != CaseState.csCO.ToString())
+                                    {
+                                        <div class="col-sm-3 @floatToRight">
+                                            <label>المتبقي : </label>
+                                            @((Model.RequiredAmount - Model.CurrentBalance))
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.caseInvestigatorDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserDetails().Id))
+                        {
+                            <div class="headOfAccordion allowToUser">
+                                @CaseResources.InvestigationResult
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        @CaseResources.Recommendation
+                                        @Html.TextArea("Recommendation", new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Recommendation, rows = "5" })
+                                        <label id="ErrorRecommendationInvestigation"></label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @CaseResources.Conclusions
+                                        @Html.TextArea("Conclusions", new { style = textAlignRight, @class = "form-control", placeholder = CaseResources.Conclusions, rows = "5" })
+                                        <label id="ErrorConclusionsInvestigation"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    تاريخ التحقيق
+                                    @Html.TextBox("InvestigationDate", DateTime.Now.ToString("M/d/yyyy", CultureInfo.InvariantCulture), new { @class = "DateTillNow form-control" })
+                                </div>
+                                <div class="form-group">
+                                    <input type="button" value="@CaseResources.InvestigationDone" onclick="MarkInvestigationDone()" class="btn btn-success " />
+                                </div>
+                            </div>
+                        }
+
+                        <br />
+                        <div class="box-footer">
+                            <input type="submit" class="btn btn-info" value="@LayoutRES.SubmitEdit" />
+                            @if (Model.ScState.Code == CaseState.csNE.ToString() || Model.ScState.Code == CaseState.csUN.ToString() || Model.ScState.Code == CaseState.csDA.ToString())
+                            {
+                                if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.submitCaseFinalApprove))
+                                {
+                                    <input id="btnGetFinalApprove" type="button" value="@CaseResources.ExceptionCase" onclick="GetFinalApprove('@Model.Id')" class="btn btn-warning" />
+                                }
+                            }
+                            @*@if (Model.ScState.Code != CaseState.csAr.ToString())*@
+
+                            @if (Enum.IsDefined(typeof(CaseArchive), Model.ScState.Code) == false)
+                            {
+                                if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ArchiveCase))
+                                {
+                                    <input onclick="ArchivingCase('@Model.Id')" type="button" value="@CaseResources.ArchivingCase" class="btn btn-warning pull-left" />
+                                }
+                            }
+                            @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ExclusionCase))
+                            {
+                                if (Model.ScState.Code != CaseState.csNE.ToString()
+                                      && Enum.IsDefined(typeof(CaseArchive), Model.ScState.Code) == false
+                                    //&& Model.ScState.Code != CaseState.csRJ.ToString()
+                                    && Model.ScState.Code != CaseState.csDA.ToString())
+                                {
+                                    if (Model.caseRejectHistoryDTOList.Any(x => x.CreatedBy == AuthorizationHelper.UserId))
+                                    {
+                                        if (Model.caseRejectHistoryDTOList.Where(x => x.CreatedBy == AuthorizationHelper.UserId
+                                                                                   && Enum.IsDefined(typeof(CaseArchive), x.NewStateId) == true).Count() > 0
+
+                                                                                                                    )
+                                        //.NewStateId ==  (int)CaseState.csRJ)
+                                        {
+                                            <input id="btnRestoreCase" onclick="RestoreCase()" type="button" value="@CaseResources.RestoreCase" class="btn btn-danger pull-left" />
+                                        }
+                                        @*else
+                                        {
+                                            <input id="btnExclusion" onclick="ExclusionCase()" type="button" value="@CaseResources.ExclusionCase" class="btn btn-danger pull-left" />
+                                        }*@
+                                    }
+                                    @*else
+                                    {
+                                        <input id="btnExclusion" onclick="ExclusionCase()" type="button" value="@CaseResources.ExclusionCase" class="btn btn-danger pull-left" />
+                                    }*@
+                                }
+                                //else if (Model.ScState.Code == CaseState.csRJ.ToString())
+                                else if (Enum.IsDefined(typeof(CaseArchive), Model.ScState.Code) == true)
+                                {
+                                    <input id="btnRestoreCase" onclick="RestoreCase()" type="button" value="@CaseResources.RestoreCase" class="btn btn-danger pull-left" />
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="box-body">
+                    <!-- /.dashbord -->
+                    <div class="box-footer">
+
+                        @if (Model.CountOfComment > 0)
+                        {
+                            <input type="button" value="@CaseResources.CaseComments + @Model.CountOfComment" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                        }
+                        else
+                        {
+                            <input type="button" value="@CaseResources.CaseComments" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                        }
+                        @*@if (Model.CountOfComment > 0)
+                            {
+                                <input type="button" value="@CaseResources.CaseComments + @Model.CountOfComment" onclick="GetCaseComments('@Model.Id')" class="btn btn-info" />
+                            }
+                            else
+                            {*@
+                        <input type="button" value="@CaseResources.CallResult" onclick="GetCaseCallResult('@Model.Id')" class="btn btn-info" />
+                        @*}*@
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ViewMedicalComments))
+                        {
+                            if (Model.CountOfMedicalComment > 0)
+                            {
+                                <input type="button" value="@CaseResources.MedicalComments + @Model.CountOfMedicalComment" onclick="GetMedicalComments('@Model.Id')" class="btn btn-info" />
+                            }
+                            else
+                            {
+                                <input type="button" value="@CaseResources.MedicalComments" onclick="GetMedicalComments('@Model.Id')" class="btn btn-info" />
+                            }
+                        }
+
+                        <input type="button" value="@CaseResources.CaseAttachment" onclick="GetCaseAttachment('@Model.Id')" class="btn btn-info  " />
+                        @if (Model.ScState.Code == CaseState.csUC.ToString())
+                        {
+                            if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToDoctor))
+                            {
+                                <input type="button" value="@CaseResources.AssignCaseToDoctor" onclick="getCaseDoctor('@Model.Id','false')" class="btn btn-info" />
+                            }
+                        }
+                        @if (Model.ScState.Code == CaseState.csUN.ToString())
+                        {
+                            if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToInvestigetor))
+                            {
+
+                                <input type="button" value="@CaseResources.AssginToInvestigator" onclick="getCaseInvestigetor('@Model.Id','false')" class="btn btn-info" />
+                            }
+                        }
+                        <input type="button" value="@CaseResources.InvestigationReview" onclick="GetInvestigationResult('@Model.Id')" class="btn btn-info  " />
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssginCaseToInvestigetor) && Model.ScState.Code == CaseState.csUC.ToString())
+                        {
+                            <input type="button" value="@CaseResources.AssginToEmployee" onclick="getCaseEmployee('@Model.Id')" class="btn btn-info" />
+                        }
+                        <input type="button" value="@CaseResources.ViewFollowResult" onclick="GetCaseVisitResult('@Model.Id')" class="btn btn-info  " />
+                        <input type="button" value="@CaseResources.ViewCaseHistory" onclick="GetCaseHistory('@Model.Id')" class="btn btn-info  " />
+                        @if (Model.ScState.Code == CaseState.csOP.ToString())
+                        {
+                            if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.submitCaseFinalApprove))
+                            {
+                                <input id="btnGetFinalApprove" type="button" value="@CaseResources.OpenTheCase" onclick="GetFinalApprove('@Model.Id')" class="btn btn-info  " />
+                            }
+                        }
+                        @if (Model.ScState.Code == CaseState.csUN.ToString())
+                        {
+                            if (Model.caseInvestigatorDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserId))
+                            {
+                                <input type="button" value="@CaseResources.ScheduleToInvestegate" onclick="showInvestegatorSchedule('@Model.Id','@Model.Id : @Model.Name')" class="btn btn-info" />
+                            }
+                        }
+                        @if (Model.ScState.Code == CaseState.csUC.ToString())
+                        {
+                            //if (Model.caseEmployeeDTO.Any(x => !x.IsDone && !x.IsDeleted && x.UserId == AuthorizationHelper.UserId))
+                            if (Model.AllowAddFollowToCase)
+                            {
+                                <input type="button" value="@CaseResources.ScheduleToFollow" onclick="showInvestegatorSchedule('@Model.Id','@Model.Id : @Model.Name')" class="btn btn-info" />
+                                <input type="button" value="@CaseResources.AddCaseFollow" onclick="GetAddFollowResult('@Model.Id')" class="btn btn-info" />
+                            }
+                        }
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ReInvestigateCase))
+                        {
+                            if (Model.ScState.Code != CaseState.csUN.ToString() && Model.ScState.Code != CaseState.csNE.ToString())
+                            {
+                                <input type="button" value="@CaseResources.ReInvestegateCase" onclick="getCaseInvestigetor('@Model.Id','true')" class="btn btn-info" />
+                            }
+                        }
+                        @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.AssignTaskToDelegate))
+                        {
+                            <input type="button" value="@CaseResources.AssignTaskToDelegate" onclick="AssignTaskToDelegate()" class="btn btn-info" />
+                        }
+                        @if (Model.ScState.Code == CaseState.csUC.ToString() || Model.ScState.Code == CaseState.csCO.ToString())
+                        {
+                            <input type="button" value="@CaseResources.PublishData" onclick="getCasePublishData()" class="btn btn-info" />
+                        }
+                        <input id="btnGetCase" type="button" class="btn btn-info" value="@CaseResources.AddCaseFollow" onclick="GetAddCaseVisiteFull(@Model.Id)" />
+                    </div>
+                    <!-- /.dashbord -->
+                    <!-- /.box-footer -->
+                    @if (Model.ScState.Code == CaseState.csNE.ToString())
+                    {
+                        if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ApproveRequest))
+                        {
+                            <form class="form-horizontal allowToUser">
+                                <div class="form-group">
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-sm-12">
+                                        <input id="txtCallResultToCaseState" name="CallResult" placeholder="@CaseResources.CallResult" type="text" class="form-control">
+                                        <input id="txtCommentToCaseState" name="Comment" placeholder="@CaseResources.Comment" type="text" class="form-control">
+                                        <label id="ErrorCommentToCaseState"></label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input id="btnAccept" onclick="FirstApprove('@CaseState.csUN.ToString()')" type="button" value="@CaseResources.Accept" class="btn btn-success pull-right" />
+                                        @*<input id="btnReject" onclick="FirstApprove('@CaseState.csRJ.ToString()')" type="button" value="@CaseResources.Reject" class="btn btn-danger pull-left" />*@
+
+                                    </div>
+                                </div>
+                            </form>
+                        }
+                    }
+                    else if (Model.ScState.Code == CaseState.csDA.ToString())
+                    {
+                        if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ApproveRequest))
+                        {
+                            <div class="box-footer allowToUser">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label @floatToRight">@CaseResources.Comment</label>
+                                    <div class="col-sm-12">
+                                        <input id="txtCommentToCaseState" name="Comment" placeholder="@CaseResources.Comment" type="text" class="form-control">
+                                        <label id="ErrorCommentToCaseState"></label>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="col-sm-12">
+                                    <input id="btnAccept" onclick="SecondApprove('@CaseState.csOP.ToString()')" type="button" value="@CaseResources.Accept" class="btn btn-success pull-right" />
+                                    @*<input id="btnReject" onclick="SecondApprove('@CaseState.csRJ.ToString()')" type="button" value="@CaseResources.Reject" class="btn btn-danger pull-left" />*@
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+<div id="DetailsCaseDiv" class="dismissClearDiv"></div>
+
+<div id="InvestigatorCaseDiv"></div>
+<div id="EmployeeCaseDiv"></div>
+<div id="DoctorCaseDiv"></div>
+<div id="InvestigationResultDiv"></div>
+<div id="InvestigatorCaseEditDiv"></div>
+<div id="CaseCommentDiv"></div>
+
+<div id="MedicalCommentDiv"></div>
+<div id="CaseAttachmentDiv"></div>
+<div id="CaseAddVisitResulDiv"></div>
+<div id="CaseVisitResultDiv"></div>
+<div id="CaseFinalApporveDiv"></div>
+<div id="AssignTaskToDelegateDiv"></div>
+<div id="CaseCaseHistoryDiv"></div>
+<div id="CaseCallResultDiv"></div>
+<div id="PopupDiv"></div>
+<div id="EditCaseMemberDiv"></div>
+<div id="EditCaseBudgetDiv"></div>
+<div id="CasePublishDataDiv"></div>
+
+<div id="AddCaseVisiteFullDiv">
+
+</div>
+
+<div id="EditCaseVisiteFullDiv">
+
+</div>
+
+
+<div id="CaseScheduleDiv">
+    <div class="modal fade" id="CaseScheduleModals" role="dialog" style="overflow-y: auto;">
+        <div class="modal-dialog" style="width: 1100px;">
+            <div class="modal-body">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="box-body" id="scheduleModelBody">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="CaseArchiveDiv">
+
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var ArchivingCaseTitle = '@CaseResources.ArchivingCase';
+        var ConfirmArchived = '@CaseResources.ConfirmArchived';
+        var ExclusionMsg = '@CaseResources.ExclusionMsg';
+        var ExclusionConfrimMsg = '@CaseResources.ExclusionConfrimMsg';
+        var RestoreConfrimMsg = '@CaseResources.RestoreConfrimMsg';
+        var RestoreMsg = '@CaseResources.RestoreMsg';
+        var AssignToInvestigatorMsg = '@CaseResources.AssignToInvestigatorMsg';
+
+
+
+        var AssignToInvestigatorBody = '@CaseResources.AssignToInvestigatorBody' + " {{Investigator}} " + ((_cultureIsArabic) ? "؟" : "?");
+        var EditCaseSubject = 'Edit Case -تم تعديل الحاله  [@Model.Id - @Model.Name] ';
+        var EditCaseBody = 'Edit Case::تم تعديل الحاله[@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now]  </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var AddCommentCaseSubject = 'Add Comment To Case - تم اضافه تعليق الى حاله  :: @Model.Id - @Model.Name  ';
+        var AddCommentCaseBody = 'Add Comment To  Case - تم أضافه تعليق الى حاله[@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var AddMedicalCommentCaseSubject = 'Add Medical Comment To Case - تم اضافه تعليق طبى الى حاله  [@Model.Id - @Model.Name] ';
+        var AddMedicalCommentCaseBody = 'Add Medical Comment To  Case - تم أضافه تعليق طبى  الى حاله[@Model.Id - @Model.Name] Done By::بواسطه [ @AuthorizationHelper.UserName ] Date::التاريخ [@DateTime.Now]  </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var ArchiveCaseSubject = 'Archive Case - تم أرشفه الحاله  [@Model.Id - @Model.Name]';
+        var ArchiveCaseBody = 'Archive Case::تم أرشفه حاله[@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var ExclusionCaseSubject = 'Exclusion Case - تم أستبعاد الحاله  [@Model.Id - @Model.Name]';
+        var ExclusionCaseBody = 'Exclusion Case - تم أستبعاد الحاله[@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var RestoreCaseSubject = 'Restore Case - تم أستعاده الحاله  [@Model.Id - @Model.Name]';
+        var RestoreCaseBody = 'Restore Case - تم أستعاده الحاله[@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var AssignCaseToInvestigatorSubject = 'Assign Investigator to Case - تم  احاله الحاله الى محقق  [@Model.Id - @Model.Name]';
+        var AssignCaseToInvestigatorBody = 'Assign Investigator to Case - تم  احاله الحاله الى محقق  [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var SecondAcceptCaseSubject = ' Second Accept Case - تم  الموافقه الثانيه على الحاله  [@Model.Id - @Model.Name]';
+        var SecondAcceptCaseBody = 'Second Accept Case - تم  الوافقه الثانيه  على الحاله  [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var SecondRejectCaseSubject = 'Second Reject Case - تم  الرفض الثاني على الحاله  [@Model.Id - @Model.Name]';
+        var SecondRejectCaseBody = ' Second Reject Case - تم  الرفض الثاني على الحاله  [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+
+        var FirstAcceptCaseSubject = 'First Accept Case - تم  الموافقه الاولى على الحاله  [@Model.Id - @Model.Name]';
+        var FirstAcceptCaseBody = 'First Accept Case - تم  الوافقه الأولى  على الحاله  [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+        var FirstRejectCaseSubject = 'First Reject Case - تم  الرفض الأول على الحاله  [@Model.Id - @Model.Name]';
+        var firstRejectCaseBody = 'First Reject Case - تم  الرفض الأول على الحاله  [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+
+        var FinalApproveCaseSubject = 'Final Approve  Case - تم  تخصيص الحاله  [@Model.Id - @Model.Name]';
+        var FinalApproveCaseBody = 'Final Approve Case - تم  تخصيص الحاله  [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+
+        var AssignCaseToDoctorSubject = 'Assign Doctor To Case - تم  احاله الحاله الى طبيب  [@Model.Id - @Model.Name]';
+        var AssignCaseToDoctorBody = 'Assign Doctor To Case - تم  احاله الحاله الى طبيب [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+
+        var ConfirmInvestigateCaseSubject = 'Confirm Investigate Case - اتمام التحقيق [@Model.Id - @Model.Name]';
+        var ConfirmInvestigateCaseBody = 'Confirm Investigate Case - اتمام التحقيق [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+
+        var AddFollowToCaseSubject = 'Add Follow to  Case -  أضافه متابعه للحاله [@Model.Id - @Model.Name]';
+        var AddFollowToCaseBody = 'Add Follow to  Case -  أضافه متابعه للحاله [@Model.Id - @Model.Name] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=' + @Model.Id + '&allowToUser=false';
+
+        var DateError = '@LayoutRES.DateRequired';
+        var VisitResultError = '@LayoutRES.VisitResultError';
+
+
+        var archiveArr = @Html.Raw(Json.Encode(Enum.GetNames(typeof(CaseArchive)).ToArray()));
+
+        var AddFollowToCaseSubject = 'Add Follow to  Case -  أضافه متابعه للحاله [#CaseCode# - #CaseName#]';
+        var AddFollowToCaseBody = 'Add Follow to  Case -  أضافه متابعه للحاله [#CaseName#] Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case/Details?id=#CaseCode#&allowToUser=false';
+
+        var DateError = '@LayoutRES.DateRequired';
+
+
+    </script>
+    @*@Scripts.Render("~/bundles/Cases")*@
+    <script src="~/Scripts/MersalScripts/CasesManagment/CaseDetails.js?version=1.6"></script>
+    <script src="~/Scripts/MersalScripts/CasesManagment/InvestigationResult.js?version=1.6"></script>
+    <script src="~/Scripts/MersalScripts/CasesManagment/CaseCustomAttrValue.js?version=1.6"></script>
+    <script src="~/Scripts/Facebook/FacebookMersalAdminApp.js"></script>
+    @*@if (ViewBag.allowToUser)
+        {
+            <script>
+                $(document).ready(function () {
+                    $(".allowToUser").show();
+                });
+            </script>
+        }*@
+
+    <script>
+        var caseIdForVisit = @Model.Id;
+        function GetAddCaseVisiteFull(id) {
+            caseIdForVisit = id;
+            if (caseIdForVisit == "") {
+                return;
+            }
+            $("#AddCaseVisiteFullDiv").html("");
+            $.ajax({
+                url: "/Case/GetAddCaseFullVisite?caseId=" + caseIdForVisit,
+                type: 'Get',
+                dataType: "html",
+                contentType: 'application/html; charset=utf-8',
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (result) {
+                    $("#imgAjaxLoader").hide();
+                    $("#AddCaseVisiteFullDiv").append(result);
+                    $('#CaseVisitResultModals').modal('show');
+                    $("#VisitDateString").kendoDatePicker({
+                        max: new Date(),
+                        format: "d/M/yyyy",
+                    }).attr("readonly", "readonly");
+
+                    $("#FamilyMemberId").prop("disabled", true);
+
+                    $("#imgAjaxLoader").show();
+                    fillDropDownWithCallback('NAT', '#FamilyMemberNationalityId', undefined, function () {
+                        $("#FamilyMemberId").prop("disabled", false);
+                        $("#imgAjaxLoader").hide();
+                    });
+                    fillDropDownWithCallback('RLG', '#FamilyMemberReligionId');
+                    fillDropDownWithCallback('GEND', '#FamilyMemberGenderId');
+                    GetCaseFamilyMembers(caseIdForVisit);
+                },
+                error: function (xhr) {
+                    $("#imgAjaxLoader").hide();
+                    confirmMessageBootstrap("", "لا يوجد حالة بهذا الكود او الحالة مغلقة", 400, 250);
+                    $("#btnsubmitConfirmationDialog").hide();
+                }
+            });
+        }
+
+        var familyArray = [];
+
+        function GetCaseFamilyMembers(caseId,selectedId) {
+            familyArray = [{ Name: $("#CaseName").val(), Id: caseIdForVisit, CaseId: caseIdForVisit }]
+            console.log(familyArray);
+            var apiurl = MersalWebAPIBaseUrl + "api/Case/GetCaseFamilyMember";
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: apiurl + "?Id=" + caseId,
+                crossDomain: true,
+                headers: getHeaders(),
+                beforeSend: function () {
+                  //  $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    if (data != undefined && data.length != 0)
+                        Array.prototype.push.apply(familyArray, data);
+
+                    var html = "<option></option>";
+                    let selec;
+                    $.each(familyArray, function (key, value) {
+                        selec = '';
+                        if (selectedId && selectedId == value.Id) selec = " selected='selected' ";
+
+                        if (_cultureIsArabic) {
+                            html += "<option value=" + value.Id + selec + " >" + value.Name + "</option>";
+                            }
+                        else {
+                            html += "<option value=" + value.Id + selec + " >" + value.Name + "</option>";
+                            }
+                    });
+                    //$("#imgAjaxLoader").hide();
+                    $("#FamilyMemberId").html(html);
+                    $('.familydetails').hide();
+                    addChangeEvent();
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.error);
+                }
+            });
+
+        }
+
+        function addChangeEvent() {
+            $("#FamilyMemberId").change(function (e) {
+                $('.familydetails').hide("slow");
+                if ($('#CaseId').val() != $("#FamilyMemberId").val()) {
+                    familyArray.forEach(function (element) {
+                        if (element.Id == $("#FamilyMemberId").val()) {
+                            $('#FamilyMemberReligionId').val(""); $('#FamilyMemberReligionId').prop("disabled", false);
+                            $('#FamilyMemberNationalityId').val(""); $('#FamilyMemberNationalityId').prop("disabled", false);
+                            $('#FamilyMemberAge').val(""); $('#FamilyMemberAge').removeAttr('readonly');
+                            $('#FamilyMemberGenderId').val(""); $('#FamilyMemberGenderId').prop("disabled", false);
+
+
+                            if (element.Age != null) {
+                                $('#FamilyMemberAge').val(element.Age);
+                                $('#FamilyMemberAge').attr('readonly', true);
+                            }
+                            if (element.FamilyMemberReligionId != null) {
+                                $('#FamilyMemberReligionId').val(element.FamilyMemberReligionId);
+                                $('#FamilyMemberReligionId').prop("disabled", true);
+                            }
+                            if (element.FamliyMemberNationality != null) {
+                                $('#FamilyMemberNationalityId').val(element.FamliyMemberNationality);
+                                $('#FamilyMemberNationalityId').prop("disabled", true);
+                            }
+                            if (element.FamilyMemberGenderId != null) {
+                                $('#FamilyMemberGenderId').val(element.FamilyMemberGenderId);
+                                $('#FamilyMemberGenderId').prop("disabled", true);
+                            }
+                        }
+                        return;
+                    });
+                    $('.familydetails').show("slow");
+                }
+            });
+        }
+        function GetMultiSelectValues(id) {
+            var multiselect = $("#" + id).data("kendoMultiSelect");
+            var selectedData = [];
+            if (multiselect != undefined) {
+                var items = multiselect.value();
+                for (var i = 0; i < items.length; i++) {
+                    selectedData.push(items[i]);
+                }
+            }
+            return selectedData;
+        }
+        function getServices() {
+            var multiSelectResult = GetMultiSelectValues("multiselectDisease");
+            var resultStr = multiSelectResult.join(',');
+            var services = $("#serviceIDs").val();
+            //var services = $("#VisiteServiceIDs").val();
+            var result = resultStr + ',' + services;
+
+            if (result.lastIndexOf(',') == (result.length - 1))
+                result = result.substring(0, result.length - 1);
+
+            if (result.indexOf(',') == 0)
+                result = result.substring(1, result.length);
+
+
+            console.log(result);
+            return result;
+        }
+        //function getServices() {
+        //    var multiSelectResult = GetMultiSelectValues("multiselectDisease");
+        //    var resultStr = multiSelectResult.join(',');
+        //    var services = $("#VisiteServiceIDs").val();
+
+        //    var result = resultStr + ',' + services;
+
+        //    if (resultStr.length == 0 || services == '')
+        //        result = result.substring(0, result.length - 1);
+
+        //    console.log(result);
+        //    return result;
+        //}
+
+        function submitVisitResult() {
+            $("#VisitDateErrorMassage,#VisitResultErrorMassage,#VisitFamilyMemberErrorMassage").html("");
+            if ($("#FamilyMemberId").val() == "") {
+                $("#VisitFamilyMemberErrorMassage").html("الحاله مطلوبه");
+                return;
+            }
+            else if ($("#VisitDateString").val() == "") {
+                $("#VisitDateErrorMassage").html(DateError);
+                return;
+            }
+            else if ($("#VisitResult").val() == "") {
+                $("#VisitResultErrorMassage").html(VisitResultError);
+                return;
+            }
+
+            var result = {
+                CaseId: caseIdForVisit,
+                VisitDateString: $("#VisitDateString").val(),
+                VisitResult: $("#VisitResult").val(),
+                VisiteServiceIDs: getServices(),//$("#VisiteServiceIDs").val(),
+                FamilyMemberNationalityId: $("#FamilyMemberNationalityId").val(),
+                FamilyMemberReligionId: $("#FamilyMemberReligionId").val(),
+                FamilyMemberGenderId: $('#FamilyMemberGenderId').val(),
+                FamilyMemberId: $("#FamilyMemberId").val(),
+                FamilyMemberAge: $("#FamilyMemberAge").val(),
+                Amount: $("#Amount").val()
+            };
+            console.log(result);
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json; charset=utf-8',
+                url: "/Case/AddCaseVisiteResult ",
+                data: JSON.stringify(result),
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.success(SuccessfulProcess);
+                    var mailSubject = AddFollowToCaseSubject.replace("#CaseCode#", $("#CaseId").val()).replace("#CaseName#", $("#CaseName").val())
+                    var mailBody = AddFollowToCaseBody.replace("#CaseCode#", $("#CaseId").val()).replace("#CaseName#", $("#CaseName").val())
+                    sentNotificationToGroupFun(mailSubject, mailBody, sessionStorage.getItem("Id"), 13);
+                    $('#CaseVisitResultModals').modal('hide');
+                },
+                error: function (xhr) {
+                    $('#CaseVisitResultModals').modal('hide');
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.statusText);
+                }
+            });
+
+        }
+
+        function submitEditVisitResult() {
+            $("#VisitDateErrorMassage,#VisitResultErrorMassage,#VisitFamilyMemberErrorMassage").html("");
+            if ($("#FamilyMemberId").val() == "") {
+                $("#VisitFamilyMemberErrorMassage").html("الحاله مطلوبه");
+                return;
+            }
+            else if ($("#VisitDateString").val() == "") {
+                $("#VisitDateErrorMassage").html(DateError);
+                return;
+            }
+            else if ($("#VisitResult").val() == "") {
+                $("#VisitResultErrorMassage").html(VisitResultError);
+                return;
+            }
+
+            var result = {
+                CaseId: caseIdForVisit,
+                VisitDateString: $("#VisitDateString").val(),
+                VisitResult: $("#VisitResult").val(),
+                VisiteServiceIDs: getServices(),//$("#VisiteServiceIDs").val(),
+                FamilyMemberNationalityId: $("#FamilyMemberNationalityId").val(),
+                FamilyMemberReligionId: $("#FamilyMemberReligionId").val(),
+                FamilyMemberGenderId: $('#FamilyMemberGenderId').val(),
+                FamilyMemberId: $("#FamilyMemberId").val(),
+                FamilyMemberAge: $("#FamilyMemberAge").val(),
+                Amount: $("#Amount").val()
+            };
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json; charset=utf-8',
+                url: "/Case/EditCaseVisiteResult ",
+                data: JSON.stringify(result),
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.success(SuccessfulProcess);
+                    var mailSubject = AddFollowToCaseSubject.replace("#CaseCode#", $("#CaseId").val()).replace("#CaseName#", $("#CaseName").val())
+                    var mailBody = AddFollowToCaseBody.replace("#CaseCode#", $("#CaseId").val()).replace("#CaseName#", $("#CaseName").val())
+                    sentNotificationToGroupFun(mailSubject, mailBody, sessionStorage.getItem("Id"), 13);
+                    $('#CaseVisitResultModals').modal('hide');
+                },
+                error: function (xhr) {
+                    $('#CaseVisitResultModals').modal('hide');
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.statusText);
+                }
+            });
+
+        }
+
+
+
+        ///-----ServiceVisite----///
+        function checkIfServiceVisiteExsist(id) {
+            var servIds = $("#serviceIDs").val();
+            if (servIds == undefined)
+                servIds = '';
+
+            var servIdArray = servIds.split(",");
+            if (servIdArray.indexOf(id) == -1) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        function changeService(id) {
+            if (checkIfServiceVisiteExsist(id)) {
+                removeSerivceVisiteId(id);
+            }
+            else {
+                appendServiceVisiteId(id);
+            }
+        }
+
+        function removeSerivceVisiteId(serviceid) {
+            var servIds = $("#serviceIDs").val();
+            var servIdArray = servIds.split(",");
+            servIdArray.deleteElem(serviceid)
+            servIds = servIdArray.toString();
+            $("#serviceIDs").val(servIds);
+        }
+
+        function appendServiceVisiteId(serviceid) {
+            var servIds = $("#serviceIDs").val();
+            if (servIds != "") {
+                servIds += ",";
+            }
+            servIds += serviceid;
+            $("#serviceIDs").val(servIds);
+        }
+        ///-----ServiceVisite----///
+        
+
+        function MarkCaseAsServiceIsDoneNotDone(MarkAs) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: MersalWebAPIBaseUrl + "api/Case/MarkCaseAsServiceIsDoneNotDone?caseId=" + caseIdForVisit + "&MarkAs=" + MarkAs,
+                crossDomain: true,
+                headers: getHeaders(),
+                async: true,
+                beforeSend: function () {
+                    $("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.success(SuccessfulProcess);
+                },
+                error: function (xhr) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.statusText);
+                }
+            });
+        }
+
+
+        function fillDropDownWithCallback(code, dropDownId, filterArr,f) {
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + code,
+                async: true,
+                beforeSend: function () {
+                    //$("#imgAjaxLoader").show();
+                },
+                success: function (data) {
+
+                    var html = "<option></option>";
+                    $.each(data, function (key, value) {
+                        if (filterArr != undefined) {
+                            if ($.inArray(value.Code, filterArr) != -1) {
+                                if (_cultureIsArabic) {
+                                    html += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                                }
+                                else {
+                                    html += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                                }
+                            }
+                        }
+                        else {
+                            if (_cultureIsArabic) {
+                                html += "<option value=" + value.Id + " >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                html += "<option value=" + value.Id + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                    //$("#imgAjaxLoader").hide();
+                    $(dropDownId).html(html);
+                    f();
+                },
+                error: function (xhr) {
+                    $("#imgAjaxLoader").hide();
+                    toastr.error(xhr.error);
+                }
+            });
+
+
+        }
+
+
+</script>
+
+
+
+}
+

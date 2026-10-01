@@ -1,0 +1,52 @@
+﻿@model DTO.ContactUsDTO
+@using Resource
+<section id="contactUsHome">
+    <div class="block">
+        <div class="container">
+            <div class="header">
+                <div class="title-new">
+                    <h1>@HomeRES.Contactus2</h1>
+                    <span></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 form-contaier">
+                    @*<form action="">
+                          <input type="text"  placeholder="الأسم بالكامل"/>
+                          <input type="email"  placeholder="البريد الألكترونى" />
+                          <textarea name="" id="" cols="30" rows="10"  placeholder="الرسالة" ></textarea>
+                          <div class="submitt">
+                              <button class="btn">
+                                  Send
+                              </button>
+                          </div>
+                        </form>*@
+                    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "contact-form", id = "ContactUsForm" }))
+                    {
+                             
+                                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Name) })
+                                    @Html.ValidationMessageFor(x => x.Name)
+                             
+                               
+                           
+                                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Email) })
+                                    @Html.ValidationMessageFor(x => x.Email)
+                               
+                                    @Html.TextAreaFor(x => x.Message, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Message) })
+                                    @Html.ValidationMessageFor(x => x.Message)
+                            
+                                 
+                           
+                            <div class="col-12 submitt">
+                                <button  class="btn" type="submit">@LayoutRES.Submit</button>
+                            </div>
+                    }
+
+                </div>
+                <div class="col-6 Imge-section">
+                    <img src="~/images/heart-in-hand.jpg" alt="" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,89 @@
+﻿@model DTO.InvestigaionsResultDTO
+@using UserUI.Helper
+@using Resource
+@using System.Globalization;
+<div class="modal fade" id="InvestigationResultModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.InvestigationResult - @Html.DisplayFor(m => m.CaseName)</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body AccordionDiv">
+                    @if (Model != null)
+                    {
+                        if (Model.InvestigaionsList.Any())
+                        {
+                            foreach (var Investigaions in Model.InvestigaionsList)
+                            {
+                                if (Investigaions.IsDone)
+                                {
+                                    if (Investigaions.UpdatedOn.HasValue)
+                                    {
+                                        <h3>
+                                            @Investigaions.InvestigatorName  - @Investigaions.UpdatedOn.Value.ToString("d/M/yyyy HH:mm", CultureInfo.InvariantCulture)
+                                            
+                                        </h3>
+                                        
+                                    }
+                                    else
+                                    {
+                                        <h3>
+                                            @Investigaions.InvestigatorName
+                                        </h3>
+                                    }
+                                    <div>
+                                        <div>
+                                            <h4>@CaseResources.Conclusions : </h4>
+                                            @Investigaions.Conclusions
+                                        </div>
+                                        <div>
+                                            <h4>@CaseResources.Recommendation  : </h4>
+                                            @Investigaions.Recommendation
+                                        </div>
+                                        <div>
+                                            @if (Investigaions.UpdatedBy == AuthorizationHelper.UserDetails().Id){
+                                            <input type="button" class="btn btn-warning"
+                                                   value="@LayoutRES.Edit"
+                                                   onclick="GetInvestigationResultForEdit(@Investigaions.Id)" />
+                                            }
+                                        </div>
+                                    </div>
+                                    <br />
+                                    
+                                }
+                                @*else
+                                    {
+                                        <h3>
+                                            @Investigaions.InvestigatorName  - Not Done Yet
+                                        </h3>
+                                    }*@
+
+                            }
+                        }
+                    }
+
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">@LayoutRES.Close</button>
+                </div><!-- /.box-footer -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $(".AccordionDiv").accordion({
+            collapsible: true,
+            active: true,
+            header: "h3",
+            heightStyle: "content",
+        });
+    });
+</script>

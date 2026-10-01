@@ -1,0 +1,134 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = CaseResources.Cases;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+@*<style>
+        .k-grid-content {
+            max-height: 360px;
+        }
+    </style>*@
+<head>
+    <title>@CaseResources.Cases</title>
+</head>
+<a href="/Case/indexsearch" class="btn btn-info">بحث الحالات</a>
+@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.CreateCasesAdmin))
+{
+    <button id="btnPopupCreateCase" onclick="AddNewCaseAdmin()" type="button" class="btn btn-info">@LayoutRES.AddNewCase</button>
+}
+<div class="form-group col-sm-6 @floatToRight">
+    <label class="col-md-3 control-label">@CaseResources.ChooseCase </label>
+    <div class="col-sm-9">
+        <select onchange="SetCaseState(value)" class="form-control" id="casestateSelect">
+            <optgroup label="@CaseResources.Cases">
+                <option value="@CaseState.csNE.ToString()"> @LayoutRES.NewCases</option>
+                <option value="@CaseState.csUN.ToString()"> @LayoutRES.UnderInvestigation</option>
+                <option value="@CaseState.csDA.ToString()"> @LayoutRES.DependingOnApproval</option>
+                <option value="@CaseState.csOP.ToString()"> @LayoutRES.caseWaitingForOpen</option>
+            </optgroup>
+
+            <optgroup label="@CaseResources.FinancialSituation">
+                <option value="@CaseState.csCO.ToString()"> @LayoutRES.CompletedCase</option>
+                <option value="@CaseState.csUC.ToString()"> @LayoutRES.UncompletedCase</option>
+            </optgroup>
+
+            <optgroup label="@CaseResources.ArchivedCases">
+                <option value="@CaseState.csAr.ToString()"> @CaseResources.ViewOldArchivedCases</option>
+                <option value="@CaseState.csNewAr.ToString()"> @CaseResources.ViewAllArchivedCases</option>
+                <option value="@CaseState.csRJ.ToString()"> @LayoutRES.RejectedCase</option>
+                <option value="@CaseState.csNo.ToString()"> @CaseResources.NotFound</option>
+                <option value="@CaseState.csDEA.ToString()"> @CaseResources.Dead</option>
+                <option value="@CaseState.csServ.ToString()"> @CaseResources.Served</option>
+                <option value="@CaseState.csCL.ToString()"> @LayoutRES.ClosedCase</option>
+            </optgroup>
+
+            <optgroup label="@LayoutRES.CasesAssginToMe">
+                <option value="@CaseState.csAS.ToString()"> @CaseResources.CaseToinvestegation</option>
+                <option value="@CaseState.csTF.ToString()"> @CaseResources.CaseToFollowUp</option>
+            </optgroup>
+        </select>
+    </div>
+</div>
+<br />
+<br />
+
+
+<input id="IsFilters" type="hidden" value="NoFilter" />
+@*<div id="panelGrid" class="form-horizontal">*@
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+<div id="DetailsCaseDiv" class="dismissClearDiv"></div>
+<div id="InvestigatorCaseDiv"></div>
+<div id="InvestigationResultDiv"></div>
+<div id="CaseCommentDiv"></div>
+<div id="CaseAttachmentDiv"></div>
+<div id="CaseAddVisitResulDiv"></div>
+<div id="CaseVisitResultDiv"></div>
+<div id="CaseFinalApporveDiv"></div>
+<div id="CaseCaseHistoryDiv"></div>
+<div id="CaseScheduleDiv">
+    <div class="modal fade" id="CaseScheduleModals" role="dialog" style="overflow-y: auto;">
+        <div class="modal-dialog" style="width: 1100px;">
+            <div class="modal-body">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="box-body" id="scheduleModelBody">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var Babys = '@CaseResources.Babys';
+        var Children = '@CaseResources.Children';
+        var Youth = '@CaseResources.Youth';
+        var Older = '@CaseResources.Older';
+        var ServiceName = '@CaseResources.ServiceType'
+        var DisesName = '@CaseResources.DisesaseType'
+        var CaseStatus = '@CaseResources.CaseStatus'
+        var ArchivingCaseTitle = '@CaseResources.ArchivingCase';
+        var ConfirmArchived = '@CaseResources.ConfirmArchived';
+        var AddCaseSubject = 'New Case Added -تم أضافه حاله جديده';
+        var AddCaseBody = 'New Case Added::تم أضافه حاله جديده Done By::بواسطه [@AuthorizationHelper.UserName] Date::التاريخ [@DateTime.Now] </p> @ConfigurationManager.AppSettings["MersalUIBaseUrl"]Case';
+        var Mobile = "@CaseResources.Mobile";
+        var Country = "@CaseResources.Country";
+        var Governorate = "@CaseResources.Governorate";
+        var District = "@CaseResources.District";
+        var AddressLine1 = "@CaseResources.AddressLine1";
+        var Phone = "@CaseResources.Phone";
+        var Nationality = "@CaseResources.Nationality";
+        var Religion = "@CaseResources.Religion";
+        var StatusInEgypt = "@CaseResources.StatusInEgyptId";
+        var Gender = "@CaseResources.Gender";
+    </script>
+    @Scripts.Render("~/bundles/Cases")
+    @*<script src="~/Scripts/MersalScripts/CasesManagment/CaseIndex.js"></script>
+        <script src="~/Scripts/MersalScripts/CasesManagment/CaseInvestigator.js"></script>
+        <script src="~/Scripts/MersalScripts/CasesManagment/InvestigationResult.js"></script>
+        <script src="~/Scripts/MersalScripts/CasesManagment/CaseCustomAttrValue.js"></script>*@
+    <script src="~/Scripts/MersalScripts/CasesManagment/AddCase.js"></script>
+    <script src="~/Scripts/Facebook/FacebookMersalAdminApp.js"></script>
+    <script>
+        $(document).ready(function () {
+            SetCaseState('@ViewBag.caseState');
+            $("#casestateSelect").val('@ViewBag.caseState');
+        });
+    </script>
+}
+

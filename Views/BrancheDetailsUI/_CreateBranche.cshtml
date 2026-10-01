@@ -1,0 +1,92 @@
+﻿
+@model DTO.BrancheDetailsDTO
+@using Resource
+@using DTO
+@using UserUI.Helper 
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA"; 
+}
+
+<div class="modal fade" id="CreateBrancheModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@LayoutRES.CreateBranche</h4>
+                </div>
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "CreateBrancheForm" }))
+                    {
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NameEN, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.NameEN, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.NameEN)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NameAR, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.NameAR, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.NameAR)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.AddressEN, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AddressEN, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.AddressEN)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.AddressAR, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AddressAR, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.AddressAR)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Tel, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Tel, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Tel)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.EMail, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.EMail, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.EMail)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleMap, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleMap, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleMap)
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                @Html.HiddenFor(model => model.latMap, htmlAttributes: new { id = "latMapCreate" })
+                                @Html.HiddenFor(model=> model.lngMap, htmlAttributes: new { id = "lngMapCreate" })
+                                <div class="col-md-12"> 
+                                    <div id="map"></div>
+                                </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-offset-2 col-md-8">
+                                        <input id="btnSubmitCreateBranche" type="submit" value="@LayoutRES.Submit" class="btn btn-info" />
+                                     </div>
+                                </div>
+                            </div>
+                    }
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</div>
+

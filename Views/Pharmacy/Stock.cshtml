@@ -1,0 +1,48 @@
+﻿@using UserUI.Helper
+@using Resource.Pharmacy
+@{
+    ViewBag.Title = MedicineRES.Stock;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>@MedicineRES.Stock</title>
+</head>
+
+<br />
+<br />
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+@section Scripts {
+    <script>
+        var ScientificName = '@MedicineRES.ScientificName';
+        var CommercialName = '@MedicineRES.CommercialName';
+        var SmallUnit = '@MedicineRES.SmallUnit';
+        var SmallUnitCount = '@MedicineRES.SmallUnitCount';
+        var SmallUnitPrice = '@MedicineRES.SmallUnitPrice';
+        var MidddleUnit = '@MedicineRES.MidddleUnit';
+        var MidddleUnitCount = '@MedicineRES.MidddleUnitCount';
+        var MidddleUnitPrice = '@MedicineRES.MidddleUnitPrice';
+        var LargeUnit = '@MedicineRES.LargeUnit';
+        var LargeUnitCount = '@MedicineRES.LargeUnitCount';
+        var LargeUnitPrice = '@MedicineRES.LargeUnitPrice';
+        var MedicineCount = '@MedicineRES.MedicineCount';
+    </script>
+
+
+    <script src="~/Scripts/PharmacyScripts/stock/stock.js"></script>
+    <script>
+        $(document).ready(function () {
+            RefreshGird();
+        });
+    </script>
+}
+
+
+

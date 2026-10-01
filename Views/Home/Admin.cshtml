@@ -1,0 +1,400 @@
+﻿@model IEnumerable<DTO.getCasesOverViewDTO>
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    ViewBag.Title = LayoutRES.Admin;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+@if ((AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.ViewCasesList)) && Model != null)
+{
+    foreach (var item in Model)
+    {
+        switch ((CaseState)System.Enum.Parse(typeof(CaseState), item.code))
+        {
+            case CaseState.csNE:
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            @if (item.CaseCount != null)
+                            {
+                                <h3>@item.CaseCount</h3>
+                            }
+                            else
+                            {
+                                <h3>0</h3>
+                            }
+                            @if (isArabic)
+                            {
+                                <p>@item.NameAr</p>
+                            }
+                            else
+                            {
+                                <p>@item.NameEn</p>
+                            }
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person-add"></i>
+                        </div>
+                        <a href="/Case/Index?state=csNE" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                break;
+            case CaseState.csUN:
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-blue-gradient">
+                        <div class="inner">
+                            @if (item.CaseCount != null)
+                            {
+                                <h3>@item.CaseCount</h3>
+                            }
+                            else
+                            {
+                                <h3>0</h3>
+                            }
+                            @if (isArabic)
+                            {
+                                <p>@item.NameAr</p>
+                            }
+                            else
+                            {
+                                <p>@item.NameEn</p>
+                            }
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-search"></i>
+                        </div>
+                        <a href="/Case/Index?state=csUN" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                break;
+            case CaseState.csDA:
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-purple-gradient">
+                        <div class="inner">
+                            @if (item.CaseCount != null)
+                            {
+                                <h3>@item.CaseCount</h3>
+                            }
+                            else
+                            {
+                                <h3>0</h3>
+                            }
+                            @if (isArabic)
+                            {
+                                <p>@item.NameAr</p>
+                            }
+                            else
+                            {
+                                <p>@item.NameEn</p>
+                            }
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-bag"></i>
+                        </div>
+                        <a href="/Case/Index?state=csDA" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                break;
+            case CaseState.csOP:
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-yellow-gradient">
+                        <div class="inner">
+                            @if (item.CaseCount != null)
+                            {
+                                <h3>@item.CaseCount</h3>
+                            }
+                            else
+                            {
+                                <h3>0</h3>
+                            }
+
+                            <p>@LayoutRES.caseWaitingForOpen</p>
+
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-clock"></i>
+                        </div>
+                        <a href="/Case/Index?state=csOP" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                break;
+                @* case CaseState.csCL:
+                <div class="col-lg-3 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box bg-aqua-gradient">
+                        <div class="inner">
+                            @if (item.CaseCount != null)
+                            {
+                                <h3>@item.CaseCount</h3>
+                            }
+                            else
+                            {
+                                <h3>0</h3>
+                            }
+                            @if (isArabic)
+                            {
+                                <p>@item.NameAr</p>
+                            }
+                            else
+                            {
+                                <p>@item.NameEn</p>
+                            }
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-locked"></i>
+                        </div>
+                        <a href="/Case/Index?state=csCL" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                break;*@
+                @* case CaseState.csRJ:
+                    <div class="col-lg-3 col-xs-6">
+                        <!-- small box -->
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                @if (item.CaseCount != null)
+                                {
+                                    <h3>@item.CaseCount</h3>
+                                }
+                                else
+                                {
+                                    <h3>0</h3>
+                                }
+                                @if (isArabic)
+                                {
+                                    <p>@item.NameAr</p>
+                                }
+                                else
+                                {
+                                    <p>@item.NameEn</p>
+                                }
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-trash-b"></i>
+                            </div>
+                            <a href="/Case/Index?state=csRJ" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    break;
+                *@
+case CaseState.csAS:
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div style="background-color:aquamarine;" class="small-box">
+            <div class="inner">
+                @if (item.CaseCount != null)
+                {
+                    <h3>@item.CaseCount</h3>
+                }
+                else
+                {
+                    <h3>0</h3>
+                }
+                @if (isArabic)
+                {
+                    <p>@item.NameAr</p>
+                }
+                else
+                {
+                    <p>@item.NameEn</p>
+                }
+            </div>
+            <div class="icon">
+                <i class="ion-person-stalker"></i>
+            </div>
+            <a href="/Case/Index?state=csAS" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    break;
+    @*
+        case CaseState.csUC:
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-orange-active">
+                    <div class="inner">
+                        @if (item.CaseCount != null)
+                                                    {
+                                                    <h3>@item.CaseCount</h3>
+                                                    }
+                                                    else
+                                                    {
+                                                    <h3>0</h3>
+                                                    }
+                        @if (isArabic)
+                                                    {
+                                                    <p>@item.NameAr</p>
+                                                    }
+                                                    else
+                                                    {
+                                                    <p>@item.NameEn</p>
+                                                    }
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-alert-circled"></i>
+                    </div>
+                    <a href="/Case/Index?state=csUC" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+                        break;
+    *@
+case CaseState.csTF:
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box  bg-aqua-active">
+            <div class="inner">
+                @if (item.CaseCount != null)
+                {
+                    <h3>@item.CaseCount</h3>
+                }
+                else
+                {
+                    <h3>0</h3>
+                }
+                @if (isArabic)
+                {
+                    <p>@item.NameAr</p>
+                }
+                else
+                {
+                    <p>@item.NameEn</p>
+                }
+            </div>
+            <div class="icon">
+                <i class="ion-arrow-up-a"></i>
+            </div>
+            <a href="/Case/Index?state=csTF" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    break;
+    @*  case CaseState.csCO:
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-green-gradient">
+                <div class="inner">
+                    @if (item.CaseCount != null)
+                                    {
+                                    <h3>@item.CaseCount</h3>
+                                    }
+                                    else
+                                    {
+                                    <h3>0</h3>
+                                    }
+                    @if (isArabic)
+                                    {
+                                    <p>@item.NameAr</p>
+                                    }
+                                    else
+                                    {
+                                    <p>@item.NameEn</p>
+                                    }
+                </div>
+                <div class="icon">
+                    <i class="ion ion-star"></i>
+                </div>
+                <a href="/Case/Index?state=csCO" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        break;
+    *@
+case CaseState.finSit:
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green-gradient">
+            <div class="inner">
+                @if (item.CaseCount != null)
+                            {
+                    <h3>@item.CaseCount</h3>
+                }
+                else
+                {
+                    <h3>0</h3>
+                }
+                @if (isArabic)
+                            {
+                    <p>@item.NameAr</p>
+                }
+                else
+                {
+                    <p>@item.NameEn</p>
+                }
+            </div>
+            <div class="icon">
+                <i class="fa fa-bank"></i>
+            </div>
+            <a href="/Case/Index?state=csCO" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    break;
+case CaseState.csNewAr:
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-gray">
+            <div class="inner">
+                @if (item.CaseCount != null)
+                            {
+                    <h3>@item.CaseCount</h3>
+                }
+                else
+                {
+                    <h3>0</h3>
+                }
+                @if (isArabic)
+                            {
+                    <p>@item.NameAr</p>
+                }
+                else
+                {
+                    <p>@item.NameEn</p>
+                }
+            </div>
+            <div class="icon">
+                <i class="ion ion-android-archive"></i>
+            </div>
+            <a href="/Case/Index?state=csNewAr" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+                break;
+                @*case CaseState.csNo:
+                    <div class="col-lg-3 col-xs-6">
+                        <!-- small box -->
+                        <div class="small-box bg-maroon-gradient">
+                            <div class="inner">
+                                @if (item.CaseCount != null)
+                                {
+                                    <h3>@item.CaseCount</h3>
+                                }
+                                else
+                                {
+                                    <h3>0</h3>
+                                }
+                                @if (isArabic)
+                                {
+                                    <p>@item.NameAr</p>
+                                }
+                                else
+                                {
+                                    <p>@item.NameEn</p>
+                                }
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-wand"></i>
+                            </div>
+                            <a href="/Case/Index?state=csNo" class="small-box-footer">@LayoutRES.GO<i class="fa fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    break;
+                *@
+            default:
+                break;
+        }
+    }
+}

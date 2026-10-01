@@ -1,0 +1,110 @@
+﻿@model DTO.DonationStatisticsDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+
+
+<div class="modal fade" id="DonationStatisticsModel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+                        @Html.HiddenFor(x => x.Id, new { id = "TransferIdHID" })
+                        <input type="hidden" class="hidDonationType" name="DonationType" />
+                       
+                        @if (isArabic)
+                        {
+                            <label>@Model.NameArabic</label>
+
+                        }
+                        else
+                        {
+                            <label>@Model.NameEnglish</label>
+                        }
+                    </h4>
+
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "EditDonationStatisticsForm" }))
+                    {
+                        @Html.HiddenFor(m => m.Id)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+
+                                @Html.Label(DonationResources.Code, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Code, new { @class = "form-control", @disabled = "disabled" })
+                                    @Html.ValidationMessageFor(model => model.Code)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(DonationResources.NameArabic, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.NameArabic, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.NameArabic)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(DonationResources.NameEnglish, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.NameEnglish, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.NameEnglish)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(DonationResources.Value, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Value, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Value)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(DonationResources.TargetValue, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TargetValue, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TargetValue)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label(DonationResources.DescriptionArabic, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.DescriptionArabic, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.DescriptionArabic)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.Label(DonationResources.DescriptionEnglish, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.DescriptionEnglish, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.DescriptionEnglish)
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="box-footer">
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-8">
+                                    <input id="btnSubmitEdit" type="submit" value="@LayoutRES.Submit" class="btn btn-info" />
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,142 @@
+﻿@model CasesMonthlyRequestDTO
+@using System.Configuration
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = CaseResources.MonthlyCases;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+} 
+<div class="form-group col-sm-6 @floatToRight">
+    <label class="col-md-6 control-label">@CaseResources.Cases : @LayoutRES.UncompletedCase </label>
+</div>
+<br />
+<br />
+
+
+<input id="IsFilters" type="hidden" value="NoFilter" />
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+<script class="slotsTemplate" type="text/x-kendo-tmpl">
+    <input class="numeric" type="number" step="1" min="0" />
+</script>
+<script class="textTemplate" type="text/x-kendo-tmpl">
+    <textarea class="text"  rows="2" cols="22"></textarea>
+</script>
+@*<div class="form-group">
+        <label class="col-md-2 control-label">@CaseResources.CountMonthlyCases:</label>
+
+        <label class="col-md-1 control-label" id="lblCountMonthlyCases"></label>
+
+        <label class="col-md-1 control-label">@LayoutRES.Amount</label>
+
+        <label class="col-md-5 control-label" id="lblCasesMonthlyValueAmount"></label>
+    </div>*@
+@using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "createMonthlyCasesRequestForm" }))
+{ 
+    <div class="form-group">
+        <div class="col-sm-6">
+            @CaseResources.MonthlyCasesType
+            @Html.DropDownListFor(m => m.TypeId, new List<SelectListItem>(), new { @class = "form-control" })
+        </div>
+        <div class="col-sm-6">
+            @LayoutRES.Title
+            @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Title)
+        </div>
+    </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                @LayoutRES.Description
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Description)
+            </div>
+        </div>
+        <div id="distinationDiv">
+            @*<table class="table table-hover @floatToRight" id="monthlyCasestbl">
+                <tbody class="@floatToRight">
+                    <tr class="@floatToRight">
+                        <th>@CaseResources.Code</th>
+                        <th>@CaseResources.CaseName</th>
+                        <th>@LayoutRES.Amount</th>
+                        <th>Remove</th>
+                    </tr>
+                    @*<tr><td>#Code#</td><td>#Name#</td><td>#Amount#</td><td><input type="button" class="rmvbtn" value="@LayoutRES.Delete"/></td></tr>*@
+
+            @*  </tbody>*@
+
+            @*</table>*@*
+        </div>
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+                <table class="table table-bordered" id="monthlyCasestbl">
+                    <tbody>
+                        <tr>
+                            <th style="text-align: center;">@CaseResources.Code</th>
+                            <th style="text-align: center;">@CaseResources.CaseName</th>
+                            <th style="text-align: center;">@LayoutRES.Amount</th>
+                            <th style="text-align: center;" class="medical">@CaseResources.MedicalDuration</th>
+                            <th style="text-align: center;" class="medical">@CaseResources.MedicalDescription</th>
+                            <th style="text-align: center;">@LayoutRES.Delete</th>
+                        </tr>
+                        @*<tr><td>#Code#</td><td>#Name#</td><td>#Amount#</td><td><input type="button" class="rmvbtn" value="@LayoutRES.Delete"/></td></tr>*@
+
+                    </tbody>
+                </table>
+            </div><!-- /.box-body -->
+            <div class="box-footer clearfix">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">@CaseResources.CountMonthlyCases:</label>
+
+                    <label class="col-md-1 control-label" id="lblCountMonthlyCases"></label>
+
+                    <label class="col-md-1 control-label">@LayoutRES.Amount</label>
+
+                    <label class="col-md-5 control-label" id="lblCasesMonthlyValueAmount"></label>
+                </div>
+            </div>
+        </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input value="@LayoutRES.Submit" type="submit" class="btn btn-success" />
+                </div>
+            </div>
+
+
+}
+
+
+
+@section Scripts {
+    <script>
+        var Babys = '@CaseResources.Babys';
+        var Children = '@CaseResources.Children';
+        var Youth = '@CaseResources.Youth';
+        var Older = '@CaseResources.Older';
+        var ServiceName = '@CaseResources.ServiceType';
+        var DisesName = '@CaseResources.DisesaseType';
+        var ArchivingCaseTitle = '@CaseResources.ArchivingCase';
+        var ConfirmArchived = '@CaseResources.ConfirmArchived';
+        var Delete = '@LayoutRES.Delete';
+        var AddAmountToCase = '@CaseResources.AddAmountToCase';
+        var Amount = '@CaseResources.Amount';
+        var Addition = '@LayoutRES.Add';
+        var MedicalDuration = '@CaseResources.MedicalDuration';
+        var MedicalDescription = '@CaseResources.MedicalDescription';
+    </script>
+    <script src="~/Scripts/MersalScripts/MonthlyCasesManagment/CreateMonthlyCases.js"></script>
+    <script>
+        $(document).ready(function () {
+            SetCaseState('@((int)CaseState.csUC)');
+        });
+    </script>
+}
+

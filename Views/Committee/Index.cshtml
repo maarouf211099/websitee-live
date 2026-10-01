@@ -1,0 +1,49 @@
+﻿@model IEnumerable<DTO.CommitteeDTO>
+@using Resource 
+
+@{
+    ViewBag.Title = LayoutRES.Committee;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+ <head>
+     <title>@LayoutRES.Committee</title>
+ </head>
+<div class="col-md-12">
+    <div id="AllDivUser" class="col-md-3 sidebar column box box-success" style="min-height: 200px;">
+        <div class="form-group">
+            <label>@CaseResources.SearchForUser</label>
+            <input type="text" class="form-control" id="txtSearchUser" placeholder="@CaseResources.SearchForUser">
+        </div>
+
+        <div id="AllDivUser">
+            <ul id="autocompleteListOfUser" style="min-height: 165px;" class="todo-list ui-sortable"></ul>
+        </div>
+    </div>
+
+    <aside class="col-md-3 sidebar column box box-success" style="min-height: 200px;">
+        <div id="divUser">
+            <div><h4>@CaseResources.CommitteMember</h4></div>
+            <ul id="CommitteeListOfUser" style="min-height: 200px;" class="todo-list ui-sortable">
+                @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                        <li id='userId_@item.UserId' data-value='user'>@item.userName</li>
+                    }
+                }
+            </ul>
+        </div>
+    </aside>
+</div>
+<span style="display:none; color:red;" id="committeErrormsgspan"><b>@LayoutRES.CommitteeErrorMsg</b></span>
+<input type="button" value="@LayoutRES.Submit" id="AddUser" class="btn btn-info" />
+
+
+
+
+@section Scripts { 
+    @*<script src="~/Scripts/MersalScripts/CommitteeScript.js" type="text/javascript"></script>*@
+    @Scripts.Render("~/bundles/Committee") 
+}
+
+

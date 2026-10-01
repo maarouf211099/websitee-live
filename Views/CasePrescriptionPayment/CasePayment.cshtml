@@ -1,0 +1,116 @@
+﻿@model UserUI.Models.CasePaymentViewModel
+@using UserUI.Helper
+@using Resource.Pharmacy.CasePrescription
+@using Resource
+@using Resource.Pharmacy
+@{
+    ViewBag.Title = " صرف روشته الحاله";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>
+        صرف روشته الحاله
+    </title>
+</head>
+
+<br />
+<br />
+
+
+@Html.HiddenFor(m => m.CaseId)
+
+<div class="row">
+    <div class="col-md-12" dir="@dir">
+        <div class="@floatToRight">
+            اسم الحاله:
+            @Html.ValueFor(m => m.CaseName)
+        </div>
+    </div>
+</div>
+
+<div>
+
+    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "form-horizontal", id = "AddCasePrescriptionMedicineForm" }))
+    {
+        <div class="box-body">
+            <div class="form-group" dir="@dir">
+                <div class="col-sm-4 @floatToRight">
+                    اسم الدواء
+                    <br />
+                    @Html.DropDownListFor(x => x.MedicineId, new List<SelectListItem>(), new { @class = "MedicineId form-control" })
+                    @Html.ValidationMessageFor(m => m.MedicineId)
+                </div>
+            </div>
+            <div class="form-group" dir="@dir">
+                <div class="col-sm-4 @floatToRight">
+                    الوحده
+                    <br />
+                    @Html.DropDownListFor(x => x.Unit, new List<SelectListItem>(), new { @class = "Unit form-control" })
+
+                    @Html.ValidationMessageFor(m => m.Unit)
+                </div>
+
+                <div class="col-sm-2 @floatToRight">
+                    الكميه
+                    <br />
+                    @Html.TextBoxFor(m => m.Quantity, "1", new { @type = "number", @class = "form-control", placeholder = Html.DisplayNameFor(m => m.Quantity) })
+                    @Html.ValidationMessageFor(m => m.Quantity)
+                </div>
+
+
+            </div>
+
+        </div>
+        <div class="">
+            <button type="submit" class="btn btn-info">@LayoutRES.Submit</button>
+        </div>
+    }
+</div>
+
+<br />
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+<br />
+
+<button type="button" class="btn btn-info" onclick="submitCasePayment()">صرف</button>
+
+
+
+@section Scripts {
+    <script>
+        var CaseId =  '@CasePrescriptionRES.CaseId';
+        var CaseName = '@CasePrescriptionRES.CaseName';
+        var Prescription = '@CasePrescriptionRES.Prescription';
+        var CreatedOn = '@CasePrescriptionRES.CreatedOn';
+        var savedSuccessfully = '@LayoutRES.SuccessfullyAdd';
+        var CasePrescriptionId = @Model.CasePrescriptionId;
+    </script>
+    <script src="~/Scripts/PharmacyScripts/casePrescriptionPayment/casePayment.js"></script>
+    <script>
+        var apiurl = MersalWebAPIBaseUrl + "api/Medicine/GetMedicinesLookup"
+        $(document).ready(function () {
+            RefreshGird();
+
+            $("#MedicineId").kendoDropDownList({
+                dataTextField: "CommercialName",
+                dataValueField: "Id",
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: apiurl,
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,364 @@
+﻿@model DTO.Emergency.EmergencyCaseDto
+@using Resource
+@using Resource.Emergency
+@using UserUI.Helper
+@using DTO
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var KendoClass = isArabic ? "k-rtl" : "";
+
+}
+
+<style>
+    .k-file .k-filename {
+        color: black;
+    }
+    .submit-btn{
+    display: flex;
+    justify-content: center;
+    }
+     .submit-btn input, .submit-btn input:hover{
+      background-color: #edb71f;
+    color: white;
+}
+</style>
+
+<strong>@LayoutRES.AddEmergencyCase</strong>
+
+@using (Html.BeginForm("CreateEmergencyRequest", "EmergencyCase", null, FormMethod.Post, new { @class = "", id = "createEmergencyRequestForm", enctype = "multipart/form-data" }))
+{
+    <div class="row">
+        <input type="hidden" id="Source" name="Source" value="@((int)CaseSource.CWeb)" />
+        <br />
+        <div class="textfield">
+            <div class="col-md-6 @floatToRight">
+                <h5>@Html.DisplayNameFor(m => m.CaseName)</h5>
+                @Html.TextBoxFor(m => m.CaseName, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.CaseName) })
+                @Html.ValidationMessageFor(m => m.CaseName)
+            </div>
+
+
+            <div class="col-sm-6 @floatToRight">
+                <h5>@Html.DisplayNameFor(m => m.Age)</h5>
+                @Html.TextBoxFor(m => m.Age, new { placeholder = Html.DisplayNameFor(m => m.Age) })
+                @Html.ValidationMessageFor(m => m.Age)
+            </div>
+
+        </div>
+
+        <strong style="float: left;width: 100%;text-align: center;margin-top: 10px;color:#37a1a2">@CaseResources.SenderData</strong>
+
+        <div class="textfield">
+            <br />
+            <div class="col-sm-6 @floatToRight">
+                <h5>@Html.DisplayNameFor(m => m.NameAnonymous)</h5>
+                @Html.TextBoxFor(m => m.NameAnonymous, new { placeholder = Html.DisplayNameFor(m => m.NameAnonymous) })
+                @Html.ValidationMessageFor(m => m.NameAnonymous)
+            </div>
+
+            <div class="col-sm-6 @floatToRight">
+                <h5>@Html.DisplayNameFor(m => m.PhoneNumberAnonymous)</h5>
+                @Html.TextBoxFor(m => m.PhoneNumberAnonymous, new { placeholder = Html.DisplayNameFor(m => m.PhoneNumberAnonymous) })
+                @Html.ValidationMessageFor(m => m.PhoneNumberAnonymous)
+            </div>
+            @Html.HiddenFor(x => x.Mobile)
+        </div>
+
+
+        <div class="textfield">
+            <div class="col-md-6 @floatToRight">
+                <h5>@Html.DisplayNameFor(m => m.DiagnosisId)</h5>
+                @Html.DropDownListFor(x => x.DiagnosisId, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible", id = "EmergencyServiceType" })
+                @Html.ValidationMessageFor(m => m.DiagnosisId)
+            </div>
+        </div>
+
+        <div class="textfield">
+
+        </div>
+
+
+        <div id="coronaForm" class="coronaForm" style="display:none">
+
+            <strong style="float: left;width: 100%;text-align: center;margin-top: 10px;color:#37a1a2">بيانات اشتباه الكورونا</strong>
+
+            <div class="textfield">
+
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.NeedId)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.NeedId, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.NeedId)
+                </div>
+
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.DiseaseStartDateString)</h5>
+                    @Html.TextBoxFor(m => m.CoronaForm.DiseaseStartDateString, new { @class = "DateTillNow form-control"
+                                                                             , placeholder = Html.DisplayNameFor(m => m.CoronaForm.DiseaseStartDateString) })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.DiseaseStartDateString)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <br />
+                <div class="col-sm-3 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.PCRTest)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.PCRTest, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                               }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.PCRTest)
+                </div>
+            </div>
+
+            <div class="textfield PCRTestContainer">
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.PCRLocation)</h5>
+                    @Html.TextBoxFor(m => m.CoronaForm.PCRLocation, new { placeholder = Html.DisplayNameFor(m => m.CoronaForm.PCRLocation) })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.PCRLocation)
+                </div>
+                <div class="col-sm-3 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.PCRTestDateString)</h5>
+                    @Html.TextBoxFor(m => m.CoronaForm.PCRTestDateString, " ", new { @class = "DateTillNow form-control" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.PCRTestDateString)
+                </div>
+
+            </div>
+
+            <div class="textfield">
+                <br />
+                <div class="col-sm-3 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.IsTheTempertureHigh)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.IsTheTempertureHigh, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                               }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.IsTheTempertureHigh)
+                </div>
+            </div>
+
+
+            <div class="textfield tempertureContainer">
+                <div class="col-sm-3 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.Temperture)</h5>
+                    @Html.TextBoxFor(m => m.CoronaForm.Temperture, new { placeholder = Html.DisplayNameFor(m => m.CoronaForm.Temperture) })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.Temperture)
+                </div>
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.IsTempertureDescreseByMedicine)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.IsTempertureDescreseByMedicine, new List<SelectListItem>() {
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.IsTempertureDescreseByMedicine)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.HasChronicDiseases)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.HasChronicDiseases, new List<SelectListItem>() {
+                                                                                   new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                               }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.HasChronicDiseases)
+                </div>
+            </div>
+            <div class="textfield chronicDiseasesNamesContainer">
+                <div class="col-sm-12 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.ChronicDiseasesNames)</h5>
+                    @Html.TextAreaFor(m => m.CoronaForm.ChronicDiseasesNames, new { placeholder = Html.DisplayNameFor(m => m.CoronaForm.ChronicDiseasesNames) })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.ChronicDiseasesNames)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-12 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.Medicines)</h5>
+                    @Html.TextAreaFor(m => m.CoronaForm.Medicines, new { placeholder = Html.DisplayNameFor(m => m.CoronaForm.Medicines) })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.Medicines)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.UseOxygen)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.UseOxygen, new List<SelectListItem>() {
+                                                                                   new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                               }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.UseOxygen)
+                </div>
+            </div>
+
+
+            <div class="textfield usOxygenContainer">
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.IsStillUseOxygen)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.IsStillUseOxygen, new List<SelectListItem>() {
+                                                                                   new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                    new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                               }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.IsStillUseOxygen)
+                </div>
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.PercentageOfOxygen)</h5>
+                    @Html.TextBoxFor(m => m.CoronaForm.PercentageOfOxygen, new { placeholder = Html.DisplayNameFor(m => m.CoronaForm.PercentageOfOxygen) })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.PercentageOfOxygen)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-6 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.CanEatAndDrink)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.CanEatAndDrink, new List<SelectListItem>() {
+                                                                                                       new SelectListItem() { Text=EmergencyCaseRES.Yes, Value="true" },
+                                                                                                       new SelectListItem() { Text=EmergencyCaseRES.No, Value="false" }
+                                                                                                   }, "", new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.CanEatAndDrink)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-4 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.CaseLocationId)</h5>
+                    @Html.DropDownListFor(x => x.CoronaForm.CaseLocationId, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible" })
+                    @Html.ValidationMessageFor(m => m.CoronaForm.CaseLocationId)
+                </div>
+                <div class="hospitalLocationContainer">
+                    <div class="col-sm-4 @floatToRight">
+                        <h5>@Html.DisplayNameFor(m => m.CoronaForm.HospitalName)</h5>
+                        @Html.TextBoxFor(m => m.CoronaForm.HospitalName, new { placeholder = Html.DisplayNameFor(m => m.CoronaForm.HospitalName) })
+                        @Html.ValidationMessageFor(m => m.CoronaForm.HospitalName)
+                    </div>
+
+                    <div class="col-sm-4 @floatToRight">
+                        <h5>@Html.DisplayNameFor(m => m.CoronaForm.HospitalLocationId)</h5>
+                        @Html.DropDownListFor(x => x.CoronaForm.HospitalLocationId, new List<SelectListItem>(), new { @class = "select2 select2-hidden-accessible" })
+                        @Html.ValidationMessageFor(m => m.CoronaForm.HospitalLocationId)
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="textfield">
+                @Html.HiddenFor(x => x.CoronaForm.CoronaTestIDs)
+
+                <div class="form-group" dir="@dir">
+                    <div class="col-sm-12 @floatToRight">
+                        <h5>@Html.DisplayNameFor(m => m.CoronaForm.CoronaTestIDs)</h5>
+                    </div>
+                    <br />
+                    <div class="CoronaTestIdsDiv @floatToRight">
+
+                    </div>
+                    @Html.ValidationMessageFor(m => m.CoronaForm.CoronaTestIDs)
+                </div>
+            </div>
+
+
+            <div class="textfield">
+                <div class="col-sm-12 @floatToRight">
+                    @Html.HiddenFor(x => x.CoronaForm.SymptomsIDs)
+                    <h5>@Html.DisplayNameFor(m => m.CoronaForm.SymptomsIDs)</h5>
+                    <br />
+                    <div class="SymptomsIDsDiv @floatToRight">
+
+                    </div>
+
+                    @Html.ValidationMessageFor(m => m.CoronaForm.SymptomsIDs)
+                </div>
+            </div>
+
+
+            <div class="textfield otherContainer" style="display:none">
+                @Html.HiddenFor(x => x.CoronaForm.AddSymptomOtherText.Id)
+                <div class="form-group" dir="@dir">
+                    <div class="col-sm-6 @floatToRight">
+                        @Html.TextBoxFor(x => x.CoronaForm.AddSymptomOtherText.OtherText, new { placeholder = EmergencyCaseRES.OtherEmergencyText })
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="textfield">
+                <input type="hidden" id="CaseHaseFile" />
+                <div class="demo-section k-content @KendoClass ">
+                    @(Html.Kendo().Upload()
+                                                                                                                                                                                                                                                                                                                                                            .Name("files")
+                                                                                                                                                                                                                                                                                                                                                             .Messages(m => m.Select(EmergencyCaseRES.PCRAndAnalysisAttachment).UploadSelectedFiles(""))
+                                                                                                                                                                                                                                                                                                                                                            .TemplateId("fileTemplate")
+                                                                                                                                                                                                                                                                                                                                                            .HtmlAttributes(new { id = "CaseFile" })
+                                                                                                                                                                                                                                                                                                                                                            .Multiple(true)
+                                                                                                                                                                                                                                                                                                                                                            .Async(a => a
+                                                                                                                                                                                                                                                                                                                                                            .Save("UploadCaseAttachment", "EmergencyCase")
+                                                                                                                                                                                                                                                                                                                                                            .AutoUpload(false)
+                                                                                                                                                                                                                                                                                                                                                            .Batch(true)
+                                                                                                                                                                                                                                                                                                                                                            )
+                                                                                                                                                                                                                                                                                                                                                            .Events(c => c
+                                                                                                                                                                                                                                                                                                                                                            .Upload("onUploadEmergencyNewCase").Success("onSuccessUploadNewEmergencyCase")
+                                                                                                                                                                                                                                                                                                                                                            .Select("onEmergencySelectCaseFile")
+                                                                                                                                                                                                                                                                                                                                                            )
+                    )
+                </div>
+                <div class="divStatus"></div>
+            </div>
+
+
+        </div>
+
+        <div id="emergencyForm" class="emergencyForm" style="display:none">
+            <strong style="float: left;width: 100%;text-align: center;margin-top: 10px;color:#37a1a2">بيانات حاله الطواريء</strong>
+
+            <div class="textfield">
+                <div class="col-sm-12 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.EmergencyForm.Description)</h5>
+                    @Html.TextAreaFor(m => m.EmergencyForm.Description, new { placeholder = Html.DisplayNameFor(m => m.EmergencyForm.Description) })
+                    @Html.ValidationMessageFor(m => m.EmergencyForm.Description)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-12 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.EmergencyForm.Requirements)</h5>
+                    @Html.TextAreaFor(m => m.EmergencyForm.Requirements, new { placeholder = Html.DisplayNameFor(m => m.EmergencyForm.Requirements) })
+                    @Html.ValidationMessageFor(m => m.EmergencyForm.Requirements)
+                </div>
+            </div>
+
+            <div class="textfield">
+                <div class="col-sm-12 @floatToRight">
+                    <h5>@Html.DisplayNameFor(m => m.EmergencyForm.Notes)</h5>
+                    @Html.TextAreaFor(m => m.EmergencyForm.Notes, new { placeholder = Html.DisplayNameFor(m => m.EmergencyForm.Notes) })
+                    @Html.ValidationMessageFor(m => m.EmergencyForm.Notes)
+                </div>
+            </div>
+
+ 
+        </div>
+        <div class="textfield">
+            <br />
+        </div>
+
+<div class="col-md-12 submit-btn">
+    <input type="submit proceed" value="@LayoutRES.Send" class="btn">
+
+</div>
+    </div>
+}
+
+<strong id="requestMessage" style="margin-bottom: 25px;width: 80%;display:none;">
+
+</strong>
+<div style="height: 300px;"></div>
+<script>
+
+    var isAuthenticatedUser = '@AuthorizationHelper.IsAuthenticated()';
+
+</script>
+
+<script src="~/Scripts/MersalScripts/EmergencyCase/add-emergency-case.js?version=1.1"></script>

@@ -1,0 +1,817 @@
+﻿
+@model WithdrawPermissionSearchDTO
+@using DTO
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@using Resource
+@{
+    ViewBag.Title= StoreOperationsRes.WithdrawPermission;
+    Layout = "~/Views/Store/StoreOperations.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (UserUI.Helper.CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<h2>@StoreOperationsRes.WithdrawPermission</h2>
+
+<div id="AddOrEditWithdrawPermissionDiv"></div>
+<div id="DeleteWithdrawPermissionDiv"></div>
+@Html.Partial("~/Views/StoreOperation/ViewPrintWithdrawPermission.cshtml", new WithdrawPermissionDTO())
+
+@{
+    var culture = System.Globalization.CultureInfo.CurrentCulture.ToString();
+
+    var layoutPath = ConfigurationManager.AppSettings["LayoutPath"] != null ?
+        ConfigurationManager.AppSettings["LayoutPath"] : "~/Views/Shared/_AdminLayout.cshtml";
+
+    Layout = layoutPath;
+
+}
+<script src="~/Scripts/MersalScripts/Volunteers/searchObjectBuilder.js"></script>
+
+
+<style>
+    #Grid .k-grid-header .k-header {
+        color: white;
+    }
+</style>
+<div id="_searchWithdrawPermissions" class="AccordionDiv box-body">
+    <h3>@StoreOperationsRes.Search</h3>
+    <div id="_searchWithdrawPermissions" class="box-body">
+        @using (Html.BeginForm("AddNewItem", "InventoryItem", null, FormMethod.Post, new { role = "form", id = "frmSearchStoreOperation", @class = "form-horizontal", }))
+        {
+            <div class="box-body">
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+
+                    <div class="col-md-4" floatToRight style="align-items:center">
+                        <div class="col-md-2">
+                            <input type="radio" name="IsConfirmed" checked value="0" style="width:25px;height:25px;margin:0!important" />
+                        </div>
+                        <div class="col-md-10">
+                            <label>@StoreOperationsRes.NotConfirmed  </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4" floatToRight>
+                        <div class="col-md-2">
+                            <input type="radio" name="IsConfirmed" floatToRight value="1" style="width:25px;height:25px;margin:0!important" />
+                        </div>
+                        <div class="col-md-10">
+                            <label color="white"> @StoreOperationsRes.Confirmed</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4" floatToRight>
+                        <div class="col-md-2">
+                            <input type="radio" name="IsConfirmed" floatToRight value="2" style="width:25px;height:25px;margin:0!important" />
+                        </div>
+                        <div class="col-md-10">
+                            <label color="white"> @StoreOperationsRes.All</label>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4" dir="@dir">
+
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.StoreId)</h5>
+                        @Html.DropDownListFor(x => x.StoreId, new List<SelectListItem>(), new { @class = "form-control", id = "ddlSearchStoreId" })
+                        @Html.ValidationMessageFor(m => m.StoreId)
+
+                    </div>
+                    <div class="col-md-4" dir="@dir">
+
+                        <h5 class="h5White">@Html.DisplayNameFor(m => m.InventoryItemId)</h5>
+                        @Html.DropDownListFor(x => x.InventoryItemId, new List<SelectListItem>(), new { @class = "form-control", id = "ddlSearchInventoryItemId" })
+                        @Html.ValidationMessageFor(m => m.InventoryItemId)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-4" @floatToRight>
+                        <div>@Html.DisplayNameFor(m => m.MinWithdrawCreationDate)</div>
+                        <input id="datepicker" class="KendoDatePicker" name="ExpirationDate" value="@Model.MinWithdrawCreationDate" style="width: 100%" placeholder="@StoreOperationsRes.ExpirationDate" />
+                        @Html.ValidationMessageFor(m => m.MinWithdrawCreationDate)
+                    </div>
+                    <div class="col-md-4" @floatToRight>
+                        <div>@Html.DisplayNameFor(m => m.MaxWithdrawCreationDate)</div>
+                        <input id="datepicker" class="KendoDatePicker" name="ArrivalOrExchangeDate" value="@Model.MaxWithdrawCreationDate" style="width: 100%" placeholder="@StoreOperationsRes.ArrivalOrExchangeDate" />
+                        @Html.ValidationMessageFor(m => m.MaxWithdrawCreationDate)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-4" @floatToRight>
+                        <div>@Html.DisplayNameFor(m => m.UserName)</div>
+                        @Html.TextBoxFor(m => m.UserName, new { placeholder = Html.DisplayNameFor(m => m.UserName), id = "txtUserName", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.UserName)
+                    </div>
+                    <div class="col-md-4" @floatToRight>
+                        <div>@Html.DisplayNameFor(m => m.CaseCode)</div>
+                        @Html.TextBoxFor(m => m.CaseCode, new { placeholder = Html.DisplayNameFor(m => m.CaseCode), id = "txtUserName", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.CaseCode)
+                    </div>
+                </div>
+            </div>
+                    <!-- /.box-body -->
+            <hr />
+            <div class="box-footer">
+                <button type="submit" class="btn btn-info Accordion-Custom-Click-Close">@LayoutRES.Submit</button>
+                <button type="button" class="btn btn-default Accordion-Custom-Click-Close" data-dismiss="modal">@LayoutRES.Close</button>
+            </div><!-- /.box-footer -->
+        }
+    </div>
+</div>
+<br />
+<div class="box-body">
+    <div style="float: @(isArabic ? "left" : "right");">
+        <div @*class="navbar-form @(CultureHelper.IsRighToLeft() ? "navbar-left" : "navbar-right")"*@>
+        @*<button id="btnAddWithdrawPermission" type="button" class="btn btn-blue">@StoreOperationsRes.Withdraw</button>*@
+            <button id="btnAddWithdrawPermission" type="button" class="btn btn-info">@StoreOperationsRes.Withdraw</button>
+
+        </div>
+    </div>
+    <br />
+    <br />
+
+    <div class="@(!isArabic ? "k-rtl" : "")">
+        <div id="WithdrawPermissions_Grid"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        function onSelect(e) {
+            switch ($(e.item).index()) {
+                case 1:
+                    //bind Privileges
+                    bindPrivileges();
+                    break;
+                case 2:
+                    //bind Groups
+                    bindGroups();
+                    break;
+                case 3:
+                    //bind Roles
+                    bindRoles();
+                    break;
+                case 4:
+                    bindMenus();
+                    break;
+            }
+
+        }
+        $(".AccordionDiv").accordion({
+            collapsible: true,
+            active: true,
+            header: "h3",
+            heightStyle: "content",
+        });
+        $("#tabstrip").kendoTabStrip({
+            select: onSelect,
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            }
+        });
+    });
+
+    function initialzeUserTabs() {
+        var tabStrip = $("#tabstrip").kendoTabStrip().data("kendoTabStrip");
+        tabStrip.select(0);
+    }
+</script>
+<script type="text/javascript">
+    $(function () {
+        searchWithdrawPermissions();
+
+        $('#btnSearch_User').click(function (evt) {
+            searchWithdrawPermissions();
+        });
+    });
+
+    function searchWithdrawPermissions() {
+        //var jsonObject = searchObjectBuilder.getJsonSearchObj('searchBox_User input');
+        //var strJSON = JSON.stringify(jsonObject);
+        var _data = {
+            "isNotConfirmedFilter": true,
+            "isDeletedFilter": false
+        };
+        $.ajax({
+            url: '@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'api/StoreOperations/GetAllWithdrawPermissions?isNotConfirmedFilter=True&isDeletedFilter=false',
+            cache: false,
+            type: "POST",
+            headers: getHeaders(),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(_data),
+            success: function (data) {
+                bindWithdrawPermissionsGrid(data);
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            },
+            async: true,
+            processData: false
+        });
+    }
+    function RefreshWithdrawPermissions() {
+        //var jsonObject = searchObjectBuilder.getJsonSearchObj('searchBox_User input');
+        //var strJSON = JSON.stringify(jsonObject);
+        var _data = {
+            "isNotConfirmedFilter": true,
+            "isDeletedFilter": false
+        };
+        $.ajax({
+            url: '@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'api/StoreOperations/GetAllWithdrawPermissions?isNotConfirmedFilter=True&isDeletedFilter=false',
+            cache: false,
+            type: "Post",
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(_data),
+            //data: strJSON,
+            success: function (data) {
+                ds1 = new kendo.data.DataSource({
+                    data: data
+                });
+
+                var grid = $("#WithdrawPermissions_Grid").data("kendoGrid");
+                grid.dataSource = ds1;
+                ds1.read();
+                grid.refresh();
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            },
+            async: true,
+            processData: false
+        });
+    }
+</script>
+<script type="text/javascript">
+    function bindWithdrawPermissionsGrid(jsonData) {
+        var firstDeleteRequest = 1;
+
+        var isHidden = !$("#IsActiveUser").is(":checked");
+
+        var commands = [{
+            name: "details",
+            text: "",
+            iconClass: "fa fa-file-text-o fa-fw fa-2x",
+            click: function (e) {
+                var tr = $(e.target).closest("tr");
+                var id = tr.find('.id-cell').text();
+
+                EditWithdrawPermission(id);
+            }
+        },
+               {
+                   name: "delete",
+                   text: "",
+                   iconClass: "fa fa-trash-o fa-fw fa-2x",
+                   click: function (e) {
+                       var tr = $(e.target).closest("tr");
+                       var id = tr.find('.id-cell').text();
+
+                       var CallBackFunction = function () { DeleteWithdrawPermission(tr, id); };
+                       confirmMessage("Confirmation", "are you sure you want to delete", 400, 250, CallBackFunction);
+
+
+                       //DeleteWithdrawPermission(tr, id);
+                       $(this).disabled = true;
+
+                   }
+               }];
+
+        _columns = [
+                { field: "Id", filterable: false, hidden: true, attributes: { "class": "id-cell" } },
+                { field: "Quantity", title: "@StoreOperationsRes.Quantity" },
+            {
+                field: 'StoreName',
+                title: "@StoreOperationsRes.StoreId",
+                filterable: true
+            },
+            {
+                field: 'InventoryItemName',
+                title: "@StoreOperationsRes.InventoryItemId",
+                filterable: true
+            },
+            {
+                field: 'CaseCode',
+                title: "@StoreOperationsRes.CaseId",
+                filterable: true
+            },
+            {
+                field: 'UserName',
+                title: "@StoreOperationsRes.UserId",
+                filterable: true
+            },
+            {
+                template: "#=getConfirmTemplate(Id,IsConfirmed,Quantity,AvailableQuantityAtStore)#",
+                title: "@StoreOperationsRes.Confirm",
+            },
+            {
+                field: "AvailableQuantityAtStore",
+                title: "@StoreOperationsRes.AvailableQuantity",
+            },
+
+
+            @*{
+                field: "ExpirationDateString",
+                title: "@StoreOperationsRes.ExpirationDate",
+            },*@
+            @*{
+
+                template: "#=IsDeposit ? ArrivalOrExchangeDateString: ''#",
+                field: "ArrivalOrExchangeDateString",
+                title: "@StoreOperationsRes.DepositDate",
+            },*@
+            @*{
+                template: "#=IsDeposit ?'':ArrivalOrExchangeDateString#",
+                field: "ArrivalOrExchangeDateString",
+                title: "@StoreOperationsRes.WithdrawDate",
+            },*@
+            {
+                title: '@LayoutRES.Manage',
+                command: commands,
+                width: 200
+            }]
+
+        $("#WithdrawPermissions_Grid").html("");
+        $("#WithdrawPermissions_Grid").kendoGrid({
+            groupable: false,
+            scrollable: false,
+            sortable: true,
+            editable: true,
+            pageable: {
+                pageSize: 10,
+                refresh: false
+            },
+            selectable: "multiple cell",
+            allowCopy: {
+                delimeter: ",",
+            },
+            columns: _columns,
+            filterable: {
+                extra: false,
+                messages: {
+                    filter: "@CommonRes.Filter", // sets the text for the "Filter" button
+                    clear: "@CommonRes.Clear", // sets the text for the "Clear" button
+
+                    // when filtering boolean numbers
+                    isTrue: "@CommonRes.IsTrue", // sets the text for "isTrue" radio button
+                    isFalse: "@CommonRes.IsFalse", // sets the text for "isFalse" radio button
+
+                    //changes the text of the "And" and "Or" of the filter menu
+
+                    and: "@CommonRes.And",
+                    or: "@CommonRes.Or",
+                    itemsPerPage: "@CommonRes.ItemsPerPage",
+                    of: "@CommonRes.Of",
+                    items: "@CommonRes.Items"
+
+                }
+                , operators: {
+                    //filter menu for "string" type columns
+                    string: {
+                        EqualsTo: "@CommonRes.EqualsTo",
+                        NotEqualTo: "@CommonRes.NotEqualTo",
+                        StartsWith: "@CommonRes.StartsWith",
+                        EndsWith: "@CommonRes.EndsWith",
+                        Contain: "@CommonRes.Contain",
+                        doesNotContain: "@CommonRes.DoesNotContain",
+                        IsGreaterThan: "@CommonRes.IsGreaterThan",
+                        IsLessThan: "@CommonRes.IsLessThan",
+                        IsGreaterThanOrEqualTo: "@CommonRes.IsGreaterThanOrEqualTo",
+                        IsLessThanOrEqualTo: "@CommonRes.IsLessThanOrEqualTo"
+                    },
+
+                }
+            },
+            dataSource: {
+                data: jsonData,
+                schema: {
+                    model: { id: "Id" }
+                }
+            }
+        });
+    }
+</script>
+
+<script type="text/javascript" id="edit delete / items">
+</script>
+<script type="text/javascript">
+    var PrintWithdrawId = 0;
+    $(document).ready(function () {
+    });
+</script>
+<script type="text/javascript">
+
+    // this derivation fro the function is to reduce the number of requests
+    function GetAnyMasterDetalisCode(MasterCode, dropDownListId, enableAll, async, selectedId) {
+        $.ajax({
+            type: "GET",
+            async: false,
+            contentType: "application/json",
+            url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + MasterCode,
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                var selec = "";
+                var textByIdArr = [];
+                $.each(data, function (key, value) {
+
+                    if (value.masterCodeValue == MasterCode) {
+                        if (value.Id == selectedId) selec = " selected='selected' ";
+                        if (_cultureIsArabic) {
+                            html += "<option Code=" + value.Code + " value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                            textByIdArr[value.Id.toString()] = value.NameAr;
+                        }
+                        else {
+                            html += "<option Code=" + value.Code + " value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                            textByIdArr[value.Id.toString()] = value.NameEn;
+                        }
+                    }
+                });
+                $("#" + dropDownListId).html(html);
+            },
+            error: function (xhr) { 
+    toastr.error(xhr.statusText);
+            }
+        });
+    }
+    function isset(variable) {
+        return typeof variable !== typeof undefined ? true : false;
+    }
+</script>
+<script id="showPopUps">
+
+    $("#btnAddStoreOperation").click(function () {
+
+        $("#AddOrEditWithdrawPermissionDiv").html("");
+        $.ajax({
+            url: "/StoreOperation/ViewAddStoreOperation",
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+
+                $("#AddOrEditWithdrawPermissionDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                RefreshWithdrawPermissions();
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+    });
+    function EditWithdrawPermission(userId) {
+        $("#AddOrEditWithdrawPermissionDiv").html("");
+        $.ajax({
+            url: "/StoreOperation/ViewEditWithdrawPermission?id=" + userId,
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+                $("#AddOrEditWithdrawPermissionDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                RefreshWithdrawPermissions();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+
+    }
+    $("#btnAddStoreOperation").click(function () {
+
+        $("#AddOrEditWithdrawPermissionDiv").html("");
+        $.ajax({
+            url: "/StoreOperation/ViewAddStoreOperation",
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+
+                $("#AddOrEditWithdrawPermissionDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+    });
+    $("#btnAddDepositOperation").click(function () {
+
+        $("#AddOrEditWithdrawPermissionDiv").html("");
+        $.ajax({
+            url: "/StoreOperation/ViewAddDepositOperation",
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+
+                $("#AddOrEditWithdrawPermissionDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+    });
+    $("#btnAddWithdrawOperation").click(function () {
+
+        $("#AddOrEditWithdrawPermissionDiv").html("");
+        $.ajax({
+            url: "/StoreOperation/ViewAddWithdrawOperation",
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+
+                $("#AddOrEditWithdrawPermissionDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+    });
+    $("#btnAddWithdrawPermission").click(function () {
+
+        $("#AddOrEditWithdrawPermissionDiv").html("");
+        $.ajax({
+            url: "/StoreOperation/ViewAddWithdrawPermission",
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+
+                $("#AddOrEditWithdrawPermissionDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+
+                Print(PrintWithdrawId);
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+    });
+
+    function DeleteWithdrawPermission(GridRowToDelete, userId) {
+
+        $.ajax({
+            url: '@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'api/StoreOperations/DeleteWithdrawPermission?ID=' + userId,
+            type: 'Get',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result == 1) {
+                    toastr.success('@InventoryItemsRes.OperationSucceeded');
+                    $(GridRowToDelete).remove();
+                }
+                else {
+                    toastr.error('@InventoryItemsRes.OperationFailed')
+                    // $('#deleteView_User').html(result);
+                    // $('#deleteView_User').modal('show');
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+
+</script>
+<script id="loadKendDatePicker">
+
+    //$(".KendoDatePicker").kendoDatePicker({
+    //  animation: false
+    //});
+
+    if (_cultureIsArabic) {
+        kendo.culture("ar-EG");
+    }
+    $(".KendoDatePicker").kendoDatePicker({
+        format: "dd/MM/yyyy",
+    }).attr("readonly", "readonly");
+    $(".KendoDatePicker").removeClass("KendoDatePicker");
+</script>
+
+<script id="load drop down lists">
+    function loadStoresList(dropDownListId, enableAll, async, selectedId) {
+        $.ajax({
+            type: "Post",
+            async: false,
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/stores/GetAllStores",
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                var selec = "";
+                var textByIdArr = [];
+                $.each(data, function (key, value) {
+
+
+                    if (value.Id == selectedId) selec = " selected='selected' ";
+                    if (_cultureIsArabic) {
+                        html += "<option  value=" + value.Id + selec + "  >" + value.Name + "</option>";
+
+                    }
+                    else {
+                        html += "<option  value=" + value.Id + selec + " >" + value.Name + "</option>";
+                    }
+
+                });
+                $("#" + dropDownListId).html(html);
+            },
+            error: function (xhr) { 
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+    function loadInventoryItemsList(dropDownListId, enableAll, async, selectedId) {
+        $.ajax({
+            type: "Post",
+            async: false,
+            contentType: "application/json",
+            url: MersalWebAPIBaseUrl + "api/InventoryItems/GetAllInventoryItems",
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+
+                var selec = "";
+                var textByIdArr = [];
+                $.each(data, function (key, value) {
+
+
+                    if (value.Id == selectedId) selec = " selected='selected' ";
+                    if (_cultureIsArabic) {
+                        html += "<option  value=" + value.Id + selec + "  >" + value.Name + "</option>";
+
+                    }
+                    else {
+                        html += "<option value=" + value.Id + selec + " >" + value.Name + "</option>";
+                    }
+
+                });
+                $("#" + dropDownListId).html(html);
+            },
+            error: function (xhr) { 
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+    loadStoresList("ddlSearchStoreId", true, false, 0);
+    loadInventoryItemsList("ddlSearchInventoryItemId", true, false, 0);
+</script>
+
+<script id="form submit">
+    function registerSearchFormSubmitting() {
+        $("#frmSearchStoreOperation").submit(function (e) {
+            var apiurl = MersalWebAPIBaseUrl + "api/StoreOperations/searchWithdrawPermissions";
+            $.validator.unobtrusive.parse($("#frmSearchStoreOperation"))
+            e.preventDefault();
+            if (!$("#frmSearchStoreOperation").valid()) return;
+
+            var data = {};
+            $("#frmSearchStoreOperation").serializeArray().map(function (x) { data[x.name] = x.value; });
+
+            console.log(JSON.stringify(data));
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: apiurl,
+                crossDomain: true,
+                headers: getHeaders(),
+                data: JSON.stringify(data),
+                async: false,
+                success: function (data) {
+                    ds1 = new kendo.data.DataSource({
+
+                        data: data
+                    });
+
+                    var grid = $("#WithdrawPermissions_Grid").data("kendoGrid");
+                    grid.dataSource = ds1;
+                    ds1.read();
+                    grid.refresh();
+                },
+                error: function (xhr) {
+                    $('#AddCaseModals').modal('hide');
+                    toastr.error('@InventoryItemsRes.OperationFailed '); 
+                }
+            });
+        });
+
+    };
+    registerSearchFormSubmitting();
+</script>
+<script id="occordion Behavior">
+    $(".Accordion-Custom-Click-Close").click(function () {
+        $('.AccordionDiv').accordion({ header: "h3", active: false, collapsible: true });
+    });
+</script>
+<style>
+    k-icon.k-i-calendar {
+        background-image: url('../../images/dropdown.jpg');
+    }
+</style>
+
+<script id="confirm withdraw permission"> 
+        function ConfirmWithdrawPermission(Id) {
+
+            var _url = '@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'api/StoreOperations/ConfirmWithdrawPermission?withdrawTransactionId=' + Id;
+
+            $.ajax({
+                type: "Get",
+                async: false,
+                contentType: "application/json",
+                url: _url,
+                success: function (data) {
+                    if (data > 0) {
+                        toastr.success('@InventoryItemsRes.OperationSucceeded');
+                        RefreshWithdrawPermissions();
+                    }
+                    else {
+                        toastr.error('@InventoryItemsRes.OperationFailed');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('@InventoryItemsRes.OperationFailed');
+                }
+            });
+        } 
+   
+</script>
+<script id="Kendo Grid Confirm Withdraw">
+ 
+    function getConfirmTemplate(id,isConfirmed, quantity, availableQuantity) {
+        if (isConfirmed) {
+            return '<label>@StoreOperationsRes.AlreadConfirmed</label>'
+        }
+        else {
+            if (quantity <= availableQuantity) {
+                return "<a onClick='ConfirmWithdrawPermission(" + id + ")' >@StoreOperationsRes.Confirm</a>";
+            }
+            else {
+                return "<a style='color: red'>@StoreOperationsRes.CanNotBeConfirmed</a>";
+            }
+        }
+
+    }
+
+</script>

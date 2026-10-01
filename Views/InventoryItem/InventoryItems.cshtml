@@ -1,0 +1,567 @@
+﻿@model UserDTO
+@using DTO
+@using Components.UserManagement.DTO
+@using Kendo.Mvc.UI
+@using Components.UserManagement.Resources
+@using System.Configuration;
+@using Resource
+@{
+    ViewBag.Title = "ReviewPendingVolunteers";
+    Layout = "~/Views/InventoryItem/InventoryItems.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (UserUI.Helper.CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<h2>@InventoryItemsRes.ViewInventoryItems</h2>
+
+<div id="AddOrEditInventoryItemDiv"></div>
+<div id="DeleteInventoryItemDiv"></div>
+
+
+@{
+    var culture = System.Globalization.CultureInfo.CurrentCulture.ToString();
+
+    var layoutPath = ConfigurationManager.AppSettings["LayoutPath"] != null ?
+        ConfigurationManager.AppSettings["LayoutPath"] : "~/Views/Shared/_AdminLayout.cshtml";
+
+    Layout = layoutPath;
+
+}
+<script src="~/Scripts/MersalScripts/Volunteers/searchObjectBuilder.js"></script>
+
+
+    <style>
+        #Grid .k-grid-header .k-header {
+            color: white;
+        }
+    </style>
+    @*<div id="_Index_User" class="_Index">
+        <div class="modal-body">
+            <div id="searchBox_User" class="form-group">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">@UserManagementResources.Search</h3>
+                                <span class="@(!isArabic ? "pull-right clickable" : "pull-left clickable")"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-role">
+                                            @Html.Label(UserManagementResources.UserName, new { @class = "control-label" })
+                                            @Html.TextBox("UserName", "", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-role">
+                                            @Html.Label(UserManagementResources.FirstName, new { @class = "control-label" })
+                                            @Html.TextBox((true ? UserManagementResources.FirstNameOtherCol : UserManagementResources.FirstNameCol), "", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-role">
+                                            @Html.Label(UserManagementResources.MiddleName, new { @class = "control-label" })
+                                            @Html.TextBox((true ? UserManagementResources.MiddleNameOtherCol : UserManagementResources.MiddleNameCol), "", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-role">
+                                            @Html.Label(UserManagementResources.LastName, new { @class = "control-label" })
+                                            @Html.TextBox((true ? UserManagementResources.LastNameOtherCol : UserManagementResources.LastNameCol), "", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="inline col-md-12">
+                                                <input id="IsActiveUser" type="checkbox" class="ace col-md-1" checked="checked" />
+                                                <span style="@(!isArabic ? "margin-right:9px;" : "margin-left:9px;")">@UserManagementResources.IsActive</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="inline col-md-12">
+                                                <input id="IsActiveDirectoryUser" type="checkbox" class="ace col-md-1" />
+                                                <span style="@(!isArabic ? "margin-right:9px;float:left" : "margin-left:9px;float:right")">@UserManagementResources.IsActiveDirectoryUser</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br style="clear: both;" />
+                                <div class="modal-footer" style="float: @(!isArabic ? "left" : "right"); width: 100%;">
+                                    <button type="button" class="btn btn-blue" id="btnSearch_User">@UserManagementResources.Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="width: 100%;">
+            <div style="float: @(!isArabic ? "right" : "left");">
+                <h4 class="title">@UserManagementResources.SearchResults</h4>
+            </div>
+
+
+        </div>
+        <hr style="clear: both;">
+
+    </div>*@
+<div style="float: @(isArabic ? "left" : "right");">
+    <div @*class="navbar-form @(CultureHelper.IsRighToLeft() ? "navbar-left" : "navbar-right")"*@>
+        <button id="btnAddInventoryItem" type="button" class="btn btn-blue" >@InventoryItemsRes.AddInventoryItem</button>
+    </div>
+</div>
+<br />
+<br/>
+<div class="@(!isArabic ? "k-rtl" : "")">
+    <div id="InventoryItems_Grid"></div>
+</div>
+
+    @Html.HiddenFor(model => model.Id, new { @id = "hfUserId" })
+    @Html.HiddenFor(model => model.Id, new { @id = "hfRestoreId" })
+    <script id="globalVaribales">
+        //// the global array is 2d array
+        // the main purpose of this array is to convert the id returned in the dto to text
+        // the global array will have the values of the drop down list and the text
+        // the first dimenssion is the array name
+        // the second dimentsion is the id
+        // the value of the array elements are the text whether arabic or english
+        var GlobalArray = [];
+        function loadGlobalVariables() {
+            $.holdReady(true);
+            GetAnyMasterDetalisCode('IMTY', "ddlTypeId", false, true);
+            GetAnyMasterDetalisCode('IMU', "ddlUnitId", false, true);
+            GetAnyMasterDetalisCode('IMPU', "ddlPackingUnitId", false, true);
+            GetAnyMasterDetalisCode('IMEU', "dllExchangeUnitId", false, true);
+            GetAnyMasterDetalisCode('IMC', "ddlCategoryId", false, true);
+            GetAnyMasterDetalisCode('IMF', "ddlformulaId", false, true);
+            $.holdReady(false);
+
+        }
+
+        function GetValueFromGlobalArray(arrayNameStr, id) {
+           
+            if (isset(GlobalArray[arrayNameStr]) && isset(GlobalArray[arrayNameStr][id]))
+                return '<span>' + GlobalArray[arrayNameStr][id.toString()] + '</span>';
+            else
+                return '';
+        }
+
+
+
+        function LoadDDlFromGlobalArr(Array, dropDownListId, selectedId) {
+            var html = "";
+            var selec = "";
+            var textByIdArr = [];
+            
+            $.each(Array, function (key, value) {
+                // performance issue need to be enhanced
+                // looping throgh alot of uncexisted elements 
+                // for example if the key was 10000 and this key is the first
+                // foreach will make tenThoutand loop
+                if (value) {
+                    if (parseInt(key) == selectedId) selec = " selected='selected' ";
+                    if (_cultureIsArabic) {
+                        html += "<option  value=" +key+ "  >" + value + "</option>";
+                    }
+                    else {
+                        html += "<option value=" +key+  " >" + value + "</option>";
+                    }
+                }
+            });
+            $("#" + dropDownListId).html(html);
+        }
+
+
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function onSelect(e) {
+                switch ($(e.item).index()) {
+                    case 1:
+                        //bind Privileges
+                        bindPrivileges();
+                        break;
+                    case 2:
+                        //bind Groups
+                        bindGroups();
+                        break;
+                    case 3:
+                        //bind Roles
+                        bindRoles();
+                        break;
+                    case 4:
+                        bindMenus();
+                        break;
+                }
+            }
+
+            $("#tabstrip").kendoTabStrip({
+                select: onSelect,
+                animation: {
+                    open: {
+                        effects: "fadeIn"
+                    }
+                }
+            });
+        });
+
+        function initialzeUserTabs() {
+            var tabStrip = $("#tabstrip").kendoTabStrip().data("kendoTabStrip");
+            tabStrip.select(0);
+        }
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            loadGlobalVariables();
+            searchInventoryItems();          
+            $('#btnSearch_User').click(function (evt) {
+                searchInventoryItems();
+            });
+        });
+
+        function searchInventoryItems() {
+            //var jsonObject = searchObjectBuilder.getJsonSearchObj('searchBox_User input');
+            //var strJSON = JSON.stringify(jsonObject);
+            
+            $.ajax({
+                url: '@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'api/InventoryItems/GetAllInventoryItems',
+                cache: false,
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                //data: strJSON,
+                success: function (data) {
+                    bindInventoryItemsGrid(data);
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText);
+                },
+                async: true,
+                processData: false
+            });
+        }
+        function RefreshInventoryItems() {
+            //var jsonObject = searchObjectBuilder.getJsonSearchObj('searchBox_User input');
+            //var strJSON = JSON.stringify(jsonObject);
+
+            $.ajax({
+                url: '@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]' + 'api/InventoryItems/GetAllInventoryItems',
+                cache: false,
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                //data: strJSON,
+                success: function (data) {
+                      
+                    ds1 = new kendo.data.DataSource({
+                        data: data
+                    });
+
+                    var grid = $("#InventoryItems_Grid").data("kendoGrid");
+                    grid.dataSource = ds1;
+                    ds1.read();
+                    grid.refresh();
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText);
+                },
+                async: true,
+                processData: false
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        function bindInventoryItemsGrid(jsonData) {
+            var firstDeleteRequest = 1;
+
+            var isHidden = !$("#IsActiveUser").is(":checked");
+
+            var commands = [{
+                name: "details",
+                text: "",
+                iconClass: "fa fa-file-text-o fa-fw fa-2x",
+                click: function (e) {
+                    var tr = $(e.target).closest("tr");
+                    var id = tr.find('.id-cell').text();
+
+                    EditInventoryItem(id);
+                }
+            },
+                   {
+                       name: "delete",
+                       text: "",
+                       iconClass: "fa fa-trash-o fa-fw fa-2x",
+                       click: function (e) {
+                           var tr = $(e.target).closest("tr");
+                           var id = tr.find('.id-cell').text();
+
+                           var CallBackFunction = function () { DeleteInventoryItem(tr, id); };
+                           confirmMessage("Confirmation", "are you sure you want to delete", 400, 250, CallBackFunction);
+
+                           
+                           
+
+                       }
+                   }];
+
+            _columns = [
+                    { field: "Id", filterable: false, hidden: true, attributes: { "class": "id-cell" } },
+                    { field: "Name", title: "@UserManagementResources.UserName", filterable: true },
+                {
+                    template: '#=GetValueFromGlobalArray("IMC",CategoryId)#',
+                    title: "@InventoryItemsRes.CategoryId",
+                    filterable: true
+                },
+                {
+                    template: '#=GetValueFromGlobalArray("IMTY",TypeId)#',
+                    title: "@InventoryItemsRes.TypeId",
+                    filterable: true
+                },
+                { field: "Concentration", title: "@UserManagementResources.UserName", filterable: true },
+                {
+                    template: '#=GetValueFromGlobalArray("IMU",UnitId)#',
+                    title: "@InventoryItemsRes.UnitId",
+                    filterable: true
+                },
+                {
+                    template: '#=GetValueFromGlobalArray("IMF",FormulaId)#',
+                    title: "@InventoryItemsRes.FormulaId",
+                    filterable: true
+                },
+                {
+                    template: '#=GetValueFromGlobalArray("IMPU",PackingUnitId)#',
+                    title: "@InventoryItemsRes.PackingUnitId",
+                    filterable: true
+                },
+                {
+                    template: '#=GetValueFromGlobalArray("IMEU",ExchangeUnitId)#',
+                    title: "@InventoryItemsRes.ExchangeUnitId",
+                    filterable: true
+                },
+                { field: "PackingExchangeUnitsNumber", title: "@InventoryItemsRes.PackingExchangeUnitsNumber", filterable: true },
+                { field: "Description", title: "@UserManagementResources.Description", filterable: true },
+                {
+                    title: "@LayoutRES.Manage",
+                    command: commands,
+                    width: 200
+                }]
+
+            $("#InventoryItems_Grid").html("");
+            $("#InventoryItems_Grid").kendoGrid({
+                groupable: false,
+                scrollable: false,
+                sortable: true,
+                pageable: {
+                    pageSize: 10,
+                    refresh: false
+                },
+                selectable: "multiple cell",
+                allowCopy: {
+                    delimeter: ",",
+                },
+                columns: _columns,
+                filterable: {
+                    extra: false,
+                    messages: {
+                        filter: "@CommonRes.Filter", // sets the text for the "Filter" button
+                        clear: "@CommonRes.Clear", // sets the text for the "Clear" button
+
+                        // when filtering boolean numbers
+                        isTrue: "@CommonRes.IsTrue", // sets the text for "isTrue" radio button
+                        isFalse: "@CommonRes.IsFalse", // sets the text for "isFalse" radio button
+
+                        //changes the text of the "And" and "Or" of the filter menu
+
+                        and: "@CommonRes.And",
+                        or: "@CommonRes.Or",
+                        itemsPerPage: "@CommonRes.ItemsPerPage",
+                        of: "@CommonRes.Of",
+                        items: "@CommonRes.Items"
+
+                    }
+                    , operators: {
+                        //filter menu for "string" type columns
+                        string: {
+                            EqualsTo: "@CommonRes.EqualsTo",
+                            NotEqualTo: "@CommonRes.NotEqualTo",
+                            StartsWith: "@CommonRes.StartsWith",
+                            EndsWith: "@CommonRes.EndsWith",
+                            Contain: "@CommonRes.Contain",
+                            doesNotContain: "@CommonRes.DoesNotContain",
+                            IsGreaterThan: "@CommonRes.IsGreaterThan",
+                            IsLessThan: "@CommonRes.IsLessThan",
+                            IsGreaterThanOrEqualTo: "@CommonRes.IsGreaterThanOrEqualTo",
+                            IsLessThanOrEqualTo: "@CommonRes.IsLessThanOrEqualTo"
+                        },
+
+                    }
+                },
+                dataSource: {
+                    data: jsonData,
+                    schema: {
+                        model: { id: "Id" }
+                    }
+                }
+            });
+
+        }
+    </script>
+
+    <script type="text/javascript" id="edit delete / items">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+        });
+    </script>
+    <script type="text/javascript">
+
+        // this derivation fro the function is to reduce the number of requests
+        function GetAnyMasterDetalisCode(MasterCode, dropDownListId, enableAll, async, selectedId) {
+            $.ajax({
+                type: "GET",
+                async: false,
+                contentType: "application/json",
+                url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + MasterCode,
+                success: function (data) {
+                    var html = "";
+                    if (enableAll) {
+                        if (_cultureIsArabic) {
+                            html = "<option value='0'>الكل</option>";
+                        }
+                        else {
+                            html = "<option value='0'>All</option>";
+                        }
+                    }
+                    var selec = "";
+                    var textByIdArr = [];
+                    $.each(data, function (key, value) {
+
+                        if (value.masterCodeValue == MasterCode) {
+                            if (value.Id == selectedId) selec = " selected='selected' ";
+                            if (_cultureIsArabic) {
+                                html += "<option Code=" + value.Code + " value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                                textByIdArr[value.Id.toString()] = value.NameAr;
+                            }
+                            else {
+                                html += "<option Code=" + value.Code + " value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                                textByIdArr[value.Id.toString()] = value.NameEn;
+                            }
+                        }
+                    });
+                    $("#" + dropDownListId).html(html);
+                    GlobalArray[MasterCode] = textByIdArr;
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText); 
+                }
+            });
+        }
+        function isset(variable) {
+            return typeof variable !== typeof undefined ? true : false;
+        }
+    </script>
+<script id="showPopUps">
+
+    $("#btnAddInventoryItem").click(function () {
+        $("#AddOrEditInventoryItemDiv").html("");
+        $.ajax({
+            url: "/InventoryItem/AddInventoryItem",
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+                $("#AddOrEditInventoryItemDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+    });
+    function EditInventoryItem(userId) {
+        $("#AddOrEditInventoryItemDiv").html("");
+        $.ajax({
+            url: "/InventoryItem/EditInventoryItem?id=" + userId,
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+                $("#AddOrEditInventoryItemDiv").append(result);
+                $('#dlgAddNewItem').modal('show');
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+
+    }
+
+    function DeleteInventoryItem(GridRowToDelete,userId) {
+
+        $.ajax({
+            url:'@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]'+'api/InventoryItems/Delete?ID=' + userId,
+            type: 'Get',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result == 1) {
+                    toastr.success('@InventoryItemsRes.OperationSucceeded');
+                    $(GridRowToDelete).remove();
+                }
+                else {
+                    toastr.erro('@InventoryItemsRes.OperationFailed')
+                   // $('#deleteView_User').html(result);
+                   // $('#deleteView_User').modal('show');
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+    function GetAndShowPopUpMenu (containerDialog,dialog,url) {
+         $("#"+ContainerDialog).html("");
+        $.ajax({
+            url: url,
+            type: 'Get',
+            dataType: "html",
+            contentType: 'application/html; charset=utf-8',
+            beforeSend: function () {
+                //$("#imgAjaxLoader").show();
+            },
+            success: function (result) {
+                $("#ContainerDialog").append(result);
+                $('#'+ dialog).modal('show');
+                loadAllDropDownLists();
+            },
+            error: function (xhr) {
+                //$("#imgAjaxLoader").hide();
+                toastr.error(xhr.statusText);
+            }
+        });
+
+    };
+
+
+
+      
+
+
+</script>

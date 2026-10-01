@@ -1,0 +1,268 @@
+﻿@model DTO.ActivityDTO
+@using Kendo.Mvc.UI
+@using Resource
+@using System.Globalization
+@using UserUI.Helper
+
+@{
+    ViewBag.Title = ActivitiesRES.EditActivity;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    DTO.ActivityDTO activity = ViewBag.Data;
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+    var dir = isArabic ? "rtl" : "ltr"; 
+    var floatRightStyle = isArabic ? "float:right;" : "";
+    var floatNone = isArabic ? "" : "float:none;";
+    var remain = Model.MaxCapacity - Model.ParticipantsCounter;
+
+
+}
+
+<script src="~/Scripts/images.slider.min.js"></script>
+<link href="~/Content/Slider_css/imageSlider.css" rel="stylesheet" />
+@Html.HiddenFor(model => model.Id, new { Value = Model.Id })
+ 
+<div class="block gray">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 column FloatRight">
+                <div class="blog-detail-page">
+                    <div class="post-intro cause-intro" style="padding:0px;">
+                        <div id="activities_image_slider" style="position: relative; margin: 0 auto; margin-bottom: 40px; top: 0px; left: 0px; width: 1200px; height: 600px; overflow: hidden; visibility: hidden;">
+                            <!-- Loading Screen -->
+                            <div data-u="loading" style="position: absolute; top: 0px; left: 0px;">
+                                <div style="filter: alpha(opacity=70); opacity: 0.7; position: absolute; display: block; top: 0px; left: 0px; width: 100%; height: 100%;"></div>
+                                <div style="position:absolute;display:block;background:url('../../Content/slider_Control_Images/loading.gif') no-repeat center center;top:0px;left:0px;width:100%;height:100%;"></div>
+                            </div>
+                            <div id="Slider" data-u="slides" style="cursor: default; position: relative; top: 0px; left: 0px; width: 1200px; height: 600px; overflow: hidden;">
+                                @*<div data-p="112.50" style="display: none;">
+                                        <img data-u="image" src="~/Content/images/resource/blog-list2.jpg" />
+                                    </div>
+                                    <div data-p="112.50" style="display: none;">
+                                        <img data-u="image" src="~/Content/images/resource/blog-list3.jpg" />
+                                    </div>
+                                    <div data-p="112.50" style="display: none;">
+                                        <img data-u="image" src="~/Content/images/resource/blog-list6.jpg" />
+                                    </div>
+                                    <div data-p="112.50" style="display: none;">
+                                        <img data-u="image" src="~/Content/images/resource/blog-list5.jpg" />
+                                    </div>*@
+
+                            </div>
+                            <!-- Bullet Navigator -->
+                            <div data-u="navigator" class="jssorb05" style="bottom:16px;right:16px;" data-autocenter="1">
+                                <!-- bullet navigator item prototype -->
+                                <div data-u="prototype" style="width:16px;height:16px;"></div>
+                            </div>
+                            <!-- Arrow Navigator -->
+                            <span data-u="arrowleft" class="jssora12l" style="top:0px;left:0px;width:30px;height:46px;" data-autocenter="2"></span>
+                            <span data-u="arrowright" class="jssora12r" style="top:0px;right:0px;width:30px;height:46px;" data-autocenter="2"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="meta" style="width:97%;"> 
+                                    @if (!string.IsNullOrEmpty(Model.StartDateS))
+                                    {
+                                        <li style="@floatRightStyle ;color:#000">@ActivitiesRES.Start <i class="ti-calendar"></i>@Model.StartDateS</li>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.EndDateS))
+                                    {
+                                        <li style="@floatRightStyle ;color:#000">@ActivitiesRES.End <i class="ti-calendar"></i>@Model.EndDateS</li>
+                                    }
+                                </ul>
+                                <h1 class="post-title" style="width: 95%;">@Model.Title</h1>
+                            </div>
+                        </div>
+                    <div style="width:100%;padding: 0px 5%;">
+                        <p>
+                            @Model.Description
+                        </p>
+                    </div>
+                        
+                    </div><!-- Post Intro -->
+                    <div class="row">
+                        <div class="col-lg-12" style="width:50%;">
+                            @*<p>
+                                    @Model.Description
+                                </p>*@
+                        </div>
+                        <div class="col-lg-12" style="width:50%;">
+                            <div class="row" align="center">
+                                <div id="Schedulerdata" class="@schedulerClass">
+                                    @*@{Html.RenderPartial("~/Views/Reminder/ActivityDetailSceduler.cshtml"); }*@
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div><!-- Blog Detail -->
+            </div>
+            <aside class="col-md-3 sidebar column ">
+                <div class="post-intro cause-intro" style="@floatNone">
+                    <div class="cause-detail" style="margin: auto;">
+                        <span><i>@ActivitiesRES.Seats <br> <br> </i>@Model.MaxCapacity</span>
+                        @if (AuthorizationHelper.IsAuthenticated())
+                        {
+                            <strong style="cursor: pointer;" onclick="callDonationpopup(4,'@Model.Id','@Model.AccountID','@Model.Title','')">@ActivitiesRES.RegisterNow<a>اضغط للمشاركه</a></strong>
+                            if (Model.IsFree)
+                            {
+                                <span><i>@ActivitiesRES.Fees <br> <br> </i>@ActivitiesRES.Free</span>
+                            }
+                            else
+                            {
+                                <span><i>@ActivitiesRES.Fees <br> <br> </i>@Model.Fees</span>
+                            }
+
+                        }
+                        else
+                        {
+                            <strong style="cursor: pointer;" class="NewRegist"> @ActivitiesRES.RegisterNow<a>@LayoutRES.PressCreateNewAccount </a></strong>
+                            if (Model.IsFree)
+                            {
+                                <span><i>@ActivitiesRES.Fees <br> <br> </i>@ActivitiesRES.Free</span>
+                            }
+                            else
+                            {
+                                <span><i>@ActivitiesRES.Fees <br> <br> </i>@Model.Fees</span>
+                            }
+
+                        }
+                    </div>
+                </div><!-- Widget -->
+
+            </aside><!-- Sidebar -->
+        </div>
+    </div>
+</div>
+
+<div style="height:200px"></div>
+
+
+
+
+
+
+
+<script>
+
+    $(document).ready(function (){
+
+
+
+        fillData();
+
+        prepareSlider();
+
+
+    });
+
+    function prepareSlider(){
+
+        var jssor_1_SlideshowTransitions = [
+               {$Duration:1200,$Opacity:2}
+        ];
+
+        var jssor_1_options = {
+            $AutoPlay: true,
+            $SlideshowOptions: {
+                $Class: $JssorSlideshowRunner$,
+                $Transitions: jssor_1_SlideshowTransitions,
+                $TransitionsOrder: 1
+            },
+            $ArrowNavigatorOptions: {
+                $Class: $JssorArrowNavigator$
+            },
+            $BulletNavigatorOptions: {
+                $Class: $JssorBulletNavigator$
+            }
+        };
+
+        var jssor_1_slider = new $JssorSlider$("activities_image_slider", jssor_1_options);
+
+        //responsive code begin
+        //you can remove responsive code if you don't want the slider scales while window resizing
+        function ScaleSlider() {
+            var refSize = jssor_1_slider.$Elmt.parentNode.clientWidth;
+            if (refSize) {
+                refSize = Math.min(refSize, 1200);
+                jssor_1_slider.$ScaleWidth(refSize);
+            }
+            else {
+                window.setTimeout(ScaleSlider, 30);
+            }
+        }
+        ScaleSlider();
+        $(window).bind("load", ScaleSlider);
+        $(window).bind("resize", ScaleSlider);
+        $(window).bind("orientationchange", ScaleSlider);
+        //responsive code end
+
+    }
+
+    function fillData() {
+
+        var data = @Html.Raw(Json.Encode(((List<string>)ViewBag.ActivityImagesPaths)));
+        //$("#Description").val(data.Description);
+        //var sch=data.Scheduler;
+        //sch.Start = new Date(parseInt(sch.Start.replace("/Date(", "").replace(")/",""), 10));
+        //sch.End = new Date(parseInt(sch.End.replace("/Date(", "").replace(")/",""), 10));
+        //sch.CreatedOn=new Date(parseInt(sch.CreatedOn.replace("/Date(", "").replace(")/",""), 10));
+        //$("#scheduler").data("kendoScheduler").date(sch.Start);
+        //$("#scheduler").data("kendoScheduler").view('day');
+        //var dataSource = new kendo.data.SchedulerDataSource({
+        //    data:[sch],
+        //    schema: {
+        //        model: {
+        //            id:"Id",
+        //            fields: {
+        //                title: { from: "Title", defaultValue: "No title", validation: { required: true } },
+        //                start: { type: "date", from: "Start" },
+        //                end: { type: "date", from: "End" },
+        //                startTimezone: { from: "StartTimezone" },
+        //                endTimezone: { from: "EndTimezone" },
+        //                description: { from: "Description" },
+        //                recurrenceId: { from: "RecurrenceID" },
+        //                recurrenceRule: { from: "RecurrenceRule" },
+        //                recurrenceException: { from: "RecurrenceException" },
+        //                ownerId: { from: "OwnerID", defaultValue: 1 },
+        //                isAllDay: { type: "boolean", from: "IsAllDay" }
+        //            }
+        //        }
+        //    }
+        //});
+        //$("#scheduler").data("kendoScheduler").setDataSource(dataSource);
+        if (data!=null) {
+            $.each(data,function(v,Images){
+                document.getElementById("Slider").appendChild(createSliderElement(Images));
+            })
+        }
+
+
+    }
+
+    function Register(){
+        //if(sessionStorage.getItem("Id")==0){
+        //    //alert("not logged");
+        //}else{
+        //    // alert(" logged");
+        //}
+
+    }
+
+    function createSliderElement(imgsrc){
+        var img=document.createElement("img");
+        img.src=imgsrc.replace("~",'');
+        img.setAttribute("data-u","image") ;
+        var div=document.createElement("div");
+        div.setAttribute("style","display:none;");
+        div.setAttribute("data-p","112.50");
+        div.appendChild(img);
+        return div;
+    }
+
+
+</script>
+
+
+
+

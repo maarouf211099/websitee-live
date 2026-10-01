@@ -1,0 +1,44 @@
+﻿
+ 
+
+@model  UserUI.Models.Donation.FawryResponseViewModel
+@using Resource
+@{
+    ViewBag.Title = "FawryReceipt";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="block gray" style="padding: 10px 0 !important;text-align:center;">
+    <div class="container">
+        @*<h2 style="color:#e47257 !important" id="title">Not<span> Available</span></h2>*@
+
+        <div class="row">
+            <div class="col-md-12">
+                <div>
+                    <h2>
+                        @((!Model.IsException && Model.IsSuccess) ? DonationResources.ThankYouForDonation
+                                                                   : DonationResources.DonatingError
+                                                                    + Environment.NewLine
+                                                                    + Model.Message
+                                                                    
+                         )
+                    </h2>
+                    <span style="white-space: pre-line">
+                        @((!Model.IsException && Model.IsSuccess) ? DonationResources.DonatingSuccessfully
+                                                                    + " " + Model.Amount + " " 
+                                                                    + Environment.NewLine
+                                                                    + DonationResources.TransactionNo + " : " + Model.TransactionNumber
+
+                                                                   : ""
+                                                                   )
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+

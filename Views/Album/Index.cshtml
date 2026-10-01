@@ -1,0 +1,33 @@
+﻿@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = AlbumResource.Albums;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+ 
+<div class="form-group">
+    <button onclick="getCreateAblum()" type="button" class="btn btn-info">@AlbumResource.CreateAblum</button>
+</div>
+<div>
+
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+    <div id="AlbumDetailsList"></div>
+    <div id="EditImage"></div>
+
+</div>
+<div id="CreateAlbumDiv">
+    @Html.Partial("~/Views/Album/_CreateAlbum.cshtml", new AlbumsDTO())
+</div> 
+
+@section Scripts {
+<script>
+        var TitleEnglish = "@AlbumResource.TitleEn";
+        var TitleArabic = "@AlbumResource.TitleAr";
+       var images="@AlbumResource.Images";
+</script>
+@Scripts.Render("~/bundles/AlbumIndex")
+    @*<script src="~/Scripts/MersalScripts/LayoutManagment/AlbumController.js"></script> 
+    <script src="~/Scripts/MersalScripts/AlbumScript/Albumjavascript.js"></script>*@
+
+}

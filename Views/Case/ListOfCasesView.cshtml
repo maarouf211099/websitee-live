@@ -1,0 +1,108 @@
+﻿@model DTO.CasesListViewDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<section>
+    <div >
+        <div class="container">
+         
+                    <div class="title">
+                        @Html.HiddenFor(x => x.CurrantCountOfCases)
+                        @Html.HiddenFor(x => x.StateId, new { id = "CurrantStateId" })
+                       
+
+                        <div class="row filter-section d-mob-initial">
+                           <div class=" col-lg-3 col-md-12 new-title">
+                                <h1>@CaseResources.Cases</h1>
+                            </div>
+                            <div class=" col-lg-9 col-md-12"  >
+                               
+                                @Html.DropDownListFor(m => m.AgeGroup, new List<SelectListItem>() {
+                                   new SelectListItem { Selected = true, Text= LayoutRES.All  ,  Value=((int)FilterByAgeGroup.All).ToString() },
+                                   new SelectListItem { Text= CaseResources.Babys , Value=((int)FilterByAgeGroup.Babys).ToString()},
+                                   new SelectListItem { Text= CaseResources.Children , Value=((int)FilterByAgeGroup.Children).ToString()},
+                                   new SelectListItem { Text= CaseResources.Youth  , Value=((int)FilterByAgeGroup.Youth).ToString()},
+                                   new SelectListItem { Text= CaseResources.Older , Value=((int)FilterByAgeGroup.Older).ToString()},
+                               }
+                               , new { @class = "border-radius3px select2 select2-hidden-accessible",  })
+
+                                @Html.DropDownListFor(m => m.StateId, new List<SelectListItem>() {
+                                   new SelectListItem { Selected = true,Text=LayoutRES.UncompletedCase , Value=((int)CaseState.csUC).ToString()},
+                                   new SelectListItem { Text=LayoutRES.CompletedCase , Value=((int)CaseState.csCO).ToString()}
+                               }
+                               , new { @class = "border-radius3px select2 select2-hidden-accessible", })
+
+                                <input id="caseTextSearch" type="text" placeholder="@CaseResources.SearchForCase"  />
+                             
+                            </div> 
+                         
+
+                        </div>
+
+
+                    </div>
+                    <div class="successful-stories list-cases-view">
+                        <div class="row" id="casesListDiv">
+                            @if (Model.caseHomeViewList.Any())
+                            {
+                                foreach (var _case in Model.caseHomeViewList)
+                                {
+                                    <div class="col-md-4 float-right">
+                                        <div class="product">
+                                            <div class="product-img ActivityImg">
+                                               
+                                                <img src="/@_case.imageSrcThum" onerror="null;this.src = '/images/logo_W.png';"><a href="/Case/CaseView/@_case.Id">@CaseResources.CaseDetails</a>
+                                            </div>
+                                            <div class="story-Header">
+                                                
+                                                <h3><a> @CaseResources.Code :: @_case.Id :: @_case.CaseName.Substring(0, (_case.CaseName.Length > 15 ?15 : _case.CaseName.Length)) ...</a></h3>
+                                            </div>
+                                            <div class="story-detail">
+                                                <h3><a>@_case.Description.Substring(0, (_case.Description.Length > 150 ? 150 : _case.Description.Length)) ... </a></h3>
+                                            </div>
+                                            
+                                            <div class="new-totalCount">
+                                                <h6> <span>  @CaseResources.Goal : </span> <span> @_case.moneyWanted </span>  </h6>
+
+                                                @if (!_case.remainingText.Contains("-"))
+                                                {
+                                                    <h6>  <span> @CaseResources.Remaining : </span>  <span>  @_case.remainingText</span> </h6>
+
+                                                }
+                                                else
+                                                {
+                                                    <span>    0 </span>
+                                                }
+                                                
+
+
+                                            </div>
+
+                                             
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="showMore">
+                            <a id="btnShowMore" class="btn">@LayoutRES.ShowMore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+   
+</section>
+
+
+@section Scripts {
+    @*<script src="~/Scripts/MersalScripts/CasesManagment/CasesView.js"></script>*@
+    @Scripts.Render("~/bundles/CasesView")
+}
+
+ 

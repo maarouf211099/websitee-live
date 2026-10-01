@@ -1,0 +1,136 @@
+﻿@model TempPageDTO
+@using DTO
+@using Resource
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    int i = 0;
+}
+
+<!--Rows Template-->
+@*<section>
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div class="title2">
+                        @if (!string.IsNullOrEmpty(Model.TitleAr) || !string.IsNullOrEmpty(Model.TitleEn))
+                        {
+                            <h1>@(isArabic ? Model.TitleAr : Model.TitleEn)</h1>
+                        }
+                        <span>@(isArabic ? Model.SubTitleAr : Model.SubTitleEn)</span>
+                    </div>
+                    @if (Model.TempPageBlockDTOList.Any())
+                    {
+                        foreach (var block in Model.TempPageBlockDTOList)
+                        {
+                            <div class="RowsTemp">
+                                <div class="row">
+                                    @if (!string.IsNullOrEmpty(block.ImagePath))
+                                    {
+                                        <div class="col-md-4">
+                                            <div style="min-height: 200px;">
+                                                <img src="~/ClientFilesLayout/TempPageBlock/@block.ImagePath" />
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class='@(string.IsNullOrEmpty(block.ImagePath)? "col-md-12" :  "col-md-8" )'>
+                                        @if (!string.IsNullOrEmpty(block.TitleAr) || !string.IsNullOrEmpty(block.TitleEn))
+                                        {
+                                            <h3>
+                                                @(isArabic ? block.TitleAr : block.TitleEn)
+
+                                            </h3>
+                                        }
+                                        @if (!string.IsNullOrEmpty(block.SubTitleAr) || !string.IsNullOrEmpty(block.SubTitleEn))
+                                        {
+                                            <h4>
+                                                @(isArabic ? block.SubTitleAr : block.SubTitleEn)
+                                            </h4>
+                                        }
+                                        @if (!string.IsNullOrEmpty(block.DescriptionAr) || !string.IsNullOrEmpty(block.DescriptionEn))
+                                        {
+                                            <h5>
+                                                @(isArabic ? block.DescriptionAr : block.DescriptionEn)
+                                            </h5>
+                                        }
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(block.Href))
+                                {
+                                    <div class="showMore">
+                                        <a href="@block.Href" class="btn">@LayoutRES.ShowMore</a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>*@
+<!--Rows Template-->
+
+
+<section>
+    <div class="block gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column">
+                    <div class="title2">
+                        @if (!string.IsNullOrEmpty(Model.TitleAr) || !string.IsNullOrEmpty(Model.TitleEn))
+                        {
+                            <h1>@(isArabic ? Model.TitleAr : Model.TitleEn)</h1>
+                        }
+                        <span>@(isArabic ? Model.SubTitleAr : Model.SubTitleEn)</span>
+                    </div>
+                    @if (Model.TempPageBlockDTOList.Any())
+                    {
+                        foreach (var block in Model.TempPageBlockDTOList)
+                        {
+                            <div class="RowsTemp">
+                                <div class="row"> 
+                                    @if (!string.IsNullOrEmpty(block.ImagePath))
+                                    {
+                                        <div class="col-md-4"> 
+                                                <img src="~/ClientFilesLayout/TempPageBlock/@block.ImagePath" /> 
+                                        </div>
+                                    }
+                                    <div class='@(string.IsNullOrEmpty(block.ImagePath)? "col-md-12" :  "col-md-8" )'>
+                                        @if (!string.IsNullOrEmpty(block.TitleAr) || !string.IsNullOrEmpty(block.TitleEn))
+                                        {
+                                            <h3>
+                                                @(isArabic ? block.TitleAr : block.TitleEn)
+
+                                            </h3>
+                                        }
+                                        @if (!string.IsNullOrEmpty(block.SubTitleAr) || !string.IsNullOrEmpty(block.SubTitleEn))
+                                        {
+                                            <h4>
+                                                @(isArabic ? block.SubTitleAr : block.SubTitleEn)
+                                            </h4>
+                                        }
+                                        @if (!string.IsNullOrEmpty(block.DescriptionAr) || !string.IsNullOrEmpty(block.DescriptionEn))
+                                        {
+                                            <h5>
+                                                @(isArabic ? block.DescriptionAr : block.DescriptionEn)
+                                            </h5>
+                                        }
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(block.Href))
+                                {
+                                    <div class="showMore">
+                                        <a href="@block.Href" class="btn">@LayoutRES.ShowMore</a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

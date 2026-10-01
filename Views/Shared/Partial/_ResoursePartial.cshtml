@@ -1,0 +1,113 @@
+﻿@using System.Configuration
+@using Resource
+@using Components.UserManagement.Resources
+
+<script>
+
+    var SystmeCodeWebAPIBaseUrl = "@ConfigurationManager.AppSettings["SystmeCodeWebAPIBaseUrl"]"; // "http://localhost:2626/";
+    var MersalWebAPIBaseUrl = "@ConfigurationManager.AppSettings["MersalWebAPIBaseUrl"]";  //"http://localhost:22782/";
+    var UserNamagementWebAPIBaseUrl = "@ConfigurationManager.AppSettings["UserNamagementWebAPIBaseUrl"]"; //"http://localhost:11931/";
+    var NotificationApi = "@ConfigurationManager.AppSettings["NotificationApi"]"; // "http://localhost:3163";
+    var NotificationAPIBaseUrl = "@ConfigurationManager.AppSettings["NotificationAPIBaseUrl"]"; //http://localhost:3163/
+    var SystmeCodeUIUrl = "@ConfigurationManager.AppSettings["SystmeCodeUIUrl"]"; //"http://localhost:2634/";
+    var UserNamagementUIUrl = "@ConfigurationManager.AppSettings["UserNamagementUIUrl"]"; // "http://localhost:2633/";
+    var MersalUIBaseUrl = "@ConfigurationManager.AppSettings["MersalUIBaseUrl"]";
+    var SignalRServiceURL = "@ConfigurationManager.AppSettings["SignalRServiceURL"]";
+
+    function getCookie(c_name) {
+        var i, x, y, ARRcookies = document.cookie.split(";");
+
+        for (i = 0; i < ARRcookies.length; i++) {
+            x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
+            y = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
+            x = x.replace(/^\s+|\s+$/g, "");
+            if (x == c_name) {
+                return unescape(y);
+            }
+        }
+    }
+    var _culture = getCookie("_culture");
+    if (_culture == null) {
+        _culture = "ar-SA";
+    }
+    var _cultureIsArabic = true;
+    if (_culture === "en-US") {
+        _cultureIsArabic = false;
+    }
+
+    var SuccessfulProcess = '@LayoutRES.SuccessfulProcess';
+    var SuccessfullyAdd = '@LayoutRES.SuccessfullyAdd';
+    var ErrorMessage = '@LayoutRES.ErrorMessage';
+    var CaseCode = '@LayoutRES.CaseCode';
+    var CaseName = '@LayoutRES.CaseName';
+    var Description = '@LayoutRES.Description';
+    var Age = '@CaseResources.Age';
+    var Region = '@CaseResources.Region';
+    var Details = '@LayoutRES.Details';
+    var CreatedOn = '@LayoutRES.CreatedOn';
+    var PleaseAddComment = '@LayoutRES.PleaseAddComment';
+    var SuccessfullyAccept = '@LayoutRES.SuccessfullyAccept';
+    var SuccessfullyReject = '@LayoutRES.SuccessfullyReject';
+    var SuccessfullyAssginCaseToInvestigetor = '@LayoutRES.SuccessfullyAssginCaseToInvestigetor';
+    var ExeportToExcel = '@LayoutRES.ExeportToExcel';
+    var DragaColumnHeaderAndDropItHereToGroupByThatColumn = '@LayoutRES.DragaColumnHeaderAndDropItHereToGroupByThatColumn';
+    var caseHoverText = '@LayoutRES.caseHoverText';
+    var CaseDetails = "@CaseResources.CaseDetails";
+    var Donate = '@LayoutRES.Donate';
+    var Goal = '@LayoutRES.Goal';
+    var Remaining = '@LayoutRES.Remaining';
+    var ValueAmount = '@LayoutRES.ValueAmount';
+    var AccountName = '@LayoutRES.AccountName';
+    var DonationName = '@LayoutRES.DonationName';
+    var TransferNumber = '@LayoutRES.TransferNumber';
+    var DonationOtherWayName = '@LayoutRES.DonationOtherWayName';
+    var TransferDate = '@DonationResources.TransferDate';
+    var Phone = '@DonationResources.Phone';
+
+    var Curency = '@DonationResources.Currency';
+    var DonationDestination = '@DonationResources.DonationDestination';
+
+
+
+    var PleaseAddValueAmount = '@LayoutRES.PleaseAddValueAmount';
+    var DonateNow = '@LayoutRES.DonateNow';
+    var moneyWanted = '@LayoutRES.moneyWanted';
+    var ThisEmailAlreadyRegisted = '@LayoutRES.ThisEmailAlreadyRegisted';
+    var Free = '@ActivitiesRES.Free';
+    var PleaseUploadTransferImage = '@DonationResources.PleaseUploadTransferImage';
+    var ConfirmDelete = '@LayoutRES.ConfirmDelete';
+
+    var ConfirmCollectDonation = '@DonationResources.ConfirmCollectRepresentativeDonation';
+    var confirmConfirmedByAccountsTitle = '@DonationResources.confirmConfirmedByAccountsTitle';
+
+
+    var ReadMore = '@LayoutRES.ReadMore';
+    var ReadMore = '@LayoutRES.ReadMore'
+    var itemsPerPage = '@LayoutRES.ItemsPerPage';
+    var display = '@LayoutRES.Items';
+    var page = '@LayoutRES.Page';
+    var of = '@LayoutRES.Of';
+    var empty = '@LayoutRES.Empty';
+
+    var IsEqualTo = '@LayoutRES.IsEqualTo';
+    var IsNotEqualTo = '@LayoutRES.IsNotEqualTo';
+    var StartsWith = '@LayoutRES.StartsWith';
+    var Contains = '@LayoutRES.Contains';
+    var doesnotcontain = '@LayoutRES.doesnotcontain';
+    var endswith = '@LayoutRES.endswith';
+    var After = '@LayoutRES.After';
+    var Before = '@LayoutRES.Before';
+    var AndOperator = '@LayoutRES.And';
+    var OrOperator = '@LayoutRES.Or';
+    var IsGreaterThan = '@CommonRes.IsGreaterThan';
+    var IsLessThan = '@CommonRes.IsLessThan';
+
+    var Filter = '@LayoutRES.Filter';
+    var Clear = '@LayoutRES.Clear';
+
+    var Report = '@LayoutRES.Report';
+    var sureDelete = "@LayoutRES.sureDelete";
+    var DonationCase = "@LayoutRES.DonationCase";
+ var TransActionSource = '@DonationResources.DonationSource';
+
+</script>

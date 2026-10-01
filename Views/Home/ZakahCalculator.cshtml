@@ -1,0 +1,580 @@
+﻿@using Resource
+
+<div id="DonationCalculator">
+    <div class="container">
+        <div class="new-row">
+
+            <div class="content-sector col-md-9">
+                <h2>
+                    @DynamicPagesRES.ZakatAccount
+                </h2>
+
+                <p  class="page-desc"> @DynamicPagesRES.ZakatPageDiscription </p>
+                <div class="accordion" id="accordionExample">
+
+
+
+                    <div class="accordion-item charity-item">
+
+                        <button id="headingOne" class="accordion-button ZakatMoney" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h4>     @DynamicPagesRES.ZakatMoney   </h4>
+                        </button>
+
+
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <form id="MoneyForm" class="new-row">
+                                <div class="col-md-6">
+                                    <label id="CashInHand" for="CashInHand" class="form-label">
+                                        @DynamicPagesRES.ZakatMoneyLable1
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="SavingsAccounts" class="form-label">
+                                        @DynamicPagesRES.ZakatMoneyLable2
+                                    </label>
+                                    <div class="add-data">
+                                        <input id="SavingsAccounts" type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatMoneyLable3
+                                    </label>
+                                    <div class="add-data">
+                                        <input id="CurrentAccounts" type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatMoneyLable4
+                                    </label>
+                                    <div class="add-data">
+                                        <input id="FixedDeposits" type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+
+                            </form>
+                            <div class="add-data">
+                                <div class=" form-control total-value">
+                                    <div class="d-md-flex gap-3 justify-content-center">
+                                        <span>
+                                            @DynamicPagesRES.TotalAmountOf
+                                            @DynamicPagesRES.ZakatMoney
+
+                                            :
+                                        </span>
+                                        <span id="totalMoneyDisplay" class=" text-center total-amount "> </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <!-- الذهب -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingTwo" class="accordion-button  ZakatGold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            <h4>    @DynamicPagesRES.ZakatGold  </h4>
+                        </button>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+
+                            <form id="GoldForm">
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatGoldlable1
+                                    </label>
+                                    <div class="add-data d-md-flex">
+                                        <input type="number" name="weight24" class="form-control" placeholder="@DynamicPagesRES.WeightGrams">
+                                        <input type="number" name="price24" class="form-control" placeholder="@DynamicPagesRES.pricePerGram">
+                                        <div class=" form-control total-value">
+                                            <div class="d-md-flex justify-content-between">
+                                                <span>  @DynamicPagesRES.EstimatedValue  :</span>
+                                                <span id='EstimatedValue24' class=" text-center total-amount"> </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatGoldlable2
+                                    </label>
+                                    <div class="add-data d-md-flex">
+                                        <input type="number" name="weight22" class="form-control" placeholder="@DynamicPagesRES.WeightGrams">
+                                        <input type="number" name="price22" class="form-control" placeholder="@DynamicPagesRES.pricePerGram">
+                                        <div class=" form-control total-value">
+                                            <div class="d-md-flex justify-content-between">
+                                                <span>  @DynamicPagesRES.EstimatedValue  :</span>
+                                                <span id='EstimatedValue22' class=" text-center total-amount"> </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatGoldlable3
+
+                                    </label>
+                                    <div class="add-data d-md-flex">
+                                        <input type="number" name="weight18" class="form-control" placeholder="@DynamicPagesRES.WeightGrams">
+                                        <input type="number" name="price18" class="form-control" placeholder="@DynamicPagesRES.pricePerGram">
+                                        <div class=" form-control total-value">
+                                            <div class="d-md-flex justify-content-between">
+                                                <span>  @DynamicPagesRES.EstimatedValue  :</span>
+                                                <span id='EstimatedValue18' class=" text-center total-amount"> </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatGoldlable4
+
+                                    </label>
+                                    <div class="add-data d-md-flex">
+                                        <input id="AnotherGoldAmount" type="number" class="form-control" placeholder="@DynamicPagesRES.AnotherAmount">
+
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+
+                    <!-- الفضه -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingZakatSilver" class="accordion-button ZakatSilver" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZakatSilver" aria-expanded="true" aria-controls="collapseZakatSilver">
+                            <h4>    @DynamicPagesRES.ZakatSilver </h4>
+                        </button>
+                        <div id="collapseZakatSilver" class="accordion-collapse collapse" aria-labelledby="headingZakatSilver" data-bs-parent="#accordionExample">
+                            <form id="SilverForm">
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatSilverDesc
+                                    </label>
+                                    <div class="add-data">
+                                        <input id="SilverFormValue" type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- احجار كريمه -->
+                    <div class="accordion-item charity-item">
+
+                        <button id="headingPreciousStones" class="accordion-button ZakatPreciousStones" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePreciousStones" aria-expanded="true" aria-controls="collapsePreciousStones">
+                            <h4>
+                                @DynamicPagesRES.ZakatPreciousStones
+                            </h4>
+                        </button>
+                        <div id="collapsePreciousStones" class="accordion-collapse collapse" aria-labelledby="headingPreciousStones" data-bs-parent="#accordionExample">
+                            <form id="PreciousStones">
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatPreciousStonesDesc
+                                    </label>
+                                    <div class="add-data d-md-flex">
+                                        <input id="PreciousStonesValue" type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- القروض و الاستثمارات  -->
+                    <div class="accordion-item charity-item">
+
+                        <button id="headingLoansAndInvestments" class="accordion-button LoansAndInvestments" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoansAndInvestments" aria-expanded="true" aria-controls="collapseLoansAndInvestments">
+                            <h4>
+                                @DynamicPagesRES.LoansAndInvestments
+                            </h4>
+                        </button>
+                        <div id="collapseLoansAndInvestments" class="accordion-collapse collapse" aria-labelledby="headingLoansAndInvestments" data-bs-parent="#accordionExample">
+                            <form id=LoansAndInvestments class="new-row">
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable1
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable2
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable3
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable4
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable5
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable6
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable7
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.LoansAndInvestmentsLable8
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- زكاة الاستثمارات العقارية -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingRealEstateInvestments" class="accordion-button ZakatRealEstateInvestments" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRealEstateInvestments" aria-expanded="true" aria-controls="collapseRealEstateInvestments">
+                            <h4>
+                                @DynamicPagesRES.ZakatRealEstateInvestments
+
+                            </h4>
+                        </button>
+                        <div id="collapseRealEstateInvestments" class="accordion-collapse collapse" aria-labelledby="headingRealEstateInvestments" data-bs-parent="#accordionExample">
+                            <form id="RealEstateInvestments">
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.ZakatRealEstateInvestmentsDesc
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+
+                    <!-- الاعمال -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingBusiness" class="accordion-button Business" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBusiness" aria-expanded="true" aria-controls="collapseBusiness">
+                            <h4>
+                                @DynamicPagesRES.Business
+                            </h4>
+                        </button>
+                        <div id="collapseBusiness" class="accordion-collapse collapse" aria-labelledby="headingBusiness" data-bs-parent="#accordionExample">
+
+                            <form id="BusinessForm" class="new-row">
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.BusinessLable1
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.BusinessLable2
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.BusinessLable3
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.BusinessLable4
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.BusinessLable5
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="add-data">
+                                <div class=" form-control total-value">
+                                    <div class="d-md-flex gap-3 justify-content-center">
+                                        <span>
+                                            @DynamicPagesRES.TotalAmountOf     @DynamicPagesRES.Business
+                                        </span>
+                                        <span id="totalBusinessValueDisplay" class="text-center total-amount"> </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--   المشاركة باسهم بالشركات -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingCompaniesShares" class="accordion-button CompaniesShares" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCompaniesShares" aria-expanded="true" aria-controls="collapseCompaniesShares">
+                            <h4>
+                                @DynamicPagesRES.CompaniesShares
+                            </h4>
+                        </button>
+                        <div id="collapseCompaniesShares" class="accordion-collapse collapse" aria-labelledby="headingCompaniesShares" data-bs-parent="#accordionExample">
+
+                            <form id="CompaniesSharesForm" class="new-row">
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.CompaniesSharesLable1
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.CompaniesSharesLable2
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.CompaniesSharesLable3
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.CompaniesSharesLable4
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="add-data">
+                                <div class=" form-control total-value">
+                                    <div class="d-md-flex justify-content-center gap-3">
+                                        <span>
+                                            @DynamicPagesRES.TotalAmountOf     @DynamicPagesRES.CompaniesShares
+
+                                            :
+                                        </span>
+                                        <span id="totalCompaniesSharesValueDisplay" class="text-center total-amount"> </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--  المنتجات الزراعية-->
+                    <div class="accordion-item charity-item">
+                        <button id="headingAgriculturalProducts" class="accordion-button AgriculturalProducts" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAgriculturalProducts" aria-expanded="true" aria-controls="collapseAgriculturalProducts">
+                            <h4>
+                                @DynamicPagesRES.AgriculturalProducts
+                            </h4>
+                        </button>
+                        <div id="collapseAgriculturalProducts" class="accordion-collapse collapse" aria-labelledby="headingAgriculturalProducts" data-bs-parent="#accordionExample">
+
+                            <form id="AgriculturalProductsForm" class="new-row">
+                                <div class="col-md-12">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.AgriculturalProductsLable1
+
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.AgriculturalProductsLable2
+
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.AgriculturalProductsLable3
+
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!--    حيواناتِ و طيور داجنة و زراعة سمك  -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingAnimalsPoultry" class="accordion-button AnimalsPoultry" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnimalsPoultry" aria-expanded="true" aria-controls="collapseAnimalsPoultry">
+                            <h4>
+                                @DynamicPagesRES.AnimalsPoultry
+                            </h4>
+                        </button>
+                        <div id="collapseAnimalsPoultry" class="accordion-collapse collapse" aria-labelledby="headingAnimalsPoultry" data-bs-parent="#accordionExample">
+
+                            <form id="AnimalsAndBirdsForm">
+                                <div>
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.AnimalsPoultryDesc
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!--  headingGR -->
+                    <div class="accordion-item charity-item">
+                        <button id="headingGR" class="accordion-button GeneralResponsibilities" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGR" aria-expanded="true" aria-controls="collapseGR">
+                            <h4>
+                                @DynamicPagesRES.GeneralResponsibilities
+                            </h4>
+                        </button>
+                        <div id="collapseGR" class="accordion-collapse collapse" aria-labelledby="headingGR" data-bs-parent="#accordionExample">
+
+                            <form id="GeneralResponsibilitiesForm" class="new-row">
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.GeneralResponsibilitiesLable1
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.GeneralResponsibilitiesLable2
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        @DynamicPagesRES.GeneralResponsibilitiesLable3
+
+                                    </label>
+                                    <div class="add-data">
+                                        <input type="number" class="form-control" placeholder="@DynamicPagesRES.EstimatedValue">
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="add-data">
+                                <div class=" form-control total-value">
+                                    <div class="d-md-flex gap-3 justify-content-center">
+                                        <span>
+                                            @DynamicPagesRES.GeneralResponsibilities
+                                            :
+                                        </span>
+                                        <span id="totalGeneralResponsibilitiesValueDisplay" class=" text-center total-amount"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-12">
+                <div class="sidebar-donation">
+                    <h5 class="">
+                        @DynamicPagesRES.FinalValueZakat
+                    </h5>
+                    <form>
+                        <div class="form-group">
+                            <input type="text" disabled class="form-control" id="totalAmount" aria-describedby="emailHelp" placeholder="">
+                        </div>
+                        <a class="btn donation-btn DonateNow" href="/Donation?donationDestID=6821">@DonationResources.DonateNow</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script src="~/Scripts/MersalScripts/ZakahCalculator.js"></script>
+<script src="~/Scripts/js/bootstrap.bundle.min.js"></script>

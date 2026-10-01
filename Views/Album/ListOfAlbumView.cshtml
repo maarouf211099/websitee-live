@@ -1,0 +1,82 @@
+﻿ 
+@model DTO.AlbumListViewDTO
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+
+<section>
+    <div class="block Album-list">
+        <div class="container">
+            <div class="row" >
+                <div class="col-md-12 column">
+                    <div class="title">
+                        @Html.HiddenFor(x => x.CurrantCountOfAlbums)
+
+                        @if (isArabic)
+                        {
+                            <h2>@AlbumResource.Albums </h2>
+                        }
+                        else
+                        {
+                            <h2>@AlbumResource.Albums @*<span>@AlbumResource.Stories</span>*@</h2>
+                        }
+
+
+
+                    </div>
+                    <div class="successful-stories">
+                        <div class="row" id="casesListDiv">
+                            @if (Model.AlbumHomeViewList.Any())
+                            {
+                                foreach (var _Album in Model.AlbumHomeViewList)
+                                {
+                                    <div class="col-md-4"  >
+                                        <div class="story"  >
+                                            <a href="/Album/LastfourAlbumImages/@_Album.Id">
+                                                <div class="story-img"  >
+                                          <div class="view-more">
+                                            
+                                                @if (isArabic){
+                                            
+                                                <p>  @_Album.TitleAr </p>
+                                            }
+                                            else
+                                            {
+                                                 <p>@_Album.TitleEn</p>
+
+                                            }
+                                              
+                                          </div >
+
+                                                    <img src='@_Album.ImagePathThumbnail'>
+                                                </div>
+                                               
+                                            </a>
+                                        </div>
+                                        
+                                    </div><!-- Story -->
+
+                                }
+                            }
+                        </div>
+                        <div class="title">
+                            <span><a onclick="getMoreAlbums()" class="theme-btn" style="width:150px;cursor: pointer;">@LayoutRES.ShowMore</a></span>
+                        </div>
+                    </div><!-- Successful Stories -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+@Scripts.Render("~/bundles/ListOfAlbumView")
+    @*<script src="~/Scripts/MersalScripts/AlbumScript/AlbumInnerScr.js"></script>*@
+}

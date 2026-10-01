@@ -1,0 +1,83 @@
+﻿@model Components.UserManagement.DTO.UserDTORegister
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+} 
+<div id="signup-popup" class="n-popup">
+    <div class="container">
+        <div class="popup-centralize">
+            <span class="close"><i class="fa fa-remove"></i></span>
+            <div class="payment-box">
+                <div class="n-popup-c">
+                    <strong>@LayoutRES.CreateAccount</strong>
+                    @using (Html.BeginForm("Register", "Account", null, FormMethod.Post, new { role = "form", id = "RegisterForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.FirstName, new { placeholder = Html.DisplayNameFor(m => m.FirstName) })
+                                @Html.ValidationMessageFor(m => m.FirstName)
+                            </div>
+
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.LastName, new { placeholder = Html.DisplayNameFor(m => m.LastName) })
+                                @Html.ValidationMessageFor(m => m.LastName)
+                            </div>
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.Email, new { id = "EmailRegist", placeholder = Html.DisplayNameFor(m => m.Email), onkeyup = "setIsMailValid()", onblur = "setIsMailValid()" })
+                                @Html.ValidationMessageFor(m => m.Email)
+                                @Html.Hidden("RegisterMailValid")
+                            </div>
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.Phone, new { placeholder = Html.DisplayNameFor(m => m.Phone) })
+                                @Html.ValidationMessageFor(m => m.Phone)
+                            </div>
+                            <div class="textfield">
+                                @Html.PasswordFor(m => m.Password, new { placeholder = Html.DisplayNameFor(m => m.Password) })
+                                @Html.ValidationMessageFor(m => m.Password)
+                            </div>
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.ConfirmPassword, new { placeholder = Html.DisplayNameFor(m => m.ConfirmPassword), type = "password" })
+                                @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                            </div>
+                            <div class="textfield">
+                                <div class="col-md-4 @floatToRight"> 
+                                    <h5>@Html.DisplayNameFor(m => m.Country)</h5>
+                                    @Html.DropDownListFor(x => x.Country, new List<SelectListItem>(), new { @class = "Country regiser-Country border-radius3px select2 select2-hidden-accessible" })
+                                    @Html.ValidationMessageFor(m => m.Country) 
+                                </div>
+                                <div class="col-md-4 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.Governorate)</h5>
+                                    @Html.DropDownListFor(x => x.Governorate, new List<SelectListItem>(), new { @class = "Governorate regiser-Governorate border-radius3px select2 select2-hidden-accessible", id = "GovernorateRegister" })
+                                    @Html.ValidationMessageFor(m => m.Governorate) 
+                                </div>
+                                <div class="col-md-4 @floatToRight">
+                                    <h5>@Html.DisplayNameFor(m => m.District)</h5>
+                                    @Html.DropDownListFor(x => x.District, new List<SelectListItem>(), new { @class = "select2 border-radius3px select2-hidden-accessible", id = "DistrictRegister" })
+                                    @Html.ValidationMessageFor(m => m.District) 
+                                </div>
+                            </div>
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.AddressLine1, new { placeholder = Html.DisplayNameFor(m => m.AddressLine1) })
+                                @Html.ValidationMessageFor(m => m.AddressLine1)
+                            </div>
+                            <div class="textfield">
+                                @Html.TextBoxFor(m => m.AddressLine2, new { placeholder = Html.DisplayNameFor(m => m.AddressLine2) })
+                                @Html.ValidationMessageFor(m => m.AddressLine2)
+                            </div> 
+                            <div class="submit-bar">
+                                <input type="submit" value="@LayoutRES.CreateAccount" class="btn">
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

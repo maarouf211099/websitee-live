@@ -1,0 +1,357 @@
+﻿@model DTO.ActivityDTO
+@using Kendo.Mvc.UI
+@using Resource;
+
+@{
+    ViewBag.Title = ActivitiesRES.CreateActivity;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var schedulerClass = isArabic ? "k-rtl" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var mersalapi = ViewBag.mersalApi;
+    var local = Server.MapPath("~").Replace("/","\\");
+
+} 
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "CreateForm" }))
+{
+    @*@Html.AntiForgeryToken()*@
+    
+    <div class="form-horizontal"  dir="@dir">
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group" >
+           
+            @Html.LabelFor(model => model.Title, new { @class = "col-md-2  control-label" })
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.Title,new { @class="form-control"})
+                @Html.ValidationMessageFor(model => model.Title)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Address)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MaxCapacity, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.Kendo().NumericTextBoxFor(model => model.MaxCapacity).Min(0).Format("0").Value(0)
+                @Html.ValidationMessageFor(model => model.MaxCapacity)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsFree, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.Kendo().CheckBoxFor(model=>model.IsFree)
+                @Html.ValidationMessageFor(model => model.IsFree)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Fees, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.Kendo().NumericTextBoxFor(model => model.Fees).Format("0.00").Min(0).Value(0)
+                @Html.ValidationMessageFor(model => model.Fees)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsActive, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.Kendo().CheckBoxFor(model => model.IsActive).Checked(true)
+                @Html.ValidationMessageFor(model => model.IsActive)
+            </div>
+        </div>
+
+        @*<div class="form-group" >
+            @Html.Label(ActivitiesRES.Duration, new { @class = "control-label col-md-2" })
+            <div id="SchedulerDiv" class="col-md-8" >
+                <h3>@ActivitiesRES.Duration</h3>
+                <div id="Schedulerdata" class="@schedulerClass">
+                    @{Html.RenderPartial("~/Views/Reminder/ActivityScheduler.cshtml"); }
+                </div>
+            </div>
+        </div>
+        <span class="field-validation-error">
+            <span id="ActivityReminderErrorMessage" style="display: none;">@ActivitiesRES.AddReminder</span>
+        </span>*@
+        <div class="form-group">
+            @Html.LabelFor(m => m.StartDate, new { @class = "col-md-2 control-label" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.StartDateS, new { @class = "DatekendoDatePicker" })
+                @Html.ValidationMessageFor(m => m.StartDateS)
+            </div>
+            @Html.LabelFor(m => m.EndDate, new { @class = "col-md-2 control-label" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.EndDateS, new { @class = "DatekendoDatePicker" })
+                @Html.ValidationMessageFor(m => m.EndDateS)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label(ActivitiesRES.PublicAcademia, new { @class = "control-label col-md-2" })
+            <div id="IsAcademia" class="col-md-8">
+                <div class="col-md-6" floatToRight style="align-items:center">
+                    <div class="col-md-2">
+                        <input type="radio" name="IsAcademia" id="isPubhlicAcademia" @(Model.IsAcademia == true ? "checked" : "")  style="width:25px;height:25px;margin:0!important" value="false" />
+                    </div>
+                    <div class="col-md-10">
+                        <label  class="WhiteLable" color="white">@ActivitiesRES.IsPublic </label>
+                    </div>
+                </div>
+                <div class="col-md-6" floatToRight>
+                    <div class="col-md-2">
+                        <input type="radio" style="width:25px;height:25px;margin:0!important" name="IsAcademia" @(Model.IsAcademia == true ? "" : "checked") floatToRight value="true" />
+                    </div>
+                    <div class="col-md-10">
+                        <label class="WhiteLable"> @ActivitiesRES.IsNotPublic</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+           
+            @Html.LabelFor(m => m.ParentAccountId, new { @class = "col-md-2 control-label" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.ParentAccountId, new List<SelectListItem>(), new { @class = "form-control" })
+              
+            </div>
+        </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PublicShowing , htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-3">
+                    @Html.Kendo().CheckBoxFor(model => model.PublicShowing).Checked(true)
+                    @Html.ValidationMessageFor(model => model.PublicShowing)
+                </div>
+            </div>
+       
+
+        <div class="form-group">
+            @Html.Label(ActivitiesRES.Members,new { @class="control-label col-md-2"})
+            <div class="col-md-3">
+                @(Html.Kendo().MultiSelect()
+                   .Name("membersMulti")
+                   .Placeholder(ActivitiesRES.AddMember)
+                   .DataTextField("UserName")
+                   .DataValueField("Id")
+                   .Filter(FilterType.Contains)
+                   .DataSource(d=>d.Read(r=> { r.Action("GetMembers", "Activities"); }))
+                   .HtmlAttributes(new { @class= @schedulerClass })
+
+                   )
+                
+                
+                
+            </div>
+        </div>
+        <div class="form-group @schedulerClass">
+            @Html.Label(ActivitiesRES.Images, new { @class = "control-label col-md-2" })
+            <div class="col-md-5">
+                @(Html.Kendo().Upload()
+                               .Name("files")
+                               .Multiple(true)
+                               .Async(a =>
+                               {
+                                   a.Save("UploaderSave", "Activities");
+                                   a.Remove("UploaderRemove", "Activities");
+                                   a.AutoUpload(true);
+                               }).HtmlAttributes(new{ accept = "image/*", id = "activitiesaImage" })
+                              )
+            </div>
+        </div>
+            <span class="field-validation-error">
+                <span id="ActivityImageErrorMessage" style="display: none;">@CampaignResource.PleaseAddImage</span>
+            </span>
+
+        <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @*<input type="submit" value='@ActivitiesRES.BTN_Create'  class="btn btn-default" />*@
+                    <input type="submit" value='@ActivitiesRES.BTN_Create' class="btn btn-info" />
+                </div>
+            </div>
+
+        </div>
+}
+
+ @*<script>
+
+     $(document).ready(function () {
+
+         var createActivityForm = $('#CreateForm');
+         createActivityForm.submit(function (sub) {
+            
+             var sendAjax = true;
+             sub.preventDefault();
+             var $form = $(this);
+             if (!$form.valid()) {
+                 sendAjax = false;
+             }
+             $("#ActivityReminderErrorMessage").css("display", "none");
+             $("#ActivityImageErrorMessage").css("display", "none");
+             var data = $form.serializeObject();
+             if ($("#scheduler").data("kendoScheduler").dataSource.data().length == 0) { 
+                
+                 $("#ActivityReminderErrorMessage").css("display", "block");
+                 sendAjax = false;
+             }
+             var uploadImages = $("#activitiesaImage").data("kendoUpload");
+             var Imagelen = uploadImages.wrapper.find(".k-file").length;
+             if (Imagelen === 0) {
+                 $("#ActivityImageErrorMessage").css("display", "block");
+                 sendAjax = false; 
+             }
+
+             data["Scheduler"] = $("#scheduler").data("kendoScheduler").dataSource.at(0);
+             
+
+             if (sendAjax) {
+                 data["ActivityMembers"] = GetMembers();
+                 data["Images"] = [];
+
+                 var images = [];
+                 $.ajax({
+                     url: '@Url.Action("getImages", "Activities")',
+                     dataType: 'json',
+                     async: false,
+                     headers: getHeaders(),
+                     success: function (imag) {
+                         $.each(imag, function (v, databytes) {
+                             var e = v.split(".");
+                             data["Images"].push({ 'data': databytes, 'IsActive': true, ext:e[e.length-1] })
+
+                         })
+                         addActivity(data);
+
+                     },
+                     error: function (xhr) {
+                         toastr.error(xhr.statusText);
+                     }
+                 })
+
+             } else {
+                 return;
+             }
+         });
+
+         $("#IsFree").change(function () {
+             var fees = $("#Fees").data("kendoNumericTextBox");
+             if ($(this).is(':checked')) {
+                 fees.value(null);
+                 fees.enable(false);
+             } else {
+                 fees.enable(true);
+             }
+         });
+
+         $("#SchedulerDiv").accordion({
+             collapsible: true,
+             animated: true,
+             autoHeight: true,
+             active: true
+         });
+
+         $("#SchedulerDiv").on("accordionactivate", function (event, ui) {
+             $("#scheduler").data("kendoScheduler").refresh();
+         });
+     })
+
+     function GetMembers() {
+         var mem = [];
+         $.each($("#membersMulti").data("kendoMultiSelect").value(), function () {
+             mem.push({ UserId: this });
+         })
+         return mem;
+     }
+
+     function GetReminder() {
+         var reminderdata = $("#scheduler").data("kendoScheduler").dataSource.data();
+         if (reminderdata.length > 0) {
+
+         }
+         else {
+
+         }
+     }
+
+     function addActivity(data) {
+         $.ajax({
+             type: 'POST',
+             contentType: "application/json; charset=utf-8",
+             
+             url: '@mersalapi' + 'api/Activities/AddActivity',
+             data: JSON.stringify(data),
+             async: false,
+             headers: getHeaders(),
+             success: function (msg) { 
+                 document.getElementById("CreateForm").reset();
+                 $("#scheduler").data("kendoScheduler").dataSource.data([]);;
+                 $.ajax({
+                     url: '@Url.Action("deleteImagesSession", "Activities")',
+                     async: false,
+                     headers: getHeaders(),
+                     success: function (data) {
+                         toastr.success(SuccessfulProcess);
+                     },
+                     error: function (xhr) {
+                         toastr.error(xhr.statusText);
+                     }
+                 });
+
+
+             },
+             error: function (xhr) {
+                 toastr.error(xhr.statusText);
+             }
+         });
+        
+     }
+
+    
+
+     function onUploadActivityImage(e, data) { 
+         var x = e;
+         var y = data;
+     }
+
+     $.fn.serializeObject = function () {
+
+         var o = {};
+         var a = this.serializeArray();
+         $.each(a, function () {
+
+             if (o.hasOwnProperty(this.name)) {
+                 //if (!o[this.name].push) {
+                 //    o[this.name] = [o[this.name]];
+                 //}
+                 //o[this.name].push(this.value || '');
+             } else {
+                 o[this.name] = this.value || '';
+            }
+         });
+         return o;
+     };
+
+
+
+ </script>*@
+
+@section Scripts { 
+    <script src="~/Scripts/MersalScripts/Activity/CreateActivityScript.js"></script>
+}
+
+

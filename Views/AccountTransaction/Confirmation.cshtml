@@ -1,0 +1,259 @@
+﻿@using Resource
+@using UserUI.Helper
+@{
+    ViewBag.Title = AccountTransactionRES.ConfirmationReciept;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<script>
+    var dexriptionTitle = '@AccountTransactionRES.describtion';
+    var valueTitle = '@AccountTransactionRES.value';
+    var ConfirmationTitle = '@AccountTransactionRES.Confirmation';
+    var AccountTitle = '@AccountTransactionRES.Account';
+</script>
+<div class="modal fade" style="float:right;padding-right: 9%;" id="ConfirmationModal" role="dialog">
+
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Case Comment - @Html.DisplayFor(m => m.CaseName)</h4>*@
+                    <h4 class="modal-title"> @AccountTransactionRES.Confirmation</h4>
+
+
+
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+
+
+                    <!-- general form elements -->
+                    <div class="box box-primary">
+                        <form role="form" id="CreateAccountForm">
+                            <div class="box-body">
+                            <h5>@AccountTransactionRES.ConfirmationMsg</h5>
+
+                            </div>
+                            <div class="box-footer">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    <button type="button" style="width: 45%;" onclick="ConfrimExecute()" class="btn btn-primary">@AccountTransactionRES.accept</button>
+                                    @*<button type="button" style="width: 45%;" class="btn btn-default" data-dismiss="modal">@AccountTransactionRES.Cancel&times;</button>*@
+                                    <button type="button" style="width: 45%;" class="btn btn-info" data-dismiss="modal">@AccountTransactionRES.Cancel&times;</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3" id="paymentBTN" hidden>
+        <a href="@Url.Action("PaymentReciept")" class="btn btn-primary">@AccountTransactionRES.CreatePaymentReciept</a>
+
+    </div>
+    <div class="col-md-3" id="CashBTN" hidden>
+    <a href="@Url.Action("CashReciept")" class="btn btn-primary">@AccountTransactionRES.createCashReciept</a>
+
+    </div>
+</div>
+<br />
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<script>
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+    
+    BindGrid()
+    function BindGrid() {
+        var ispayment = getParameterByName('ispayment');
+        var GetAllTransactionsUrl = MersalWebAPIBaseUrl + "api/CashCustodyConfirmation/GetAllNotConfirm?isPayment=" + ispayment;
+
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: GetAllTransactionsUrl,
+                    dataType: "json",
+                    headers: getHeaders(),
+                },
+                parameterMap: function (options, operation) {
+                    //var caseStateURL = getUrlParameter("Cstate");
+                    //console.log(caseStateURL);
+                    //var filterByState = { filterByState: caseStateURL };
+                    //$.extend(options, filterByState);
+                    //$.extend(options, filterByState);
+                    //console.log(options);
+                    return options;
+                }
+            },
+            schema: {
+                total: function (data) {
+                    return data.Total;
+
+                },
+                data: function (data) {
+
+                    return data.Data;
+                },
+
+                model: {
+                    Id: "Id",
+                    fields: {
+                        Id: { type: "number" },
+
+                        Value: { type: "number" },
+                        AccountName: { type: "string" },
+                        Details: { type: "string" },
+
+                        CreatedOn: { type: "date" },
+                    }
+                }
+            },
+            type: "json",
+            pageSize: 10,
+            serverPaging: true,
+            serverFiltering: true,
+            serverSorting: true
+        });
+        $("#grid").kendoGrid({
+            dataSource: dataSource,
+            filterable: {
+                extra: false
+            },
+            //filterable : true,
+            sortable: true,
+            pageable: {
+                messages: {
+                    itemsPerPage: '',
+                    display: '',
+                    page: '',
+                    of: '',
+                    empty: ''
+                },
+
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            resizable: true,
+            width: '100%',
+            sortable: false,
+
+            columns: [
+                {
+                    field: "Id",
+                    title: 'Id',
+                    filterable: false,
+                    hidden: true,
+
+                },
+                {
+                    field: "AccountName",
+                    title: AccountTitle,
+                    
+                },
+                {
+                    field: "Value",
+                    title: valueTitle,
+
+                },
+                {
+                    field: "Details",
+                    title: dexriptionTitle,
+
+                },
+            
+
+                {
+                    field: "CreateOn",
+                    title: CreatedOn,
+                    type: "date",
+                    format: "{0:d/MM/yyyy }",
+                    //parseFormats: ["MM/dd/yyyy h:mm:ss"],
+                    //filterable: false,
+                    filterable: {
+                        extra: true, //do not show extra filters
+                        operators: {
+                            date: {
+                                eq: "Is equal to",
+                                after: "Is after",
+                                befor: "Is before"
+                            }
+                        },
+                        ui: function (element) {
+                            if (_cultureIsArabic) {
+                                kendo.culture("ar-EG");
+                            }
+                            element.kendoDatePicker({
+                                format: "d/M/yyyy"
+                            });
+                        }
+                    }
+                },
+
+            {
+                filterable: false,
+                sortable: false,
+                title: ConfirmationTitle,
+                template: "<div class='text-center'><a style='cursor: pointer;color: \\#3c8dbc!important' onclick=getConfirmation(#=Id#)><i class='fa fa-thumbs-o-up fa-fw fa-2x'></i></a></div>"
+
+            }
+            ]
+        });
+    }
+
+    var TransactionId = 0;
+    function getConfirmation(Id) {
+        TransactionId = Id;
+        $("#ConfirmationModal").modal("show")
+    }
+    function ConfrimExecute() {
+        var apiurl = MersalWebAPIBaseUrl + "api/CashCustodyConfirmation/Confirmation?Id=" + TransactionId;
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: apiurl,
+            crossDomain: true,
+            headers: getHeaders(),
+          //  data: JSON.stringify(DTO),
+            async: false,
+            success: function (data) {
+                if (data > 0) {
+                    BindGrid()
+                    HideAnyModal()
+                    toastr.success(SuccessfullyAdd + " - " + data);
+                }
+                else {
+                    toastr.error(Error);
+                    HideAnyModal()
+                } 
+            },
+            error: function (xhr) {
+                // HideAnyModal();
+                toastr.error(xhr.error); 
+            }
+        });
+    }
+    function HideAnyModal() {
+        $(".modal").modal("hide")
+    }
+    function ShowCreateBTN() {
+        if (getParameterByName('ispayment').toLowerCase() == "true") {
+            $("#paymentBTN").show()
+        }
+        else {
+            $("#CashBTN").show()
+
+        }
+    }
+    ShowCreateBTN()
+</script>

@@ -1,0 +1,159 @@
+﻿@using Resource
+@using DTO
+@model AccountTransactionDTO
+@{
+    ViewBag.Title = AccountTransactionRES.CashRecieptTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var urlGrid = Url.Action("confirmation") + "?ispayment=false";
+
+}
+<script>
+    var AccountDRPPlacholder = '@AccountTransactionRES.AccountDRPPlacholder';
+    var EmplyeeDRPPlacholder = '@AccountTransactionRES.SelectUser';
+    var AccountRES = '@AccountTransactionRES.For';
+    var valueRES = '@AccountTransactionRES.value';
+    var poundsRES = '@AccountTransactionRES.pounds';
+    var EmpployeRes = '@AccountTransactionRES.employee';
+    var ValueVSBalanceMSG = '@AccountTransactionRES.ValueVSBalanceMSG'
+    var codeRes = '@AccountTransactionRES.codeRes'
+    </script>
+<div class="modal-dialog" style="border: 3px solid #d2d6de !important;" hidden id="PrintDIV" dir="rtl">
+    <!-- Modal content-->
+    <div class="modal-body" style="border: 3px solid #d2d6de !important;float:right !important;direction:rtl !important;width:100%;">
+        <div class="box box-info" style="">
+            <div class="box-header">
+                <img class="" style="position:fixed;top:10px;left:25px; width:200px;height:100px;" src="~/images/mersalLogo.png" />
+
+                <h2 class="" style="position:relative;top:10px;right:25px; width:50%!important;">@ViewBag.Title</h2>
+            </div><!-- /.box-header -->
+            <!-- form start -->
+            <div class="box-body">
+                <!-- general form elements -->
+                <div style="float:right !important;direction:rtl !important;">
+                    <div class="row">
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="codeTXT" style="margin-right:25px!important; color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="EmplyeeTXT" style="margin-right:25px!important; color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                            <br />
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="AccountTXT" style="margin-right:25px!important; color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="ValueTXT" style="margin-right:25px!important;color:#337ab7;font-size: 23px;"></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label style="margin-right:25px!important;color:#337ab7;font-size: 23px;">@AccountTransactionRES.describtion  :-</label>
+                                <br />
+                                <label id="DescibtionTXT" style="margin-right:50px!important;color:#337ab7;font-size: 18px;"></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <br />
+                        <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label  style="margin-right:600px!important;color:#337ab7;font-size: 23px;"> التوقيع</label>
+
+                            </div>
+                        </div>
+                      <br />
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label style="margin-right:600px!important;color:#337ab7;font-size: 23px;"> </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="box box-info">
+    <!-- /.box-header -->
+    <!-- form start -->
+    <div class="box-body">
+
+
+        <!-- general form elements -->
+        <!-- form start -->
+        <form role="form" id="CreateCashReciept">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group ">
+                            @Html.Label(AccountTransactionRES.employee)
+                            <input type="text" id="EmployeeDRP" style="width:100%;" class="form-control" />
+                            <span id="EmployeeDRPMSG" hidden class="field-validation-error"><span>@AccountTransactionRES.emplyeeRequired </span></span>
+
+                         </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group ">
+                            @Html.Label(AccountTransactionRES.Account)
+                            <input type="text" id="AccountDRP" style="width:100%;" class="form-control" />
+                            <span id="AccountDRPMSG" hidden class="field-validation-error"><span>@AccountTransactionRES.AccountRequired </span></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.value)
+                            @Html.TextBoxFor(m => m.value, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.value)
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.describtion)
+                            @Html.TextAreaFor(m => m.describtion, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.describtion)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer" style="float:left;">
+
+
+                <button type="button" onclick="CreateCashReciept()" class="btn btn-primary">@AccountTransactionRES.SavePrint</button>
+                @*<a href="@urlGrid" class="btn btn-default">@AccountTransactionRES.Return</a>*@
+                <a href="@urlGrid" class="btn btn-info">@AccountTransactionRES.Return</a>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/Scripts/MersalScripts/AccounTransaction/CashReciept.js"></script>
+<script>
+    $(document).ready(function () {
+       
+    });
+ 
+</script>

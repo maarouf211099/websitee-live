@@ -1,0 +1,44 @@
+﻿
+@using System.Configuration
+@using UserUI.Helper
+@using Resource
+@using DTO
+@{
+    ViewBag.Title = "بحث الحالات";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+@section Scripts {
+    <script>
+        var Babys = '@CaseResources.Babys';
+        var Children = '@CaseResources.Children';
+        var Youth = '@CaseResources.Youth';
+        var Older = '@CaseResources.Older';
+        var ServiceName = '@CaseResources.ServiceType'
+        var DisesName = '@CaseResources.DisesaseType'
+        var Country = "@CaseResources.Country";
+        var Governorate = "@CaseResources.Governorate";
+        var District = "@CaseResources.District";
+        var AddressLine1 = "@CaseResources.AddressLine1";
+        var Mobile = "@CaseResources.Mobile";
+        var Phone = "@CaseResources.Phone";
+        var Nationality = "@CaseResources.Nationality";
+        var Religion = "@CaseResources.Religion";
+        var StatusInEgypt = "@CaseResources.StatusInEgyptId";
+        var Gender = "@CaseResources.Gender";
+    </script>
+    @*@Scripts.Render("~/bundles/Cases")*@
+    <script src="~/Scripts/MersalScripts/CasesManagment/IndexSearch.js"></script>
+    @*<script src="~/Scripts/MersalScripts/CasesManagment/CaseIndex.js"></script>
+        <script src="~/Scripts/MersalScripts/CasesManagment/CaseInvestigator.js"></script>
+        <script src="~/Scripts/MersalScripts/CasesManagment/InvestigationResult.js"></script>
+        <script src="~/Scripts/MersalScripts/CasesManagment/CaseCustomAttrValue.js"></script>*@
+}
+

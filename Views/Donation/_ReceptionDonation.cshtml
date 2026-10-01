@@ -1,0 +1,447 @@
+﻿@using Resource
+@model UserUI.Models.CreateReceptionDonationDto
+
+
+
+<div id="ReceptionDonation" class="donation-fields pt-2">
+    <div class="tabContainer">
+        @*<strong class="popup-title text-center pt-3">
+            @DonationResources.ReceptionDonation
+
+            
+        </strong>*@
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "ReceptionDonationForm" }))
+        {
+    <div class="form">
+      
+        <div class="form-group col-md-6 DonationDestinationTypeDiv float-right">
+             <div class="textfield">
+                @Html.DropDownListFor(x => x.MersalBranchId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.MersalBranchId)َ
+            </div>
+        </div>
+          <div class="form-group col-md-6 DonationDestinationTypeDiv">
+             <div class="textfield">
+                @Html.DropDownListFor(x => x.GenderBranchId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.GenderBranchId)َ
+            </div>
+        </div>
+        <div class="col-md-6  ">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.DonationName, new { @class = "form-control  textfield", placeholder = @DonationResources.DonationName+'*' })
+                @Html.ValidationMessageFor(x => x.DonationName)
+            </div>
+        </div>
+
+        <div class="col-md-6 ">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.Phone, new { @class = "form-control textfield", placeholder = @DonationResources.Phone + '*' })
+                @Html.ValidationMessageFor(x => x.Phone)
+            </div>
+        </div>
+
+
+
+        <div class="col-md-6">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.Amount, new { Value = "", placeholder = DonationResources.EnterTheAmountYouWant+'*', onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                @Html.ValidationMessageFor(x => x.Amount)
+            </div>
+        </div>
+
+
+
+        <div class="col-md-6 FloatRight">
+            <div class="textfield">
+                @Html.TextBoxFor(x => x.ReciptNo, new { @class = "form-control  textfield", placeholder = @DonationResources.ReciptNo + '*' })
+                @Html.ValidationMessageFor(x => x.ReciptNo)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(x => x.NumberNotebook, new { placeholder = @DonationResources.NumberNotebook+'*' })
+                @Html.ValidationMessageFor(x => x.NumberNotebook)
+            </div>
+        </div>
+
+        <div class="form-group col-md-6 DonationDestinationTypeDiv">
+            @*<label class="col-md-4 control-label FloatRight">@DonationResources.DonationPayWayId :</label>*@
+            <div class="textfield">
+                @Html.DropDownListFor(x => x.DonationPayWayIdd, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationPayWayIdd)َ
+            </div>
+        </div>
+
+        <div class="form-group col-md-6 DonationDestinationTypeDiv">
+            @*<label class="col-md-4 control-label FloatRight">@DonationResources.TypeDonorId :</label>*@
+            <div class="textfield">
+                @Html.DropDownListFor(x => x.TypeDonorBranchId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.TypeDonorBranchId)َ
+            </div>
+        </div>
+        <div class="form-group col-md-6 DonationDestinationTypeDiv">
+            @*<label class="col-md-4 control-label FloatRight">@DonationResources.Currency :</label>*@
+            <div class="textfield">
+                @Html.DropDownListFor(x => x.CurencyReceptionId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.CurencyReceptionId)َ
+            </div>
+        </div>
+        <div class="form-group col-md-6 DonationDestinationTypeDiv">
+            @*<label class="col-md-4 control-label FloatRight">@DonationResources.DonationDestination :</label>*@
+            <div class="textfield">
+                @Html.DropDownListFor(x => x.DonationDestinationReceptionId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationDestinationReceptionId)َ
+            </div>
+
+            <div class="textfield" id="DonationSubReception" style="display:none;">
+                @Html.DropDownListFor(x => x.DonationDestinationSubReceptionId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationDestinationSubReceptionId)َ
+            </div>
+
+            <div class="textfield" id="DonationSubOfSubReception" style="display:none;">
+                @Html.DropDownListFor(x => x.DonationDestinationSubOfSubReceptionId, new List<SelectListItem>(), new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.DonationDestinationSubOfSubReceptionId)َ
+            </div>
+
+            <div class="textfield" id="ReceptionDonationCaseCodeContainer" style="display:none;">
+                @Html.TextBoxFor(x => x.ReceptionDonationCaseCode, new { @class = "form-control", placeholder = Html.DisplayNameFor(m => m.ReceptionDonationCaseCode) })
+                @Html.ValidationMessageFor(x => x.ReceptionDonationCaseCode)
+            </div>
+
+        </div>
+
+        @*<div class="col-md-6">
+            <div class="textfield FloatRight">
+                @Html.TextBoxFor(model => model.TransferDate, new { type = "datetime-local", placeholder = @DonationResources.TransferDate })
+
+                @Html.ValidationMessageFor(x => x.TransferDate)
+            </div>
+        </div>*@
+
+
+        @*<div class="col-md-6 pb-2">
+
+            <div class="row">
+                <label class="col-md-4 control-label FloatRight">@DonationResources.TransferDate :</label>
+
+                <div class="col-md-8">
+                    <div class="textfield FloatRight">
+                        @Html.TextBoxFor(model => model.TransferDate, new { type = "datetime-local", @class = "form-control" })
+
+                    </div>
+                </div>
+
+            </div>
+        </div>*@
+        <div class="col-md-6 FloatRight pb-3 pt-2">
+            <div class="textfield">
+                @Html.TextAreaFor(x => x.Description, new { @class = "form-control", placeholder = DonationResources.KnowAboutMersal })
+
+                @Html.ValidationMessageFor(x => x.Description)
+            </div>
+        </div>
+
+        @*<div class="col-md-12 d-lg-flex">
+            <ul class="donation-figures col-8">
+                <li><a class="wpdonation-button " id="Donate10OtherRec" title="">10.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate50OtherRec" title="">50.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate100OtherRec" title="">100.00 EGP</a></li>
+                <li><a class="wpdonation-button" id="Donate500OtherRec" title="">500.00 EGP</a></li>
+                <li><a class="wpdonation-button active" id="OtherAmountOtherRec" title="Other Amount Online">@DonationResources.OtherAmount</a></li>
+            </ul>
+            <div class="donation-amount  col-4 ">
+                <div>
+
+
+                    @Html.TextBoxFor(x => x.Amount, new { @class = "form-control", Id = "ValueAmountOtherRec", maxlength = 5, Value = "", placeholder = DonationResources.EnterTheAmountYouWant, onkeypress = "return event.charCode >= 48 && event.charCode <= 57" })
+                    <span>EGP</span>
+
+
+                    @Html.ValidationMessageFor(x => x.Amount)
+
+                </div>
+            </div>
+        </div>*@
+
+        <div class="donate-now col-md-12 justfy-align-center"><input type="submit" itemprop="url" class="proceed" value="@LayoutRES.Submit" /></div>
+
+
+    </div>
+        }
+    </div>
+</div>
+
+
+<script>
+
+    //$('#Donate10OtherRec').click(function () {
+    //    $("#ValueAmountOtherRec").attr("readonly", true).val(10);
+    //});
+
+    //$('#Donate50OtherRec').click(function () {
+    //    $("#ValueAmountOtherRec").attr("readonly", true).val(50);
+    //});
+
+    //$('#Donate100OtherRec').click(function () {
+    //    $("#ValueAmountOtherRec").attr("readonly", true).val(100);
+    //});
+
+    //$('#Donate500OtherRec').click(function () {
+    //    $("#ValueAmountOtherRec").attr("readonly", true).val(500);
+    //});
+
+    //$('#OtherAmountOtherRec').click(function () {
+    //    $("#ValueAmountOtherRec").attr("readonly", false).val('');
+    //});
+    //$("#TransferDate").datepicker("setDate", new Date());
+
+
+    GetAnyMasterDetalisCode('DonateThroughOtherMeansCurency', 'CurencyReceptionId', false, true, "", "", true,'@DonationResources.Currency');
+
+
+    GetAnyMasterDetalisCode('DoDs', 'DonationDestinationReceptionId', false, true, "", "", true,'@DonationResources.DonationDestination');
+
+    GetAnyMasterDetalisCode('MersalBranchs', 'MersalBranchId', false, true, "", "", true,'@DonationResources.MersalBranchId');
+    GetAnyMasterDetalisCode('GEND', 'GenderBranchId', false, true, "", "", true,'@DonationResources.Gender');
+    GetAnyMasterDetalisCode('MethodsPayingDonationBranches', 'DonationPayWayIdd', false, true, "", "", true,'@DonationResources.DonationPayWayId');
+    GetAnyMasterDetalisCode('TypeDonor', 'TypeDonorBranchId', false, true, "", "", true,'@DonationResources.TypeDonorId');
+
+
+
+
+    $('#DonationDestinationReceptionId').change(function () {
+
+        console.log("DonationDestinationReceptionId Change");
+
+        $('#DonationSubReception').hide();
+        $('#DonationSubOfSubReception').hide();
+        $('#ReceptionDonationCaseCodeContainer').hide();
+
+        $('#DonationDestinationSubOfSubReceptionId').html('');
+        $('#DonationDestinationSubReceptionId').html('');
+
+        $("#DonationDestinationSubReceptionId").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+        $("#DonationDestinationSubOfSubReceptionId").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+        $("#ReceptionDonationCaseCode").rules("add", {
+            required: false,
+            messages: {
+                required: requiredCaseCode
+            }
+        });
+
+
+        var id = $('#DonationDestinationReceptionId').val();
+        var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+        debugger;
+        GetByParentIdReception('DonationDestinationSubReceptionId', id, 'DonationSubReception', placeHolder);
+    });
+
+    $('#DonationDestinationSubReceptionId').change(function () {
+        $('#DonationSubOfSubReception').hide();
+        $('#DonationDestinationSubOfSubReceptionId').html('');
+
+        $("#DonationDestinationSubOfSubReceptionId").rules("add", {
+            required: false,
+            messages: {
+                required: requiredDonationDestination
+            }
+        });
+
+        var code = this.options[this.selectedIndex].getAttribute('Code');
+        if (code == "DonZkaCase") {
+            $('#ReceptionDonationCaseCodeContainer').show();
+            $("#ReceptionDonationCaseCode").rules("add", {
+                required: true,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+        }
+        else {
+            $('#ReceptionDonationCaseCodeContainer').hide();
+            $('#ReceptionDonationCaseCode').val('');
+            $("#ReceptionDonationCaseCode").rules("add", {
+                required: false,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+            var id = $('#DonationDestinationSubReceptionId').val();
+            var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+            GetByParentIdReception('DonationDestinationSubOfSubReceptionId', id, 'DonationSubOfSubReception', placeHolder);
+        }
+    });
+
+    $('#DonationDestinationSubOfSubReceptionId').change(function (e) {
+        var code = this.options[this.selectedIndex].getAttribute('Code');
+        if (code == "DonGeneralCase") {
+            $('#ReceptionDonationCaseCodeContainer').show();
+            $("#ReceptionDonationCaseCode").rules("add", {
+                required: true,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+        }
+        else {
+            $('#ReceptionDonationCaseCodeContainer').hide();
+            $('#ReceptionDonationCaseCode').val('');
+            $("#ReceptionDonationCaseCode").rules("add", {
+                required: false,
+                messages: {
+                    required: requiredCaseCode
+                }
+            });
+        }
+    });
+
+
+    function GetAnyMasterDetalisCode(MasterCode, dropDownListId, enableAll, async, selectedId, PerantCode, emptyOption,placeholder) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + MasterCode,
+            async: async,
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                if (PerantCode) {
+                    $.each(data, function (key, value) {
+                        if (value.Parent) {
+                            if (value.Parent.Code == PerantCode) {
+                                var selec = "";
+                                if (value.masterCodeValue == MasterCode) {
+                                    if (value.Id == selectedId) selec = " selected='selected' ";
+                                    if (_cultureIsArabic) {
+                                        html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                                    }
+                                    else {
+                                        html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                else {
+                    $.each(data, function (key, value) {
+                        var selec = "";
+                        if (value.masterCodeValue == MasterCode) {
+                            if (value.Id == selectedId) selec = " selected='selected' ";
+                            if (_cultureIsArabic) {
+                                html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                html += "<option Code=\"" + value.Code + "\" value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                }
+                $("#" + dropDownListId).html(html);
+                if (emptyOption) {
+                    $("#" + dropDownListId).prepend("<option value='' selected='selected'>" + placeholder+'*'+"</option>");
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+
+
+    }
+
+
+
+    function GetByParentIdReception(dropDownId, parentId, itemToShow, placeHolder = '') {
+        var url = SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetByParentId?parentId=" + parentId;
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: url,
+            async: true,
+            success: function (data) {
+                var htmlGovernorate = "<option value=''>" + placeHolder + "</option>";
+                $.each(data, function (key, value) {
+                    htmlGovernorate += "<option Code=\"" + value.Code + "\" value=" + value.Id + " >" + value.NameEn + "</option>";
+                });
+                $("#" + dropDownId).html(htmlGovernorate);
+                if (data.length != 0) {
+                    $('#' + itemToShow).show();
+                    $("#" + dropDownId).rules("add", {
+                        required: true,
+                        messages: {
+                            required: requiredDonationDestination
+                        }
+                    });
+                }
+            },
+            error: function (xhr) {
+                //toastr.error(xhr.statusText);
+            }
+        });
+
+    }
+
+
+
+
+
+
+    // call api in submit
+
+
+
+    var ReceptionDonationForm = $("#ReceptionDonationForm");
+    ReceptionDonationForm.submit(function (e) {
+        $.validator.unobtrusive.parse(ReceptionDonationForm)
+        e.preventDefault();
+        if (!ReceptionDonationForm.valid()) return;
+        var apiurl = MersalWebAPIBaseUrl + "api/Donation/CraeteReceptionDonation";
+        var data = {};
+        $("#ReceptionDonationForm").serializeArray().map(function (x) { data[x.name] = x.value; });
+        data.CaseId = data.ReceptionDonationCaseCode;
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: apiurl,
+            crossDomain: true,
+            headers: getHeaders(),
+            data: JSON.stringify(data),
+            async: true,
+            beforeSend: function () {
+                $("#imgAjaxLoader").show();
+            },
+            success: function (data) {
+                $("#imgAjaxLoader").hide();
+                toastr.success(SuccessfullyAdd);
+                document.getElementById("ReceptionDonationForm").reset();
+                $('#DonationDestinationReceptionId').change();
+            },
+            error: function (xhr) {
+                $("#imgAjaxLoader").hide();
+                toastr.error(xhr.error);
+            }
+        });
+    });
+
+
+</script>

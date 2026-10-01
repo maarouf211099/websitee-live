@@ -1,0 +1,70 @@
+﻿@model DTO.CaseHomeViewDTO
+@using System.Globalization
+@using Resource
+@using UserUI.Helper
+@using DTO
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+    var floatNone = isArabic ? "" : "float:none;";
+    var floatRightStyle = isArabic ? "float:right;" : ""; 
+}
+ 
+<section>
+    <div class=""> 
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 column FloatRight">
+                    <div class="blog-detail-page">
+                        <div class="post-intro cause-intro" > 
+                            <aside class="col-md-3 sidebar column ">
+                                <div class="post-intro cause-intro">
+                                    <div class="cause-detail" >
+                                        <span><i style="font-size: 25px; margin: 0px 10px;" >@CaseResources.Goal</i>@Model.moneyWanted</span>
+                                        @if (int.Parse(Model.remainingText) > 0)
+                                        {
+                                            <strong style="cursor: pointer;" onclick="callDonationpopup(1,'@Model.Id','@Model.AccountId','@Model.Id :: @Model.CaseName','@Model.remainingText')" CaseId="@Model.Id" AccountId="@Model.AccountId">@CaseResources.DonateNow<a itemprop="url" href="@Url.Action("index", "Donation")" >@CaseResources.DonateNow</a></strong>
+                                            <span><i style=" font-size: 25px;" >@CaseResources.Remaining </i>@Model.remainingText</span>
+
+                                        }
+                                        else
+                                        {
+
+                                            <span><i style=" font-size: 25px;margin: 0px 10px;" >@CaseResources.Completed</i></span>
+                                        }
+                                    </div>
+                                </div>
+                            </aside> 
+                            <img  src="~/ClientFilesLayout/CasesImage/@(Model.Id+".jpg")" onError="this.onerror = null; this.src = '/images/logo_W.png';" style="">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @*<ul class="meta" style="width:97%;">
+                                        <li style="@floatRightStyle ;color:#000"><i class="ti-calendar"></i>@Model.CreatedOn.ToString("d/MMMM/yyyy", CultureInfo.InvariantCulture)</li>
+                                        @if (isArabic)
+                                        {
+                                            <li style="@floatRightStyle ;color:#000"><i class="ti-location-pin"></i>@Model.CategoryNameAr</li>
+                                            <li style="@floatRightStyle ;color:#000"><i class="ti-user"></i><a style="color:#000">@Model.CurrantStateNameAr</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li style="@floatRightStyle ;color:#000"><i class="ti-location-pin"></i>@Model.CategoryNameEn</li>
+                                            <li style="@floatRightStyle ;color:#000"><i class="ti-user"></i><a style="color:#000" >@Model.CurrantStateNameEn</a></li>
+                                        }
+                                    </ul>*@
+                                    <h1 class="post-title" style="color: #37a1a2;">@Model.Id :: @Model.CaseName</h1> 
+                                </div>
+                            </div>
+                            <p style="font-size: 20px;">
+                                @Model.Description
+                            </p>
+
+                        </div><!-- Post Intro -->
+
+                    </div><!-- Blog Detail -->
+                </div> 
+            </div>
+        </div>
+    </div>
+</section>

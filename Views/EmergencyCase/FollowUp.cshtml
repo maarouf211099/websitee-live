@@ -1,0 +1,61 @@
+﻿@using UserUI.Helper
+@using Resource
+@using Resource.Emergency
+@using DTO
+@{
+    ViewBag.Title = EmergencyCaseRES.FollowUp;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+@*<style>
+        .k-grid-content {
+            max-height: 360px;
+        }
+    </style>*@
+<head>
+    <title>@EmergencyCaseRES.FollowUp</title>
+</head>
+
+<br />
+<br />
+
+
+<input id="IsFilters" type="hidden" value="NoFilter" />
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var CaseStatus = '@CaseResources.CaseStatus'
+        var ArchivingCaseTitle = '@CaseResources.ArchivingCase';
+        var ConfirmArchived = '@CaseResources.ConfirmArchived';
+        var Mobile = '@CaseResources.PhoneNumberAnonymous';
+        var State = "@CaseResources.State";
+        var CaseName = "@CaseResources.CaseName";
+        var Diagnosis = "@EmergencyCaseRES.DiagnosisId";
+        var NameAnonymous = "@CaseResources.NameAnonymous";
+        var PhoneNumberAnonymous = "@CaseResources.PhoneNumberAnonymous";
+        var CreatedOn = '@CaseResources.CreatedOn';
+        var CreatedBy = '@CaseResources.Employee';
+        var Age = '@CaseResources.Age';
+        var OtherEmergency = '@EmergencyCaseRES.OtherEmergency';
+        var CoronaSuspicion = '@EmergencyCaseRES.CoronaSuspicion';
+        var HospitalName = '@EmergencyCaseRES.ExactHospitalName';
+        var HospitalEntryDate = '@EmergencyCaseRES.HospitalAttendDate';
+        var RequiredAmount = '@EmergencyCaseRES.Amount';
+    </script>
+    @Scripts.Render("~/bundles/Cases")
+    <script src="~/Scripts/MersalScripts/EmergencyCase/emergency-case-follow-up.js"></script>
+    <script>
+        $(document).ready(function () {
+            SetCaseState('@ViewBag.caseState');
+        });
+    </script>
+}
+

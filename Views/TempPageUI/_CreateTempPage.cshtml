@@ -1,0 +1,81 @@
+﻿
+@model DTO.TempPageDTO
+@using Resource
+@using DTO
+@using UserUI.Helper
+@using Kendo.Mvc.UI
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+<div class="modal fade" id="TempPageModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@DynamicPagesRES.CreateTempBlockPage</h4>
+                </div>
+                <div class="box-body">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "CreateTempPageForm" }))
+                    {
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleEn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleEn, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleEn)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.TitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TitleAr)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SubTitleEn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.SubTitleEn, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.SubTitleEn)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SubTitleAr, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.SubTitleAr, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.SubTitleAr)
+                                </div>
+                            </div> 
+                            <div class="form-group"> 
+                                  @Html.LabelFor(model => model.TemplateId, htmlAttributes: new { @class = "control-label col-md-4" })
+        
+                                    <div class="col-md-8">
+                                        <label for="Column">Column</label>
+                                        <input type="radio" name="TemplateId" id="Column" value="1" />
+
+                                        <label for="Rows">Rows</label>
+                                        <input type="radio" name="TemplateId" id="Rows" value="2" />
+
+                                        <label for="Tabs">Tabs</label>
+                                        <input type="radio" name="TemplateId" id="Tabs" value="3" />
+
+                                        <label for="accordion">Accordion</label>
+                                        <input type="radio" name="TemplateId" id="accordion" value="4" />
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="box-footer"> 
+                            <button type="submit" class="btn btn-info pull-right">@LayoutRES.Submit</button>
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                        </div><!-- /.box-footer -->
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

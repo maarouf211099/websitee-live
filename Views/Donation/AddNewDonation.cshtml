@@ -1,0 +1,853 @@
+﻿@using UserUI.Helper
+@using Resource
+@using DTO
+@using Components.UserManagement.Resources
+@model NewDonationDTO
+@{
+    ViewBag.Title = DonationResources.DonationThroughBranches;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<script>
+    var chooseTheCasePlaceHolder = '@DonationResources.ChooseTheCase';
+    var dateIsRequiredPlaceHolder = '@DonationResources.RequiredDate';
+    var dateIsInvalidPlaceHolder = '@DonationResources.InvalidDate';
+    var Case = '@CaseResources.Case';
+    var DonationDate = '@DonationResources.Date';
+    var Amount = '@DonationResources.ValueAmount';
+    var TransActionSource = '@DonationResources.DonationSource';
+    var ReciptNo = '@DonationResources.voucherNumber';
+    var DonationType = '@DonationResources.DonationType';
+    var DonationDestination = '@DonationResources.DonationDestination';
+    var branch = "@DonationResources.MersalBranchId";
+    var DetailsTitleGrid = "@DonationResources.Details";
+    var UserName = '@AuthorizationHelper.UserName';
+    var IsGreaterThan = '@CommonRes.IsGreaterThan';
+    var IsLessThan = '@CommonRes.IsLessThan';
+</script>
+
+@*<title>@DonationResources.AddNewDonation</title>*@
+
+
+@*<div class="box box-info">
+    <!-- /.box-header -->
+    <!-- form start -->
+    <div class="box-body">
+
+        <!-- general form elements -->
+        <!-- form start -->
+        <form id="AddNewDonationForm">
+            <div class="box-body">
+                <div class="row">
+                    @Html.HiddenFor(x => x.Id, new { id = "TransferIdHID" })
+                    @Html.HiddenFor(x => x.IsDone)
+
+
+                    <div class="col-md-4">
+                        <div class="form-group ">
+                            @Html.Label(DonationResources.ChooseTheCase)*@
+
+@*@Html.DropDownListFor(x => x.CaseId, new List<SelectListItem>(), new { @class = "form-control CaseId" })*@
+@*@Html.ValidationMessageFor(x => x.CaseId)َ*@
+
+@*
+    <input type="text" name="CaseId" id="CaseId" style="width:100%;" class="form-control CaseId" />
+    <span id="CaseIdMsg" class="field-validation-error hidden"><span>@DonationResources.CaseIsRequired</span></span>
+                            </div>
+                        </div>
+    <div class="col-md-4">
+        <div class="form-group ">
+            @Html.LabelFor(m => m.ReceiptNo)
+            @Html.TextBoxFor(m => m.ReceiptNo, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.ReceiptNo)
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            @Html.LabelFor(m => m.value)
+            @Html.TextBoxFor(m => m.value, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.value)
+        </div>
+    </div>
+                    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.LabelFor(x => x.TransitionSource)
+                @Html.TextBoxFor(x => x.TransitionSource, new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.TransitionSource)
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Date)
+                @Html.TextBoxFor(m => m.Date, new { @class = "form-control" })
+                <span id="DateMsg" class="field-validation-error hidden"><span>@DonationResources.CaseIsRequired</span></span>
+            </div>
+        </div>
+    </div>
+                </div>
+    <div class="box-footer" style="float:left;">
+        <button type="submit" onclick="CreateDonation()" class="btn btn-primary">@DonationResources.Save</button>
+    </div>
+
+            </form>
+
+
+
+
+        </div>
+    </div>*@
+<div class="container">
+    <div class="col-md-4">
+        <h3>@DonationResources.Done:<input type="radio" name="ridIsDone" value="true" /></h3>
+    </div>
+    <div class="col-md-4">
+        <h3>@DonationResources.NotDone:<input type="radio" name="ridIsDone" value="false" checked="checked" /></h3>
+    </div>
+
+
+</div>
+<input type="hidden" id="hidIsDone" value="false" />
+
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="gridTwo" hidden class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<h3 id="TotalAmount"></h3>
+
+
+<script>
+
+    var GetAllDonationUrl = MersalWebAPIBaseUrl + "api/Donation/GetAllReceptionDonation2";
+    var PostLoggingDetailsUrl = "/Logger/PostLoggerInformation"
+
+    var totalAmount = 0;
+    $(function () {
+        $('.modal').on('hide.bs.modal', function () {
+            $("#grid").data("kendoGrid").dataSource.read();
+        });
+
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: GetAllDonationUrl,
+                    dataType: "json",
+                    headers: getHeaders(),
+                },
+                parameterMap: function (options, type) {
+                    if ($("#hidIsDone").val() == "true") {
+                        $.extend(options, { IsDone: true });
+                    }
+                    else
+                        $.extend(options, { IsDone: false });
+
+                    return options;
+                },
+            },
+            schema: {
+                total: function (data) {
+                    totalAmount = data.Aggregates;
+                    if (totalAmount != null)
+                        $("#TotalAmount").text("أجمالى التبرعات " + totalAmount.toString());
+                    return data.Total;
+
+                },
+                data: function (data) {
+
+                    return data.Data;
+                },
+
+                model: {
+                    Id: "Id",
+                    fields: {
+                        Id: { type: "number" },
+                        //Name: { type: "string" },
+                        CreatedOn: { type: "date" },
+                        Phone: { type: "string" },
+                        Amount: { type: "number" },
+                        //TitleName: { type: "string" },
+                        DonationTypeAr: { type: "string" },
+                        //DonationCase: { type: "string" },
+                        CaseId: { type: "string" },
+                        TransactionSource: { type: "string " }
+
+                    }
+                }
+            },
+            type: "json",
+            pageSize: 10,
+            requestEnd: onRequestEnd,
+            serverPaging: true,
+            serverFiltering: true,
+            serverSorting: true,
+            aggregate: [
+                { field: "Amount", aggregate: "sum" },
+
+            ]
+        });
+
+        function onRequestEnd(e) {
+         
+            if (e.response.Data && e.response.Data.length) {
+                var data = e.response.Data;
+                if (e.type == "read") {
+                    //loopRecords(data);
+                }
+            }
+        }
+        function loopRecords(data) {
+            for (var i = 0; i < data.length; i++) {
+                var creationDate = data[i].CreatedOn;
+                var dt = new Date(creationDate);
+                dt.setHours(dt.getHours() + 2);
+
+                data[i].CreatedOn = dt;
+            }
+        }
+        $("#grid").kendoGrid({
+
+            toolbar: [{
+                name: "excel",
+                text: ExeportToExcel,
+            }],
+            excel: {
+                fileName: "List Of Cases.xlsx",
+                allPages: true,
+                filterable: false
+
+            },
+            dataSource: dataSource,
+
+            filterable: {
+                extra: false,
+                operators: {
+                    string: {
+                        eq: IsEqualTo,
+                        neq: IsNotEqualTo,
+                        startswith: StartsWith,
+                        contains: Contains,
+                        doesnotcontain: doesnotcontain,
+                        endswith: endswith,
+                    }
+                },
+                messages: {
+                    info: "",
+                    filter: Filter,
+                    clear: Clear,
+                    and: AndOperator,
+                    or: OrOperator
+                }
+
+            },
+
+            sortable: true,
+            pageable: {
+                messages: {
+                    itemsPerPage: itemsPerPage,
+                    display: display,
+                    page: page,
+                    of: of,
+                    empty: empty
+                },
+
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            resizable: true,
+            width: '100%',
+            sortable: false,
+            groupable: {
+                messages: {
+                    empty: DragaColumnHeaderAndDropItHereToGroupByThatColumn,//Drag a column header and drop it here to group by that column"
+                }
+            },
+            columns: [
+                {
+                    field: "Id",
+                    title: 'Id',
+                    filterable: false,
+                    hidden: true,
+                },
+                {
+                    field: "DonationName",
+                    title: DonationName,
+
+                },
+                {
+                    field: "DonationTypeAr",
+                    title: DonationDestination,
+
+                },
+                {
+                    field: "CaseId",
+                    title: CaseCode,
+                },
+                {
+                    field: "branch",
+                    title: branch,
+
+                },
+                {
+                    field: "Amount",
+                    title: Amount,
+                    footerTemplate: "Sum: #= sum # ",
+                    filterable: {
+                        operators: {
+                            number: {
+                                eq: IsEqualTo,
+                                gt: IsGreaterThan,
+                                lt: IsLessThan
+                            }
+                        }
+                    }
+                },
+                {
+                    field: "CreatedOn",
+                    title: CreatedOn,
+                    type: "date",
+                    format: "{0:d/M/yyyy h:mm tt}",
+                    parseFormats: ["MM/dd/yyyy h:mm:ss tt"],
+                    //filterable: false,
+                    filterable: {
+                        messages: {
+                            and: AndOperator,
+                            or: OrOperator
+                        },
+                        extra: true,
+                        operators: {
+                            date: {
+                                eq: IsEqualTo,
+                                gt: After,
+                                lt: Before,
+                            }
+                        },
+                        ui: function (element) {
+                            if (_cultureIsArabic) {
+                                kendo.culture("ar-EG");
+                            }
+                            element.kendoDatePicker({
+                                format: "0:d/M/yyyy h:mm"
+                            });
+                        }
+                    }
+                    , width: 130
+                },
+                {
+                    command: [
+                         {
+                            name: "edit",
+                            text: "",
+                            iconClass: "fa  fa-info-circle",
+                            click: function (e) {
+                                var tr = $(e.target).closest("tr");
+                                dataRow = this.dataItem(tr);
+                                var rowIdx = $("tr", grid.tbody).index(tr);
+                                Edit(dataRow);
+                            }
+                        },
+
+                    ],
+                    field: "isNotDoneCommands",
+                    title: DetailsTitleGrid,
+                    width: 90
+                },
+                {
+                    command: [
+
+                        {
+                            name: "delete",
+                            text: "",
+                            iconClass: "fa fa-trash-o",
+                            click: function (e) {
+                                var tr = $(e.target).closest("tr");
+                                var dataRow = this.dataItem(tr);
+                                var rowIdx = $("tr", grid.tbody).index(tr);
+                                DeleteReceptionDonation(dataRow.Id);
+                            }
+                        },
+
+                    ]
+                    , title: '@LayoutRES.Delete'
+                    , width: 90
+                    , field: "deleteCommand"
+                }
+            ],
+            excelExport: function (e) {
+                e.preventDefault();
+            }
+        });
+
+        $('.k-grid-filter').click(function () {
+            $('.k-animation-container').addClass('k-rtl');
+        });
+
+        var grid = $("#grid").data("kendoGrid");
+        grid.bind("dataBound", grid_dataBound);
+        function grid_dataBound() {
+            if ($("#hidIsDone").val() == "true")
+                this.hideColumn("deleteCommand");
+            else {
+                this.showColumn("deleteCommand");
+            }
+        }
+
+
+        var hiddengrid = $("#gridTwo").kendoGrid({
+            autobind: false,
+            dataSource: dataSource,
+            excel: {
+                fileName: "List Of Reception donation.xlsx",
+                allPages: true,
+                filterable: true
+            },
+            columns: [
+                {
+                    field: "DonationName",
+                    title: DonationName,
+                },
+                {
+                    field: "Phone",
+                    title: Phone
+                },
+                {
+                    field: "DonationTypeAr",
+                    title: DonationDestination,
+                },
+                {
+                    field: "CaseId",
+                    title: CaseCode,
+                },
+
+                {
+                    field: "branch",
+                    title: branch,
+                },
+                {
+                    field: "Amount",
+                    title: Amount,
+                    footerTemplate: "Sum: #= sum # "
+                },
+
+                {
+                    field: "CreatedOn",
+                    title: CreatedOn,
+                    type: "date",
+                    format: "{0:d/M/yyyy h:mm}",
+                    parseFormats: ["MM/dd/yyyy h:mm:ss"],
+                }
+            ],
+            noRecords: true,
+            dataBound: function () {
+                $("#gridTwo").replaceWith('<div></div>')
+            },
+        }).data("kendoGrid");
+
+
+
+        // onClick Data Logging
+        $(".k-grid-excel").click(function () {
+
+            hiddengrid.dataSource.read().then(function () {
+                hiddengrid.saveAsExcel();
+            });
+
+
+            $.ajax({
+                url: PostLoggingDetailsUrl,
+                type: "POST",
+                dataType: "text",
+                cache: false,
+                data: {
+                    UserName: UserName,
+                    logType: "ExcelExportLogger"
+                }
+            })
+        });
+
+
+
+        $("#CaseId").kendoComboBox({
+            placeholder: chooseTheCasePlaceHolder,
+            dataTextField: "Name",
+            dataValueField: "Id",
+            filter: "contains",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: MersalWebAPIBaseUrl + "api/Case/GetCasesNamesIds",
+                        headers: getHeaders()
+                    }
+                }
+            }
+       ,
+            filter: "contains",
+            suggest: true,
+        });
+
+    });
+
+
+    //old code
+    //var GetAllDonationUrl = MersalWebAPIBaseUrl + "api/Donation/GetAllReceptionDonation";
+
+    //$(function () {
+    //    var dataSource = new kendo.data.DataSource({
+    //        transport: {
+    //            read: {
+    //                url: GetAllDonationUrl,
+    //                dataType: "json",
+    //                headers: getHeaders(),
+    //            },
+    //            parameterMap: function (options, type) {
+    //                return options;
+    //            },
+    //        },
+    //        schema: {
+    //            total: function (data) {
+    //                return data.Total;
+
+    //            },
+    //            data: function (data) {
+    //                return data.Data;
+    //            },
+    //            model:
+    //                {
+    //                    Id: "Id",
+    //                    fields: {
+    //                        Id: { type: "number" },
+    //                        CaseId: { type: "number" },
+    //                        donationDate: { type: "date" },
+    //                        Amount: { type: "number" },
+    //                        ReciptNo: { type: "string" },
+    //                        TransactionSource: { type: "string " }
+    //                    }
+    //                }
+    //        },
+    //        type: "json",
+    //        pageSize: 10,
+    //        serverPaging: true,
+    //        serverFiltering: true,
+    //        serverSorting: true
+    //    });
+    //    loadKendoGrid(dataSource);
+    //    $("#CaseId").kendoComboBox({
+    //        placeholder: chooseTheCasePlaceHolder,
+    //        dataTextField: "Name",
+    //        dataValueField: "Id",
+    //        filter: "contains",
+    //        dataSource: {
+    //            transport: {
+    //                read: {
+    //                    url: MersalWebAPIBaseUrl + "api/Case/GetCasesNamesIds",
+    //                    headers: getHeaders()
+    //                }
+    //            }
+    //        }
+    //   ,
+    //        filter: "contains",
+    //        suggest: true,
+    //    });
+    //});
+
+    function DeleteReceptionDonation(id) {
+        var CallBackFunction = function () { ConfirmDeleteReceptionDonation(id); };
+        confirmMessageBootstrap(ConfirmDelete, sureDelete, 400, 250, CallBackFunction);
+    }
+
+    function ConfirmDeleteReceptionDonation(id) {
+        var url = MersalWebAPIBaseUrl + "api/Donation/DeleteReceptionDonation?id=" + id
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            headers: getHeaders(),
+            url: url,
+            async: false,
+            success: function (data) {
+                toastr.success(SuccessfulProcess);
+                $("#grid").data("kendoGrid").dataSource.read();
+                $("#grid").data("kendoGrid").refresh();
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        $("input#Date").datepicker().datepicker("setDate", new Date());
+
+        $('#CaseId').change(function () {
+            $('#CaseIdMsg').addClass('hidden');
+        });
+
+        $('#Date').change(function () {
+            $('#DateMsg').addClass('hidden');
+            $(this).datepicker("setDate", $(this).datepicker('getDate'));
+        });
+
+        $('form').submit(function () {
+            var ifAllValid = true;
+
+
+            if ($("#CaseId").val() === '') {
+                $('#CaseIdMsg').removeClass('hidden');
+                ifAllValid = false;
+            }
+
+            if ($('#TransitionSource').val() === '') {
+                ifAllValid = false;
+            }
+
+            if ($('#ReceiptNo').val() === '') {
+                ifAllValid = false;
+            }
+
+            if ($('#value').val() === '') {
+                ifAllValid = false;
+            }
+
+            if ($("#Date").datepicker('getDate') === null) {
+                $('#DateMsg span').html(dateIsRequiredPlaceHolder);
+                $('#DateMsg').removeClass('hidden');
+                ifAllValid = false;
+            } else {
+                var date_regex = /^([1-9]|1[0-2])\/([1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+                var date = ($("#Date").datepicker('getDate').getMonth() + 1) + '/' + $("#Date").datepicker('getDate').getDate() + '/' + $("#Date").datepicker('getDate').getFullYear();
+                if (!(date_regex.test(date))) {
+                    $('#DateMsg span').html(dateIsInvalidPlaceHolder);
+                    $('#DateMsg').removeClass('hidden');
+                    ifAllValid = false;
+                }
+            }
+
+            if (ifAllValid) {
+                if ($('form').valid()) {
+                    CreateDonation();
+                }
+            }
+            return false
+        });
+    });
+
+    function CreateDonation() {
+        var apiurl = MersalWebAPIBaseUrl + "api/AccountTransaction/AddNewDonation";
+        var date = $("#Date").datepicker('getDate').getDate() + '/' + ($("#Date").datepicker('getDate').getMonth() + 1) + '/' + $("#Date").datepicker('getDate').getFullYear();
+        var DTO = {
+            CaseId: $("#CaseId").val(),
+            AccountId: 0,
+            value: $("#value").val(),
+            describtion: '',
+            CreateBy: getHeaders()["Id"],
+            Date: date,
+            TransitionSource: $('#TransitionSource').val(),
+            ReceiptNo: $('#ReceiptNo').val()
+        };
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: apiurl,
+            crossDomain: true,
+            headers: getHeaders(),
+            data: JSON.stringify(DTO),
+            async: false,
+            success: function (data) {
+                if (data === '') {
+                    toastr.success(SuccessfulProcess);
+                    document.getElementById("AddNewDonationForm").reset();
+                    $("#CaseId").kendoComboBox({
+                        placeholder: chooseTheCasePlaceHolder,
+                        dataTextField: "Name",
+                        dataValueField: "Id",
+                        filter: "contains",
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    url: MersalWebAPIBaseUrl + "api/Case/GetCasesNamesIds",
+                                    headers: getHeaders()
+                                }
+                            }
+                        }
+       ,
+                        filter: "contains",
+                        suggest: true,
+                    });
+                    $("#grid").data("kendoGrid").dataSource.read();
+                    $("#grid").data("kendoGrid").refresh();
+
+                    location.reload(true);
+
+                }
+                else {
+                    toastr.error(data);
+                }
+            },
+            error: function (xhr) {
+                toastr.error(xhr.error);
+                console.log(xhr);
+            }
+        });
+
+    }
+
+
+
+    function loadKendoGrid(dSource) {
+        if (getHeaders().Privileges.split(',').indexOf("5363") >= 0) {
+            $("#grid").kendoGrid({
+                dataSource: dSource,
+                filterable: false,
+
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                resizable: true,
+                width: '100%',
+                sortable: false,
+                columns: [
+                    {
+                        field: "Id",
+                        title: 'Id',
+                        filterable: false,
+                        hidden: true,
+                    },
+                    {
+                        field: "CaseId",
+                        title: Case,
+
+                    },
+                    {
+                        field: "Amount",
+                        title: Amount,
+                    },
+                    {
+                        field: "TransactionSource",
+                        title: TransActionSource,
+
+                    },
+                       {
+                           field: "ReciptNo",
+                           title: ReciptNo,
+
+                       },
+                       {
+                           field: "donationDate",
+                           title: DonationDate,
+                           type: "date",
+                           format: "{0:d/M/yyyy}",
+                           parseFormats: ["MM/dd/yyyy h:mm:ss"],
+                       },
+
+            {
+                command: [
+                    {
+                        name: "edit",
+                        text: "",
+                        iconClass: "fa  fa-pencil-square-o",
+                        click: function (e) {
+                            var tr = $(e.target).closest("tr");
+                            dataRow = this.dataItem(tr);
+                            var rowIdx = $("tr", grid.tbody).index(tr);
+                            Edit(dataRow);
+                        }
+                    }
+
+                ], title: EditTitleGrid, width: 90,
+            }
+                ]
+            });
+        } else {
+            $("#grid").kendoGrid({
+                dataSource: dSource,
+                filterable: false,
+
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                resizable: true,
+                width: '100%',
+                sortable: false,
+                columns: [
+                    {
+                        field: "Id",
+                        title: 'Id',
+                        filterable: false,
+                        hidden: true,
+                    },
+                    {
+                        field: "CaseId",
+                        title: Case,
+
+                    },
+                    {
+                        field: "Amount",
+                        title: Amount,
+                    },
+                    {
+                        field: "TransactionSource",
+                        title: TransActionSource,
+
+                    },
+                       {
+                           field: "ReciptNo",
+                           title: ReciptNo,
+
+                       },
+                       {
+                           field: "donationDate",
+                           title: DonationDate,
+                           type: "date",
+                           format: "{0:d/M/yyyy}",
+                           parseFormats: ["MM/dd/yyyy h:mm:ss"],
+                       }
+                ]
+            });
+        }
+
+    }
+
+    function Edit(datarow) {
+        if (getHeaders().Privileges.split(',').indexOf("5363") >= 0) {
+            window.location = '@Url.Action("EditDonation")/' + datarow.Id;
+        } else {
+            alert('UnAuthorized');
+        }
+    }
+
+    function View(CaseId, ReceiptNo, TransactionSource, Amount, donationDate) {
+        if (getHeaders().Privileges.split(',').indexOf("5363") >= 0) {
+            $("#CaseId").val(CaseId);
+            $("#ReceiptNo").val(ReceiptNo);
+            $("#TransitionSource").val(TransactionSource);
+            $("#value").val(Amount);
+            $("#Date").val(donationDate);
+
+
+
+        } else {
+            alert('UnAuthorized');
+        }
+    }
+
+    kendo.culture(_culture);
+
+
+    $("input[type=radio][name=ridIsDone]").change(function () {
+        if ($(this).val() == "true") {
+            $("#hidIsDone").val(true);
+        } else
+            $("#hidIsDone").val(false);
+
+        $("#grid").data("kendoGrid").dataSource.read();
+        $("#grid").data("kendoGrid").refresh();
+
+    });
+
+
+</script>

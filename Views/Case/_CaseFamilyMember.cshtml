@@ -1,0 +1,152 @@
+﻿
+@model DTO.CaseFamilyMemberDTO
+@using System.Globalization;
+@using Resource
+@using DTO
+@using UserUI.Helper
+
+<div class="modal fade" id="CaseFamilyMemberModals" role="dialog">
+    <div class="modal-dialog" style="width:60%;">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@CaseResources.CaseFamilyMember</h4>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                    @if (Model.CaseFamilyMemberDTOList.Any())
+                    {
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>@CaseResources.Name</th>
+                                    <th>@CaseResources.Relativity</th>
+                                    <th>@CaseResources.Age</th>
+                                    <th>@CaseResources.Job</th>
+                                    <th>@CaseResources.Education</th>
+                                    <th>@CaseResources.Comment</th>
+                                    <th>@CaseResources.Gender</th>
+                                    <th>@CaseResources.Religion</th>
+                                    <th>@CaseResources.Nationality</th>
+                                    <th>@LayoutRES.Delete</th>
+                                    <th>@LayoutRES.Edit</th>
+                                    
+                                </tr>
+                                @foreach (var member in Model.CaseFamilyMemberDTOList.Select((value, i) => new { i, value}))
+                                {
+                                    <tr id="@member.value.Id">
+                                        <td>@(member.i + 1)</td>
+                                        <td>@member.value.Name</td>
+                                        <td>@member.value.Relativity</td>
+                                        <td>@member.value.Age</td>
+                                        <td>@member.value.Job</td>
+                                        <td>@member.value.Education</td>
+                                        <td>@member.value.Comment</td>
+                                        <td>@member.value.FamilyMemberGenderAr</td>
+                                        <td>@member.value.ReligionNameAr</td>
+                                        <td>@member.value.NationalityNameAr</td>
+                                        <td><i class="fa fa-times-circle-o" onclick="DeleteCaseFamilyMember('@member.value.Id')"></i></td>
+                                        <td>
+                                            @if (AuthorizationHelper.UserId == member.value.CreatedBy)
+                                            {
+                                                <i class="fa fa-edit" style="cursor:pointer" onclick="openEditCaseFamilyMember('@member.value.Id')"></i>
+
+                                            }
+                                        </td>       
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+                <div class="box-body">
+                    @if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.EditCase))
+                    {
+                        using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", id = "AddCaseFamilyMemberForm" }))
+                        {
+                            @Html.HiddenFor(x => x.CaseId)
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Name)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Relativity, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.Relativity, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Relativity)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Age, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.Age, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Age)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Job, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.Job, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Job)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Education, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.Education, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Education)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Comment, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.Comment, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Comment)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FamilyMemberGenderId, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(x => x.FamilyMemberGenderId, new List<SelectListItem>(), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.FamilyMemberGenderId)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FamilyMemberReligionId, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(x => x.FamilyMemberReligionId, new List<SelectListItem>(), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.FamilyMemberReligionId)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FamliyMemberNationality, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(x => x.FamliyMemberNationality, new List<SelectListItem>(), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.FamliyMemberNationality)
+                                    </div>
+                                </div>
+
+                            </div>
+                     <!-- /.box-body -->
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-info pull-right">@LayoutRES.Add</button>
+                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">@LayoutRES.Close</button>
+                            </div><!-- /.box-footer -->
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

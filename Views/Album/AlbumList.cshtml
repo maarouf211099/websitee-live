@@ -1,0 +1,17 @@
+﻿
+@using UserUI.Helper
+@using Resource
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+<div id="AlbumDetailsList"></div>
+@section Scripts { 
+  @Scripts.Render("~/bundles/AlbumList")
+    @*<script src="~/Scripts/MersalScripts/AlbumScript/Albumjavascript.js"></script>*@
+}
+
+
+

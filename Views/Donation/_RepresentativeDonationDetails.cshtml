@@ -1,0 +1,909 @@
+﻿@model DTO.RepresentativeDonationDTO
+@using Resource
+@using Kendo.Mvc.UI
+@using DTO
+@using UserUI.Helper
+@{
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var KendoClass = isArabic ? "k-rtl" : "";
+}
+
+@functions {
+    object getHtmlAttributes(bool? @disabled, string CssClass, string type = "", string min = "", string placeHolder = "")
+    {
+        if (@disabled != null && @disabled == true)
+        {
+            return new { type = type, min = min, placeholder = placeHolder, @class = CssClass, @disabled = "@disabled" };
+        }
+        return new { type = type, min = min, placeholder = placeHolder, @class = CssClass };
+    }
+}
+
+<div class="modal-dialog" style="border: 3px solid #d2d6de !important;" hidden id="PrintDIV" dir="rtl">
+    <!-- Modal content-->
+    <div class="modal-body" style="border: 3px solid #d2d6de !important;float:right !important;direction:rtl !important;width:100%;">
+        <div class="box box-info" style="">
+            <div class="box-header">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img class="" style="position:fixed;top:10px;left:25px; width:200px;height:100px;" src="~/images/mersalLogo.png" />
+                    </div>
+                    <div class="col-sm-8">
+                        <h1>@LayoutRES.Mersal</h1>
+                        <h3>@LayoutRES.MersalFoundation</h3>
+                    </div>
+                </div>
+
+                @*<p class="" style="position:relative;top:10px;right:25px; width:50%!important;">
+                            @DonationResources.voucherNumber:<label id="voucherNumber"></label>
+                        @DonationResources.Date:<label id="Date"></label><br />
+                    </p>*@
+
+
+
+            </div><!-- /.box-header -->
+            <!-- form start -->
+            <div class="box-body">
+                <!-- general form elements -->
+                @* <div style="float:right !important;direction:rtl !important;">*@
+
+                <div class="row">
+                    <div class="col-md-6 row form-group">
+                        <div class="col-sm-4">
+                            @DonationResources.voucherNumber:
+                        </div>
+                        <div class="col-sm-4">
+                            <label id="voucherNumber"></label>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>@DonationResources.Date:</h4>
+                        </div>
+                        <div class="col-sm-4">
+                            <label id="Date"></label><br />
+                        </div>
+                    </div>
+                    <div class="col-md-6 row form-group">
+                        <div class="col-sm-4">
+                            استلمت انا
+                        </div>
+                        <div class="col-sm-8">
+                            <label id="representativeName"></label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 row form-group">
+                        <div class="col-sm-4">
+                            مبلغ و قدره
+                        </div>
+                        <div class="col-sm-8">
+                            <label id="Amount"></label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 row form-group">
+                        <div class="col-sm-4">
+                            من السيد
+                        </div>
+                        <div class="col-sm-8">
+                            <label id="volunteerName"></label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 row form-group">
+                        <div class="col-sm-4">
+                            العنوان
+                        </div>
+                        <div class="col-sm-8">
+                            <label id="Address"></label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 row form-group">
+                        <div class="col-sm-12">
+                            @DonationResources.Signature <label style="left:25px;" id="Signature"></label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+
+                <br />
+            </div>
+            @*</div>*@
+            <div class="box-footer">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="RepresentativeDonationModals" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-body">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <div class="modal-title">
+                        @Html.HiddenFor(x => x.Id)
+
+                        @Html.HiddenFor(x => x.DonationType)
+                        @if (isArabic)
+                        {
+
+                            <h4>@Model.HeaderTitleAr</h4>
+                        }
+                        else
+                        {
+                            <h4>@Model.HeaderTitleEn</h4>
+                        }
+
+
+                    </div>
+                    <div class="box-body">
+                        <br>
+                        @using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "", id = "EditRepresentativeDonationForm" }))
+                        {
+                            @Html.HiddenFor(m => m.Id)
+                            @Html.HiddenFor(m => m.DonationType)
+                        <div class="form-horizontal">
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Code, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Code, @getHtmlAttributes(true, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.Code)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Name + "*", htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.NameAnonymous, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.NameAnonymous)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Address + "*", htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AddressAnonymous, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.AddressAnonymous)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Phone + "*", htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.PhoneNumberAnonymous, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.PhoneNumberAnonymous)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Email + "*", htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.EmailAnonymous, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.EmailAnonymous)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Amount + "*", htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Amount, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "number", "0"))
+                                    @Html.ValidationMessageFor(model => model.Amount)
+                                </div>
+                            </div>
+                            @if (Model.IsConfirmedByAccounts == true)
+                            {
+                                <div class="col-md-6 row form-group">
+                                    <div class="col-md-4">
+                                        @Html.Label(DonationResources.OriginalAmount + "*", htmlAttributes: new { @class = "control-label" })
+
+                                    </div>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(model => model.OriginalAmount, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "number", "0"))
+                                        @Html.ValidationMessageFor(model => model.Amount)
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.DonateEye, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.DonateEye, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.DonateEye)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.AntherPhone, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AntherPhone, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.AntherPhone)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.AdditionNumber, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AdditionNumber, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.AdditionNumber)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.CountryId, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.CountryId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.CountryId)َ
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.AntherAddress, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AntherAddress, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.AntherAddress)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Region, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8" id="Region">
+                                    @Html.DropDownListFor(x => x.RegionId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.RegionId)َ
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.AddtionAddress, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.AddtionAddress, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(model => model.AddtionAddress)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.CollectionDate, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(c => c.CollectionDate, "{0:s}", @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "datetime-local"))
+
+                                    @*@Html.TextBoxFor(model => model.CollectionDate, new { type = "datetime-local", @class = "form-control" })*@
+                                    @Html.ValidationMessageFor(x => x.CollectionDate)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.TypeDonorId, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.TypeDonorId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.TypeDonorId)َ
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Gender, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.GenderId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.GenderId)َ
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.IsNeedCar, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.IsNeedCar, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.IsNeedCar)َ
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.TypeAddressId, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.TypeAddressId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.TypeAddressId)َ
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.Currency, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.CurrencyId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.CurrencyId)َ
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6 row form-group" id="BBFCYRate">
+                                <div class="col-md-4">
+                                    @DonationResources.FCYRate*
+                                </div>
+                                <div class=" col-md-8">
+                                    @if (Model.IsConfirmedByAccounts == null || Model.IsConfirmedByAccounts == false)
+                                    {
+                                        @Html.TextBoxFor(m => m.FCYRate, new { @type = "number", @step = "0.01", @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.FCYRate)
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.FCYRate, new { @type = "number", @step = "0.01", @class = "form-control", @disabled = Model.IsConfirmedByAccounts })
+                                        @Html.ValidationMessageFor(m => m.FCYRate)
+                                    }
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.DonationPayWayId, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.DonationPayWayId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+
+
+                                    @Html.ValidationMessageFor(x => x.DonationPayWayId)َ
+                                </div>
+                            </div>
+
+
+                            @*<div class="col-md-6 row form-group">
+            @Html.Label(DonationResources.ReciptNo, htmlAttributes: new { @class = "control-label" })
+            <div class="col-md-8">
+                @Html.TextBoxFor(model => model.OperationNumber, new { @class = "form-control", })
+                @Html.ValidationMessageFor(model => model.OperationNumber)
+            </div>
+        </div>
+        <div class="col-md-6 row form-group">
+            @Html.Label(DonationResources.ReciptNo, htmlAttributes: new { @class = "control-label" })
+            <div class="col-md-8">
+                @Html.TextBoxFor(model => model.NumberNotebook, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.NumberNotebook)
+            </div>
+        </div>*@
+
+
+
+                            <div class="col-md-6 row form-group">
+                                <label class="col-md-4 control-label FloatRight">@DonationResources.DonationDestination :</label>
+                                <div class="col-sm-8">
+                                    @Html.DropDownListFor(x => x.DonationDestinationRepresentativeId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.DonationDestinationRepresentativeId)َ
+                                </div>
+
+                                <div class="col-sm-8" id="DonationSubRepresentative" style="display:none;">
+                                    @Html.DropDownListFor(x => x.DonationDestinationSubRepresentativeId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.DonationDestinationSubRepresentativeId)َ
+                                </div>
+
+                                <div class="col-sm-8" id="DonationSubOfSubRepresentative" style="display:none;">
+                                    @Html.DropDownListFor(x => x.DonationDestinationSubOfSubRepresentativeId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.DonationDestinationSubOfSubRepresentativeId)
+                                </div>
+                                <div class="col-sm-12" id="DonationDestinationRepresentativeCaseCode" style="display:none; margin-right: 25%">
+                                    <div class="col-sm-9 caseId-container">
+                                        @Html.TextBoxFor(x => x.CaseId, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "", "", Html.DisplayNameFor(m => m.CaseId).ToString()))
+                                        @Html.ValidationMessageFor(x => x.CaseId)
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.RepresentativeId, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(x => x.RepresentativeId, new List<SelectListItem>(), @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control"))
+                                    @Html.ValidationMessageFor(x => x.RepresentativeId)َ
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.PaymentDate, htmlAttributes: new { @class = "control-label" })
+
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(c => c.PaymentDate, "{0:s}", @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "datetime-local"))
+
+                                    @*@Html.TextBoxFor(model => model.CollectionDate, new { type = "datetime-local", @class = "form-control" })*@
+                                    @Html.ValidationMessageFor(x => x.PaymentDate)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.ReceiptNumber, htmlAttributes: new { @class = "control-label" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.ReceiptNumber, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "number", "0"))
+                                    @Html.ValidationMessageFor(model => model.ReceiptNumber)
+                                </div>
+                            </div>
+                            <div class="col-md-6 row form-group">
+                                <div class="col-md-4">
+                                    @Html.Label(DonationResources.ReceiptValue, htmlAttributes: new { @class = "control-label" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.ReceiptValue, @getHtmlAttributes(Model.IsConfirmedByAccounts, "form-control", "number", "0"))
+                                    @Html.ValidationMessageFor(model => model.ReceiptValue)
+                                </div>
+                            </div>
+                            @if (Model.IsConfirmedByAccounts == null || Model.IsConfirmedByAccounts == false)
+                            {
+                                <div class="  col-md-12 form-group justify-fotter-center">
+
+                                    <input id="btnSubmitEdit" type="submit" value="@DonationResources.Edit" class="btn btn-info" />
+
+
+                                </div>
+                            }
+                            <div class="box-footer">
+
+                                @if (AuthorizationHelper.UserIsInPrivilege(5374))
+                                {
+                                    if (!Model.IsDone)
+                                    {
+                                        <input id="btnIsDone" type="button" value="@DonationResources.Collected" class="btn btn-success" onclick="confirmDonation(@Model.Id)" />
+                                        @*<button class="btn btn-default pull-left" onclick="PrintReset('@Model.Id','@DateTime.Now','.....','@Model.Amount','@Model.NameAnonymous','@Model.AddressAnonymous')"><i class="fa fa-print" aria-hidden="true"></i> @LayoutRES.Print</button>*@
+
+
+                                        @*<input id="Printbtn"  type="button" value="@LayoutRES.Print"  />*@
+
+
+                                        @*<div class="col-md-6 row form-group">
+                        <div class="col-md-offset-2 col-md-8">
+                            <input id="btnIsDone" type="button" value="@DonationResources.Done" class="btn btn-default" onclick="confirmDonation(@Model.Id)"/>
+                        </div>
+                        <div class="col-md-offset-2 col-md-8">
+                            <input id="btnIsDone" type="button" value="@DonationResources.Done" class="btn btn-default" onclick="confirmDonation(@Model.Id)"/>
+                            <input id="Printbtn" type="button" value="@LayoutRES.Print" class="btn btn-info" onclick="PrintReset('@Model.Id','@Model.Amount','@Model.NameAnonymous','@Model.AddressAnonymous')" />
+                        </div>
+                    </div>*@
+                                    }
+                                }
+
+
+                                @if (AuthorizationHelper.UserIsInPrivilege(5373))
+                                {
+                                    if (Model.IsDone && (Model.IsConfirmedByAccounts == null || Model.IsConfirmedByAccounts == false))
+                                    {
+                                        <input id="btnIsConfirmedByAccounts" type="button" value="@DonationResources.ConfirmedByAccounts" class="btn btn-success" onclick="confirmConfirmedByAccounts(@Model.Id)" />
+                                    }
+                                }
+
+
+                            </div>
+
+                        </div>
+                        }
+                      
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currancyList = [];
+        var model = @Html.Raw(Json.Encode(Model));
+        GetRepresentative(model.RepresentativeId);
+        GetNeedCar('IsNeedCar', 'IsNeedCarId','@DonationResources.IsNeedCar')
+        GetAnyMasterDetalisCode('DonateThroughOtherMeansCurency', 'CurrencyId', false, true, "", "", true, '@DonationResources.Currency');
+        GetAnyMasterDetalisCode('GEND', 'GenderId', false, true, "", "", true, '@DonationResources.Gender');
+        GetAnyMasterDetalisCode('MethodsPayingDonationBranches', 'DonationPayWayId', false, true, "", "", true,'@DonationResources.DonationPayWayId');
+        GetAnyMasterDetalisCode('TypeDonor', 'TypeDonorId', false, true, "", "", true,'@DonationResources.TypeDonorId');
+
+        GetAnyMasterDetalisCode('Gove', 'CountryId', false, true, "", "", true,'@DonationResources.CountryId');
+        GetAnyMasterDetalisCode('TypeAddress', 'TypeAddressId', false, true, "", "", true,'@DonationResources.TypeAddressId');
+
+        GetAnyMasterDetalisCode('DoDs', 'DonationDestinationRepresentativeId', false, true, "", "", true ,'@DonationResources.DonationDestination');
+        GetByParentId('RegionId', model.CountryId, 'Region', '@DonationResources.Region');
+        
+    $('#TypeAddressId').change(function () {
+        var code = this.options[this.selectedIndex].getAttribute('Code');
+        if (code == "Other") {
+            $('#TypeAddress').show();
+
+        }
+        else {
+            $('#TypeAddress').hide();
+        }
+
+
+    });
+
+
+
+    $('#CountryId').change(function () {
+        //$('#Region').hide();
+        $('#RegionId').html('');
+
+        //$("#RegionId").rules("add", {
+        //    required: true,
+        //    messages: {
+        //        required: requiredDonationDestination
+        //    }
+        //});
+        var code = this.options[this.selectedIndex].getAttribute('Code');
+        if (code == "Other") {
+            //$('#Region').hide();
+            $('#CountryName').show();
+
+        }
+        else {
+            //$('#Region').show();
+            $('#CountryName').hide();
+            var id = $('#CountryId').val();
+            GetByParentId('RegionId', id, 'Region','@DonationResources.Region');
+        }
+    });
+
+
+        $('#DonationDestinationRepresentativeId').change(function (e) {
+
+            $('#DonationSubRepresentative').hide();
+            $('#DonationSubOfSubRepresentative').hide();
+            $('#DonationDestinationRepresentativeCaseCode').hide();
+
+            $('#DonationDestinationSubOfSubRepresentativeId').html('');
+            $('#DonationDestinationSubRepresentativeId').html('');
+
+            var id = $('#DonationDestinationRepresentativeId').val();
+            var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+            GetByParentId('DonationDestinationSubRepresentativeId', id, 'DonationSubRepresentative', placeHolder);
+        });
+
+        $('#DonationDestinationSubRepresentativeId').change(function (e) {
+
+            $('#DonationSubOfSubRepresentative').hide();
+            $('#DonationDestinationSubOfSubRepresentativeId').html('');
+
+
+            var code = this.options[this.selectedIndex].getAttribute('Code');
+            if (code == "DonZkaCase") {
+                $('#DonationDestinationRepresentativeCaseCode').show();
+            }
+            else {
+                $('#DonationDestinationRepresentativeCaseCode').hide();
+                $('#CaseId').val('');
+                var id = $('#DonationDestinationSubRepresentativeId').val();
+                var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+                GetByParentId('DonationDestinationSubOfSubRepresentativeId', id, 'DonationSubOfSubRepresentative', placeHolder);
+            }
+        });
+
+
+        $('#DonationDestinationSubOfSubRepresentativeId').change(function (e) {
+            var code = this.options[this.selectedIndex].getAttribute('Code');
+            if (code == "DonGeneralCase") {
+                $('#DonationDestinationRepresentativeCaseCode').show();
+            }
+            else {
+                $('#DonationDestinationRepresentativeCaseCode').hide();
+                $('#CaseId').val('');
+            }
+        });
+        
+
+        $('#CurrencyId').change(function () {
+            var selected = currancyList.find(({ Id }) => Id == $('#CurrencyId').val());
+            if (selected.NameEn.trim() != 'EGP') {
+                $('#BBFCYRate').show();
+            } else {
+                $('#BBFCYRate').hide();
+            }
+
+        });
+    function GetNeedCar(dropDownId, itemToShow, placeholder) {
+        var htmlGovernorate = "<option value=''>"+placeholder+"</option>";
+
+
+        htmlGovernorate += "<option Code=\"" + 'true' + "\" value=" + true + " >" + '@DonationResources.Yes' + "</option>";
+        htmlGovernorate += "<option Code=\"" + 'No' + "\" value=" + false + " >" + '@DonationResources.No' + "</option>";
+
+
+        $("#" + dropDownId).html(htmlGovernorate);
+
+        if (model.IsNeedCar != null && model.IsNeedCar == true) {
+            $("#" + dropDownId).val("true");
+        }
+        else if (model.IsNeedCar != null && model.IsNeedCar == false) {
+            $("#" + dropDownId).val("false");
+        }
+    }
+
+
+    function GetAnyMasterDetalisCode(MasterCode, dropDownListId, enableAll, async, selectedId, PerantCode, emptyOption,placeholder) {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetMasterCodeByMultiCode?masterCode=" + MasterCode,
+            async: async,
+            success: function (data) {
+                var html = "";
+                if (enableAll) {
+                    if (_cultureIsArabic) {
+                        html = "<option value='0'>الكل</option>";
+                    }
+                    else {
+                        html = "<option value='0'>All</option>";
+                    }
+                }
+                if (PerantCode) {
+                    $.each(data, function (key, value) {
+                        if (value.Parent) {
+                            if (value.Parent.Code == PerantCode) {
+                                var selec = "";
+                                if (value.masterCodeValue == MasterCode) {
+                                    if (value.Id == selectedId) selec = " selected='selected' ";
+                                    if (_cultureIsArabic) {
+                                        html += "<option Code=" + value.Code + " value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                                    }
+                                    else {
+                                        html += "<option Code=" + value.Code + " value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                else {
+                    $.each(data, function (key, value) {
+                        var selec = "";
+                        if (value.masterCodeValue == MasterCode) {
+                            if (value.Id == selectedId) selec = " selected='selected' ";
+                            if (_cultureIsArabic) {
+                                html += "<option Code=" + value.Code + " value=" + value.Id + selec + "  >" + value.NameAr + "</option>";
+                            }
+                            else {
+                                html += "<option Code=" + value.Code + " value=" + value.Id + selec + " >" + value.NameEn + "</option>";
+                            }
+                        }
+                    });
+                }
+                $("#" + dropDownListId).html(html);
+                if (emptyOption) {
+                    $("#" + dropDownListId).prepend("<option value='' selected='selected'>" + placeholder+"</option>");
+                }
+
+                if (MasterCode == 'DonateThroughOtherMeansCurency') {
+                    currancyList = data;
+                    $('#CurrencyId').val(model.CurrencyId);
+                    var selected = currancyList.find(({ Id }) => Id == $('#CurrencyId').val());
+                    if (selected.NameEn.trim() != 'EGP') {
+                        $('#BBFCYRate').show();
+                    } else {
+                        $('#BBFCYRate').hide();
+                    }
+                    
+                }
+
+                else if (MasterCode == 'MethodsPayingDonationBranches') {
+                    $('#DonationPayWayId').val(model.DonationPayWayId);
+                }
+
+                else if (MasterCode == 'TypeDonor') {
+                    $('#TypeDonorId').val(model.TypeDonorId);
+                }
+
+                else if (MasterCode == 'GEND') {
+                    $('#GenderId').val(model.GenderId);
+                }
+
+
+                else if (MasterCode == 'Gove') {
+                    $('#CountryId').val(model.CountryId);
+                }
+
+                else if (MasterCode == 'TypeAddress') {
+                    $('#TypeAddressId').val(model.TypeAddressId);
+                }
+
+                else if (MasterCode == 'DoDs') {
+                    $('#DonationDestinationRepresentativeId').val(model.DonationDestinationRepresentativeId);
+                    var placeHolder = _cultureIsArabic ? 'مخصص الى' : 'Dedicated to';
+                    if (model.DonationDestinationRepresentativeId != null) {
+                        GetByParentId('DonationDestinationSubRepresentativeId', model.DonationDestinationRepresentativeId, 'DonationSubRepresentative', placeHolder);
+                    }
+                    if (model.DonationDestinationSubRepresentativeId != null) {
+                        GetByParentId('DonationDestinationSubOfSubRepresentativeId', model.DonationDestinationSubRepresentativeId, 'DonationSubOfSubRepresentative', placeHolder);
+                    }
+
+                    if (model.CaseId != null) {
+                        $('#DonationDestinationRepresentativeCaseCode').show();
+                        $('#CaseId').val(model.CaseId);
+                    }
+
+
+                }
+
+
+            },
+            error: function (xhr) {
+                toastr.error(xhr.statusText);
+            }
+        });
+
+
+    }
+
+
+        function GetByParentId(dropDownId, parentId, itemToShow, placeHolder = '') {
+            var url = SystmeCodeWebAPIBaseUrl + "api/DetailCode/GetByParentId?parentId=" + parentId;
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: url,
+                async: true,
+                success: function (data) {
+
+                    var htmlGovernorate = "<option  value=''>" + placeHolder + "</option>";
+                    if (data != null) {
+                        $.each(data, function (key, value) {
+                            htmlGovernorate += "<option Code=\"" + value.Code + "\" value=" + value.Id + " >" + value.NameEn + "</option>";
+                        });
+                    }
+
+                    $("#" + dropDownId).html(htmlGovernorate);
+                    if (data != null && data.length != 0) {
+                        $('#' + itemToShow).show();
+                        //$("#" + dropDownId).rules("add", {
+                        //    required: false,
+                        //    messages: {
+                        //        required: requiredDonationDestination
+                        //    }
+                        //});
+                    }
+                    if (itemToShow == 'DonationSubRepresentative' && model.DonationDestinationSubRepresentativeId!=null) {
+                        $('#DonationDestinationSubRepresentativeId').val(model.DonationDestinationSubRepresentativeId);
+                    }
+
+                    if (itemToShow == 'DonationSubOfSubRepresentative' && model.DonationDestinationSubOfSubRepresentativeId!=null) {
+                        $('#DonationDestinationSubOfSubRepresentativeId').val(model.DonationDestinationSubOfSubRepresentativeId);
+                    }
+
+                    if (itemToShow == 'Region' && model.RegionId != null) {
+                        $('#RegionId').val(model.RegionId);
+                    }
+                },
+                error: function (xhr) {
+                    //toastr.error(xhr.statusText);
+                }
+            });
+
+        }
+
+
+        function GetRepresentative(RepresentativeId) {
+            var apiurl = MersalWebAPIBaseUrl + "api/Representative/GetRepresentativesLookup";
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: apiurl,
+                async: true,
+                success: function (data) {
+                    debugger
+                    var html = "";
+                    if (_cultureIsArabic) {
+                        html = "<option value='null' >المندوب</option>";
+                    }
+                    else {
+                        html = "<option value='null' >Representative</option>";
+                    }
+                        $.each(data, function (key, value) {
+                            var selec = "";                          
+                            if (value.Id == RepresentativeId) selec = " selected='selected' ";
+                                if (_cultureIsArabic) {
+                                    html += "<option Code=" + value.Code + " value=" + value.Id + selec + "  >" + value.Name + "</option>";
+                                }
+                                else {
+                                    html += "<option Code=" + value.Code + " value=" + value.Id + selec + " >" + value.Name + "</option>";
+                                }
+                            
+                       });
+                    
+                    $("#RepresentativeId").html(html);
+                    
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.statusText);
+                }
+            });
+        }
+
+
+    </script>
+    <style>
+        .modal-dialog {
+            width: 1000px;
+        }
+
+        .bottom-space {
+            margin-bottom: 10px;
+        }
+
+        .caseId-container input {
+            margin-right: 10%;
+            width: 95%;
+            margin-top: 15px;
+        }
+
+        .justify-fotter-center {
+            display: flex;
+            justify-content: center;
+        }
+
+            .justify-fotter-center button {
+                margin: 0px 10px;
+            }
+
+        select {
+            margin-bottom: -10px !important;
+        }
+    </style>

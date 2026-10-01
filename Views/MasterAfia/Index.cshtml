@@ -1,0 +1,51 @@
+﻿@using System.Configuration
+@using UserUI.Helper
+@using Resource.Afia
+@using DTO
+@{
+    ViewBag.Title = MasterAfiaRES.MasterAfia;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isArabic = UserUI.Helper.CultureHelper.GetCurrentCulture() == "ar-SA";
+    var floatToRight = (CultureHelper.IsRighToLeft() ? "floatToRight" : "");
+    var textAlignRight = isArabic ? "text-align: right;" : "";
+    var dir = isArabic ? "rtl" : "ltr";
+}
+<head>
+    <title>@MasterAfiaRES.MasterAfia</title>
+</head>
+@if (AuthorizationHelper.UserIsInPrivilege((int)EnumPrivilages.CreateCasesAdmin))
+{
+    <button id="btnPopupCreateCase" onclick="AddNewMasterAfia()" type="button" class="btn btn-info">@MasterAfiaRES.AddNewMasterAfia</button>
+}
+
+<br />
+<br />
+
+
+<div id="panelGrid" class="form-horizontal">
+    <div id="grid" class="@(CultureHelper.IsRighToLeft() ? "k-rtl" : "")"></div>
+</div>
+
+<div id="createMasterAfiaDiv"></div>
+
+
+
+@section Scripts {
+    <script>
+        var CreateOn = '@MasterAfiaRES.CreateOn';
+        var Name = '@MasterAfiaRES.Name';
+        var Description = '@MasterAfiaRES.Description';
+
+        var IsActive = '@MasterAfiaRES.IsActive';
+ 
+    </script>
+    <script src="~/Scripts/AfiaScripts/MasterAfia/addMasterAfia.js"></script>
+    <script src="~/Scripts/AfiaScripts/MasterAfia/MasterAfiaIndex.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            RefreshGird();
+        });
+    </script>
+}
+

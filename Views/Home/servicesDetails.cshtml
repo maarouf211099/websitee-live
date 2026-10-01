@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "servicesDetails";
+}
+
+ @using Resource 
+<div id="ServicesDetails">
+  <div class="header">
+    <h1> @DynamicPagesRES.Services</h1>
+  </div>
+
+  <div class="container">
+    <div >
+      <div class="row">
+        <div class="col-lg-7 col-md-12 services-description-card" >
+         <div id='ServicesName'></div> 
+          <div id="ServicesDetailsDiv"></div>
+        </div>
+        <div class="col-lg-5 col-md-12 imges" id="ServicesImges">
+        
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+      <script src="~/Scripts/MersalScripts/ServisesDetails.js"></script>
+
+}
+

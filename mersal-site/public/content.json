@@ -4,42 +4,50 @@
     {
       "banner": "/img/old/9270-381d6513.jpg",
       "link": "/donate.html#online",
-      "alt": "ابعت فرحة - لمرضى مرسال",
+      "alt": "أم مع طفليها يبتسمون - ابعت فرحة لمرضى مرسال",
       "bannerSm": "/img/old/9270-381d6513-sm.jpg",
-      "title": "ابعت فرحة",
-      "text": "لمرضى مرسال",
+      "title": "ابعت فرحة لمرضى مرسال",
+      "text": "كل تبرع بيرسم ابتسامة",
       "button": "تبرع الآن",
-      "focus": "20% 50%"
+      "focus": "35% 50%",
+      "kicker": "#ابعت_فرحة",
+      "mobile": "/img/old/9270-381d6513-m.jpg"
     },
     {
       "banner": "/img/old/9770-c30d41fe.jpg",
       "link": "/donate.html?amount=500#online",
-      "alt": "احتياجاتهم من اختيارهم - سعر الكارت 500 جنيه",
+      "alt": "شنطة مرسال بالاحتياجات الأساسية - احتياجاتهم من اختيارهم",
       "bannerSm": "/img/old/9770-c30d41fe-sm.jpg",
       "title": "احتياجاتهم من اختيارهم",
       "text": "سعر الكارت 500 جنيه",
-      "button": "ساهم بكارت",
-      "focus": "18% 50%"
+      "button": "اشتري كارت بـ 500",
+      "focus": "30% 50%",
+      "kicker": "كارت الاحتياجات",
+      "mobile": "/img/old/9770-c30d41fe-m.jpg"
     },
     {
       "banner": "/img/old/2791-aca7e195.jpg",
       "link": "/donate.html?for=p42&amount=750#online",
-      "alt": "شارك في كفالة أسرة مريض - قيمة سهم الكفالات 750 جنيه",
+      "alt": "يد تسلّم كارت كفالة ليد أخرى - شارك في كفالة أسرة مريض",
       "bannerSm": "/img/old/2791-aca7e195-sm.jpg",
       "title": "شارك في كفالة أسرة مريض",
-      "text": "قيمة سهم الكفالات 750 جنيه",
+      "text": "قيمة السهم 750 جنيه",
       "button": "اكفل أسرة",
-      "focus": "18% 50%"
+      "focus": "45% 50%",
+      "kicker": "كفالات الأسر",
+      "mobile": "/img/old/2791-aca7e195-m.jpg"
     },
     {
       "banner": "/img/old/8177-ee001799.jpg",
       "link": "/donate.html?for=p31&amount=500#online",
-      "alt": "انقذ حياة مريض أورام - سهم مركز مرسال للأورام 500 جنيه",
+      "alt": "مريضة أورام تبتسم على سرير العلاج - انقذ حياة مريض أورام",
       "bannerSm": "/img/old/8177-ee001799-sm.jpg",
       "title": "انقذ حياة مريض أورام",
-      "text": "سهم مركز مرسال للأورام 500 جنيه",
-      "button": "تبرع بسهم",
-      "focus": "20% 50%"
+      "text": "السهم 500 جنيه",
+      "button": "ساهم بسهم",
+      "focus": "45% 50%",
+      "kicker": "مركز مرسال للأورام",
+      "mobile": "/img/old/8177-ee001799-m.jpg"
     }
   ],
   "campaigns": [
@@ -53,7 +61,8 @@
       "raised": 16601,
       "link": "/p/31.html",
       "purpose": "p31",
-      "imageSm": "/img/old/20260406130217-46584c7d-sm.jpg"
+      "imageSm": "/img/old/20260406130217-46584c7d-sm.jpg",
+      "impact": "كل جرعة = يوم علاج لمريض أورام"
     },
     {
       "title": "مشروع الحضانات",
@@ -65,7 +74,8 @@
       "raised": 4443,
       "link": "/p/52.html",
       "purpose": "p52",
-      "imageSm": "/img/old/20230215124111-d72b3d98-sm.jpg"
+      "imageSm": "/img/old/20230215124111-d72b3d98-sm.jpg",
+      "impact": "سهم في حضّانة بتنقذ طفل حديث الولادة"
     },
     {
       "title": "مستشفى مرسال للأطفال",
@@ -77,7 +87,8 @@
       "raised": 6939,
       "link": "/p/30.html",
       "purpose": "p30",
-      "imageSm": "/img/old/20230215124414-9748fdf5-sm.jpg"
+      "imageSm": "/img/old/20230215124414-9748fdf5-sm.jpg",
+      "impact": "سهم في بناء مستشفى للأطفال الأكثر احتياجاً"
     },
     {
       "title": "كفالات مرضى",
@@ -89,7 +100,8 @@
       "raised": 0,
       "link": "/p/42.html",
       "purpose": "p42",
-      "imageSm": "/img/old/20260830103226-a28fe23c-sm.jpg"
+      "imageSm": "/img/old/20260830103226-a28fe23c-sm.jpg",
+      "impact": "كفالة أسرة مريض لمدة شهر"
     },
     {
       "title": "علاج شهري",
@@ -101,7 +113,8 @@
       "raised": 158328,
       "link": "/p/37.html",
       "purpose": "p37",
-      "imageSm": "/img/old/20260406221511-c43c274e-sm.jpg"
+      "imageSm": "/img/old/20260406221511-c43c274e-sm.jpg",
+      "impact": "علاج شهري لمريض مزمن غير قادر"
     }
   ],
   "channels": [

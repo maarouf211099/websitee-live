@@ -4,6 +4,7 @@
 - JPEGs: capped at 1600px (640px for *-sm files), quality 76, progressive, metadata stripped.
 - Photo PNGs without transparency (>80KB) become JPEGs; references in HTML/CSS/JS/JSON are rewritten.
 - PNGs with transparency are only stripped.
+- Slide banners (content.json "slides") get a phone crop <banner>-m.jpg (left 46%: the photo half) for the hero.
 - Every JPEG/PNG under public/img (except uploads/) gets a .webp sibling; js/layout.js (mersalPic) relies on that,
   so run this script again after adding images to public/img by hand.
 Safe to re-run; files only get replaced when the result is smaller.
@@ -40,7 +41,25 @@ def replace_refs(old_rel, new_rel):
     return n
 
 
+def mobile_banners():
+    """Phone hero crops: the left 46% (photo half-disc) of each slide banner -> <banner>-m.jpg (+ .webp in main())."""
+    cp = ROOT / "content.json"
+    if not cp.exists():
+        return
+    import json
+    for s in json.loads(cp.read_text(encoding="utf-8")).get("slides", []):
+        b = s.get("banner") or ""
+        if not b.startswith("/img/") or "/uploads/" in b:
+            continue
+        src = ROOT / b.lstrip("/")
+        m = src.with_name(src.stem + "-m.jpg")
+        if src.exists() and (not m.exists() or m.stat().st_mtime < src.stat().st_mtime):
+            subprocess.run(["convert", str(src) + "[0]", "-gravity", "West", "-crop", "46%x100%+0+0", "+repage", "-unsharp", "0x0.8+0.8+0.02", "-strip", "-interlace", "Plane", "-sampling-factor", "4:2:0", "-quality", "82", str(m)], check=True)
+            print("phone crop", m.relative_to(ROOT))
+
+
 def main():
+    mobile_banners()
     saved = 0
     files = [p for p in IMG.rglob("*") if p.suffix.lower() in (".jpg", ".jpeg", ".png") and "uploads" not in p.parts]
     for p in sorted(files):
@@ -63,7 +82,7 @@ def main():
             saved += before - new.stat().st_size
             p.unlink(); p = new; before = p.stat().st_size; tmp = None
             src = None
-        elif kind == "JPEG" and int(run("identify", "-format", "%Q", str(p))) <= int(QUALITY) and max(w, h) <= int(cap(p).split("x")[0]):
+        elif p.stem.endswith("-m") or (kind == "JPEG" and int(run("identify", "-format", "%Q", str(p))) <= int(QUALITY) and max(w, h) <= int(cap(p).split("x")[0])):
             tmp = None  # already optimized on a previous run: don't re-encode (each pass loses quality)
         else:
             subprocess.run(["convert", str(p) + "[0]", "-strip", "-resize", cap(p), "-interlace", "Plane", "-sampling-factor", "4:2:0", "-quality", QUALITY, str(tmp)], check=True)

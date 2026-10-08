@@ -288,3 +288,27 @@
   body.has-mbar { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
   html { scroll-padding-bottom: 96px; }
 }
+
+/* ===== v5: lighter on phones + odometer counters + share ===== */
+@media (max-width: 760px) {
+  .home .quick-donate { backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; }
+  .home .num { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,.1); }
+}
+.ticker { -webkit-mask: none; mask: none; position: relative; }
+.ticker::before, .ticker::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 1; pointer-events: none; }
+.ticker::before { right: 0; background: linear-gradient(270deg, #fff, rgba(255,255,255,0)); }
+.ticker::after { left: 0; background: linear-gradient(90deg, #fff, rgba(255,255,255,0)); }
+@media (max-width: 760px) { .home .sl-track { animation: none !important; } }
+/* odometer: every digit rolls on the compositor (transform only) */
+.odo { display: inline-flex; align-items: flex-start; white-space: nowrap; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.odo .od { display: inline-block; height: 1em; overflow: hidden; line-height: 1; }
+.odo .od-roll { display: block; transform: translateY(0); transition: transform 1.4s cubic-bezier(.16, .9, .22, 1); transition-duration: calc(1s + var(--i, 0) * .15s); will-change: transform; }
+.odo .od-roll i { display: block; height: 1em; line-height: 1; font-style: normal; }
+.odo.od-go .od-roll { transform: translateY(calc(var(--d) * -1em)); }
+.odo .od-sep { display: inline-block; line-height: 1; }
+@media (prefers-reduced-motion: reduce) { .odo .od-roll { transition: none; } }
+.camp-links { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.camp-share { display: inline-flex; align-items: center; gap: 6px; font: 700 13px "Cairo", sans-serif; color: var(--muted); background: none; border: 0; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
+.camp-share svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.camp-share:hover, .camp-share:active { color: var(--teal); background: var(--teal-soft); }
+.odo > span { font-size: inherit; color: inherit; font-weight: inherit; font-family: inherit; margin: 0; }

@@ -42,6 +42,8 @@
     return html;
   };
   window.mersalWebp = webpOf;
+  // tiny haptic tick on phones that support it (Android Chrome); silent elsewhere
+  window.mersalTap = function (ms) { try { if (navigator.vibrate && matchMedia("(hover: none)").matches) navigator.vibrate(ms || 8); } catch (e) {} };
   window.MERSAL_SITE = SITE;
   if (!SITE.onlinePayment) document.documentElement.classList.add("no-online-pay");
 

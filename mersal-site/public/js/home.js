@@ -20,7 +20,7 @@
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () {
       form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.remove("on"); });
-      b.classList.add("on"); input.value = b.dataset.v;
+      b.classList.add("on"); input.value = b.dataset.v; if (window.mersalTap) window.mersalTap(8);
     });
   });
   form.addEventListener("submit", function (e) {
@@ -30,6 +30,17 @@
 
   // ---------- numbers + ticker (from content.json "numbers") ----------
   var fmtN = new Intl.NumberFormat("en-US");
+  // Odometer: "16,601" -> each digit rolls to its value (transform only, so it stays smooth on phones)
+  function odometer(el, value, prefix) {
+    var str = fmtN.format(Math.round(value)), digits = 0;
+    el.setAttribute("aria-label", (prefix || "") + str); el.classList.add("odo");
+    if (reduceMotion) { el.textContent = (prefix || "") + str; return; }
+    el.innerHTML = (prefix ? '<span class="od-sep">' + esc(prefix) + "</span>" : "") + str.split("").map(function (ch) {
+      if (!/\d/.test(ch)) return '<span class="od-sep">' + ch + "</span>";
+      return '<span class="od" aria-hidden="true"><span class="od-roll" style="--d:' + ch + ';--i:' + (digits++) + '"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>';
+    }).join("");
+    requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("od-go"); }); });
+  }
   function numbers(list) {
     var tk = document.getElementById("ticker"), grid = document.querySelector(".numbers-grid");
     if (list && list.length) {
@@ -160,7 +171,8 @@
           (price && st !== "done" ? '<div class="camp-qty" role="group" aria-label="عدد ' + esc(unit) + '"><button type="button" data-d="1" aria-label="زيادة">+</button><output aria-live="polite">1</output><button type="button" data-d="-1" aria-label="تقليل">−</button></div>' : "") +
           '<a class="btn btn-gold camp-give" href="' + (st === "done" ? "/donate.html#online" : base + (price || "") + "#online") + '" data-base="' + base + '">' +
             (st === "done" ? "ادعم حالة تانية" : price ? (c.cta ? esc(c.cta) : 'تبرع بـ <b class="amt">' + fmt.format(price) + "</b> ج") : "تبرع الآن") + "</a></div>" +
-        '<a class="camp-more" href="' + esc(link) + '">تفاصيل الحملة ←</a>' +
+        '<div class="camp-links"><a class="camp-more" href="' + esc(link) + '">تفاصيل الحملة ←</a>' +
+          '<button type="button" class="camp-share" data-title="' + esc(c.title) + '" data-url="' + esc(link) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>شارك</button></div>' +
       "</div></article>";
   }
   function donationCampaigns(list) {
@@ -176,7 +188,8 @@
     // one clock drives the number, the percentage, the bar and its thumb
     function animate(card, delay) {
       var pct = +card.dataset.pct, raised = +card.dataset.raised, num = card.querySelector(".camp-num"), pc = card.querySelector(".camp-pct"), D = 1600, t0 = null;
-      function paint(e) { card.style.setProperty("--p", (pct * e).toFixed(2)); if (num) num.textContent = fmt.format(Math.round(raised * e)); if (pc) pc.textContent = Math.round(pct * e) + "%"; }
+      function paint(e) { card.style.setProperty("--p", (pct * e).toFixed(2)); if (pc) pc.textContent = Math.round(pct * e) + "%"; }
+      if (num) odometer(num, raised);
       if (reduceMotion || !pct) { paint(1); card.classList.add("filled"); return; }
       setTimeout(function () {
         requestAnimationFrame(function step(t) {
@@ -199,6 +212,14 @@
     var n = Math.min(+card.dataset.max || 50, Math.max(1, (+out.textContent || 1) + +b.dataset.d)), total = n * +card.dataset.unit;
     out.textContent = n; give.href = give.dataset.base + total + "#online"; if (amt) amt.textContent = fmt.format(total);
     give.classList.remove("bump"); void give.offsetWidth; give.classList.add("bump");
+    if (window.mersalTap) window.mersalTap(8);
+  });
+  // share a campaign: native share sheet on phones, WhatsApp elsewhere
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".camp-share"); if (!b) return;
+    var url = location.origin + b.dataset.url, text = b.dataset.title + " - مؤسسة مرسال";
+    if (navigator.share) { navigator.share({ title: b.dataset.title, text: text, url: url }).catch(function () {}); }
+    else window.open("https://wa.me/?text=" + encodeURIComponent(text + " " + url), "_blank", "noopener");
   });
 
   // Count-up numbers (hospital facts, numbers band)
@@ -206,13 +227,8 @@
     var nums = document.querySelectorAll("[data-count]:not([data-done])");
     nums.forEach(function (n) { n.setAttribute("data-done", "1"); });
     function run(el) {
-      var to = Number(el.dataset.count), t0 = null, pre = el.dataset.prefix || "";
-      if (reduceMotion) { el.textContent = pre + fmt.format(to); return; }
-      requestAnimationFrame(function step(t) {
-        t0 = t0 || t; var p = Math.min(1, (t - t0) / 1500);
-        el.textContent = pre + fmt.format(Math.round(to * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(step); else el.classList.add("done");
-      });
+      odometer(el, Number(el.dataset.count), el.dataset.prefix || "");
+      setTimeout(function () { el.classList.add("done"); }, reduceMotion ? 0 : 1700);
     }
     if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
     var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } }); }, { threshold: .6 });

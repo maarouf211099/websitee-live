@@ -28,6 +28,10 @@
     location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "#online";
   });
 
+  // ---------- ticker ----------
+  var tk = document.getElementById("ticker");
+  if (tk && !reduceMotion) tk.innerHTML += tk.innerHTML;
+
   // ---------- slider ----------
   function slider(slides) {
     var box = document.getElementById("slides"), dots = document.getElementById("sl-dots"), root = document.getElementById("slider");
@@ -129,14 +133,14 @@
       var pct = c.goal ? Math.min(100, Math.round((c.raised || 0) / c.goal * 100)) : 0;
       var give = "/donate.html?for=" + encodeURIComponent(c.purpose || "general") + (c.unitPrice ? "&amount=" + c.unitPrice : "") + "#online";
       return '<article class="card camp">' +
-        '<a class="camp-img" href="' + esc(c.link) + '"><img src="' + esc(c.imageSm || c.image) + '"' + (c.imageSm ? ' srcset="' + esc(c.imageSm) + ' 600w, ' + esc(c.image) + ' 900w" sizes="(max-width: 760px) 82vw, 380px"' : "") + ' alt="' + esc(c.title) + '" loading="lazy" width="900" height="900"></a>' +
+        '<a class="camp-img" href="' + esc(c.link) + '"><img src="' + esc(c.imageSm || c.image) + '"' + (c.imageSm ? ' srcset="' + esc(c.imageSm) + ' 600w, ' + esc(c.image) + ' 900w" sizes="(max-width: 760px) 82vw, 380px"' : "") + ' alt="' + esc(c.title) + '" loading="lazy" width="900" height="900">' +
+          (c.unitPrice ? '<span class="camp-badge">سهم ' + fmt.format(c.unitPrice) + ' جنيه</span>' : "") + "</a>" +
         '<div class="body">' +
-          '<h3><a href="' + esc(c.link) + '">' + esc(c.title) + "</a></h3>" +
-          (c.unitPrice ? '<span class="unit-price">سعر الـ' + esc(c.unit) + ": <b>" + fmt.format(c.unitPrice) + " جنيه</b></span>" : "") +
+          '<div class="camp-head"><h3><a href="' + esc(c.link) + '">' + esc(c.title) + "</a></h3>" +
+            '<svg class="ring" viewBox="0 0 44 44" role="img" aria-label="' + pct + '%"><circle class="ring-bg" cx="22" cy="22" r="19" pathLength="100"/><circle class="ring-fg" cx="22" cy="22" r="19" pathLength="100" data-pct="' + pct + '"/><text x="22" y="26" text-anchor="middle">' + pct + '%</text></svg></div>' +
           '<div class="goal-box">' +
-            '<div class="goal-top"><span>تم توفير <b data-to="' + (c.raised || 0) + '">0</b> ' + esc(c.unit) + '</span><span class="pct">' + pct + "%</span></div>" +
             '<div class="progress"><i data-pct="' + pct + '"></i></div>' +
-            '<div class="goal-bottom">الهدف ' + fmt.format(c.goal) + " " + esc(c.unit) + "</div>" +
+            '<div class="goal-top"><span>تم توفير <b data-to="' + (c.raised || 0) + '">0</b> ' + esc(c.unit) + '</span><span>الهدف ' + fmt.format(c.goal) + "</span></div>" +
           "</div>" +
           '<div class="camp-actions"><a class="btn btn-gold" href="' + give + '">تبرع الآن</a><a class="btn btn-ghost-teal" href="' + esc(c.link) + '">التفاصيل</a></div>' +
         "</div></article>";
@@ -149,8 +153,9 @@
     car.querySelector(".car-prev").addEventListener("click", function () { step(1); });
     // fill the bars and count up when visible
     function animate(card) {
-      var bar = card.querySelector(".progress i"), num = card.querySelector("b[data-to]");
+      var bar = card.querySelector(".progress i"), num = card.querySelector("b[data-to]"), ring = card.querySelector(".ring-fg");
       bar.style.width = bar.dataset.pct + "%";
+      if (ring) ring.style.strokeDashoffset = 100 - Number(ring.dataset.pct);
       var to = Number(num.dataset.to), t0 = null;
       if (reduceMotion || !to) { num.textContent = fmt.format(to); return; }
       requestAnimationFrame(function stepN(t) {

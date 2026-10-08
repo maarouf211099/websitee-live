@@ -850,3 +850,12 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
   .sl-dots button[aria-selected="true"] { width: 22px; overflow: hidden; }
   .sl-dots button::before { content: ""; position: absolute; inset: -14px -6px; }
 }
+
+/* ===== global v2: glass header, type scale, balanced headings ===== */
+h1, h2, h3, .big-title { text-wrap: balance; }
+.site-header { background: rgba(0,89,89,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: background .3s, box-shadow .3s; }
+.site-header.scrolled { background: rgba(0,70,70,.96); box-shadow: 0 10px 30px -10px rgba(0,0,0,.4); }
+.section-title h2 { font-weight: 800; }
+.card { border-radius: 20px; }
+.btn { font-weight: 800; }
+.page-head h1 { font-weight: 800; }

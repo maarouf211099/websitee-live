@@ -1,0 +1,173 @@
+/* ===================================================================
+   Mersal home page — visual layer v2 (loaded after site.css, index only)
+   Hero full-bleed, overlapping donate strip, ticker, rich cards, motion.
+   =================================================================== */
+
+/* ---------- hero: full-bleed banner slider on the brand gradient ---------- */
+.home .slider,
+.home .slider:has(.slides.banners) {
+  padding: 0 0 54px;
+  position: relative; overflow: hidden;
+  background-color: var(--teal-dark);
+  background-image: url(../img/pattern-white.png), var(--brand-grad);
+  background-size: 240px 240px, cover;
+}
+.home .slides.banners {
+  max-width: none; margin: 0; border-radius: 0 0 36px 36px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.45);
+}
+.home .slide.banner img { aspect-ratio: 1920 / 640; }
+.home .slides.banners ~ .sl-dots { position: absolute; inset-inline: 0; bottom: 22px; padding: 0; z-index: 3; }
+.home .slides.banners ~ .sl-dots button { background: rgba(255,255,255,.45); }
+.home .slides.banners ~ .sl-dots button[aria-selected="true"] { background: var(--gold); }
+.home .slides.banners ~ .sl-arrow { top: calc(50% - 27px); background: rgba(0,32,32,.35); color: #fff; backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.25); }
+.home .slides.banners ~ .sl-arrow:hover { background: var(--gold); color: var(--teal-ink); }
+.hero-wave { position: absolute; inset-inline: 0; bottom: -1px; width: 100%; height: 42px; display: block; z-index: 2; }
+.hero-wave path { fill: #fff; }
+
+/* ---------- donate strip overlapping the hero ---------- */
+.home .quick-bar { margin-top: -38px !important; }
+.home .quick-donate {
+  background: rgba(255,255,255,.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0,144,145,.15); border-radius: 22px; padding: 16px 20px;
+  box-shadow: 0 24px 60px -18px rgba(0,48,48,.35), 0 2px 0 rgba(255,255,255,.8) inset;
+}
+.home .quick-donate .qd-text b { font-size: 19px; }
+.home .quick-donate .amounts button { border-radius: 12px; border-width: 2px; }
+.home .quick-donate .amounts button.on { background: var(--teal); border-color: var(--teal); color: #fff; box-shadow: 0 8px 18px -8px var(--teal); }
+.home .qd-go { border-radius: 14px; padding: 12px 30px; }
+
+/* ---------- ticker ---------- */
+.ticker { overflow: hidden; margin: 26px 0 0; padding: 12px 0; border-block: 1px solid var(--line); background: #fff; -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.ticker-track { display: flex; width: max-content; gap: 0; animation: tick 48s linear infinite; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+.ticker-track span { white-space: nowrap; padding: 0 26px; font-size: 15px; color: var(--muted); font-weight: 600; position: relative; }
+.ticker-track span::after { content: "✦"; position: absolute; inset-inline-end: -8px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 12px; }
+.ticker-track b { color: var(--teal-dark); font-family: "Titillium Web", "Cairo", sans-serif; font-size: 18px; margin-inline-end: 4px; }
+.ticker-track .hash { color: var(--teal); }
+.ticker-track .hash b { color: var(--gold-dark); font-size: 18px; }
+@keyframes tick { to { transform: translateX(50%); } }
+
+/* ---------- section titles, split layout ---------- */
+.home .section-title h2 { font-size: clamp(28px, 4.4vw, 44px); font-weight: 800; letter-spacing: -.3px; }
+.home .section-title.split { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; text-align: start; }
+.home .section-title.split h2::after { margin-inline: 0; }
+.home .section-title.split p { margin: 0; max-width: 440px; }
+.home .eyebrow { font-size: 14px; }
+
+/* ---------- campaign cards ---------- */
+.home .camp { border-radius: 24px; border: 0; box-shadow: 0 14px 40px -20px rgba(0,48,48,.35); }
+.home .camp-img { position: relative; }
+.home .camp-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(0,32,32,.55) 100%); pointer-events: none; }
+.home .camp-badge { position: absolute; z-index: 1; inset-inline-start: 14px; bottom: 14px; background: var(--gold); color: var(--teal-ink); font-weight: 800; font-size: 13.5px; padding: 6px 12px; border-radius: 999px; box-shadow: 0 6px 16px -6px rgba(0,0,0,.5); }
+.home .camp .body { padding: 16px 18px 18px; gap: 10px; }
+.camp-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.camp-head h3 { font-size: 19px; }
+.ring { width: 54px; height: 54px; flex: none; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 4.5; }
+.ring-bg { stroke: var(--teal-soft); }
+.ring-fg { stroke: var(--gold); stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1) .2s; }
+.ring text { transform: rotate(90deg); transform-origin: 22px 22px; font: 700 11px "Titillium Web", "Cairo", sans-serif; fill: var(--teal-dark); }
+.home .goal-box { background: var(--bg-2); border-radius: 14px; padding: 10px 12px; margin: 0; }
+.home .goal-box .progress { margin: 0 0 8px; height: 8px; }
+.home .goal-top { font-size: 13px; }
+.home .camp-actions .btn { border-radius: 12px; }
+.home .camp-carousel .car-arrow { background: #fff; color: var(--teal-dark); border: 1px solid var(--line); }
+.home .camp-carousel .car-arrow:hover { background: var(--gold); border-color: var(--gold); }
+
+/* ---------- about ---------- */
+.home .about-intro { position: relative; overflow: hidden; }
+.home .about-intro::before { content: ""; position: absolute; width: 420px; height: 420px; border-radius: 50%; inset-inline-end: -140px; top: -160px; background: radial-gradient(circle, rgba(254,200,48,.22), transparent 65%); pointer-events: none; }
+.home .big-title { font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.3; }
+.home .big-title mark { background: linear-gradient(transparent 62%, rgba(254,200,48,.55) 62%); color: inherit; padding: 0 .1em; border-radius: 4px; }
+.home .values li { background: #fff; border: 1px solid var(--line); border-inline-start: 4px solid var(--gold); box-shadow: var(--shadow); }
+.home .about-pic::before { background: linear-gradient(135deg, var(--teal-soft), rgba(254,200,48,.25)); inset: 24px -24px -24px 24px; border-radius: 32px; }
+.home .about-pic img { border-radius: 32px; box-shadow: 0 30px 60px -24px rgba(0,48,48,.5); }
+
+/* ---------- numbers ---------- */
+.home .numbers { position: relative; overflow: hidden; padding: 64px 0; }
+.home .numbers::before, .home .numbers::after { content: ""; position: absolute; border-radius: 50%; filter: blur(40px); opacity: .35; pointer-events: none; }
+.home .numbers::before { width: 360px; height: 360px; background: var(--gold); inset-inline-start: -120px; top: -120px; }
+.home .numbers::after { width: 420px; height: 420px; background: #00c2c4; inset-inline-end: -160px; bottom: -200px; }
+.home .numbers .wrap { position: relative; }
+.home .num { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); border-radius: 22px; backdrop-filter: blur(8px); }
+.home .num b { font-size: clamp(38px, 5vw, 56px); letter-spacing: -1px; }
+
+/* ---------- hospital story ---------- */
+.home .hospital-feature { background: #fff; }
+.home .hf-pic { position: relative; }
+.home .hf-pic img { border-radius: 32px; }
+.home .chip { position: absolute; z-index: 2; background: #fff; border-radius: 16px; padding: 10px 16px; box-shadow: 0 16px 40px -14px rgba(0,48,48,.45); display: flex; flex-direction: column; line-height: 1.2; animation: float 6s ease-in-out infinite; }
+.home .chip b { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 26px; color: var(--teal); }
+.home .chip span { font-size: 12.5px; color: var(--muted); }
+.home .chip-a { inset-inline-start: -14px; top: 22px; }
+.home .chip-b { inset-inline-end: -14px; bottom: 26px; animation-delay: 1.5s; }
+.home .facts div { border-radius: 16px; }
+
+/* ---------- services & projects ---------- */
+.home .services-sec { background: var(--bg-2); }
+.home .svc { border-radius: 22px; border: 0; position: relative; overflow: hidden; }
+.home .svc::after { content: "←"; position: absolute; inset-inline-start: 18px; bottom: 16px; color: var(--teal); font-weight: 800; opacity: 0; transform: translateX(8px); transition: .3s; }
+.home .svc:hover::after { opacity: 1; transform: none; }
+.home .svc-i { background: linear-gradient(135deg, var(--teal), #00c2c4); color: #fff; border-radius: 16px; }
+.home .projects-sec, .home .campaigns-sec + .about-intro + .numbers + .hospital-feature + .services-sec + .alt { background: #fff; }
+.home .car-track .card { border-radius: 22px; border: 0; }
+.home .ways-sec { background: var(--bg-2); }
+.home .way2 { border-radius: 20px; border: 0; }
+
+/* ---------- slogan band ---------- */
+.home .slogan-band { background: #fff; position: relative; overflow: hidden; padding: 64px 0; }
+.home .slogan-band::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 20%, rgba(0,144,145,.10), transparent 55%); pointer-events: none; }
+.home .slogan-band .wrap { position: relative; }
+.home .slogan-band .tag { font-size: 28px; }
+.home .contact-cards a { border-radius: 16px; }
+
+/* ---------- mobile ---------- */
+@media (max-width: 760px) {
+  .home .slider, .home .slider:has(.slides.banners) { padding: 0 0 44px; }
+  .home .slides.banners { margin: 0; border-radius: 0 0 26px 26px; }
+  .home .slide.banner img { aspect-ratio: 1920 / 780; object-position: 82% center; }
+  .home .slides.banners ~ .sl-dots { bottom: 16px; }
+  .hero-wave { height: 26px; }
+  .home .quick-bar { margin-top: -26px !important; }
+  .home .quick-donate { padding: 12px; border-radius: 18px; }
+  .ticker { margin-top: 18px; padding: 9px 0; }
+  .ticker-track span { font-size: 13.5px; padding: 0 18px; }
+  .ticker-track b { font-size: 16px; }
+  .home .section-title.split { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .home .section-title.split p { font-size: 14px; }
+  .home .section-title h2 { font-size: 26px; }
+  .home .big-title { font-size: 25px; }
+  .home .camp { border-radius: 20px; }
+  .home .camp .body { padding: 14px; }
+  .ring { width: 48px; height: 48px; }
+  .home .numbers { padding: 40px 0; }
+  .home .numbers::before, .home .numbers::after { display: none; }
+  .home .num { border-radius: 16px; }
+  .home .num b { font-size: 32px; }
+  .home .chip { padding: 8px 12px; border-radius: 12px; }
+  .home .chip b { font-size: 20px; }
+  .home .chip-a { inset-inline-start: 8px; top: 12px; }
+  .home .chip-b { inset-inline-end: 8px; bottom: 12px; }
+  .home .hf-pic img { border-radius: 20px; }
+  .home .about-pic img { border-radius: 20px; }
+  .home .slogan-band { padding: 40px 0; }
+  .home .slogan-band .tag { font-size: 22px; }
+}
+
+/* ---------- motion: scroll-driven reveals (progressive enhancement) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .home .reveal { opacity: 1; transform: none; transition: none; animation: sdaReveal linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+    .home .reveal.zoom { animation-name: sdaZoom; }
+    .home .section-title.reveal:not(.in) h2::after { width: 56px; }
+    .home .slider .sl-bg, .home .slider .slides { animation: heroDrift linear both; animation-timeline: scroll(); animation-range: 0 700px; }
+  }
+}
+@keyframes sdaReveal { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
+@keyframes sdaZoom { from { opacity: 0; transform: scale(.92) translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes heroDrift { to { transform: translateY(60px); } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
+  .home .chip, .ring-fg { animation: none; transition: none; }
+}
+.hf-pic img, .about-pic img { height: auto; }

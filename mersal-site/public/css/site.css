@@ -532,3 +532,68 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 .layout-side { grid-template-columns: minmax(0, 1fr) 300px; }
 .layout-side > * { min-width: 0; }
 @media (max-width: 960px) { .layout-side { grid-template-columns: minmax(0, 1fr); } }
+
+/* ===== polish v2: slider card, consistent mobile scale ===== */
+/* banner slider: rounded card, dots under the picture */
+.slider:has(.slides.banners) { background: linear-gradient(180deg, #003737 0 46%, #fff 46% 100%); padding: 18px 0 8px; }
+.slides.banners { max-width: 1280px; margin: 0 auto; border-radius: 22px; overflow: hidden; box-shadow: 0 18px 40px rgba(0,32,32,.22); transform: translateZ(0); }
+.slides.banners ~ .sl-dots { position: static; padding: 14px 0 6px; }
+.slides.banners ~ .sl-dots button { background: #cfdede; }
+.slides.banners ~ .sl-dots button[aria-selected="true"] { background: var(--gold); }
+.slides.banners ~ .sl-arrow { top: calc(50% - 18px); background: rgba(255,255,255,.85); color: var(--teal-dark); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+.slides.banners ~ .sl-arrow:hover { background: var(--gold); color: #fff; }
+.slides.banners .slide { transition: opacity .7s ease, visibility 0s linear .7s; }
+.slides.banners .slide.on { transition: opacity .7s ease; }
+@media (min-width: 1300px) { .slides.banners ~ .sl-prev { right: calc(50% - 640px - 22px); } .slides.banners ~ .sl-next { left: calc(50% - 640px - 22px); } }
+@media (min-width: 761px) and (max-width: 1299px) { .slides.banners { margin-inline: 16px; } }
+.slider:has(.slides.banners) + .quick-bar { margin-top: 8px !important; }
+
+@media (max-width: 760px) {
+  /* one clean header bar */
+  .topbar { display: none; }
+  .site-header .wrap { min-height: 58px; }
+  .brand img { height: 32px; }
+  .search-btn { width: 38px; height: 38px; }
+
+  .slider:has(.slides.banners) { padding: 12px 0 2px; }
+  .slides.banners { margin-inline: 12px; border-radius: 16px; box-shadow: 0 10px 24px rgba(0,32,32,.2); }
+  .slides.banners ~ .sl-dots { padding: 10px 0 2px; }
+
+  /* type & spacing scale */
+  body { font-size: 15px; line-height: 1.75; }
+  section { padding: 36px 0; }
+  .section-title h2 { font-size: 22px; }
+  .section-title h2::after { width: 44px; height: 3px; margin-top: 8px; }
+  .section-title p { font-size: 14px; margin-top: 8px; }
+  .big-title { font-size: 22px; }
+  .eyebrow { font-size: 12.5px; }
+  .about-intro p, .hospital-feature p { font-size: 15px; }
+  .btn { padding: 10px 22px; font-size: 15px; }
+  .card .body { padding: 14px 16px 16px; }
+  .card h3 { font-size: 17px; }
+  .card p { font-size: 14px; }
+  .values li { padding: 10px 12px; }
+  .values b { font-size: 15px; }
+  .stat { padding: 16px 10px; }
+  .stat b { font-size: 26px; }
+  .page-head { padding: 22px 0; }
+  .page-head h1 { font-size: 22px; }
+  .crumbs { font-size: 12px; }
+  .legacy { font-size: 15px; }
+  .legacy h2, .legacy .content-sector h2 { font-size: 20px; padding: 3px 18px; }
+  .legacy h4, .legacy .content-sector h4 { font-size: 15px; }
+
+  /* quick donate: compact */
+  .quick-bar .hero-card { padding: 14px; border-radius: 16px; }
+  .quick-donate h2 { font-size: 18px; }
+  .quick-donate .field label { font-size: 13px; }
+  .quick-donate .amounts button { padding: 9px 0; font-size: 15px; }
+  .quick-donate .field input, .quick-donate .field select { padding: 9px 12px; }
+  .qd-go { height: 46px; }
+  .qd-row { grid-template-columns: 1fr 1fr; }
+  .qd-row .qd-purpose, .qd-row .amounts, .qd-row .qd-go { grid-column: 1 / -1; }
+  .qd-row .qd-amount { grid-column: 1 / -1; }
+
+  .amounts.big button { padding: 11px 0; font-size: 16px; }
+  .input-suffix input { font-size: 18px; }
+}

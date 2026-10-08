@@ -88,3 +88,5 @@
 .share-bar .sh-fb { background: #1877f2; border-color: #1877f2; color: #fff; }
 .related { background: var(--bg-2); }
 .related .card { color: inherit; text-decoration: none; }
+.legacy h2, .legacy .content-sector h2 { background: var(--teal-dark); color: var(--gold); }
+.legacy h4, .legacy .content-sector h4 { background: var(--teal); }

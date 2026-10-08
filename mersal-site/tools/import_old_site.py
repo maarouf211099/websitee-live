@@ -175,7 +175,7 @@ def head(title, desc):
 <link rel="icon" type="image/png" href="/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/legacy.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
@@ -294,7 +294,7 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
     with open(os.path.join(PUB, "data", "pages.json"), "w", encoding="utf-8") as f:
         json.dump({str(k): {"title": v["title"], "desc": v["desc"][:140], "photo": v["photo"] or v["cover"]}
                    for k, v in pages.items()}, f, ensure_ascii=False, indent=1)
-    urls = ["/", "/donate.html", "/zakat.html", "/afia.html", "/contact.html"] + [f"/p/{k}.html" for k in sorted(pages)]
+    urls = ["/", "/donate.html", "/zakat.html", "/afia.html", "/contact.html", "/albums.html"] + [f"/p/{k}.html" for k in sorted(pages)]
     with open(os.path.join(PUB, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
         f.writelines(f"  <url><loc>{SITE_URL}{u}</loc></url>\n" for u in urls)
@@ -381,6 +381,36 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
         print("  ! no anonymous token: donation campaigns skipped")
     if camps:
         content["campaigns"] = camps
+
+    # Photo albums (old /Album pages)
+    albums = []
+    home = api("Albums/GetLastFourAlbums?maxResults=100") or {}
+    for al in home.get("AlbumHomeViewList") or []:
+        aid = al.get("Id")
+        paths, count = [], 0
+        for _ in range(12):
+            d = api(f"Albums/GetImagesInAlbum?albumId={aid}&currantCount={count}") or {}
+            batch = [x.get("ImagePath") for x in (d.get("AlbumHomeViewList") or []) if x.get("ImagePath")]
+            new = [b_ for b_ in batch if b_ not in paths]
+            if not new:
+                break
+            paths += new
+            count = d.get("CurrantCountOfAlbums") or (count + len(batch))
+            if len(paths) >= 30:
+                break
+        cover = al.get("ImagePath")
+        photos = []
+        for ph in ([cover] if cover else []) + [x for x in paths if x != cover]:
+            big = local_image(ph, max_w=1400)
+            if big:
+                photos.append(big)
+        if photos:
+            albums.append({"title": (al.get("TitleAr") or al.get("TitleEn") or "").strip(),
+                           "date": (al.get("CreatedOn") or "")[:10], "photos": photos[:30]})
+            print("  album", aid, len(photos), "photos")
+    if albums:
+        with open(os.path.join(PUB, "data", "albums.json"), "w", encoding="utf-8") as f:
+            json.dump(albums, f, ensure_ascii=False, indent=1)
     with open(content_path, "w", encoding="utf-8") as f:
         json.dump(content, f, ensure_ascii=False, indent=2)
     print(f"done: {len(content.get('campaigns', []))} campaigns, {len(pages)} pages, {len(slides)} slides, {len(channels)} channels, {len(stats)} stats, {len(projs)} projects, {len(os.listdir(IMG_DIR))} images")

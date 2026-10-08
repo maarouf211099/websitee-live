@@ -49,7 +49,8 @@
   var FOOT = [
     ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"],
     ["/p/30.html", "مستشفى مرسال"], ["/p/4.html", "المشاريع"], ["/p/46.html", "فروع مرسال"],
-    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/p/51.html", "الأسئلة الشائعة"]
+    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/p/51.html", "الأسئلة الشائعة"],
+    ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"]
   ];
   var here = location.pathname.replace(/index\.html$/, "");
 
@@ -63,7 +64,7 @@
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
-      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><img src="/img/logo-mersal.png" alt="مؤسسة مرسال" width="70" height="43"></a>' +
+      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><img src="/img/brand-logo.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></a>' +
       '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return '<li><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
@@ -76,7 +77,7 @@
   var footer =
     '<footer class="site-footer"><div class="wrap cols">' +
       "<div>" +
-        '<div class="logo-box"><img src="/img/logo-mersal.png" alt="مؤسسة مرسال" width="70" height="43"></div>' +
+        '<div class="logo-box"><img src="/img/brand-logo-h.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="302" height="52"></div>' +
         "<h3>مؤسسة مرسال للأعمال الخيرية والتنموية</h3>" +
         "<p>مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم.</p>" +
         social() +
@@ -123,7 +124,7 @@
   window.mersalReveal(document.querySelectorAll("main .section-title, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
 
   // Extra links added to the imported menu groups
-  var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
+  var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"], ["/albums.html", "ألبومات الصور"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   function navItem(it) {
     var kids = (it.children || []).slice();
@@ -167,7 +168,8 @@
     { t: "طرق التبرع", u: "/donate.html", d: "الحسابات البنكية، المحافظ، إنستاباي، فوري، مندوب لحد البيت" },
     { t: "حاسبة الزكاة", u: "/zakat.html", d: "احسب زكاة مالك وذهبك وتجارتك" },
     { t: "كارت عافية", u: "/afia.html", d: "كارت خصومات عائلي على الخدمات الطبية حتى 70%" },
-    { t: "تواصل معنا", u: "/contact.html", d: "الخط الساخن 19340، العنوان، البريد" }
+    { t: "تواصل معنا", u: "/contact.html", d: "الخط الساخن 19340، العنوان، البريد" },
+    { t: "ألبومات الصور", u: "/albums.html", d: "صور فعاليات وحملات مرسال: التبرع بالدم، فوانيس الفرحة، بازار عيد الأم" }
   ];
   var index = null;
   function norm(t) { return String(t || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").toLowerCase(); }

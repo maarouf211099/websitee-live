@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<title>ألبومات الصور | مؤسسة مرسال</title>
+<meta name="description" content="صور من فعاليات وحملات مؤسسة مرسال الخيرية.">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="page-head"><div class="wrap">
+  <h1>ألبومات الصور</h1>
+  <p>لقطات من فعاليات وحملات مرسال</p>
+</div></div>
+<main id="main">
+  <section>
+    <div class="wrap grid grid-3" id="albums"></div>
+  </section>
+</main>
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="عرض الصور">
+  <button type="button" class="lb-close" aria-label="إغلاق">×</button>
+  <button type="button" class="lb-prev" aria-label="السابقة">&#8250;</button>
+  <figure><img alt=""><figcaption></figcaption></figure>
+  <button type="button" class="lb-next" aria-label="التالية">&#8249;</button>
+</div>
+<div id="site-footer"></div>
+<script src="/js/layout.js"></script>
+<script>
+(function () {
+  function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  var lb = document.getElementById("lightbox"), img = lb.querySelector("img"), cap = lb.querySelector("figcaption");
+  var cur = null, idx = 0, lastFocus = null;
+  function show() { img.src = cur.photos[idx]; img.alt = cur.title; cap.textContent = cur.title + " — " + (idx + 1) + " / " + cur.photos.length; }
+  function open(a, i) { cur = a; idx = i || 0; show(); lastFocus = document.activeElement; lb.hidden = false; document.body.style.overflow = "hidden"; lb.querySelector(".lb-close").focus(); }
+  function close() { lb.hidden = true; document.body.style.overflow = ""; if (lastFocus) lastFocus.focus(); }
+  function step(d) { idx = (idx + d + cur.photos.length) % cur.photos.length; show(); }
+  lb.querySelector(".lb-close").onclick = close;
+  lb.querySelector(".lb-next").onclick = function () { step(1); };
+  lb.querySelector(".lb-prev").onclick = function () { step(-1); };
+  lb.addEventListener("click", function (e) { if (e.target === lb) close(); });
+  addEventListener("keydown", function (e) {
+    if (lb.hidden) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft") step(1);   /* RTL: left = next */
+    if (e.key === "ArrowRight") step(-1);
+  });
+  var x0 = null;
+  lb.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener("touchend", function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) step(dx > 0 ? 1 : -1); });
+
+  fetch("/data/albums.json").then(function (r) { return r.json(); }).then(function (albums) {
+    var box = document.getElementById("albums");
+    box.innerHTML = albums.map(function (a, i) {
+      return '<button type="button" class="card album" data-i="' + i + '">' +
+        '<div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(a.photos[0]) + '\')"></div></div>' +
+        '<div class="body"><h3>' + esc(a.title) + '</h3><p>' + a.photos.length + ' صورة' + (a.date ? " · " + esc(a.date.slice(0, 4)) : "") + "</p></div></button>";
+    }).join("");
+    box.querySelectorAll(".album").forEach(function (b) { b.addEventListener("click", function () { open(albums[+b.dataset.i], 0); }); });
+    if (window.mersalReveal) window.mersalReveal(box.children);
+    var q = new URLSearchParams(location.search).get("a");
+    if (q !== null && albums[+q]) open(albums[+q], 0);
+  });
+})();
+</script>
+</body>
+</html>

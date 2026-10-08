@@ -4,6 +4,7 @@
     { "route": "/Donation/*", "redirect": "/donate.html", "statusCode": 301 },
     { "route": "/home/ZakahCalculator", "redirect": "/zakat.html", "statusCode": 301 },
     { "route": "/home/AfiaCard", "redirect": "/afia.html", "statusCode": 301 },
+    { "route": "/Album/*", "redirect": "/albums.html", "statusCode": 301 },
     { "route": "/home/contactus", "redirect": "/contact.html", "statusCode": 301 },
     { "route": "/DynamicPage/RenderPage", "rewrite": "/legacy.html" },
     { "route": "/home/HosbitalDetals", "redirect": "/p/30.html", "statusCode": 301 },

@@ -3,13 +3,13 @@
     {
       "route": "/js/*",
       "headers": {
-        "Cache-Control": "public, max-age=600, stale-while-revalidate=86400"
+        "Cache-Control": "public, max-age=30, must-revalidate"
       }
     },
     {
       "route": "/css/*",
       "headers": {
-        "Cache-Control": "public, max-age=600, stale-while-revalidate=86400"
+        "Cache-Control": "public, max-age=30, must-revalidate"
       }
     },
     {

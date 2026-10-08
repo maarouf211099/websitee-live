@@ -98,7 +98,7 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 - `tools/optimize_images.py` بيضغط كل الصور في `public/img` (JPEG بجودة 76 وبحد أقصى 1600px) وبيعمل نسخة `.webp` جنب كل صورة.
   شغّله بعد ما تضيف صور يدوياً في `public/img` (الصور اللي بتترفع من لوحة التحكم مش محتاجاه).
 - الصور في الكروت والسلايدر بتتعرض عبر `mersalPic()` في `js/layout.js` (WebP + تحميل مؤجل).
-- الكاش: الصور 30 يوم، CSS/JS عشر دقايق، الصفحات 30 ثانية (في `staticwebapp.config.json`).
+- الكاش: الصور 30 يوم (أسماء ثابتة)، أما CSS/JS والصفحات 30 ثانية بس عشان أي نشر يظهر فوراً (في `staticwebapp.config.json`).
 
 ## المحتوى المنقول من الموقع القديم
 `tools/import_old_site.py` بيقرا الموقع القديم (القايمة، كل صفحات الـCMS، السلايدر، طرق التبرع، الأرقام، المشاريع)

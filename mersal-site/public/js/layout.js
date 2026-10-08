@@ -98,8 +98,11 @@
     var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname);
     var dHref = "/donate.html" + (pm ? "?for=p" + pm[1] : "") + "#online";
     document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>' +
-      '<nav class="m-bar" aria-label="تبرع سريع"><a class="m-call" href="tel:19340"><span aria-hidden="true">📞</span>19340</a>' +
-      '<a class="m-donate" href="' + dHref + '">💚 تبرع الآن</a><a class="m-zakat" href="/zakat.html"><span aria-hidden="true">🧮</span>الزكاة</a></nav>');
+      '<nav class="m-bar" aria-label="تبرع سريع">' +
+        '<a class="m-call" href="tel:19340"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>19340</a>' +
+        '<a class="m-donate" href="' + dHref + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg>تبرع الآن</a>' +
+        '<a class="m-zakat" href="/zakat.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h6"/></svg>الزكاة</a>' +
+      "</nav>");
     document.body.classList.add("has-mbar");
   }
 
@@ -121,7 +124,8 @@
       el.classList.add("reveal"); io.observe(el);
     });
   };
-  window.mersalReveal(document.querySelectorAll("main .section-title, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
+  document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img").forEach(function (el) { el.classList.add("zoom"); });
+  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
 
   // Extra links added to the imported menu groups
   var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"], ["/albums.html", "ألبومات الصور"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
@@ -160,7 +164,11 @@
   var mainEl = document.querySelector("main"); if (mainEl && !mainEl.id) mainEl.id = "main";
   document.body.insertAdjacentHTML("beforeend", '<button type="button" class="to-top" aria-label="الرجوع لأعلى الصفحة">↑</button>');
   var toTop = document.querySelector(".to-top");
-  addEventListener("scroll", function () { toTop.classList.toggle("show", scrollY > 600); }, { passive: true });
+  var fab = document.querySelector(".fab-donate");
+  addEventListener("scroll", function () {
+    toTop.classList.toggle("show", scrollY > 600);
+    if (fab) fab.classList.toggle("show", scrollY > 500);
+  }, { passive: true });
   toTop.addEventListener("click", function () { scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
 
   // Site search over the imported pages + main pages
@@ -204,8 +212,20 @@
   });
 
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
-  toggle.addEventListener("click", function () {
-    var open = nav.classList.toggle("open");
+  function setMenu(open) {
+    nav.classList.toggle("open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
+    toggle.setAttribute("aria-label", open ? "إغلاق القائمة" : "القائمة");
+    document.body.classList.toggle("menu-open", open);
+  }
+  toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!nav.classList.contains("open")); });
+  nav.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
+  addEventListener("keydown", function (e) { if (e.key === "Escape" && nav.classList.contains("open")) { setMenu(false); toggle.focus(); } });
+  // Mobile menu footer: donate + hotline (added once the menu is built)
+  function menuCta() {
+    if (nav.querySelector(".m-menu-cta")) return;
+    nav.insertAdjacentHTML("beforeend", '<li class="m-menu-cta"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a><a class="btn btn-ghost-light" href="tel:19340">اتصل 19340</a></li>');
+  }
+  menuCta();
+  new MutationObserver(menuCta).observe(nav, { childList: true });
 })();

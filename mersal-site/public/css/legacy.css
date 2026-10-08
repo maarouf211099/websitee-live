@@ -90,3 +90,6 @@
 .related .card { color: inherit; text-decoration: none; }
 .legacy h2, .legacy .content-sector h2 { background: var(--teal-dark); color: var(--gold); }
 .legacy h4, .legacy .content-sector h4 { background: var(--teal); }
+/* FAQ answers: plain text, not section bars */
+.legacy .accordion-body h4 { background: none; color: var(--ink); padding: 0; font-size: 16px; font-weight: 600; border-radius: 0; }
+.legacy .accordion-body h5 { color: var(--teal); }

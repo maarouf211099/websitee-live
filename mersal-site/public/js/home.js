@@ -38,7 +38,7 @@
       if (s.banner) {
         return '<div class="slide banner' + (i === 0 ? " on" : "") + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + " / " + slides.length + '">' +
           (i === 0 ? '<h1 class="sr-only">مؤسسة مرسال للأعمال الخيرية والتنموية</h1>' : "") +
-          '<a href="' + esc(s.link || "/donate.html") + '"><img src="' + esc(s.banner) + '" alt="' + esc(s.alt || "") + '" width="1920" height="570"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + "></a></div>";
+          '<a href="' + esc(s.link || "/donate.html") + '"><img ' + (i ? "data-" : "") + 'src="' + esc(s.banner) + '"' + (s.bannerSm ? " " + (i ? "data-" : "") + 'srcset="' + esc(s.bannerSm) + ' 1200w, ' + esc(s.banner) + ' 1920w" sizes="100vw"' : "") + ' alt="' + esc(s.alt || "") + '" width="1920" height="570"' + (i ? "" : ' fetchpriority="high"') + "></a></div>";
       }
       var heading = i === 0 ? "h1" : "h2";
       var tel = /^tel:/.test(s.link || "");
@@ -54,6 +54,13 @@
         "</div></div>";
     }).join("");
     var els = box.querySelectorAll(".slide"), cur = 0, timer = null;
+    function wake() {
+      box.querySelectorAll("img[data-src]").forEach(function (im) {
+        if (im.dataset.srcset) im.srcset = im.dataset.srcset;
+        im.src = im.dataset.src; im.removeAttribute("data-src"); im.removeAttribute("data-srcset");
+      });
+    }
+    if (document.readyState === "complete") setTimeout(wake, 800); else addEventListener("load", function () { setTimeout(wake, 800); });
     dots.innerHTML = slides.map(function (_, i) {
       return '<button type="button" role="tab" aria-label="الشريحة ' + (i + 1) + '" aria-selected="' + (i === 0) + '"></button>';
     }).join("");
@@ -67,9 +74,10 @@
       els[cur].classList.add("on");
       if (!reduceMotion) els[cur].classList.add("kb");
       dotEls[cur].setAttribute("aria-selected", "true");
+      dotEls[cur].style.animation = "none"; void dotEls[cur].offsetWidth; dotEls[cur].style.animation = "";
     }
-    function play() { stop(); if (!reduceMotion && els.length > 1) timer = setInterval(function () { go(cur + 1); }, 6500); }
-    function stop() { if (timer) clearInterval(timer); timer = null; }
+    function play() { stop(); root.classList.remove("paused"); if (!reduceMotion && els.length > 1) timer = setInterval(function () { go(cur + 1); }, 6500); }
+    function stop() { if (timer) clearInterval(timer); timer = null; root.classList.add("paused"); }
     dotEls.forEach(function (d, i) { d.addEventListener("click", function () { go(i); play(); }); });
     root.querySelector(".sl-next").addEventListener("click", function () { go(cur + 1); play(); });
     root.querySelector(".sl-prev").addEventListener("click", function () { go(cur - 1); play(); });
@@ -98,7 +106,7 @@
         bar = '<div class="progress" aria-label="' + pct + '%"><i style="width:' + pct + '%"></i></div>' +
           '<div class="meta-row"><span>تم جمع ' + fmt.format(c.raised || 0) + ' جنيه</span><span>الهدف ' + fmt.format(c.goal) + "</span></div>";
       }
-      return '<article class="card"><div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(c.image) + '\')" role="img" aria-label="' + esc(c.title) + '"></div></div>' +
+      return '<article class="card"><div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(c.imageSm || c.image) + '\')" role="img" aria-label="' + esc(c.title) + '"></div></div>' +
         '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(c.text) + "</p>" + bar +
         '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + (c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
     }).join("");
@@ -121,7 +129,7 @@
       var pct = c.goal ? Math.min(100, Math.round((c.raised || 0) / c.goal * 100)) : 0;
       var give = "/donate.html?for=" + encodeURIComponent(c.purpose || "general") + (c.unitPrice ? "&amount=" + c.unitPrice : "") + "#online";
       return '<article class="card camp">' +
-        '<a class="camp-img" href="' + esc(c.link) + '"><img src="' + esc(c.image) + '" alt="' + esc(c.title) + '" loading="lazy" width="900" height="900"></a>' +
+        '<a class="camp-img" href="' + esc(c.link) + '"><img src="' + esc(c.imageSm || c.image) + '"' + (c.imageSm ? ' srcset="' + esc(c.imageSm) + ' 600w, ' + esc(c.image) + ' 900w" sizes="(max-width: 760px) 82vw, 380px"' : "") + ' alt="' + esc(c.title) + '" loading="lazy" width="900" height="900"></a>' +
         '<div class="body">' +
           '<h3><a href="' + esc(c.link) + '">' + esc(c.title) + "</a></h3>" +
           (c.unitPrice ? '<span class="unit-price">سعر الـ' + esc(c.unit) + ": <b>" + fmt.format(c.unitPrice) + " جنيه</b></span>" : "") +
@@ -158,26 +166,17 @@
     } else cards.forEach(animate);
   }
 
-  function channels(list) {
-    if (!list || !list.length) return;
-    document.getElementById("channels").innerHTML = list.map(function (c) {
-      return '<div class="card channel">' + (c.image ? '<img src="' + esc(c.image) + '" alt="" loading="lazy">' : "") +
-        "<div><h3>" + esc(c.title) + "</h3><p>" + esc(c.text) + "</p></div></div>";
-    }).join("");
-    document.getElementById("channels-sec").hidden = false;
-    if (window.mersalReveal) window.mersalReveal(document.getElementById("channels").children);
-  }
 
   // Count-up numbers in the hospital section
   (function () {
     var nums = document.querySelectorAll("[data-count]");
     function run(el) {
-      var to = Number(el.dataset.count), t0 = null;
-      if (reduceMotion) { el.textContent = fmt.format(to); return; }
+      var to = Number(el.dataset.count), t0 = null, pre = el.dataset.prefix || "";
+      if (reduceMotion) { el.textContent = pre + fmt.format(to); return; }
       requestAnimationFrame(function step(t) {
         t0 = t0 || t; var p = Math.min(1, (t - t0) / 1500);
-        el.textContent = fmt.format(Math.round(to * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(step);
+        el.textContent = pre + fmt.format(Math.round(to * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step); else el.classList.add("done");
       });
     }
     if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
@@ -186,6 +185,6 @@
   })();
 
   fetch("/content.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (data) {
-    slider(data.slides); donationCampaigns(data.campaigns); campaigns(data.projects); channels(data.channels);
+    slider(data.slides); donationCampaigns(data.campaigns); campaigns(data.projects);
   }).catch(function () {});
 })();

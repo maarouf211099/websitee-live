@@ -175,7 +175,7 @@ def head(title, desc):
 <link rel="icon" type="image/png" href="/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/legacy.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
@@ -252,7 +252,7 @@ def main():
                   if not re.search(r"checklist|logo", m)]
         if pid == 3:  # the old About page showed this picture beside the text
             body = ('<div class="row align-items-center"><div class="col-md-7">' + body +
-                    '</div><div class="col-md-5"><img src="/img/about-mersal.png" alt="مؤسسة مرسال" loading="lazy"></div></div>')
+                    '</div><div class="col-md-5"><img src="/img/about-mersal.jpg" alt="مؤسسة مرسال" loading="lazy"></div></div>')
         with open(os.path.join(PUB, "p", f"{pid}.html"), "w", encoding="utf-8") as f:
             f.write(page_html(title, body, desc, cover, cover or (photos[0] if photos else None)))
         pages[pid] = {"title": title, "desc": desc, "cover": cover, "photo": photos[0] if photos else None}
@@ -416,5 +416,47 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
     print(f"done: {len(content.get('campaigns', []))} campaigns, {len(pages)} pages, {len(slides)} slides, {len(channels)} channels, {len(stats)} stats, {len(projs)} projects, {len(os.listdir(IMG_DIR))} images")
 
 
+def small_copy(path, width=720):
+    """Make a lighter copy for phones: /img/old/x.jpg -> /img/old/x-sm.jpg (returns its URL)."""
+    if not path or not path.startswith("/img/") or not shutil.which("convert"):
+        return None
+    src = os.path.join(PUB, path.lstrip("/"))
+    if not os.path.exists(src):
+        return None
+    stem, ext = os.path.splitext(src)
+    if stem.endswith("-sm"):
+        return path
+    out = stem + "-sm" + ext
+    if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(src):
+        subprocess.run(["convert", src, "-resize", f"{width}x{width}>", "-strip", "-quality", "78", out], capture_output=True)
+    return "/" + os.path.relpath(out, PUB).replace(os.sep, "/") if os.path.exists(out) else None
+
+
+def add_small_copies():
+    """Phone-sized variants for every image the home page, related cards and albums show."""
+    cp = os.path.join(PUB, "content.json")
+    c = json.load(open(cp, encoding="utf-8"))
+    for s in c.get("slides", []):
+        if s.get("banner"):
+            s["bannerSm"] = small_copy(s["banner"], 1200)
+    for key in ("campaigns", "projects"):
+        for it in c.get(key, []):
+            it["imageSm"] = small_copy(it.get("image"), 600)
+    json.dump(c, open(cp, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    pp = os.path.join(PUB, "data", "pages.json")
+    if os.path.exists(pp):
+        pg = json.load(open(pp, encoding="utf-8"))
+        for v in pg.values():
+            v["photoSm"] = small_copy(v.get("photo"), 600)
+        json.dump(pg, open(pp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    ap = os.path.join(PUB, "data", "albums.json")
+    if os.path.exists(ap):
+        al = json.load(open(ap, encoding="utf-8"))
+        for a in al:
+            a["thumbs"] = [small_copy(x, 600) or x for x in a["photos"]]
+        json.dump(al, open(ap, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
+
 if __name__ == "__main__":
     main()
+    add_small_copies()

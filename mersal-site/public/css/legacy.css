@@ -1,0 +1,77 @@
+/* Styles for pages imported from the old site (their HTML uses Bootstrap-like classes). */
+.legacy { line-height: 1.95; font-size: 16.5px; }
+.legacy img { max-width: 100%; height: auto; border-radius: 12px; }
+.legacy .container, .legacy .container-fluid { width: 100%; padding: 0; margin: 0; max-width: none; }
+.legacy .row, .legacy .new-row { display: flex; flex-wrap: wrap; margin-inline: -12px; align-items: flex-start; }
+.legacy .row > *, .legacy .new-row > * { padding-inline: 12px; flex: 1 1 100%; min-width: 0; }
+.legacy .align-items-center { align-items: center; }
+@media (min-width: 768px) {
+  .legacy .col-md-2 { flex: 0 0 16.666%; } .legacy .col-md-3 { flex: 0 0 25%; } .legacy .col-md-4 { flex: 0 0 33.333%; }
+  .legacy .col-md-5 { flex: 0 0 41.666%; } .legacy .col-md-6 { flex: 0 0 50%; } .legacy .col-md-7 { flex: 0 0 58.333%; }
+  .legacy .col-md-8 { flex: 0 0 66.666%; } .legacy .col-md-9 { flex: 0 0 75%; } .legacy .col-md-12 { flex: 0 0 100%; }
+}
+@media (min-width: 992px) {
+  .legacy .col-lg-3 { flex: 0 0 25%; } .legacy .col-lg-4 { flex: 0 0 33.333%; } .legacy .col-lg-6 { flex: 0 0 50%; }
+  .legacy .col-lg-8 { flex: 0 0 66.666%; } .legacy .col-lg-12 { flex: 0 0 100%; }
+}
+.legacy .text-center { text-align: center; }
+.legacy .content-sector { margin-bottom: 36px; }
+.legacy h2, .legacy .content-sector h2 {
+  display: inline-block; background: var(--teal); color: var(--gold); border-radius: 12px 0 12px 0;
+  padding: 4px 26px; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.5; margin: 0 0 20px;
+}
+.legacy h4, .legacy .content-sector h4 {
+  background: var(--teal); color: #fff; border-radius: 0 12px 0 12px; padding: 4px 16px; font-size: 17px; margin: 22px 0 12px; display: block;
+}
+.legacy h3 { color: var(--teal-dark); }
+.legacy h5 { color: var(--teal); font-size: 17px; margin: 16px 0 8px; }
+.legacy ul { list-style: none; padding: 0 !important; margin: 0 0 16px; }
+.legacy ul li { position: relative; padding-inline-start: 34px; margin-bottom: 10px; }
+.legacy ul li .img-icon { position: absolute; inset-inline-start: 0; top: 6px; width: 22px !important; height: 22px; border-radius: 0; }
+.legacy ul li:not(:has(.img-icon))::before {
+  content: "✓"; position: absolute; inset-inline-start: 0; top: 4px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gold); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 800;
+}
+.legacy ol { padding-inline-start: 22px; }
+.legacy p { margin: 0 0 14px; }
+.legacy a { text-decoration: underline; text-underline-offset: 3px; }
+.legacy table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; display: block; overflow-x: auto; }
+.legacy td, .legacy th { border: 1px solid var(--line); padding: 8px 10px; }
+.legacy iframe { max-width: 100%; border: 0; border-radius: 12px; }
+.legacy .box-info-card img:not(.img-icon) { margin-bottom: 12px; }
+.legacy .logo-shape { display: none; }
+.legacy-cover { width: 100%; max-height: 420px; object-fit: cover; margin-bottom: 24px; box-shadow: var(--shadow); }
+.legacy [style*="font-family"] { font-family: inherit !important; }
+
+/* FAQ accordion (Bootstrap markup in the old content) */
+.legacy .accordion-item { border: 0; margin: 0 0 12px; }
+.legacy .accordion-button {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: start;
+  background: var(--teal); color: #fff; border: 0; border-radius: 12px; padding: 14px 18px; cursor: pointer; font: inherit;
+}
+.legacy .accordion-button::after { content: "+"; font-size: 24px; line-height: 1; color: var(--gold); transition: transform .25s; }
+.legacy .accordion-button[aria-expanded="true"]::after { transform: rotate(45deg); }
+.legacy .accordion-button h4 { background: none; padding: 0; margin: 0; font-size: 17px; color: inherit; }
+.legacy .accordion-collapse { overflow: hidden; transition: height .3s ease; }
+.legacy .accordion-collapse:not(.show) { height: 0; }
+.legacy .accordion-body { padding: 14px 6px 6px; }
+.legacy .accordion-body h4 { background: none; color: var(--ink); padding: 0; font-size: 16.5px; font-weight: 600; }
+
+/* Old Bootstrap 3 image carousels inside page content */
+.legacy .slide { position: relative; inset: auto; opacity: 1; visibility: visible; overflow: hidden; background: none; transition: none; }
+.legacy .slide::before { display: none; }
+.legacy .carousel { border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.legacy .carousel > ol { display: none; }
+.legacy .carousel-inner .item { display: none; }
+.legacy .carousel-inner .item.active { display: block; animation: fadein .6s ease; }
+.legacy .carousel-inner img { width: 100%; border-radius: 0; display: block; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+.legacy .do-btn, .legacy a.btn {
+  display: inline-flex; margin: 12px auto 0; padding: 10px 32px; border-radius: 999px; background: var(--gold); color: #fff;
+  font-weight: 700; text-decoration: none;
+}
+.legacy .do-btn:hover { background: var(--gold-dark); color: #fff; }
+.legacy .row:has(> .do-btn) { justify-content: center; }
+.legacy .mt-40 { margin-top: 32px; }
+.legacy .block-card { margin-bottom: 20px; }
+.legacy .row > .do-btn { flex: 0 0 auto; padding-inline: 32px; }

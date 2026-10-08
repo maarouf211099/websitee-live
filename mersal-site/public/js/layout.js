@@ -42,18 +42,24 @@
     ["/zakat.html", "حاسبة الزكاة"],
     ["/contact.html", "تواصل معنا"]
   ];
+  var FOOT = [
+    ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"],
+    ["/p/30.html", "مستشفى مرسال"], ["/p/4.html", "المشاريع"], ["/p/46.html", "فروع مرسال"],
+    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/p/51.html", "الأسئلة الشائعة"]
+  ];
   var here = location.pathname.replace(/index\.html$/, "");
 
   var header =
     '<div class="topbar"><div class="wrap">' +
       '<div class="phones">' +
+        '<a class="zakat-link" href="/zakat.html">حساب الزكاة</a>' +
         '<a href="tel:' + SITE.hotline + '">الخط الساخن: <b>' + SITE.hotline + '</b></a>' +
         '<a href="tel:' + SITE.phone + '">الهاتف: <b dir="ltr">' + SITE.phone + '</b></a>' +
         '<a href="mailto:' + SITE.email + '">' + SITE.email + '</a>' +
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
-      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><img src="/img/logo.png" alt="مؤسسة مرسال" width="61" height="56"></a>' +
+      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><img src="/img/logo-mersal.png" alt="مؤسسة مرسال" width="70" height="43"></a>' +
       '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return '<li><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
@@ -65,12 +71,12 @@
   var footer =
     '<footer class="site-footer"><div class="wrap cols">' +
       "<div>" +
-        '<div class="logo-box"><img src="/img/logo.png" alt="مؤسسة مرسال" width="70" height="64"></div>' +
+        '<div class="logo-box"><img src="/img/logo-mersal.png" alt="مؤسسة مرسال" width="70" height="43"></div>' +
         "<h3>مؤسسة مرسال للأعمال الخيرية والتنموية</h3>" +
         "<p>مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم.</p>" +
         social() +
       "</div>" +
-      "<div><h3>روابط</h3><ul>" + NAV.map(function (n) { return '<li><a href="' + n[0] + '">' + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
+      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + n[0] + '">' + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
       "<div><h3>تواصل معنا</h3><ul>" +
         "<li>" + SITE.address + "</li>" +
         '<li>الخط الساخن: <a href="tel:' + SITE.hotline + '">' + SITE.hotline + "</a></li>" +
@@ -105,6 +111,38 @@
     });
   };
   window.mersalReveal(document.querySelectorAll("main .section-title, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
+
+  // Extra links added to the imported menu groups
+  var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  function navItem(it) {
+    var kids = (it.children || []).slice();
+    (EXTRA[it.title] || []).forEach(function (e, i) { kids.splice(i, 0, { title: e[1], href: e[0] }); });
+    var cur = it.href && here === it.href ? ' aria-current="page"' : "";
+    if (!kids.length) return '<li><a href="' + esc(it.href) + '"' + cur + ">" + esc(it.title) + "</a></li>";
+    var open = kids.some(function (k) { return k.href === here; });
+    return '<li class="has-sub' + (open ? " active" : "") + '"><button type="button" class="sub-toggle" aria-expanded="false">' + esc(it.title) + '<span aria-hidden="true">▾</span></button>' +
+      '<ul class="sub">' + (it.href ? '<li><a href="' + esc(it.href) + '">' + esc(it.title) + "</a></li>" : "") +
+      kids.map(function (k) { return '<li><a href="' + esc(k.href) + '"' + (k.href === here ? ' aria-current="page"' : "") + ">" + esc(k.title) + "</a></li>"; }).join("") + "</ul></li>";
+  }
+  function bindSubs() {
+    document.querySelectorAll("#nav .sub-toggle").forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var li = b.parentNode, was = li.classList.contains("open");
+        document.querySelectorAll("#nav .has-sub.open").forEach(function (x) { x.classList.remove("open"); x.firstChild.setAttribute("aria-expanded", "false"); });
+        if (!was) { li.classList.add("open"); b.setAttribute("aria-expanded", "true"); }
+      });
+    });
+  }
+  document.addEventListener("click", function () {
+    document.querySelectorAll("#nav .has-sub.open").forEach(function (x) { x.classList.remove("open"); x.firstChild.setAttribute("aria-expanded", "false"); });
+  });
+  fetch("/data/menu.json").then(function (r) { return r.json(); }).then(function (tree) {
+    if (!tree || !tree.length) return;
+    document.getElementById("nav").innerHTML = '<li><a href="/"' + (here === "/" ? ' aria-current="page"' : "") + ">الرئيسية</a></li>" + tree.map(navItem).join("");
+    bindSubs();
+  }).catch(function () {});
 
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
   toggle.addEventListener("click", function () {

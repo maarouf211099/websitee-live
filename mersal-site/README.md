@@ -67,6 +67,12 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 - `purpose`: `general | zakat | sadaqa | hospital | oncology | cases`.
 - لو بنك مصر رفض بيانات المتبرع (`customer`)، الدفع بيكمل عادي بس `donor` هيوصل فاضي.
 
+## المحتوى المنقول من الموقع القديم
+`tools/import_old_site.py` بيقرا الموقع القديم (القايمة، كل صفحات الـCMS، السلايدر، طرق التبرع، الأرقام، المشاريع)
+ويكتب `public/p/<id>.html` و`public/img/old/` و`public/data/menu.json` و`public/content.json`.
+الروابط القديمة `/DynamicPage/RenderPage?id=N` بتتحول تلقائياً لـ `/p/N.html`.
+بعد ما الموقع القديم يتقفل، عدّل الصفحات دي مباشرة.
+
 ## تعديل المحتوى
 - الحملات: `public/content.json` (عنوان، نص، صورة، رابط، واختياري `goal`/`raised` لشريط التقدم).
 - أرقام المحافظ/إنستاباي: `WALLETS` أول `public/js/donate.js`.

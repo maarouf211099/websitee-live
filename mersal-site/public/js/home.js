@@ -32,7 +32,14 @@
   function slider(slides) {
     var box = document.getElementById("slides"), dots = document.getElementById("sl-dots"), root = document.getElementById("slider");
     if (!slides || !slides.length) return;
+    var banners = slides.every(function (s) { return s.banner; });
+    if (banners) box.classList.add("banners");
     box.innerHTML = slides.map(function (s, i) {
+      if (s.banner) {
+        return '<div class="slide banner' + (i === 0 ? " on" : "") + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + " / " + slides.length + '">' +
+          (i === 0 ? '<h1 class="sr-only">مؤسسة مرسال للأعمال الخيرية والتنموية</h1>' : "") +
+          '<a href="' + esc(s.link || "/donate.html") + '"><img src="' + esc(s.banner) + '" alt="' + esc(s.alt || "") + '" width="1920" height="570"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + "></a></div>";
+      }
       var heading = i === 0 ? "h1" : "h2";
       var tel = /^tel:/.test(s.link || "");
       return '<div class="slide' + (i === 0 ? " on" : "") + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + " / " + slides.length + '"' +
@@ -82,11 +89,12 @@
   }
 
   // ---------- counters ----------
-  function stats(list) {
+  function stats(list, title) {
     if (!list || !list.length) return;
+    if (title) document.getElementById("stats-title").textContent = title;
     var sec = document.getElementById("stats"), grid = document.getElementById("stats-grid");
     grid.innerHTML = list.map(function (s) {
-      return '<div class="stat"><b data-to="' + Number(s.value || 0) + '">0</b><span>' + esc(s.label) + "</span></div>";
+      return '<div class="stat"><b data-to="' + Number(s.value || 0) + '">0</b>' + (s.suffix ? "<small>" + esc(s.suffix) + "</small>" : "") + "<span>" + esc(s.label) + "</span></div>";
     }).join("");
     sec.hidden = false;
     function run() {
@@ -118,7 +126,7 @@
       }
       return '<article class="card"><div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(c.image) + '\')" role="img" aria-label="' + esc(c.title) + '"></div></div>' +
         '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(c.text) + "</p>" + bar +
-        '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">تبرع للحملة</a></div></article>';
+        '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + (c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
     }).join("");
     var car = track.parentNode;
     function check() { car.classList.toggle("overflow", track.scrollWidth > track.clientWidth + 4); }
@@ -130,7 +138,17 @@
     if (window.mersalReveal) window.mersalReveal(track.children);
   }
 
+  function channels(list) {
+    if (!list || !list.length) return;
+    document.getElementById("channels").innerHTML = list.map(function (c) {
+      return '<div class="card channel">' + (c.image ? '<img src="' + esc(c.image) + '" alt="" loading="lazy">' : "") +
+        "<div><h3>" + esc(c.title) + "</h3><p>" + esc(c.text) + "</p></div></div>";
+    }).join("");
+    document.getElementById("channels-sec").hidden = false;
+    if (window.mersalReveal) window.mersalReveal(document.getElementById("channels").children);
+  }
+
   fetch("/content.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (data) {
-    slider(data.slides); stats(data.stats); campaigns(data.campaigns);
+    slider(data.slides); stats(data.stats, data.statsTitle); campaigns(data.projects && data.projects.length ? data.projects : data.campaigns); channels(data.channels);
   }).catch(function () {});
 })();

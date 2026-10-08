@@ -7,6 +7,7 @@
   ];
 
   var KEY = "mersalPayment";
+  var ONLINE = !!(window.MERSAL_SITE && window.MERSAL_SITE.onlinePayment);
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
   function openTab(id) {
     tabs.forEach(function (t) {
@@ -22,6 +23,7 @@
     });
   });
   var hash = location.hash.replace("#", "");
+  if (!ONLINE && (hash === "online" || !hash)) hash = "bank";
   if (document.getElementById(hash) && document.getElementById(hash).getAttribute("role") === "tabpanel") openTab(hash);
 
   document.querySelectorAll(".copy").forEach(function (b) {
@@ -39,6 +41,12 @@
   }
 
   // ---------- online payment ----------
+  if (!ONLINE) return;
+  var s = document.createElement("script");
+  s.src = "https://banquemisr.gateway.mastercard.com/static/checkout/checkout.min.js";
+  s.setAttribute("data-error", "mersalPayError");
+  s.setAttribute("data-cancel", "mersalPayCancel");
+  document.head.appendChild(s);
   var form = document.getElementById("pay-form"), btn = document.getElementById("pay-btn");
   var result = document.getElementById("pay-result");
   var q = new URLSearchParams(location.search);

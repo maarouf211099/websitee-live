@@ -1,6 +1,8 @@
 // Shared header and footer for every page. Edit contact details here only.
 (function () {
   var SITE = {
+    // Card payment (Banque Misr). false = hidden everywhere until the API settings are added in Azure.
+    onlinePayment: false,
     phone: "01200002870",
     hotline: "19340",
     email: "info@mersal-ngo.org",
@@ -14,6 +16,7 @@
     }
   };
   window.MERSAL_SITE = SITE;
+  if (!SITE.onlinePayment) document.documentElement.classList.add("no-online-pay");
 
   var ICONS = {
     facebook: '<path d="M14 8h3V4h-3c-2.8 0-5 2.2-5 5v2H6v4h3v7h4v-7h3l1-4h-4V9c0-.6.4-1 1-1z"/>',

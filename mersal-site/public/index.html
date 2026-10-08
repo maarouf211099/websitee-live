@@ -30,7 +30,7 @@
           <a class="btn btn-ghost" href="tel:19340">اتصل بالخط الساخن 19340</a>
         </div>
       </div>
-      <form class="hero-card" id="quick-donate" action="/donate.html" method="get">
+      <form class="hero-card only-online" id="quick-donate" action="/donate.html" method="get">
         <h2>تبرّع سريع بالبطاقة</h2>
         <p>اختر المبلغ وسيتم تحويلك لصفحة بنك مصر الآمنة لإتمام التبرع.</p>
         <div class="amounts" role="group" aria-label="المبلغ">
@@ -45,6 +45,13 @@
         </div>
         <button class="btn btn-teal" style="width:100%" type="submit">تبرع الآن</button>
       </form>
+      <div class="hero-card only-offline">
+        <h2>تبرّع لمرسال</h2>
+        <p>اختار الطريقة الأسهل ليك:</p>
+        <div class="bank"><div><b>الخط الساخن - مندوب لحد البيت</b><a href="tel:19340">19340</a></div></div>
+        <div class="bank"><div><b>بنك CIB - بالجنيه</b><code>100034654454</code></div><button class="copy" type="button" data-copy="100034654454">نسخ</button></div>
+        <a class="btn btn-teal" style="width:100%" href="/donate.html">كل طرق التبرع</a>
+      </div>
     </div>
   </section>
 
@@ -54,8 +61,8 @@
         <h2>طرق التبرع</h2>
         <p>حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، اختر الطريقة الأسهل لك.</p>
       </div>
-      <div class="grid grid-4">
-        <a class="card way" href="/donate.html#online">
+      <div class="grid grid-4" id="ways">
+        <a class="card way only-online" href="/donate.html#online">
           <div class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></div>
           <h3>بالبطاقة البنكية</h3><p>ادفع أونلاين بأمان عبر بوابة بنك مصر.</p>
         </a>

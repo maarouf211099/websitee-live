@@ -12,8 +12,6 @@
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>طرق التبرع | مؤسسة مرسال</title>
 <meta name="description" content="تبرع لمؤسسة مرسال بالبطاقة البنكية أو بالتحويل البنكي أو المحافظ الإلكترونية أو من خلال مندوب.">
-<script src="https://banquemisr.gateway.mastercard.com/static/checkout/checkout.min.js"
-        data-error="mersalPayError" data-cancel="mersalPayCancel"></script>
 </head>
 <body>
 <div id="site-header"></div>
@@ -28,7 +26,7 @@
     <div class="wrap layout-side">
       <div>
         <div class="tabs" role="tablist">
-          <button role="tab" id="t-online" aria-controls="online" aria-selected="true">بالبطاقة البنكية</button>
+          <button role="tab" class="only-online" id="t-online" aria-controls="online" aria-selected="true">بالبطاقة البنكية</button>
           <button role="tab" id="t-bank" aria-controls="bank" aria-selected="false">الحسابات البنكية</button>
           <button role="tab" id="t-wallets" aria-controls="wallets" aria-selected="false">المحافظ وإنستاباي</button>
           <button role="tab" id="t-home" aria-controls="home" aria-selected="false">مندوب لحد البيت</button>
@@ -107,7 +105,7 @@
         </div>
 
         <div class="tab-panel" id="abroad" role="tabpanel" aria-labelledby="t-abroad" hidden>
-          <p>للتبرع من خارج مصر يمكنك استخدام البطاقة البنكية من تبويب <b>بالبطاقة البنكية</b>، أو التحويل على حساب مرسال في ألمانيا:</p>
+          <p>للتبرع من خارج مصر <span class="only-online">يمكنك استخدام البطاقة البنكية من تبويب <b>بالبطاقة البنكية</b>، أو </span>التحويل على حساب مرسال في ألمانيا:</p>
           <img src="/img/gls.jpg" alt="حساب Mersal Foundation e.V. في GLS Bank - ألمانيا" style="max-width:420px;border-radius:12px;border:1px solid var(--line)">
           <p style="margin-top:14px"><a class="btn btn-teal" href="http://bit.ly/MersalDonations" target="_blank" rel="noopener">طرق أخرى للتبرع من الخارج</a></p>
         </div>

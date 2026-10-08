@@ -2,6 +2,13 @@
 (function () {
   // Old return URL from the bank (https://www.mersal-ngo.org/?hcoReturn=1) -> donate page
   if (/[?&]hcoReturn=1/.test(location.search)) { location.replace("/donate.html" + location.search); return; }
+  document.querySelectorAll(".copy").forEach(function (b) {
+    b.addEventListener("click", function () {
+      navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(function () {
+        b.textContent = "تم النسخ ✓"; setTimeout(function () { b.textContent = "نسخ"; }, 1500);
+      });
+    });
+  });
   var form = document.getElementById("quick-donate"), input = document.getElementById("qa");
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () {

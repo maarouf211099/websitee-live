@@ -19,6 +19,12 @@ mersal-site/
     verify               يسأل البنك مباشرة؛ التبرع يتحسب بس لو CAPTURED، وبعدها يتبعت للسيستم الجديد
 ```
 
+## الدفع بالبطاقة (مقفول حالياً)
+الدفع بالبطاقة مقفول لحد ما نرجعله: تبويب البطاقة ومربع التبرع السريع مش ظاهرين، وباقي طرق التبرع
+(الحسابات البنكية، المحافظ، المندوب) شغالة عادي. علشان تفتحه:
+1. ضيف إعدادات بنك مصر تحت (`MPGS_MERCHANT`، `MPGS_API_PASSWORD`، `PUBLIC_BASE_URL`).
+2. غيّر `onlinePayment: false` إلى `true` أول `public/js/layout.js` وارفع.
+
 ## النشر على Azure (مرة واحدة)
 1. Azure Portal → **Create a resource → Static Web App**.
 2. Plan: **Free** (فيه دومين مخصص وSSL مجاناً). Region: West Europe.

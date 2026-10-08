@@ -94,7 +94,7 @@
     document.getElementById("z-nisab").textContent = p21 ? fmt.format(nisab) : "—";
     note.textContent = !p21 ? "اكتب سعر جرام الذهب عيار 21 لحساب الذهب والنصاب." :
       (net >= nisab ? "أموالك بلغت النصاب." : "أموالك لم تبلغ النصاب.");
-    document.getElementById("z-pay").href = "/donate.html?for=zakat" + (zakat >= 10 ? "&amount=" + Math.ceil(zakat) : "") + "#online";
+    document.getElementById("z-pay").href = window.MERSAL_SITE.onlinePayment ? "/donate.html?for=zakat" + (zakat >= 10 ? "&amount=" + Math.ceil(zakat) : "") + "#online" : "/donate.html";
   }
   f.addEventListener("input", calc); calc();
 })();

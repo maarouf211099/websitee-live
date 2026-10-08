@@ -200,3 +200,10 @@ section.alt { background: var(--bg-2); }
   .zakat-table td:last-child { width: 46%; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+/* card payment switch (js/layout.js -> onlinePayment) */
+.only-offline { display: none !important; }
+.no-online-pay .only-online { display: none !important; }
+.no-online-pay .only-offline { display: block !important; }
+.no-online-pay #ways { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .no-online-pay #ways { grid-template-columns: 1fr; } }

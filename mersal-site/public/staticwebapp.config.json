@@ -1,24 +1,113 @@
 {
   "routes": [
-    { "route": "/Donation", "redirect": "/donate.html", "statusCode": 301 },
-    { "route": "/Donation/*", "redirect": "/donate.html", "statusCode": 301 },
-    { "route": "/home/ZakahCalculator", "redirect": "/zakat.html", "statusCode": 301 },
-    { "route": "/home/AfiaCard", "redirect": "/afia.html", "statusCode": 301 },
-    { "route": "/Album/*", "redirect": "/albums.html", "statusCode": 301 },
-    { "route": "/home/contactus", "redirect": "/contact.html", "statusCode": 301 },
-    { "route": "/DynamicPage/RenderPage", "rewrite": "/legacy.html" },
-    { "route": "/home/HosbitalDetals", "redirect": "/p/30.html", "statusCode": 301 },
-    { "route": "/home/ProjectListView", "redirect": "/p/4.html", "statusCode": 301 },
-    { "route": "/content.json", "headers": { "Cache-Control": "no-cache" } }
+    {
+      "route": "/admin",
+      "redirect": "/admin/",
+      "statusCode": 301
+    },
+    {
+      "route": "/admin/*",
+      "allowedRoles": [
+        "admin"
+      ],
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow",
+        "Cache-Control": "no-cache"
+      }
+    },
+    {
+      "route": "/api/admin/*",
+      "allowedRoles": [
+        "admin"
+      ]
+    },
+    {
+      "route": "/.auth/login/github",
+      "statusCode": 404
+    },
+    {
+      "route": "/.auth/login/twitter",
+      "statusCode": 404
+    },
+    {
+      "route": "/logout",
+      "redirect": "/.auth/logout?post_logout_redirect_uri=/",
+      "statusCode": 302
+    },
+    {
+      "route": "/Donation",
+      "redirect": "/donate.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/Donation/*",
+      "redirect": "/donate.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/home/ZakahCalculator",
+      "redirect": "/zakat.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/home/AfiaCard",
+      "redirect": "/afia.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/Album/*",
+      "redirect": "/albums.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/home/contactus",
+      "redirect": "/contact.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/DynamicPage/RenderPage",
+      "rewrite": "/legacy.html"
+    },
+    {
+      "route": "/home/HosbitalDetals",
+      "redirect": "/p/30.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/home/ProjectListView",
+      "redirect": "/p/4.html",
+      "statusCode": 301
+    },
+    {
+      "route": "/content.json",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    }
   ],
   "responseOverrides": {
-    "404": { "rewrite": "/404.html", "statusCode": 404 }
+    "401": {
+      "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer",
+      "statusCode": 302
+    },
+    "403": {
+      "rewrite": "/admin/denied.html",
+      "statusCode": 403
+    },
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "X-Frame-Options": "SAMEORIGIN"
   },
-  "mimeTypes": { ".json": "application/json" },
-  "platform": { "apiRuntime": "node:20" }
+  "mimeTypes": {
+    ".json": "application/json"
+  },
+  "platform": {
+    "apiRuntime": "node:20"
+  }
 }

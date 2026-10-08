@@ -26,28 +26,6 @@
       "bannerSm": "/img/old/8177-ee001799-sm.jpg"
     }
   ],
-  "stats": [
-    {
-      "label": "أدوية العلاج الشهري",
-      "value": 5000000,
-      "suffix": "جنيه"
-    },
-    {
-      "label": "وجبات لأطفال الpku",
-      "value": 150000,
-      "suffix": "جنيه"
-    },
-    {
-      "label": "جهاز آشعة متحرك لمشروع الرعايات المركزة",
-      "value": 400000,
-      "suffix": "جنيه"
-    },
-    {
-      "label": "متوسط تكلفة العلاج الشهري لمركز أورام مرسال",
-      "value": 4000000,
-      "suffix": "جنيه"
-    }
-  ],
   "campaigns": [
     {
       "title": "علاج مرضى الأورام",
@@ -56,7 +34,7 @@
       "unit": "جرعة",
       "unitPrice": 500,
       "goal": 20000,
-      "raised": 16600,
+      "raised": 16601,
       "link": "/p/31.html",
       "purpose": "p31",
       "imageSm": "/img/old/20260406130217-46584c7d-sm.jpg"
@@ -68,7 +46,7 @@
       "unit": "سهم",
       "unitPrice": 75,
       "goal": 15000,
-      "raised": 4437,
+      "raised": 4443,
       "link": "/p/52.html",
       "purpose": "p52",
       "imageSm": "/img/old/20230215124111-d72b3d98-sm.jpg"
@@ -80,7 +58,7 @@
       "unit": "سهم",
       "unitPrice": 500,
       "goal": 10000,
-      "raised": 6935,
+      "raised": 6939,
       "link": "/p/30.html",
       "purpose": "p30",
       "imageSm": "/img/old/20230215124414-9748fdf5-sm.jpg"
@@ -127,7 +105,6 @@
       "image": "/img/old/3536unnamed-1c52e3b3.png"
     }
   ],
-  "statsTitle": "احتياجات مرسال",
   "projects": [
     {
       "title": "المنتدى الأول للأمراض النادرة",
@@ -261,6 +238,32 @@
       "image": "/img/old/savers-66549d79.jpg",
       "link": "/p/18.html",
       "imageSm": "/img/old/savers-66549d79-sm.jpg"
+    }
+  ],
+  "numbers": [
+    {
+      "value": 5000,
+      "prefix": "+",
+      "label": "مريض شهرياً في برنامج العلاج الشهري",
+      "link": "/p/37.html"
+    },
+    {
+      "value": 68,
+      "prefix": "",
+      "label": "مستشفى دعمتها قوافل مرسال",
+      "link": "/p/35.html"
+    },
+    {
+      "value": 15,
+      "prefix": "+",
+      "label": "تخصص طبي في عيادات مرسال",
+      "link": "/p/43.html"
+    },
+    {
+      "value": 1400,
+      "prefix": "+",
+      "label": "مريض استضافتهم دار ضيافة مرسال",
+      "link": "/p/32.html"
     }
   ]
 }

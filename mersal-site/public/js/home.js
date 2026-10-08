@@ -28,9 +28,20 @@
     location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "#online";
   });
 
-  // ---------- ticker ----------
-  var tk = document.getElementById("ticker");
-  if (tk && !reduceMotion) tk.innerHTML += tk.innerHTML;
+  // ---------- numbers + ticker (from content.json "numbers") ----------
+  var fmtN = new Intl.NumberFormat("en-US");
+  function numbers(list) {
+    var tk = document.getElementById("ticker"), grid = document.querySelector(".numbers-grid");
+    if (list && list.length) {
+      if (grid) grid.innerHTML = list.map(function (n) {
+        var tag = n.link ? "a" : "div";
+        return "<" + tag + ' class="num"' + (n.link ? ' href="' + esc(n.link) + '"' : "") + '><b data-count="' + Number(n.value || 0) + '" data-prefix="' + esc(n.prefix || "") + '">0</b><span>' + esc(n.label) + "</span></" + tag + ">";
+      }).join("");
+      if (tk) tk.innerHTML = list.map(function (n) { return "<span><b>" + esc(n.prefix || "") + fmtN.format(Number(n.value || 0)) + "</b> " + esc(n.label) + "</span>"; }).join("") +
+        '<span><b>19340</b> الخط الساخن - مندوب لحد البيت</span><span class="hash"><b>#</b>ابعت_فرحة</span>';
+    }
+    if (tk && !reduceMotion) tk.innerHTML += tk.innerHTML;
+  }
 
   // ---------- slider ----------
   function slider(slides) {
@@ -172,9 +183,10 @@
   }
 
 
-  // Count-up numbers in the hospital section
-  (function () {
-    var nums = document.querySelectorAll("[data-count]");
+  // Count-up numbers (hospital facts, numbers band)
+  function countUp() {
+    var nums = document.querySelectorAll("[data-count]:not([data-done])");
+    nums.forEach(function (n) { n.setAttribute("data-done", "1"); });
     function run(el) {
       var to = Number(el.dataset.count), t0 = null, pre = el.dataset.prefix || "";
       if (reduceMotion) { el.textContent = pre + fmt.format(to); return; }
@@ -187,9 +199,9 @@
     if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
     var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } }); }, { threshold: .6 });
     nums.forEach(function (n) { io.observe(n); });
-  })();
+  }
 
   fetch("/content.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (data) {
-    slider(data.slides); donationCampaigns(data.campaigns); campaigns(data.projects);
+    numbers(data.numbers); countUp(); slider(data.slides); donationCampaigns(data.campaigns); campaigns(data.projects);
   }).catch(function () {});
 })();

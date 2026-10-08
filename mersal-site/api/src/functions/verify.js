@@ -3,6 +3,7 @@
 // CAPTURED with a successful PAYMENT; only then is it forwarded to the new system.
 const { app } = require("@azure/functions");
 const { cfg, mpgs, forwardDonation } = require("../lib/mpgs");
+const donations = require("../lib/donations");
 
 app.http("verify", {
   methods: ["GET"],
@@ -31,7 +32,7 @@ app.http("verify", {
 
     if (paid) {
       const purpose = String(o.description || "").split(" - ")[1] || "general";
-      await forwardDonation({
+      const donation = {
         source: "mersal-website",
         orderId: o.id,
         amount: Number(o.amount),
@@ -45,7 +46,9 @@ app.http("verify", {
         paidAt: payment.timeOfRecord || o.lastUpdatedTime || new Date().toISOString(),
         gatewayTransactionId: payment.transaction?.id || null,
         receipt: payment.transaction?.receipt || null,
-      }, (...a) => ctx.warn(...a));
+      };
+      await donations.record(donation).catch((e) => ctx.warn("donation record failed", e.message));
+      await forwardDonation(donation, (...a) => ctx.warn(...a));
     }
 
     return {

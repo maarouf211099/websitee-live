@@ -88,7 +88,11 @@
   function renderSlides() {
     $("#slides").innerHTML = (content.slides || []).map(function (s, i) {
       return '<div class="item" data-i="' + i + '"><img class="thumb wide" src="' + esc(s.bannerSm || s.banner || "") + '" alt="">' +
-        '<div class="fields"><div class="field"><label>الرابط عند الضغط</label><input data-k="link" value="' + esc(s.link || "/donate.html") + '"></div>' +
+        '<div class="fields"><div class="field"><label>العنوان (بيظهر على الموبايل)</label><input data-k="title" value="' + esc(s.title || "") + '"></div>' +
+        '<div class="field"><label>سطر تحت العنوان</label><input data-k="text" value="' + esc(s.text || "") + '"></div>' +
+        '<div class="field"><label>نص الزرار</label><input data-k="button" value="' + esc(s.button || "تبرع الآن") + '"></div>' +
+        '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" value="' + esc(s.link || "/donate.html") + '"></div>' +
+        '<div class="field"><label>مكان الصورة على الموبايل (مثال 20% 50%)</label><input data-k="focus" value="' + esc(s.focus || "20% 50%") + '"></div>' +
         '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div></div>' +
         '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
@@ -149,7 +153,7 @@
   listActions("#slides", "slides", renderSlides, { big: 1920, sm: 1200 });
   listActions("#campaigns", "campaigns", renderCampaigns, { big: 900, sm: 600 });
   listActions("#numbers", "numbers", renderNumbers, {});
-  $("#add-slide").onclick = function () { collect("#slides", "slides"); (content.slides = content.slides || []).push({ banner: "", bannerSm: "", link: "/donate.html", alt: "" }); renderSlides(); };
+  $("#add-slide").onclick = function () { collect("#slides", "slides"); (content.slides = content.slides || []).push({ banner: "", bannerSm: "", title: "", text: "", button: "تبرع الآن", link: "/donate.html", focus: "20% 50%", alt: "" }); renderSlides(); };
   $("#add-campaign").onclick = function () { collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised"]); (content.campaigns = content.campaigns || []).push({ title: "حملة جديدة", text: "", image: "", imageSm: "", unit: "سهم", unitPrice: 0, goal: 0, raised: 0, link: "/donate.html", purpose: "general" }); renderCampaigns(); };
   $("#add-number").onclick = function () { collect("#numbers", "numbers", ["value"]); (content.numbers = content.numbers || []).push({ value: 0, prefix: "", label: "", link: "" }); renderNumbers(); };
   $("#save-home").onclick = function () {

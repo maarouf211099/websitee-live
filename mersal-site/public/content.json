@@ -3,27 +3,43 @@
   "slides": [
     {
       "banner": "/img/old/9270-381d6513.jpg",
-      "link": "/donate.html",
-      "alt": "مؤسسة مرسال",
-      "bannerSm": "/img/old/9270-381d6513-sm.jpg"
+      "link": "/donate.html#online",
+      "alt": "ابعت فرحة - لمرضى مرسال",
+      "bannerSm": "/img/old/9270-381d6513-sm.jpg",
+      "title": "ابعت فرحة",
+      "text": "لمرضى مرسال",
+      "button": "تبرع الآن",
+      "focus": "20% 50%"
     },
     {
       "banner": "/img/old/9770-c30d41fe.jpg",
-      "link": "/donate.html",
-      "alt": "مؤسسة مرسال",
-      "bannerSm": "/img/old/9770-c30d41fe-sm.jpg"
+      "link": "/donate.html?amount=500#online",
+      "alt": "احتياجاتهم من اختيارهم - سعر الكارت 500 جنيه",
+      "bannerSm": "/img/old/9770-c30d41fe-sm.jpg",
+      "title": "احتياجاتهم من اختيارهم",
+      "text": "سعر الكارت 500 جنيه",
+      "button": "ساهم بكارت",
+      "focus": "18% 50%"
     },
     {
       "banner": "/img/old/2791-aca7e195.jpg",
-      "link": "/donate.html",
-      "alt": "مؤسسة مرسال",
-      "bannerSm": "/img/old/2791-aca7e195-sm.jpg"
+      "link": "/donate.html?for=p42&amount=750#online",
+      "alt": "شارك في كفالة أسرة مريض - قيمة سهم الكفالات 750 جنيه",
+      "bannerSm": "/img/old/2791-aca7e195-sm.jpg",
+      "title": "شارك في كفالة أسرة مريض",
+      "text": "قيمة سهم الكفالات 750 جنيه",
+      "button": "اكفل أسرة",
+      "focus": "18% 50%"
     },
     {
       "banner": "/img/old/8177-ee001799.jpg",
-      "link": "/donate.html",
-      "alt": "مؤسسة مرسال",
-      "bannerSm": "/img/old/8177-ee001799-sm.jpg"
+      "link": "/donate.html?for=p31&amount=500#online",
+      "alt": "انقذ حياة مريض أورام - سهم مركز مرسال للأورام 500 جنيه",
+      "bannerSm": "/img/old/8177-ee001799-sm.jpg",
+      "title": "انقذ حياة مريض أورام",
+      "text": "سهم مركز مرسال للأورام 500 جنيه",
+      "button": "تبرع بسهم",
+      "focus": "20% 50%"
     }
   ],
   "campaigns": [

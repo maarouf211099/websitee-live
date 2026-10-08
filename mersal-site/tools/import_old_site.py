@@ -341,9 +341,49 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
         projs.append({"title": pages[pid]["title"], "text": pages[pid]["desc"][:110],
                       "image": img or "/img/hero.jpg", "link": f"/p/{pid}.html"})
     content["projects"] = projs
+
+    # Donation campaigns with goals (old home "التبرعات" cards). The old site calls this
+    # endpoint with the fixed anonymous-visitor token that ships in its public JS.
+    token = os.environ.get("OLD_SITE_ANON_TOKEN")
+    if not token:
+        js = os.path.join(ROOT, "..", "Scripts", "MersalScripts", "CommenHeader.js")
+        if os.path.exists(js):
+            m = re.search(r'"Authorization":\s*"([^"]{100,})"', open(js, encoding="utf-8", errors="replace").read())
+            token = m.group(1) if m else None
+    camps = []
+    if token:
+        r = subprocess.run(["curl", "-sS", "-m", "90", "--retry", "4", "--retry-all-errors", "-f",
+                            "-H", "Accept: application/json", "-H", "Id: 0", "-H", "Authorization: " + token,
+                            API + "/CampaignsHomeCounter/GetAllCampaignsDonationsAmount"], capture_output=True)
+        try:
+            rows = json.loads(r.stdout.decode("utf-8-sig")) if r.returncode == 0 else []
+        except ValueError:
+            rows = []
+        for c in rows:
+            pid = str(c.get("ProjectDestinationId") or "")
+            def num(v):
+                try:
+                    return float(str(v).replace(",", ""))
+                except ValueError:
+                    return 0.0
+            camps.append({
+                "title": (c.get("TitleAr") or "").strip(),
+                "text": (c.get("DescriptionAr") or "").strip(),
+                "image": local_image(c.get("ImageURL"), max_w=900) or "/img/hero.jpg",
+                "unit": (c.get("GoalUnit") or "").strip(),
+                "unitPrice": int(num(c.get("GoalAverageAmount"))),
+                "goal": int(num(c.get("GoalTotal"))),
+                "raised": int(num(c.get("AchievedAmount"))),
+                "link": f"/p/{pid}.html" if pid.isdigit() and int(pid) in pages else "/donate.html",
+                "purpose": f"p{pid}" if pid.isdigit() else "general",
+            })
+    else:
+        print("  ! no anonymous token: donation campaigns skipped")
+    if camps:
+        content["campaigns"] = camps
     with open(content_path, "w", encoding="utf-8") as f:
         json.dump(content, f, ensure_ascii=False, indent=2)
-    print(f"done: {len(pages)} pages, {len(slides)} slides, {len(channels)} channels, {len(stats)} stats, {len(projs)} projects, {len(os.listdir(IMG_DIR))} images")
+    print(f"done: {len(content.get('campaigns', []))} campaigns, {len(pages)} pages, {len(slides)} slides, {len(channels)} channels, {len(stats)} stats, {len(projs)} projects, {len(os.listdir(IMG_DIR))} images")
 
 
 if __name__ == "__main__":

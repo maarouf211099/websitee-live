@@ -614,3 +614,38 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
   .quick-donate .amounts button { padding: 8px 0; font-size: 14.5px; }
   .quick-donate .qd-go { grid-column: 2; grid-row: 1; padding: 8px 18px; font-size: 14px; width: auto; }
 }
+
+/* ===== donation campaigns (old home "التبرعات") ===== */
+.campaigns-sec { padding-top: 40px; }
+.camp-carousel .car-track { grid-auto-columns: calc((100% - 40px) / 3); }
+.camp { overflow: hidden; }
+.camp-img { display: block; overflow: hidden; background: var(--teal-soft); }
+.camp-img img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; transition: transform .6s ease; }
+.camp:hover .camp-img img { transform: scale(1.04); }
+.camp h3 a { color: var(--teal-dark); }
+.unit-price { display: inline-block; align-self: flex-start; background: #fdf3d8; color: #8a6400; border-radius: 999px; padding: 3px 12px; font-size: 13.5px; }
+.unit-price b { color: #6b4e00; }
+.goal-box { background: var(--bg-2); border-radius: 14px; padding: 12px 14px; margin-top: 4px; }
+.goal-top, .goal-bottom { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--muted); }
+.goal-top b { color: var(--teal-dark); font-size: 16px; }
+.goal-top .pct { font-weight: 800; color: var(--gold-dark); }
+.goal-box .progress { height: 10px; margin: 8px 0 6px; background: #e3ecec; }
+.goal-box .progress i { width: 0; background: linear-gradient(90deg, var(--gold), var(--gold-dark)); transition: width 1.4s cubic-bezier(.2,.7,.2,1); }
+.camp-actions { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-top: 10px; }
+.camp-actions .btn { margin: 0; padding: 10px 8px; }
+@media (max-width: 960px) { .camp-carousel .car-track { grid-auto-columns: calc((100% - 20px) / 2); } }
+@media (max-width: 760px) {
+  .camp-carousel .car-track { grid-auto-columns: 82%; }
+  .campaigns-sec { padding-top: 28px; }
+}
+
+/* slider a bit bigger */
+.slides.banners { max-width: 1400px; }
+@media (min-width: 1300px) { .slides.banners ~ .sl-prev { right: calc(50% - 700px - 22px); } .slides.banners ~ .sl-next { left: calc(50% - 700px - 22px); } }
+@media (max-width: 1460px) and (min-width: 1300px) { .slides.banners { margin-inline: 24px; } .slides.banners ~ .sl-prev { right: 8px; } .slides.banners ~ .sl-next { left: 8px; } }
+@media (max-width: 760px) {
+  .slides.banners { margin-inline: 8px; border-radius: 14px; }
+  .slide.banner img { aspect-ratio: 1920 / 680; object-position: center; }
+  .slider:has(.slides.banners) { padding-top: 10px; }
+}
+.camp-img img { height: auto; }

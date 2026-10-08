@@ -46,22 +46,59 @@
   ],
   "campaigns": [
     {
-      "title": "مستشفى مرسال الخيري",
-      "text": "علاج المرضى غير القادرين وتوفير الرعاية الطبية بالمجان أو بتكلفة رمزية.",
-      "image": "/img/hosbitalbackground.jpeg",
-      "link": "/donate.html?for=hospital"
+      "title": "علاج مرضى الأورام",
+      "text": "علاج مرضى الأورام",
+      "image": "/img/old/20260406130217-46584c7d.jpg",
+      "unit": "جرعة",
+      "unitPrice": 500,
+      "goal": 20000,
+      "raised": 16600,
+      "link": "/p/31.html",
+      "purpose": "p31"
     },
     {
-      "title": "مركز مرسال للأورام",
-      "text": "مساندة مرضى الأورام في رحلة العلاج: الأدوية، الجلسات، والمتابعة.",
-      "image": "/img/img-02.png",
-      "link": "/donate.html?for=oncology"
+      "title": "مشروع الحضانات",
+      "text": "مشروع حضانات مرسال",
+      "image": "/img/old/20230215124111-d72b3d98.jpg",
+      "unit": "سهم",
+      "unitPrice": 75,
+      "goal": 15000,
+      "raised": 4437,
+      "link": "/p/52.html",
+      "purpose": "p52"
     },
     {
-      "title": "حالات تحتاج مساندة",
-      "text": "حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، ويمكنك التبرع لحالة أو أكثر.",
-      "image": "/img/img-01.png",
-      "link": "/donate.html?for=cases"
+      "title": "مستشفى مرسال للأطفال",
+      "text": "مستشفى مرسال للأطفال",
+      "image": "/img/old/20230215124414-9748fdf5.jpg",
+      "unit": "سهم",
+      "unitPrice": 500,
+      "goal": 10000,
+      "raised": 6935,
+      "link": "/p/30.html",
+      "purpose": "p30"
+    },
+    {
+      "title": "كفالات مرضى",
+      "text": "كفالات مرضى",
+      "image": "/img/old/20260830103226-a28fe23c.jpg",
+      "unit": "سهم",
+      "unitPrice": 750,
+      "goal": 20000,
+      "raised": 0,
+      "link": "/p/42.html",
+      "purpose": "p42"
+    },
+    {
+      "title": "علاج شهري",
+      "text": "سهم علاج شهري",
+      "image": "/img/old/20260406221511-c43c274e.jpg",
+      "unit": "سهم",
+      "unitPrice": 100,
+      "goal": 500000,
+      "raised": 158328,
+      "link": "/p/37.html",
+      "purpose": "p37"
     }
   ],
   "channels": [

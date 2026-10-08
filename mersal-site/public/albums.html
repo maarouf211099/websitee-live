@@ -6,7 +6,7 @@
 <link rel="icon" type="image/png" href="/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
@@ -59,7 +59,7 @@
     var box = document.getElementById("albums");
     box.innerHTML = albums.map(function (a, i) {
       return '<button type="button" class="card album" data-i="' + i + '">' +
-        '<div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(a.photos[0]) + '\')"></div></div>' +
+        '<div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc((a.thumbs || a.photos)[0]) + '\')"></div></div>' +
         '<div class="body"><h3>' + esc(a.title) + '</h3><p>' + a.photos.length + ' صورة' + (a.date ? " · " + esc(a.date.slice(0, 4)) : "") + "</p></div></button>";
     }).join("");
     box.querySelectorAll(".album").forEach(function (b) { b.addEventListener("click", function () { open(albums[+b.dataset.i], 0); }); });

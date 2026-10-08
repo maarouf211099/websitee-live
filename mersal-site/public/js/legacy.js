@@ -83,7 +83,7 @@
       sec.innerHTML = '<div class="wrap"><div class="section-title"><h2>' + (parent ? esc(parent.title) : "صفحات أخرى") + '</h2></div><div class="grid grid-3">' +
         sibs.map(function (k) {
           var id = (k.href.match(/(\d+)/) || [])[1], pg = pages[id] || {};
-          return '<a class="card" href="' + esc(k.href) + '"><div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(pg.photo || "/img/hero.jpg") + '\')"></div></div>' +
+          return '<a class="card" href="' + esc(k.href) + '"><div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(pg.photoSm || pg.photo || "/img/hero.jpg") + '\')"></div></div>' +
             '<div class="body"><h3>' + esc(k.title) + "</h3><p>" + esc((pg.desc || "").slice(0, 90)) + "…</p></div></a>";
         }).join("") + "</div></div>";
       var cta = main.querySelector(".cta-band");

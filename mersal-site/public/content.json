@@ -4,22 +4,26 @@
     {
       "banner": "/img/old/9270-381d6513.jpg",
       "link": "/donate.html",
-      "alt": "مؤسسة مرسال"
+      "alt": "مؤسسة مرسال",
+      "bannerSm": "/img/old/9270-381d6513-sm.jpg"
     },
     {
       "banner": "/img/old/9770-c30d41fe.jpg",
       "link": "/donate.html",
-      "alt": "مؤسسة مرسال"
+      "alt": "مؤسسة مرسال",
+      "bannerSm": "/img/old/9770-c30d41fe-sm.jpg"
     },
     {
       "banner": "/img/old/2791-aca7e195.jpg",
       "link": "/donate.html",
-      "alt": "مؤسسة مرسال"
+      "alt": "مؤسسة مرسال",
+      "bannerSm": "/img/old/2791-aca7e195-sm.jpg"
     },
     {
       "banner": "/img/old/8177-ee001799.jpg",
       "link": "/donate.html",
-      "alt": "مؤسسة مرسال"
+      "alt": "مؤسسة مرسال",
+      "bannerSm": "/img/old/8177-ee001799-sm.jpg"
     }
   ],
   "stats": [
@@ -54,7 +58,8 @@
       "goal": 20000,
       "raised": 16600,
       "link": "/p/31.html",
-      "purpose": "p31"
+      "purpose": "p31",
+      "imageSm": "/img/old/20260406130217-46584c7d-sm.jpg"
     },
     {
       "title": "مشروع الحضانات",
@@ -65,7 +70,8 @@
       "goal": 15000,
       "raised": 4437,
       "link": "/p/52.html",
-      "purpose": "p52"
+      "purpose": "p52",
+      "imageSm": "/img/old/20230215124111-d72b3d98-sm.jpg"
     },
     {
       "title": "مستشفى مرسال للأطفال",
@@ -76,7 +82,8 @@
       "goal": 10000,
       "raised": 6935,
       "link": "/p/30.html",
-      "purpose": "p30"
+      "purpose": "p30",
+      "imageSm": "/img/old/20230215124414-9748fdf5-sm.jpg"
     },
     {
       "title": "كفالات مرضى",
@@ -87,7 +94,8 @@
       "goal": 20000,
       "raised": 0,
       "link": "/p/42.html",
-      "purpose": "p42"
+      "purpose": "p42",
+      "imageSm": "/img/old/20260830103226-a28fe23c-sm.jpg"
     },
     {
       "title": "علاج شهري",
@@ -98,7 +106,8 @@
       "goal": 500000,
       "raised": 158328,
       "link": "/p/37.html",
-      "purpose": "p37"
+      "purpose": "p37",
+      "imageSm": "/img/old/20260406221511-c43c274e-sm.jpg"
     }
   ],
   "channels": [
@@ -124,115 +133,134 @@
       "title": "المنتدى الأول للأمراض النادرة",
       "text": "منتدى الأمراض النادرة نحو رعاية صحية أكثر شمولًا وإنصافًا عن المؤتمر تنظم مؤسسة مرسال مؤتمرها تحت عنوان \"منتدى",
       "image": "/img/old/inline-babf970b69.jpg",
-      "link": "/p/54.html"
+      "link": "/p/54.html",
+      "imageSm": "/img/old/inline-babf970b69-sm.jpg"
     },
     {
       "title": "مركز الحالات الحرجة للأطفال حديثي الولادة",
       "text": "مشروع حضانات مرسال بدأت فكرة المشروع من حضانات مرسال. عندما قدمت مرسال للمرضى غير القادرين 12 محضن بأجهزتهم، و",
       "image": "/img/old/newborn-5cf8b010.jpeg",
-      "link": "/p/52.html"
+      "link": "/p/52.html",
+      "imageSm": "/img/old/newborn-5cf8b010-sm.jpeg"
     },
     {
       "title": "متجر مرسال",
       "text": "متجر مرسال يعد متجر مرسال أحد المشاريع في مؤسسة مرسال، وتعود أرباحه للمساعدة في علاج المرضى كمشروع استدامة مرب",
       "image": "/img/old/lo-c47a5bef.svg",
-      "link": "/p/45.html"
+      "link": "/p/45.html",
+      "imageSm": null
     },
     {
       "title": "أكاديمية مرسال",
       "text": "أكاديمية مرسال تهدف الأكاديمية لعمل برامج تعليمية في مجالات الإدارة وإدارة الأعمال لتكون مصدراً للتدريب على ال",
       "image": "/img/old/facebook-9f27cf13.png",
-      "link": "/p/44.html"
+      "link": "/p/44.html",
+      "imageSm": "/img/old/facebook-9f27cf13-sm.png"
     },
     {
       "title": "عيادات مرسال",
       "text": "عيادات مرسال توفر عيادات مرسال الخدمة الطبية بأعلى مستوى من الكفاءة للمرضى القادرين وغير القادرين. يوجد أكثر م",
       "image": "/img/old/clinics-7283e9d3.jpg",
-      "link": "/p/43.html"
+      "link": "/p/43.html",
+      "imageSm": "/img/old/clinics-7283e9d3-sm.jpg"
     },
     {
       "title": "كفالات أسر المرضى",
       "text": "كفالات أسر المرضى تحاول مرسال تقديم خدمة تكاملية للمرضى وتسعى لتحسين الحياة ولهذا تقوم من خلال مشروع الكفالات ",
       "image": "/img/old/family-541d8c42.jpg",
-      "link": "/p/42.html"
+      "link": "/p/42.html",
+      "imageSm": "/img/old/family-541d8c42-sm.jpg"
     },
     {
       "title": "سداد ديون المرضى",
       "text": "سداد ديون المرضى قد يقع العبء المادي على المرضى بشكل يمنعهم من القدرة على السداد وذلك بسبب ارتفاع تكلفة الخدما",
       "image": "/img/old/patients-7d3371fe.jpg",
-      "link": "/p/40.html"
+      "link": "/p/40.html",
+      "imageSm": "/img/old/patients-7d3371fe-sm.jpg"
     },
     {
       "title": "العمليات الجراحية",
       "text": "العمليات الجراحية يعاني المرضى من أمراض لابد من علاجها بتدخل جراحي، للحفاظ على حياتهم، ومنع أية مضاعفات مُحتمل",
       "image": "/img/old/surgeries-bb159cf7.jpg",
-      "link": "/p/39.html"
+      "link": "/p/39.html",
+      "imageSm": "/img/old/surgeries-bb159cf7-sm.jpg"
     },
     {
       "title": "الكشف الطبي والفحوصات",
       "text": "الكشف الطبي والفحوصات توفر مرسال خدمة الكشف الطبي للمرضى غير القادرين، وذلك بغرض اكتشاف المرض أو الفحص الدوري ",
       "image": "/img/old/medical-b4e6b27d.jpg",
-      "link": "/p/38.html"
+      "link": "/p/38.html",
+      "imageSm": "/img/old/medical-b4e6b27d-sm.jpg"
     },
     {
       "title": "خدمة العلاج الشهري",
       "text": "خدمة العلاج الشهري يعاني مرضى الأمراض المزمنة من ارتفاع تكلفة الأدوية التي لا يستطيعون توفيرها شهريًا؛ ولهذا ت",
       "image": "/img/old/services-0bc4a092.jpg",
-      "link": "/p/37.html"
+      "link": "/p/37.html",
+      "imageSm": "/img/old/services-0bc4a092-sm.jpg"
     },
     {
       "title": "مشروع الدعم النفسي",
       "text": "مشروع الدعم النفسي تؤمن مرسال بأهمية تكامل الخدمات الطبية المقدمة للمرضى وذويهم، ولذلك تقوم مرسال بتوفير جلسات",
       "image": "/img/old/psycho-9cc0e60e.jpg",
-      "link": "/p/36.html"
+      "link": "/p/36.html",
+      "imageSm": "/img/old/psycho-9cc0e60e-sm.jpg"
     },
     {
       "title": "قوافل مرسال",
       "text": "قوافل مرسال يستمر سعي مرسال في تقديم الخدمات التكاملية مع مقدمي الخدمات الطبية ولهذا يشارك فريق القوافل بمرسال",
       "image": "/img/old/mersal-ee82f575.jpg",
-      "link": "/p/35.html"
+      "link": "/p/35.html",
+      "imageSm": "/img/old/mersal-ee82f575-sm.jpg"
     },
     {
       "title": "مشروع علاج مرض الـ PKU",
       "text": "مشروع علاج مرض الـ PKU مرض الـ PKU هو أحد أمراض التمثيل الغذائي والتي يتم اكتشافها في الأسابيع الأولى من ولادة",
       "image": "/img/old/pku-2427afff.jpg",
-      "link": "/p/34.html"
+      "link": "/p/34.html",
+      "imageSm": "/img/old/pku-2427afff-sm.jpg"
     },
     {
       "title": "مشروع حكاية صوت",
       "text": "مشروع حكاية صوت قد يكون العلاج بسيطاً فقط يحتاج دعم حتى يتحقق الشفاء. هذا هو الحال مع ضعاف السمع والصم الذين ي",
       "image": "/img/old/sout-70432c7e.jpg",
-      "link": "/p/33.html"
+      "link": "/p/33.html",
+      "imageSm": "/img/old/sout-70432c7e-sm.jpg"
     },
     {
       "title": "دار ضيافة مرسال",
       "text": "دار ضيافة مرسال توفر دار ضيافة مرسال إقامة مجانية بمحافظة القاهرة للمرضى المغتربين الذين يواجهون عدم القدرة عل",
       "image": "/img/old/unnam-7b9de1dd.jpg",
-      "link": "/p/32.html"
+      "link": "/p/32.html",
+      "imageSm": "/img/old/unnam-7b9de1dd-sm.jpg"
     },
     {
       "title": "مركز مرسال لعلاج الأورام",
       "text": "مستشفى مرسال للأطفال مستشفى مرسال للأطفال حرصاً من مرسال على دعم القطاع الصحي وتطبيقاً لحق كل فرد في الرعاية ا",
       "image": "/img/old/1-ce3f944d.jpg",
-      "link": "/p/31.html"
+      "link": "/p/31.html",
+      "imageSm": "/img/old/1-ce3f944d-sm.jpg"
     },
     {
       "title": "مستشفى مرسال للأطفال",
       "text": "مستشفى مرسال للأطفال حرصاً من مرسال على دعم القطاع الصحي وتطبيقاً لحق كل فرد في الرعاية الصحية المتكاملة، نكمل",
       "image": "/img/old/1-ce3f944d.jpg",
-      "link": "/p/30.html"
+      "link": "/p/30.html",
+      "imageSm": "/img/old/1-ce3f944d-sm.jpg"
     },
     {
       "title": "مشروع الـ PKU",
       "text": "مرض الـ PKU : هو أحد الأمراض الوراثية النادرة عالميًا لكنه من أكثر الأمراض الغذائية انتشارًا رغم إن اكتشافه يت",
       "image": "/img/old/4260d24f89e3bfa-29d2887f.jpg",
-      "link": "/p/20.html"
+      "link": "/p/20.html",
+      "imageSm": "/img/old/4260d24f89e3bfa-29d2887f-sm.jpg"
     },
     {
       "title": "فريق طوارئ مرسال",
       "text": "فريق طوارئ مرسال تهدف مرسال لأن تصبح المنقذ الأول لكافة المرضى بتقديم الدعم الفوري العاجل، فتوفر بمشروع الطوار",
       "image": "/img/old/savers-66549d79.jpg",
-      "link": "/p/18.html"
+      "link": "/p/18.html",
+      "imageSm": "/img/old/savers-66549d79-sm.jpg"
     }
   ]
 }

@@ -19,20 +19,29 @@
 <div id="site-header"></div>
 
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <div>
-        <img class="tag" src="/img/far7aa.png" alt="#ابعت_فرحة" width="187" height="56">
-        <h1>مؤسسة مرسال للأعمال الخيرية والتنموية</h1>
-        <p>مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية، وإحداث فارق إيجابي في مستوى حياتهم.</p>
-        <div class="actions">
-          <a class="btn btn-gold" href="/donate.html">تبرع الآن</a>
-          <a class="btn btn-ghost" href="tel:19340">اتصل بالخط الساخن 19340</a>
+  <section class="slider" id="slider" aria-roledescription="carousel" aria-label="أخبار مرسال">
+    <div class="slides" id="slides">
+      <div class="slide on">
+        <div class="sl-bg" style="background-image:url('/img/hero.jpg')"></div>
+        <div class="wrap slide-inner">
+          <div class="sl-text">
+            <img class="tag" src="/img/far7aa.png" alt="#ابعت_فرحة" width="187" height="56">
+            <h1>مؤسسة مرسال للأعمال الخيرية والتنموية</h1>
+            <p>مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية، وإحداث فارق إيجابي في مستوى حياتهم.</p>
+            <div class="actions"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a></div>
+          </div>
         </div>
       </div>
+    </div>
+    <button class="sl-arrow sl-prev" type="button" aria-label="السابق">&#8250;</button>
+    <button class="sl-arrow sl-next" type="button" aria-label="التالي">&#8249;</button>
+    <div class="sl-dots" id="sl-dots" role="tablist"></div>
+  </section>
+
+  <section class="quick-bar">
+    <div class="wrap">
       <form class="hero-card only-online" id="quick-donate" action="/donate.html" method="get">
         <h2>تبرّع سريع بالبطاقة</h2>
-        <p>اختر المبلغ وسيتم تحويلك لصفحة بنك مصر الآمنة لإتمام التبرع.</p>
         <div class="amounts" role="group" aria-label="المبلغ">
           <button type="button" data-v="100">100</button>
           <button type="button" data-v="250" class="on">250</button>
@@ -45,13 +54,18 @@
         </div>
         <button class="btn btn-teal" style="width:100%" type="submit">تبرع الآن</button>
       </form>
-      <div class="hero-card only-offline">
-        <h2>تبرّع لمرسال</h2>
-        <p>اختار الطريقة الأسهل ليك:</p>
-        <div class="bank"><div><b>الخط الساخن - مندوب لحد البيت</b><a href="tel:19340">19340</a></div></div>
-        <div class="bank"><div><b>بنك CIB - بالجنيه</b><code>100034654454</code></div><button class="copy" type="button" data-copy="100034654454">نسخ</button></div>
-        <a class="btn btn-teal" style="width:100%" href="/donate.html">كل طرق التبرع</a>
+      <div class="hero-card quick-offline only-offline">
+        <div class="qo-item"><span>الخط الساخن - مندوب لحد البيت</span><a href="tel:19340"><b>19340</b></a></div>
+        <div class="qo-item"><span>بنك CIB - بالجنيه</span><span><code>100034654454</code> <button class="copy" type="button" data-copy="100034654454">نسخ</button></span></div>
+        <a class="btn btn-gold" href="/donate.html">كل طرق التبرع</a>
       </div>
+    </div>
+  </section>
+
+  <section class="stats" id="stats" hidden>
+    <div class="wrap">
+      <div class="section-title"><h2 id="stats-title">التبرعات</h2><p>حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، كما يمكنك التبرع لحالة أو أكثر.</p></div>
+      <div class="grid grid-4" id="stats-grid"></div>
     </div>
   </section>
 
@@ -84,8 +98,19 @@
 
   <section class="alt">
     <div class="wrap">
-      <div class="section-title"><h2>الحملات</h2></div>
-      <div class="grid grid-3" id="campaigns"></div>
+      <div class="section-title"><h2>مشاريع مرسال</h2></div>
+      <div class="carousel">
+        <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8250;</button>
+        <div class="car-track" id="campaigns"></div>
+        <button class="car-arrow car-next" type="button" aria-label="التالي">&#8249;</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="channels-sec" hidden>
+    <div class="wrap">
+      <div class="section-title"><h2>طرق أخرى للتبرع</h2></div>
+      <div class="grid grid-3" id="channels"></div>
     </div>
   </section>
 

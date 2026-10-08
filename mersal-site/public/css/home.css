@@ -311,4 +311,4 @@
 .camp-share { display: inline-flex; align-items: center; gap: 6px; font: 700 13px "Cairo", sans-serif; color: var(--muted); background: none; border: 0; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
 .camp-share svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .camp-share:hover, .camp-share:active { color: var(--teal); background: var(--teal-soft); }
-.odo > span { font-size: inherit; color: inherit; font-weight: inherit; font-family: inherit; margin: 0; }
+.odo span { font-size: inherit; color: inherit; font-weight: inherit; font-family: inherit; margin: 0; }

@@ -1,0 +1,23 @@
+{
+  "_note": "Edit this file to change the campaigns on the home page. image = path under /img. goal/raised are optional (EGP); leave them out to hide the progress bar.",
+  "campaigns": [
+    {
+      "title": "مستشفى مرسال الخيري",
+      "text": "علاج المرضى غير القادرين وتوفير الرعاية الطبية بالمجان أو بتكلفة رمزية.",
+      "image": "/img/hosbitalbackground.jpeg",
+      "link": "/donate.html?for=hospital"
+    },
+    {
+      "title": "مركز مرسال للأورام",
+      "text": "مساندة مرضى الأورام في رحلة العلاج: الأدوية، الجلسات، والمتابعة.",
+      "image": "/img/img-02.png",
+      "link": "/donate.html?for=oncology"
+    },
+    {
+      "title": "حالات تحتاج مساندة",
+      "text": "حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، ويمكنك التبرع لحالة أو أكثر.",
+      "image": "/img/img-01.png",
+      "link": "/donate.html?for=cases"
+    }
+  ]
+}

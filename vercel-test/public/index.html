@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Mersal Payment Test</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --muted:#667085; --brand:#0b7a5a; --line:#e3e6eb; --ok:#0b7a5a; --bad:#c0392b; --warn:#9a6700; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12151b; --card:#1b2029; --ink:#e7eaf0; --muted:#98a2b3; --line:#2b313c; --brand:#27b386; --ok:#27b386; --bad:#ff6b5e; --warn:#e3b341; } }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui, "Segoe UI", Tahoma, sans-serif; }
+  main { max-width:560px; margin:32px auto; padding:0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px; }
+  h1 { font-size:22px; margin:0 0 4px } p.sub { color:var(--muted); margin:0 0 16px; font-size:14px }
+  .banner { background:color-mix(in srgb, var(--warn) 14%, transparent); color:var(--warn); border-radius:8px; padding:8px 12px; font-size:14px; margin-bottom:16px }
+  label { display:block; font-size:14px; color:var(--muted); margin:12px 0 4px }
+  input { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); font:inherit }
+  button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px; background:var(--brand); color:#fff; font:inherit; font-weight:600; cursor:pointer }
+  button:disabled { opacity:.6; cursor:wait }
+  .ok { color:var(--ok) } .bad { color:var(--bad) }
+  pre { direction:ltr; text-align:left; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px; overflow:auto; font-size:12px; white-space:pre-wrap; word-break:break-all }
+  .meta { font-size:13px; color:var(--muted) } .meta code { direction:ltr; unicode-bidi:embed }
+</style>
+<script src="https://banquemisr.gateway.mastercard.com/static/checkout/checkout.min.js"
+        data-error="hcoError" data-cancel="hcoCancel"></script>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>تجربة دفع مرسال — HCO v100</h1>
+    <p class="sub">بيئة اختبار على Vercel لنفس تدفّق الدفع اللي على الموقع (بنك مصر / Mastercard).</p>
+    <div class="banner">بيئة تجريبية — استخدم كروت الاختبار فقط. لا يتم تسجيل أي تبرع.</div>
+    <form id="f">
+      <label for="amount">المبلغ (جنيه مصري)</label>
+      <input id="amount" type="number" min="1" step="1" value="10" required>
+      <button id="pay" type="submit">ادفع الآن</button>
+    </form>
+    <p class="meta" id="env">…</p>
+  </div>
+  <div class="card" id="resultCard" hidden>
+    <h1 id="resultTitle"></h1>
+    <p class="sub" id="resultText"></p>
+    <pre id="resultJson"></pre>
+  </div>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const KEY = "mersalVercelTest";
+
+  function show(title, text, cls, obj) {
+    $("resultCard").hidden = false;
+    $("resultTitle").textContent = title;
+    $("resultTitle").className = cls || "";
+    $("resultText").textContent = text || "";
+    $("resultJson").textContent = obj ? JSON.stringify(obj, null, 2) : "";
+  }
+  function hcoError(e) { show("خطأ من بوابة الدفع", "", "bad", e || {}); $("pay").disabled = false; }
+  function hcoCancel() { show("تم إلغاء الدفع", "", "bad"); $("pay").disabled = false; }
+
+  fetch("/api/health").then(r => r.json()).then(h => {
+    $("env").innerHTML = "Merchant: <code></code> · API v<code></code> · " + (h.passwordConfigured ? "✓ credentials" : "✗ MPGS_API_PASSWORD missing");
+    const c = $("env").querySelectorAll("code"); c[0].textContent = h.merchant; c[1].textContent = h.apiVersion;
+  }).catch(() => { $("env").textContent = "API not reachable"; });
+
+  $("f").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    $("pay").disabled = true;
+    try {
+      const r = await fetch("/api/initiate-checkout", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: $("amount").value })
+      });
+      const d = await r.json();
+      if (!r.ok) throw d;
+      localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, successIndicator: d.successIndicator }));
+      // v67+ allows only the session in configure(); everything else is sent server-side.
+      Checkout.configure({ session: { id: d.sessionId } });
+      Checkout.showPaymentPage();
+    } catch (e) {
+      show("تعذّر إنشاء جلسة الدفع", "", "bad", e);
+      $("pay").disabled = false;
+    }
+  });
+
+  // Return from the bank: ?hcoReturn=1&resultIndicator=...
+  (async function onReturn() {
+    const q = new URLSearchParams(location.search);
+    if (q.get("hcoReturn") !== "1") return;
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch {}
+    history.replaceState(null, "", location.pathname);
+    const indicatorOk = !!saved.successIndicator && q.get("resultIndicator") === saved.successIndicator;
+    if (!saved.orderId) return show("لا توجد عملية محفوظة", "افتح الصفحة من نفس المتصفح اللي بدأت منه الدفع.", "bad");
+    show("جارٍ التحقق من البنك…", "Order " + saved.orderId);
+    try {
+      const r = await fetch("/api/order?id=" + encodeURIComponent(saved.orderId));
+      const o = await r.json();
+      const browser = indicatorOk ? "resultIndicator مطابق ✓" : "resultIndicator غير مطابق ✗";
+      if (o.paid) show("تم الدفع بنجاح ✓", "البنك أكّد CAPTURED · " + browser, "ok", o);
+      else show("الدفع لم يكتمل", "حالة الطلب في البنك: " + (o.status || "?") + " · " + browser, "bad", o);
+    } catch (e) { show("تعذّر التحقق من الطلب", "", "bad", { error: String(e) }); }
+  })();
+</script>
+</body>
+</html>

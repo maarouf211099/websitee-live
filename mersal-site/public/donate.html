@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<title>طرق التبرع | مؤسسة مرسال</title>
+<meta name="description" content="تبرع لمؤسسة مرسال بالبطاقة البنكية أو بالتحويل البنكي أو المحافظ الإلكترونية أو من خلال مندوب.">
+</head>
+<body>
+<div id="site-header"></div>
+
+<div class="page-head"><div class="wrap">
+  <h1>طرق التبرع</h1>
+  <p>تبرعك بيوصل لمستحقيه - صدقة أو زكاة.</p>
+</div></div>
+
+<main>
+  <section>
+    <div class="wrap layout-side">
+      <div>
+        <div class="tabs" role="tablist">
+          <button role="tab" class="only-online" id="t-online" aria-controls="online" aria-selected="true">بالبطاقة البنكية</button>
+          <button role="tab" id="t-bank" aria-controls="bank" aria-selected="false">الحسابات البنكية</button>
+          <button role="tab" id="t-wallets" aria-controls="wallets" aria-selected="false">المحافظ وإنستاباي</button>
+          <button role="tab" id="t-home" aria-controls="home" aria-selected="false">مندوب لحد البيت</button>
+          <button role="tab" id="t-abroad" aria-controls="abroad" aria-selected="false">من خارج مصر</button>
+        </div>
+
+        <div class="tab-panel" id="online" role="tabpanel" aria-labelledby="t-online">
+          <div id="pay-result"></div>
+          <form id="pay-form" novalidate>
+            <p class="hint">سجل بياناتك وسيتم تحويلك لصفحة بنك مصر الآمنة لإتمام التبرع. لا نحتفظ ببيانات بطاقتك.</p>
+            <div class="amounts" role="group" aria-label="المبلغ">
+              <button type="button" data-v="100">100</button>
+              <button type="button" data-v="250">250</button>
+              <button type="button" data-v="500">500</button>
+              <button type="button" data-v="1000">1000</button>
+            </div>
+            <div class="row-2">
+              <div class="field">
+                <label for="amount">المبلغ (جنيه مصري)</label>
+                <input id="amount" name="amount" type="number" min="10" max="1000000" step="1" inputmode="numeric" required>
+              </div>
+              <div class="field">
+                <label for="purpose">نوع التبرع</label>
+                <select id="purpose" name="purpose">
+                  <option value="general">تبرع عام</option>
+                  <option value="zakat">زكاة</option>
+                  <option value="sadaqa">صدقة</option>
+                  <option value="hospital">مستشفى مرسال الخيري</option>
+                  <option value="oncology">مركز مرسال للأورام</option>
+                  <option value="cases">حالات تحتاج مساندة</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="name">الاسم</label>
+              <input id="name" name="name" autocomplete="name" maxlength="80" required>
+            </div>
+            <div class="row-2">
+              <div class="field">
+                <label for="email">البريد الإلكتروني</label>
+                <input id="email" name="email" type="email" autocomplete="email" maxlength="120" dir="ltr" required>
+              </div>
+              <div class="field">
+                <label for="phone">رقم الموبايل</label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" dir="ltr" required>
+              </div>
+            </div>
+            <button class="btn btn-gold" id="pay-btn" type="submit">تبرع الآن</button>
+            <p class="hint" style="margin-top:12px">في حالة وجود مشكلة في الدفع أونلاين برجاء الاتصال بالدعم الفني <a href="tel:01099316592" dir="ltr">01099316592</a></p>
+          </form>
+        </div>
+
+        <div class="tab-panel" id="bank" role="tabpanel" aria-labelledby="t-bank" hidden>
+          <p>يمكنك التبرع على حساب مؤسسة مرسال عن طريق تحويل بنكي من خلال البنوك التالية:</p>
+          <div class="bank"><div><b>بنك CIB - بالجنيه</b><code>100034654454</code></div><button class="copy" data-copy="100034654454">نسخ</button></div>
+          <div class="bank"><div><b>بنك CIB - بالدولار</b><code>100034654357</code></div><button class="copy" data-copy="100034654357">نسخ</button></div>
+          <div class="bank"><div><b>بنك الإمارات دبي الوطني</b><code>1019409332701</code></div><button class="copy" data-copy="1019409332701">نسخ</button></div>
+          <div class="bank"><div><b>البنك العربي الأفريقي - بالجنيه أو الدولار</b><code>701840</code></div><button class="copy" data-copy="701840">نسخ</button></div>
+          <p class="hint">بعد التحويل، ابعتلنا صورة الإيصال على <a href="mailto:info@mersal-ngo.org">info@mersal-ngo.org</a> أو كلمنا على 19340 لتأكيد التبرع.</p>
+        </div>
+
+        <div class="tab-panel" id="wallets" role="tabpanel" aria-labelledby="t-wallets" hidden>
+          <p>يمكنك التبرع من خلال:</p>
+          <ul class="chips">
+            <li>إنستاباي</li><li>فودافون كاش</li><li>اتصالات كاش</li><li>أورانج كاش</li><li>فوري</li>
+            <li>MyFawry</li><li>مصاري</li><li>أمان</li><li>ميجا خير</li><li>محافظ البنوك (من خلال فوري)</li>
+          </ul>
+          <div id="wallet-numbers"></div>
+          <p class="hint">بعد التحويل كلمنا على الخط الساخن <a href="tel:19340">19340</a> لتأكيد وتخصيص تبرعك.</p>
+        </div>
+
+        <div class="tab-panel" id="home" role="tabpanel" aria-labelledby="t-home" hidden>
+          <div class="alert info">اتصل على الخط الساخن <a href="tel:19340"><b>19340</b></a> وهيوصلك مندوبنا لحد باب البيت لاستلام تبرعك.</div>
+          <p>تقدر كمان تتبرع بأي حاجة مش محتاجها - سجل معانا ومندوبنا هيجيلك لحد البيت.</p>
+          <a class="btn btn-teal" href="tel:19340">اتصل الآن 19340</a>
+        </div>
+
+        <div class="tab-panel" id="abroad" role="tabpanel" aria-labelledby="t-abroad" hidden>
+          <p>للتبرع من خارج مصر <span class="only-online">يمكنك استخدام البطاقة البنكية من تبويب <b>بالبطاقة البنكية</b>، أو </span>التحويل على حساب مرسال في ألمانيا:</p>
+          <img src="/img/gls.jpg" alt="حساب Mersal Foundation e.V. في GLS Bank - ألمانيا" style="max-width:420px;border-radius:12px;border:1px solid var(--line)">
+          <p style="margin-top:14px"><a class="btn btn-teal" href="http://bit.ly/MersalDonations" target="_blank" rel="noopener">طرق أخرى للتبرع من الخارج</a></p>
+        </div>
+      </div>
+
+      <aside class="side-ads">
+        <a href="tel:19340"><img src="/img/donate-imge1.png" alt="يمكنك التبرع من خلال الخط الساخن 19340" loading="lazy"></a>
+        <img src="/img/mega-5eer.jpg" alt="5 جنيه بتفرق - ابعت رسالة على 9599 لمريض بمرسال" loading="lazy">
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="/js/layout.js"></script>
+<script src="/js/donate.js"></script>
+</body>
+</html>

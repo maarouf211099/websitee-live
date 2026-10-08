@@ -1,0 +1,6 @@
+{
+  "name": "mersal-hco-v100-test",
+  "private": true,
+  "description": "Vercel test harness for the Mersal Banque Misr HCO v100 payment flow",
+  "engines": { "node": ">=18" }
+}

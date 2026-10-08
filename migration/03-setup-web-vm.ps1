@@ -1,4 +1,4 @@
-# Mersal → Azure | Step 3: prepare the new web VM (run as Administrator ON THE AZURE WEB VM)
+# Mersal -> Azure | Step 3: prepare the new web VM (run as Administrator ON THE AZURE WEB VM)
 $ErrorActionPreference = "Stop"
 
 # IIS + ASP.NET 4.x + WebSockets (SignalR) + management tools

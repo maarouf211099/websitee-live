@@ -1,6 +1,6 @@
-# Mersal → Azure | Step 1: inventory of the current server (INSTANCE-9)
+# Mersal -> Azure | Step 1: inventory of the current server (INSTANCE-9)
 # READ-ONLY. Run as Administrator on INSTANCE-9:  .\01-inventory.ps1
-# Output: C:\Temp\mersal-inventory\  (send the folder back — it contains no passwords,
+# Output: C:\Temp\mersal-inventory\  (send the folder back - it contains no passwords,
 #         connection strings are masked)
 $ErrorActionPreference = "Continue"
 $out = "C:\Temp\mersal-inventory"
@@ -64,6 +64,6 @@ Get-CimInstance Win32_Service | Where-Object { $_.PathName -notmatch 'Windows\\|
 $q = "SET NOCOUNT ON; SELECT d.name, d.compatibility_level, d.recovery_model_desc, CAST(SUM(f.size)*8/1024.0/1024 AS decimal(10,2)) AS SizeGB FROM sys.databases d JOIN sys.master_files f ON f.database_id=d.database_id GROUP BY d.name,d.compatibility_level,d.recovery_model_desc ORDER BY SizeGB DESC; SELECT @@VERSION;"
 if (Get-Command sqlcmd -ErrorAction SilentlyContinue) {
   sqlcmd -S 10.128.0.14 -E -Q $q -W 2>&1 | Out-File "$out\databases.txt"
-} else { "sqlcmd not found — run the query in SSMS and save as databases.txt:`n$q" | Out-File "$out\databases.txt" }
+} else { "sqlcmd not found - run the query in SSMS and save as databases.txt:`n$q" | Out-File "$out\databases.txt" }
 
 Write-Host "Inventory written to $out" -ForegroundColor Green

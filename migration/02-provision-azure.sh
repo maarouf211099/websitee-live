@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Mersal → Azure | Step 2: create the Azure resources (run from Azure Cloud Shell or any machine with `az login`)
+# Mersal -> Azure | Step 2: create the Azure resources (run from Azure Cloud Shell or any machine with `az login`)
 # Creates: resource group, VNet + NSG, a Windows Server 2022 VM for IIS (web) and a
 # SQL Server 2022 VM (db) on a private subnet. Nothing here touches the current server.
 set -euo pipefail
@@ -8,7 +8,7 @@ RG="${RG:-rg-mersal-prod}"
 LOC="${LOC:-uaenorth}"             # closest Azure region to Egypt; westeurope is the cheaper fallback
 ADMIN_USER="${ADMIN_USER:-mersaladmin}"
 ADMIN_IP="${ADMIN_IP:?set ADMIN_IP to your office public IP (RDP is allowed only from it)}"
-WEB_SIZE="${WEB_SIZE:-Standard_D2s_v5}"   # 2 vCPU / 8 GB — adjust after the inventory
+WEB_SIZE="${WEB_SIZE:-Standard_D2s_v5}"   # 2 vCPU / 8 GB - adjust after the inventory
 DB_SIZE="${DB_SIZE:-Standard_E2s_v5}"     # 2 vCPU / 16 GB
 SQL_IMAGE="${SQL_IMAGE:-MicrosoftSQLServer:sql2022-ws2022:web-gen2:latest}"  # SQL "Web" edition: cheapest licence allowed for public websites
 

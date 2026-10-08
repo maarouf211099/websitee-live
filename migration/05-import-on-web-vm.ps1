@@ -1,4 +1,4 @@
-# Mersal → Azure | Step 5: restore the sites on the Azure web VM (run as Administrator ON THE NEW VM)
+# Mersal -> Azure | Step 5: restore the sites on the Azure web VM (run as Administrator ON THE NEW VM)
 # Expects the export from step 4 downloaded to C:\Temp\mersal-export
 param(
   [string]$Src = "C:\Temp\mersal-export",
@@ -17,10 +17,10 @@ foreach ($p in $pools.appcmd.APPPOOL) {
   & $appcmd delete apppool $p.'APPPOOL.NAME' 2>$null | Out-Null
 }
 Get-Content "$Src\iis\apppools.xml" -Raw | & $appcmd add apppool /in
-# Old bindings may be tied to the GCP server's own IPs — bind to all addresses instead
+# Old bindings may be tied to the GCP server's own IPs - bind to all addresses instead
 (Get-Content "$Src\iis\sites.xml" -Raw) -replace 'bindingInformation="[0-9.]+:', 'bindingInformation="*:' | & $appcmd add site /in
 
-# Point every config at the new DB and new public IP. Passwords are NOT changed here —
+# Point every config at the new DB and new public IP. Passwords are NOT changed here -
 # put the NEW (rotated) sa/app password in by hand afterwards (see plan, step 8).
 $files = Get-ChildItem C:\Data -Recurse -Include Web.config, *.dll.config -ErrorAction SilentlyContinue
 foreach ($f in $files) {

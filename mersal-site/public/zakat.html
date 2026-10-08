@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<title>حاسبة الزكاة | مؤسسة مرسال</title>
+<meta name="description" content="احسب زكاة مالك وذهبك وتجارتك بسهولة، وأخرجها مع مؤسسة مرسال.">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="page-head"><div class="wrap">
+  <h1>حاسبة الزكاة</h1>
+  <p>اكتب قيم أموالك بالجنيه المصري، والحاسبة هتطلعلك قيمة الزكاة (2.5%).</p>
+</div></div>
+<main>
+  <section>
+    <div class="wrap layout-side">
+      <form id="zakat" autocomplete="off">
+        <div class="alert info">يتم حساب الزكاة على المبلغ حتى وإن لم يبلغ النصاب؛ والنصاب هو قيمة 85 جرام من الذهب عيار 21، مر عليه حول كامل.</div>
+
+        <div class="zakat-group"><h3>سعر الذهب اليوم</h3>
+          <table class="zakat-table"><tr><td>سعر جرام الذهب عيار 21 (جنيه)</td><td><input name="gold21price" type="number" min="0" step="any" inputmode="decimal"></td></tr></table>
+        </div>
+        <div class="zakat-group"><h3>النقود</h3>
+          <table class="zakat-table">
+            <tr><td>النقد في اليد</td><td><input data-add name="cash" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>النقد في البنك (حسابات جارية وتوفير)</td><td><input data-add name="bank" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>الودائع والشهادات</td><td><input data-add name="deposits" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+          </table>
+        </div>
+        <div class="zakat-group"><h3>الذهب والفضة (بالجرام)</h3>
+          <table class="zakat-table">
+            <tr><td>ذهب عيار 24</td><td><input name="g24" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>ذهب عيار 21</td><td><input name="g21" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>ذهب عيار 18</td><td><input name="g18" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>قيمة الفضة (جنيه)</td><td><input data-add name="silver" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+          </table>
+        </div>
+        <div class="zakat-group"><h3>الاستثمارات والتجارة</h3>
+          <table class="zakat-table">
+            <tr><td>قيمة الأسهم بسعر السوق اليوم</td><td><input data-add name="stocks" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>قيمة البضاعة المعروضة للبيع</td><td><input data-add name="stock_goods" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td>ديون لك عند الآخرين (مرجو سدادها)</td><td><input data-add name="receivable" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+          </table>
+        </div>
+        <div class="zakat-group"><h3>يُخصم</h3>
+          <table class="zakat-table">
+            <tr><td>ديون عليك مستحقة الآن</td><td><input name="debts" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+          </table>
+        </div>
+        <p class="hint">زكاة الزروع والأنعام وعروض التجارة المعقدة: كلمنا على 19340 ونساعدك في حسابها.</p>
+      </form>
+
+      <aside class="zakat-result" aria-live="polite">
+        <div>قيمة الزكاة</div>
+        <div class="big" id="z-total">0 جنيه</div>
+        <dl>
+          <dt>إجمالي الأموال</dt><dd id="z-assets">0</dd>
+          <dt>قيمة الذهب</dt><dd id="z-gold">0</dd>
+          <dt>الديون المخصومة</dt><dd id="z-debts">0</dd>
+          <dt>الصافي</dt><dd id="z-net">0</dd>
+          <dt>النصاب (85 جم عيار 21)</dt><dd id="z-nisab">—</dd>
+        </dl>
+        <div id="z-note" class="hint" style="color:rgba(255,255,255,.8)"></div>
+        <a class="btn btn-gold" id="z-pay" href="/donate.html?for=zakat#online" style="width:100%;margin-top:10px">أخرج زكاتك الآن</a>
+      </aside>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="/js/layout.js"></script>
+<script>
+(function () {
+  var f = document.getElementById("zakat"), fmt = new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 });
+  function v(n) { var x = parseFloat(f.elements[n].value); return isFinite(x) && x > 0 ? x : 0; }
+  function calc() {
+    var p21 = v("gold21price"), gold = (v("g24") * 24 / 21 + v("g21") + v("g18") * 18 / 21) * p21;
+    var assets = gold;
+    f.querySelectorAll("[data-add]").forEach(function (i) { assets += v(i.name); });
+    var debts = v("debts"), net = Math.max(0, assets - debts), zakat = Math.round(net * 0.025 * 100) / 100;
+    document.getElementById("z-total").textContent = fmt.format(zakat) + " جنيه";
+    document.getElementById("z-assets").textContent = fmt.format(assets);
+    document.getElementById("z-gold").textContent = fmt.format(gold);
+    document.getElementById("z-debts").textContent = fmt.format(debts);
+    document.getElementById("z-net").textContent = fmt.format(net);
+    var nisab = p21 * 85, note = document.getElementById("z-note");
+    document.getElementById("z-nisab").textContent = p21 ? fmt.format(nisab) : "—";
+    note.textContent = !p21 ? "اكتب سعر جرام الذهب عيار 21 لحساب الذهب والنصاب." :
+      (net >= nisab ? "أموالك بلغت النصاب." : "أموالك لم تبلغ النصاب.");
+    document.getElementById("z-pay").href = "/donate.html?for=zakat" + (zakat >= 10 ? "&amount=" + Math.ceil(zakat) : "") + "#online";
+  }
+  f.addEventListener("input", calc); calc();
+})();
+</script>
+</body>
+</html>

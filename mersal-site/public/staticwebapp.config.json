@@ -1,0 +1,20 @@
+{
+  "routes": [
+    { "route": "/Donation", "redirect": "/donate.html", "statusCode": 301 },
+    { "route": "/Donation/*", "redirect": "/donate.html", "statusCode": 301 },
+    { "route": "/home/ZakahCalculator", "redirect": "/zakat.html", "statusCode": 301 },
+    { "route": "/home/contactus", "redirect": "/contact.html", "statusCode": 301 },
+    { "route": "/DynamicPage/RenderPage", "redirect": "/about.html", "statusCode": 301 },
+    { "route": "/content.json", "headers": { "Cache-Control": "no-cache" } }
+  ],
+  "responseOverrides": {
+    "404": { "rewrite": "/404.html", "statusCode": 404 }
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "X-Frame-Options": "SAMEORIGIN"
+  },
+  "mimeTypes": { ".json": "application/json" },
+  "platform": { "apiRuntime": "node:20" }
+}

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<title>مؤسسة مرسال للأعمال الخيرية والتنموية</title>
+<meta name="description" content="مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم">
+<meta property="og:title" content="مؤسسة مرسال للأعمال الخيرية والتنموية">
+<meta property="og:description" content="مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <img class="tag" src="/img/far7aa.png" alt="#ابعت_فرحة" width="187" height="56">
+        <h1>مؤسسة مرسال للأعمال الخيرية والتنموية</h1>
+        <p>مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية، وإحداث فارق إيجابي في مستوى حياتهم.</p>
+        <div class="actions">
+          <a class="btn btn-gold" href="/donate.html">تبرع الآن</a>
+          <a class="btn btn-ghost" href="tel:19340">اتصل بالخط الساخن 19340</a>
+        </div>
+      </div>
+      <form class="hero-card" id="quick-donate" action="/donate.html" method="get">
+        <h2>تبرّع سريع بالبطاقة</h2>
+        <p>اختر المبلغ وسيتم تحويلك لصفحة بنك مصر الآمنة لإتمام التبرع.</p>
+        <div class="amounts" role="group" aria-label="المبلغ">
+          <button type="button" data-v="100">100</button>
+          <button type="button" data-v="250" class="on">250</button>
+          <button type="button" data-v="500">500</button>
+          <button type="button" data-v="1000">1000</button>
+        </div>
+        <div class="field">
+          <label for="qa">أو اكتب المبلغ (جنيه)</label>
+          <input id="qa" name="amount" type="number" min="10" step="1" value="250" inputmode="numeric" required>
+        </div>
+        <button class="btn btn-teal" style="width:100%" type="submit">تبرع الآن</button>
+      </form>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-title">
+        <h2>طرق التبرع</h2>
+        <p>حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، اختر الطريقة الأسهل لك.</p>
+      </div>
+      <div class="grid grid-4">
+        <a class="card way" href="/donate.html#online">
+          <div class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></div>
+          <h3>بالبطاقة البنكية</h3><p>ادفع أونلاين بأمان عبر بوابة بنك مصر.</p>
+        </a>
+        <a class="card way" href="/donate.html#bank">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg></div>
+          <h3>تحويل بنكي</h3><p>حسابات مرسال في CIB وبنوك أخرى.</p>
+        </a>
+        <a class="card way" href="/donate.html#wallets">
+          <div class="icon"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+          <h3>المحافظ وإنستاباي</h3><p>فودافون كاش، إنستاباي، فوري وغيرها.</p>
+        </a>
+        <a class="card way" href="tel:19340">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></div>
+          <h3>مندوب لحد البيت</h3><p>اتصل على 19340 وهيوصلك مندوبنا.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap">
+      <div class="section-title"><h2>الحملات</h2></div>
+      <div class="grid grid-3" id="campaigns"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="banner-strip">
+        <a href="tel:19340"><img src="/img/donate-imge1.png" alt="يمكنك التبرع من خلال الخط الساخن 19340 - يصلك مندوبنا لحد باب البيت" loading="lazy"></a>
+        <img src="/img/mega-5eer.jpg" alt="5 جنيه بتفرق - ابعت رسالة على 9599 لمريض بمرسال" loading="lazy">
+        <a href="/donate.html#bank"><img src="/img/gls.jpg" alt="حساب مرسال في ألمانيا - GLS Bank" loading="lazy"></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap grid grid-2" style="align-items:center">
+      <div>
+        <div class="section-title" style="text-align:right;margin-bottom:16px"><h2 style="display:inline-block">تواصل معنا</h2></div>
+        <p>لأي استفسار عن التبرعات أو المساعدة، كلمنا على الخط الساخن <a href="tel:19340"><b>19340</b></a> أو الهاتف <a href="tel:01200002870" dir="ltr"><b>01200002870</b></a>، أو ابعتلنا رسالة.</p>
+        <p class="hint">في حالة وجود مشكلة في الدفع أونلاين برجاء الاتصال بالدعم الفني <a href="tel:01099316592" dir="ltr">01099316592</a></p>
+        <a class="btn btn-teal" href="/contact.html">ابعت رسالة</a>
+      </div>
+      <img src="/img/heart-in-hand.jpg" alt="" style="border-radius:var(--radius);box-shadow:var(--shadow)" loading="lazy">
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="/js/layout.js"></script>
+<script src="/js/home.js"></script>
+</body>
+</html>

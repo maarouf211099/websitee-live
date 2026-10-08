@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<title>تواصل معنا | مؤسسة مرسال</title>
+<meta name="description" content="تواصل مع مؤسسة مرسال: الخط الساخن 19340، الهاتف 01200002870، info@mersal-ngo.org">
+</head>
+<body>
+<div id="site-header"></div>
+<div class="page-head"><div class="wrap">
+  <h1>تواصل معنا</h1>
+  <p>يسعدنا تواصلك معنا في أي وقت.</p>
+</div></div>
+<main>
+  <section>
+    <div class="wrap grid grid-2">
+      <div>
+        <div class="bank"><div><b>الخط الساخن</b><a href="tel:19340">19340</a></div></div>
+        <div class="bank"><div><b>الهاتف</b><a href="tel:01200002870" dir="ltr">01200002870</a></div></div>
+        <div class="bank"><div><b>البريد الإلكتروني</b><a href="mailto:info@mersal-ngo.org">info@mersal-ngo.org</a></div></div>
+        <div class="bank"><div><b>العنوان</b>8 شارع 263 - المعادي الجديدة، القاهرة</div></div>
+        <div class="bank"><div><b>الدعم الفني للدفع أونلاين</b><a href="tel:01099316592" dir="ltr">01099316592</a></div></div>
+        <a href="https://maps.google.com/?q=8+Street+263+New+Maadi+Cairo" target="_blank" rel="noopener"><img src="/img/mersalmap.png" alt="خريطة موقع مؤسسة مرسال" style="border-radius:var(--radius);margin-top:8px" loading="lazy"></a>
+      </div>
+      <form id="contact" class="card" style="padding:22px">
+        <h2 style="margin:0 0 12px;color:var(--teal-dark);font-size:22px">ابعتلنا رسالة</h2>
+        <div class="field"><label for="c-name">الاسم</label><input id="c-name" required maxlength="80" autocomplete="name"></div>
+        <div class="field"><label for="c-phone">رقم الموبايل</label><input id="c-phone" type="tel" dir="ltr" maxlength="20" autocomplete="tel"></div>
+        <div class="field"><label for="c-msg">الرسالة</label><textarea id="c-msg" rows="6" required maxlength="2000"></textarea></div>
+        <button class="btn btn-teal" type="submit">إرسال</button>
+        <p class="hint" style="margin-top:8px">سيتم فتح برنامج البريد على جهازك لإرسال الرسالة إلى info@mersal-ngo.org.</p>
+      </form>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="/js/layout.js"></script>
+<script>
+document.getElementById("contact").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var n = document.getElementById("c-name").value, p = document.getElementById("c-phone").value, m = document.getElementById("c-msg").value;
+  location.href = "mailto:info@mersal-ngo.org?subject=" + encodeURIComponent("رسالة من الموقع - " + n) +
+    "&body=" + encodeURIComponent(m + "\n\n" + n + (p ? "\n" + p : ""));
+});
+</script>
+</body>
+</html>

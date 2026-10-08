@@ -19,6 +19,29 @@
     }
   };
   SITE.onlinePayment = SITE.payMode !== "off";
+
+  // Responsive <picture> with a WebP source. tools/optimize_images.py guarantees a .webp sibling for every
+  // jpg/png under /img/ (not /img/uploads/, where the admin console stores originals only).
+  function webpOf(u) { return /^\/img\/(?!uploads\/)[^?#]+\.(jpe?g|png)$/i.test(u || "") ? u.replace(/\.(jpe?g|png)$/i, ".webp") : null; }
+  function escA(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  // opt: { alt, cls, w, h, lazy (default true), priority ("high"), srcset: [[url, "1200w"], ...], sizes, attrs (raw string), defer (use data- attributes) }
+  window.mersalPic = function (src, opt) {
+    opt = opt || {};
+    var pre = opt.defer ? "data-" : "", wp = webpOf(src);
+    var set = (opt.srcset || []).map(function (e) { return escA(e[0]) + " " + e[1]; }).join(", ");
+    var setW = (opt.srcset || []).map(function (e) { return webpOf(e[0]); });
+    var hasW = wp && setW.every(Boolean);
+    var sizes = opt.sizes ? ' sizes="' + escA(opt.sizes) + '"' : "";
+    var html = "<picture>";
+    if (hasW) html += '<source type="image/webp" ' + pre + 'srcset="' + (set ? setW.map(function (u, i) { return u + " " + opt.srcset[i][1]; }).join(", ") : wp) + '"' + sizes + ">";
+    html += "<img " + pre + 'src="' + escA(src) + '"' + (set ? " " + pre + 'srcset="' + set + '"' + sizes : "") +
+      ' alt="' + escA(opt.alt) + '"' + (opt.cls ? ' class="' + escA(opt.cls) + '"' : "") +
+      (opt.w ? ' width="' + opt.w + '" height="' + opt.h + '"' : "") +
+      (opt.priority ? ' fetchpriority="' + opt.priority + '"' : opt.lazy === false ? "" : ' loading="lazy" decoding="async"') +
+      (opt.attrs ? " " + opt.attrs : "") + "></picture>";
+    return html;
+  };
+  window.mersalWebp = webpOf;
   window.MERSAL_SITE = SITE;
   if (!SITE.onlinePayment) document.documentElement.classList.add("no-online-pay");
 
@@ -98,17 +121,27 @@
     var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname);
     var dHref = "/donate.html" + (pm ? "?for=p" + pm[1] : "") + "#online";
     document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>' +
-      '<nav class="m-bar" aria-label="تبرع سريع">' +
-        '<a class="m-call" href="tel:19340"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>19340</a>' +
-        '<a class="m-donate" href="' + dHref + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg>تبرع الآن</a>' +
-        '<a class="m-zakat" href="/zakat.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h6"/></svg>الزكاة</a>' +
+      '<nav class="m-bar" aria-label="تنقل سريع">' +
+        '<a class="m-home' + (/^\/(index\.html)?$/.test(location.pathname) ? " on" : "") + '" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></a>' +
+        '<a class="m-call" href="tel:19340"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>اتصل</span></a>' +
+        '<a class="m-donate" href="' + dHref + '"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg></i><span>تبرع</span></a>' +
+        '<a class="m-zakat' + (/zakat\.html$/.test(location.pathname) ? " on" : "") + '" href="/zakat.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h6"/></svg><span>الزكاة</span></a>' +
+        '<button type="button" class="m-menu" aria-label="القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>القائمة</span></button>' +
       "</nav>");
     document.body.classList.add("has-mbar");
   }
 
-  // Header shadow once the page scrolls
-  var hdr = document.querySelector(".site-header");
-  addEventListener("scroll", function () { hdr.classList.toggle("scrolled", scrollY > 10); }, { passive: true });
+  // Header: shadow once the page scrolls; on phones it slides away while scrolling down and comes back on scroll up
+  var hdr = document.querySelector(".site-header"), lastY = scrollY, phone = matchMedia("(max-width: 760px)");
+  addEventListener("scroll", function () {
+    var y = scrollY;
+    hdr.classList.toggle("scrolled", y > 10);
+    if (phone.matches && !document.body.classList.contains("menu-open")) {
+      if (y > 140 && y - lastY > 8) hdr.classList.add("hide");
+      else if (lastY - y > 8 || y < 80) hdr.classList.remove("hide");
+    } else hdr.classList.remove("hide");
+    lastY = y;
+  }, { passive: true });
 
   // Fade-up on scroll for sections, cards and banners (skipped for reduced motion)
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -125,7 +158,7 @@
     });
   };
   document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img").forEach(function (el) { el.classList.add("zoom"); });
-  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
+  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, main .legacy .row > *, main .legacy li, main .legacy > img, main .page-side, main .share-bar, .site-footer .cols > div"));
 
   // Extra links added to the imported menu groups
   var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"], ["/albums.html", "ألبومات الصور"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
@@ -219,6 +252,8 @@
     document.body.classList.toggle("menu-open", open);
   }
   toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!nav.classList.contains("open")); });
+  var mMenu = document.querySelector(".m-bar .m-menu");
+  if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); setMenu(!nav.classList.contains("open")); if (nav.classList.contains("open")) scrollTo({ top: 0, behavior: "smooth" }); });
   nav.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
   addEventListener("keydown", function (e) { if (e.key === "Escape" && nav.classList.contains("open")) { setMenu(false); toggle.focus(); } });
   // Mobile menu footer: donate + hotline (added once the menu is built)

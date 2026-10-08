@@ -53,7 +53,8 @@
       if (s.banner) {
         return '<div class="slide banner' + (i === 0 ? " on" : "") + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + " / " + slides.length + '">' +
           (i === 0 ? '<h1 class="sr-only">مؤسسة مرسال للأعمال الخيرية والتنموية</h1>' : "") +
-          '<a href="' + esc(s.link || "/donate.html") + '"><img ' + (i ? "data-" : "") + 'src="' + esc(s.banner) + '"' + (s.bannerSm ? " " + (i ? "data-" : "") + 'srcset="' + esc(s.bannerSm) + ' 1200w, ' + esc(s.banner) + ' 1920w" sizes="100vw"' : "") + ' alt="' + esc(s.alt || "") + '" width="1920" height="570"' + (i ? "" : ' fetchpriority="high"') + "></a></div>";
+          '<a href="' + esc(s.link || "/donate.html") + '"><span class="sl-blur" aria-hidden="true">' + window.mersalPic(s.bannerSm || s.banner, { alt: "", w: 1200, h: 356, defer: i > 0, lazy: false }) + "</span>" + window.mersalPic(s.banner, { alt: s.alt || "", w: 1920, h: 570, defer: i > 0, priority: i ? "" : "high", lazy: false,
+            srcset: s.bannerSm ? [[s.bannerSm, "1200w"], [s.banner, "1920w"]] : null, sizes: s.bannerSm ? "100vw" : "" }) + "</a></div>";
       }
       var heading = i === 0 ? "h1" : "h2";
       var tel = /^tel:/.test(s.link || "");
@@ -70,6 +71,7 @@
     }).join("");
     var els = box.querySelectorAll(".slide"), cur = 0, timer = null;
     function wake() {
+      box.querySelectorAll("source[data-srcset]").forEach(function (so) { so.srcset = so.dataset.srcset; so.removeAttribute("data-srcset"); });
       box.querySelectorAll("img[data-src]").forEach(function (im) {
         if (im.dataset.srcset) im.srcset = im.dataset.srcset;
         im.src = im.dataset.src; im.removeAttribute("data-src"); im.removeAttribute("data-srcset");
@@ -121,7 +123,7 @@
         bar = '<div class="progress" aria-label="' + pct + '%"><i style="width:' + pct + '%"></i></div>' +
           '<div class="meta-row"><span>تم جمع ' + fmt.format(c.raised || 0) + ' جنيه</span><span>الهدف ' + fmt.format(c.goal) + "</span></div>";
       }
-      return '<article class="card"><div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc(c.imageSm || c.image) + '\')" role="img" aria-label="' + esc(c.title) + '"></div></div>' +
+      return '<article class="card"><div style="overflow:hidden">' + window.mersalPic(c.imageSm || c.image, { alt: c.title, cls: "media", w: 600, h: 375 }) + "</div>" +
         '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(c.text) + "</p>" + bar +
         '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + (c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
     }).join("");
@@ -144,7 +146,7 @@
       var pct = c.goal ? Math.min(100, Math.round((c.raised || 0) / c.goal * 100)) : 0;
       var give = "/donate.html?for=" + encodeURIComponent(c.purpose || "general") + (c.unitPrice ? "&amount=" + c.unitPrice : "") + "#online";
       return '<article class="card camp">' +
-        '<a class="camp-img" href="' + esc(c.link) + '"><img src="' + esc(c.imageSm || c.image) + '"' + (c.imageSm ? ' srcset="' + esc(c.imageSm) + ' 600w, ' + esc(c.image) + ' 900w" sizes="(max-width: 760px) 82vw, 380px"' : "") + ' alt="' + esc(c.title) + '" loading="lazy" width="900" height="900">' +
+        '<a class="camp-img" href="' + esc(c.link) + '">' + window.mersalPic(c.imageSm || c.image, { alt: c.title, w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, 380px" : "" }) +
           (c.unitPrice ? '<span class="camp-badge">سهم ' + fmt.format(c.unitPrice) + ' جنيه</span>' : "") + "</a>" +
         '<div class="body">' +
           '<div class="camp-head"><h3><a href="' + esc(c.link) + '">' + esc(c.title) + "</a></h3>" +

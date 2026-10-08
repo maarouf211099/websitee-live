@@ -35,46 +35,85 @@
 
         <div class="tab-panel" id="online" role="tabpanel" aria-labelledby="t-online">
           <div id="pay-result"></div>
-          <form id="pay-form" novalidate>
-            <p class="hint">سجل بياناتك وسيتم تحويلك لصفحة بنك مصر الآمنة لإتمام التبرع. لا نحتفظ ببيانات بطاقتك.</p>
-            <div class="amounts" role="group" aria-label="المبلغ">
-              <button type="button" data-v="100">100</button>
-              <button type="button" data-v="250">250</button>
-              <button type="button" data-v="500">500</button>
-              <button type="button" data-v="1000">1000</button>
-            </div>
-            <div class="row-2">
+          <form id="pay-form" class="stepper" novalidate>
+            <ol class="steps" aria-label="خطوات التبرع">
+              <li class="on" data-step="1"><span>1</span>المبلغ</li>
+              <li data-step="2"><span>2</span>بياناتك</li>
+              <li data-step="3"><span>3</span>الدفع</li>
+            </ol>
+
+            <fieldset class="step" data-step="1">
+              <legend class="sr-only">المبلغ وجهة التبرع</legend>
               <div class="field">
-                <label for="amount">المبلغ (جنيه مصري)</label>
-                <input id="amount" name="amount" type="number" min="10" max="1000000" step="1" inputmode="numeric" required>
-              </div>
-              <div class="field">
-                <label for="purpose">نوع التبرع</label>
+                <label for="purpose">تبرع لـ</label>
                 <select id="purpose" name="purpose">
-                  <option value="general">تبرع عام</option>
-                  <option value="zakat">زكاة</option>
-                  <option value="sadaqa">صدقة</option>
-                  <option value="hospital">مستشفى مرسال الخيري</option>
-                  <option value="oncology">مركز مرسال للأورام</option>
-                  <option value="cases">حالات تحتاج مساندة</option>
+                  <optgroup label="عام">
+                    <option value="general">تبرع عام - حيث الحاجة أكبر</option>
+                    <option value="zakat">زكاة المال</option>
+                    <option value="sadaqa">صدقة</option>
+                  </optgroup>
                 </select>
               </div>
-            </div>
-            <div class="field">
-              <label for="name">الاسم</label>
-              <input id="name" name="name" autocomplete="name" maxlength="80" required>
-            </div>
-            <div class="row-2">
+              <div class="freq" role="radiogroup" aria-label="نوع التبرع">
+                <label><input type="radio" name="freq" value="once" checked><span>مرة واحدة</span></label>
+                <label><input type="radio" name="freq" value="monthly"><span>شهري 💚</span></label>
+              </div>
+              <div class="amounts big" role="group" aria-label="المبلغ">
+                <button type="button" data-v="100">100</button>
+                <button type="button" data-v="250">250</button>
+                <button type="button" data-v="500" class="on">500</button>
+                <button type="button" data-v="1000">1,000</button>
+                <button type="button" data-v="2500">2,500</button>
+                <button type="button" data-v="5000">5,000</button>
+              </div>
+              <div class="field amount-field">
+                <label for="amount">أو اكتب المبلغ</label>
+                <div class="input-suffix"><input id="amount" name="amount" type="number" min="10" max="1000000" step="1" inputmode="numeric" value="500" required><span>جنيه</span></div>
+              </div>
+              <p class="impact" id="impact"></p>
+              <button class="btn btn-gold btn-block" type="button" data-next>التالي</button>
+            </fieldset>
+
+            <fieldset class="step" data-step="2" hidden>
+              <legend class="sr-only">بيانات المتبرع</legend>
               <div class="field">
-                <label for="email">البريد الإلكتروني</label>
-                <input id="email" name="email" type="email" autocomplete="email" maxlength="120" dir="ltr" required>
+                <label for="name">الاسم</label>
+                <input id="name" name="name" autocomplete="name" maxlength="80" required>
               </div>
               <div class="field">
                 <label for="phone">رقم الموبايل</label>
-                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" dir="ltr" required>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx" required>
               </div>
+              <div class="field">
+                <label for="email">البريد الإلكتروني <small>(لإرسال الإيصال)</small></label>
+                <input id="email" name="email" type="email" autocomplete="email" maxlength="120" dir="ltr" inputmode="email" required>
+              </div>
+              <label class="check"><input type="checkbox" id="anon"> تبرع بدون ذكر اسمي</label>
+              <div class="step-nav">
+                <button class="btn btn-ghost-teal" type="button" data-prev>رجوع</button>
+                <button class="btn btn-gold" type="button" data-next>التالي</button>
+              </div>
+            </fieldset>
+
+            <fieldset class="step" data-step="3" hidden>
+              <legend class="sr-only">مراجعة والدفع</legend>
+              <dl class="summary" id="summary"></dl>
+              <div class="pay-methods">
+                <span class="pm">VISA</span><span class="pm">Mastercard</span><span class="pm">Meeza</span>
+                <span class="secure">🔒 دفع آمن عبر بنك مصر</span>
+              </div>
+              <div class="step-nav">
+                <button class="btn btn-ghost-teal" type="button" data-prev>تعديل</button>
+                <button class="btn btn-gold" id="pay-btn" type="submit">ادفع <b id="pay-amount"></b></button>
+              </div>
+              <p class="hint">بالضغط على "ادفع" هيتم تحويلك لصفحة بنك مصر الآمنة لإدخال بيانات البطاقة. مرسال لا تحتفظ ببيانات بطاقتك.</p>
+            </fieldset>
+
+            <div class="gateway" id="gateway" hidden>
+              <div class="gw-spin" aria-hidden="true"></div>
+              <h3 id="gw-title">جاري التحويل لبوابة بنك مصر…</h3>
+              <div id="gw-body"></div>
             </div>
-            <button class="btn btn-gold" id="pay-btn" type="submit">تبرع الآن</button>
             <p class="hint" style="margin-top:12px">في حالة وجود مشكلة في الدفع أونلاين برجاء الاتصال بالدعم الفني <a href="tel:01099316592" dir="ltr">01099316592</a></p>
           </form>
         </div>

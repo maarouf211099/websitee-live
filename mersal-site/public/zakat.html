@@ -78,7 +78,7 @@
 <script src="/js/layout.js"></script>
 <script>
 (function () {
-  var f = document.getElementById("zakat"), fmt = new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 });
+  var f = document.getElementById("zakat"), fmt = new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 2 });
   function v(n) { var x = parseFloat(f.elements[n].value); return isFinite(x) && x > 0 ? x : 0; }
   function calc() {
     var p21 = v("gold21price"), gold = (v("g24") * 24 / 21 + v("g21") + v("g18") * 18 / 21) * p21;

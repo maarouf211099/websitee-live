@@ -40,19 +40,32 @@
 
   <section class="quick-bar">
     <div class="wrap">
-      <form class="hero-card only-online" id="quick-donate" action="/donate.html" method="get">
-        <h2>تبرّع سريع بالبطاقة</h2>
-        <div class="amounts" role="group" aria-label="المبلغ">
-          <button type="button" data-v="100">100</button>
-          <button type="button" data-v="250" class="on">250</button>
-          <button type="button" data-v="500">500</button>
-          <button type="button" data-v="1000">1000</button>
+      <form class="hero-card only-online quick-donate" id="quick-donate" action="/donate.html" method="get">
+        <div class="qd-head"><h2>تبرّع الآن</h2><span class="secure">🔒 دفع آمن</span></div>
+        <div class="qd-row">
+          <div class="field qd-purpose">
+            <label for="qp">تبرع لـ</label>
+            <select id="qp" name="for">
+              <option value="general">حيث الحاجة أكبر</option>
+              <option value="zakat">زكاة المال</option>
+              <option value="p30">مستشفى مرسال للأطفال</option>
+              <option value="p31">مركز مرسال لعلاج الأورام</option>
+              <option value="p37">العلاج الشهري</option>
+              <option value="p52">حضانات مرسال</option>
+            </select>
+          </div>
+          <div class="amounts" role="group" aria-label="المبلغ">
+            <button type="button" data-v="100">100</button>
+            <button type="button" data-v="250">250</button>
+            <button type="button" data-v="500" class="on">500</button>
+            <button type="button" data-v="1000">1,000</button>
+          </div>
+          <div class="field qd-amount">
+            <label for="qa">المبلغ (جنيه)</label>
+            <input id="qa" name="amount" type="number" min="10" step="1" value="500" inputmode="numeric" required>
+          </div>
+          <button class="btn btn-gold qd-go" type="submit">تبرع الآن</button>
         </div>
-        <div class="field">
-          <label for="qa">أو اكتب المبلغ (جنيه)</label>
-          <input id="qa" name="amount" type="number" min="10" step="1" value="250" inputmode="numeric" required>
-        </div>
-        <button class="btn btn-teal" style="width:100%" type="submit">تبرع الآن</button>
       </form>
       <div class="hero-card quick-offline only-offline">
         <div class="qo-item"><span>الخط الساخن - مندوب لحد البيت</span><a href="tel:19340"><b>19340</b></a></div>
@@ -62,10 +75,62 @@
     </div>
   </section>
 
+  <section class="about-intro">
+    <div class="wrap grid grid-2" style="align-items:center">
+      <div>
+        <span class="eyebrow">من نحن</span>
+        <h2 class="big-title">مرسال… فتح باب أمل جديد</h2>
+        <p>مرسال مؤسسة خيرية غير هادفة للربح تعمل في مجال الصحة، تسعى لتقديم كافة أنواع الرعاية الطبية بجودة عالية لكل من يحتاجها من غير القادرين بدون أي تفرقة، من خلال شبكة من الأطباء والمستشفيات المتعاقدة مع مرسال.</p>
+        <ul class="values">
+          <li><b>المريض أولاً</b><span>له الأولوية المطلقة في المؤسسة</span></li>
+          <li><b>الخصوصية</b><span>خصوصية المريض ميثاق شرف</span></li>
+          <li><b>علاج بلا تمييز</b><span>باب مفتوح لجميع المرضى</span></li>
+          <li><b>الشفافية</b><span>نعرض مصادر الدخل والإنفاق</span></li>
+        </ul>
+        <a class="btn btn-teal" href="/p/3.html">اعرف أكثر عن مرسال</a>
+      </div>
+      <div class="about-pic"><img src="/img/about-mersal.png" alt="مؤسسة مرسال" loading="lazy" width="377" height="382"></div>
+    </div>
+  </section>
+
   <section class="stats" id="stats" hidden>
     <div class="wrap">
       <div class="section-title"><h2 id="stats-title">التبرعات</h2><p>حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، كما يمكنك التبرع لحالة أو أكثر.</p></div>
       <div class="grid grid-4" id="stats-grid"></div>
+    </div>
+  </section>
+
+  <section class="hospital-feature">
+    <div class="wrap grid grid-2" style="align-items:center">
+      <div class="hf-pic"><img src="/img/old/1-ce3f944d.jpg" alt="مستشفى مرسال للأطفال" loading="lazy"></div>
+      <div>
+        <span class="eyebrow">الحلم اللي بنكمله سوا</span>
+        <h2 class="big-title">مستشفى مرسال للأطفال</h2>
+        <p>مستشفى متكاملة لعلاج حالات الأطفال الحرجة من سن يوم حتى 18 سنة، وتشمل وحدة زرع نخاع ومعمل تحاليل وقسم أشعة وصيدلية.</p>
+        <div class="facts">
+          <div><b data-count="5000">0</b><span>متر مربع</span></div>
+          <div><b data-count="35">0</b><span>سرير إقامة</span></div>
+          <div><b data-count="8">0</b><span>أسرّة عناية مركزة</span></div>
+          <div><b data-count="6">0</b><span>عيادات خارجية</span></div>
+        </div>
+        <p class="shares">ساهم بسهم: <b>500 جنيه</b> سهم أجهزة طبية · <b>1000 جنيه</b> سهم عام · <b>25,000 جنيه</b> متر وقف خيري</p>
+        <a class="btn btn-gold" href="/donate.html">ساهم في بناء المستشفى</a>
+        <a class="btn btn-ghost-teal" href="/p/30.html">تفاصيل المستشفى</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap">
+      <div class="section-title"><h2>خدمات مرسال</h2><p>خدمات طبية واجتماعية متكاملة للمرضى غير القادرين وأسرهم.</p></div>
+      <div class="grid grid-3 services">
+        <a class="card svc" href="/p/37.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"/><path d="M7 7l7 7"/></svg></span><h3>خدمة العلاج الشهري</h3><p>أدوية شهرية للمرضى أصحاب الأمراض المزمنة.</p></a>
+        <a class="card svc" href="/p/38.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v3a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="12" r="2"/></svg></span><h3>الكشف الطبي والفحوصات</h3><p>كشوفات وتحاليل وأشعة للمرضى غير القادرين.</p></a>
+        <a class="card svc" href="/p/39.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-5h6v5M12 8v5M9.5 10.5h5"/></svg></span><h3>العمليات الجراحية</h3><p>تغطية تكاليف العمليات بالمستشفيات المتعاقدة.</p></a>
+        <a class="card svc" href="/p/40.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l4-4 4 3 3-3 4 1 3 3"/><path d="M7 8v6l4 4 3-1 4-4"/></svg></span><h3>سداد ديون المرضى</h3><p>سداد مديونيات العلاج عن المرضى المتعثرين.</p></a>
+        <a class="card svc" href="/p/41.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="17" r="4"/><path d="M8 4h2v7h6l2 6"/></svg></span><h3>المستلزمات الطبية</h3><p>أجهزة ومستلزمات طبية لمن يحتاجها.</p></a>
+        <a class="card svc" href="/p/42.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10M10 20v-5h4v5"/></svg></span><h3>كفالات أسر المرضى</h3><p>دعم اجتماعي شهري لأسر المرضى.</p></a>
+      </div>
     </div>
   </section>
 

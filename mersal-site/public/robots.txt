@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Sitemap: https://jolly-moss-063f03a10.3.azurestaticapps.net/sitemap.xml

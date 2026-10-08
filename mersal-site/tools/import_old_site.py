@@ -25,6 +25,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
 CACHE = os.environ.get("IMPORT_CACHE", os.path.join(ROOT, ".import-cache"))
 SITE = "https://mersal-ngo.org"
+# Public address of the NEW site (og:image, sitemap). Change when the custom domain is live.
+SITE_URL = os.environ.get("SITE_URL", "https://jolly-moss-063f03a10.3.azurestaticapps.net").rstrip("/")
 API = SITE + "/MersalAPI/api"
 os.makedirs(CACHE, exist_ok=True)
 
@@ -74,6 +76,8 @@ def local_image(src, max_w=1600):
                 f.write(raw)
             shrink(out, max_w)
         return "/img/old/" + name
+    if "/" not in src and ":" not in src:
+        src = "/ClientFilesLayout/DynamicPageImages/" + src  # bare names in the old CMS live here
     url = urllib.parse.urljoin(SITE + "/", src)
     if not re.match(r"https?://(www\.)?mersal-ngo\.org/", url):
         return src  # external image: keep as is
@@ -182,13 +186,14 @@ def head(title, desc):
 </head>"""
 
 
-def page_html(title, body, desc, cover=None):
+def page_html(title, body, desc, cover=None, share_img=None):
     cover_html = f'<img class="legacy-cover" src="{cover}" alt="" loading="lazy">' if cover else ""
-    return f"""{head(title, desc)}
+    og = f'<meta property="og:image" content="{SITE_URL}{share_img}">' if share_img else ""
+    return f"""{head(title, desc).replace("</head>", og + chr(10) + "</head>")}
 <body>
 <div id="site-header"></div>
 <div class="page-head"><div class="wrap"><h1>{html.escape(title)}</h1></div></div>
-<main>
+<main id="main">
   <section>
     <div class="wrap legacy">
       {cover_html}
@@ -243,9 +248,14 @@ def main():
         body = clean_html(d["ContentAR"])
         cover = local_image(d.get("ImagePath")) if d.get("ImagePath") else None
         desc = text_of(body)
+        photos = [m for m in re.findall(r'<img[^>]+src="(/img/old/[^"]+)"', body)
+                  if not re.search(r"checklist|logo", m)]
+        if pid == 3:  # the old About page showed this picture beside the text
+            body = ('<div class="row align-items-center"><div class="col-md-7">' + body +
+                    '</div><div class="col-md-5"><img src="/img/about-mersal.png" alt="مؤسسة مرسال" loading="lazy"></div></div>')
         with open(os.path.join(PUB, "p", f"{pid}.html"), "w", encoding="utf-8") as f:
-            f.write(page_html(title, body, desc, cover))
-        pages[pid] = {"title": title, "desc": desc, "cover": cover}
+            f.write(page_html(title, body, desc, cover, cover or (photos[0] if photos else None)))
+        pages[pid] = {"title": title, "desc": desc, "cover": cover, "photo": photos[0] if photos else None}
         print("  page", pid, title)
 
     with open(os.path.join(PUB, "legacy.html"), "w", encoding="utf-8") as f:
@@ -280,6 +290,17 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
     os.makedirs(os.path.join(PUB, "data"), exist_ok=True)
     with open(os.path.join(PUB, "data", "menu.json"), "w", encoding="utf-8") as f:
         json.dump(tree, f, ensure_ascii=False, indent=2)
+
+    with open(os.path.join(PUB, "data", "pages.json"), "w", encoding="utf-8") as f:
+        json.dump({str(k): {"title": v["title"], "desc": v["desc"][:140], "photo": v["photo"] or v["cover"]}
+                   for k, v in pages.items()}, f, ensure_ascii=False, indent=1)
+    urls = ["/", "/donate.html", "/zakat.html", "/afia.html", "/contact.html"] + [f"/p/{k}.html" for k in sorted(pages)]
+    with open(os.path.join(PUB, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+        f.writelines(f"  <url><loc>{SITE_URL}{u}</loc></url>\n" for u in urls)
+        f.write("</urlset>\n")
+    with open(os.path.join(PUB, "robots.txt"), "w", encoding="utf-8") as f:
+        f.write(f"User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {SITE_URL}/sitemap.xml\n")
 
     # home content
     content_path = os.path.join(PUB, "content.json")
@@ -316,7 +337,7 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
         pid = int(p["Id"])
         if pid not in pages:
             continue
-        img = local_image(p.get("ImagePath"), max_w=900) or pages[pid]["cover"]
+        img = pages[pid]["photo"] or local_image(p.get("ImagePath"), max_w=900) or pages[pid]["cover"]
         projs.append({"title": pages[pid]["title"], "text": pages[pid]["desc"][:110],
                       "image": img or "/img/hero.jpg", "link": f"/p/{pid}.html"})
     content["projects"] = projs

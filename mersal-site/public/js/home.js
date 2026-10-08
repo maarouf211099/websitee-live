@@ -53,7 +53,7 @@
       if (s.banner) {
         return '<div class="slide banner' + (i === 0 ? " on" : "") + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + " / " + slides.length + '">' +
           (i === 0 ? '<h1 class="sr-only">مؤسسة مرسال للأعمال الخيرية والتنموية</h1>' : "") +
-          '<a href="' + esc(s.link || "/donate.html") + '">' + window.mersalPic(s.banner, { alt: s.alt || "", w: 1920, h: 570, defer: i > 0, priority: i ? "" : "high", lazy: false,
+          '<a href="' + esc(s.link || "/donate.html") + '"><span class="sl-blur" aria-hidden="true">' + window.mersalPic(s.bannerSm || s.banner, { alt: "", w: 1200, h: 356, defer: i > 0, lazy: false }) + "</span>" + window.mersalPic(s.banner, { alt: s.alt || "", w: 1920, h: 570, defer: i > 0, priority: i ? "" : "high", lazy: false,
             srcset: s.bannerSm ? [[s.bannerSm, "1200w"], [s.banner, "1920w"]] : null, sizes: s.bannerSm ? "100vw" : "" }) + "</a></div>";
       }
       var heading = i === 0 ? "h1" : "h2";

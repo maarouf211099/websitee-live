@@ -191,3 +191,17 @@
   .home .about-chip { top: 12px; inset-inline-start: 12px; padding: 6px 12px; }
   .home .about-chip b { font-size: 18px; }
 }
+
+/* ---------- v3: the whole banner is visible; a blurred copy fills the frame behind it ---------- */
+.home .slide.banner a { position: relative; display: block; overflow: hidden; background: var(--teal-dark); }
+.home .slide.banner .sl-blur { position: absolute; inset: -12%; z-index: 0; pointer-events: none; }
+.home .slide.banner .sl-blur img { width: 100%; height: 100%; object-fit: cover; filter: blur(22px) saturate(1.25) brightness(.9); aspect-ratio: auto; }
+.home .slide.banner > a > picture > img { position: relative; z-index: 1; aspect-ratio: 1920 / 570; object-fit: contain; }
+.home .slides.banners .slide.on.kb img { animation: none; }
+.home .slides.banners .slide.on.kb > a > picture > img { animation: kenburns-soft 9s ease-out both; }
+@keyframes kenburns-soft { from { scale: 1.03; } to { scale: 1; } }
+@media (max-width: 760px) {
+  .home .slide.banner a { aspect-ratio: 1920 / 760; }
+  .home .slide.banner > a > picture { position: absolute; inset: 0; display: block; }
+  .home .slide.banner > a > picture > img { height: 100%; width: 100%; aspect-ratio: auto; object-fit: contain; object-position: center; padding: 10px 0 34px; }
+}

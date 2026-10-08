@@ -44,6 +44,8 @@ jobs:
           api_location: "/mersal-site/api" # Api source code path - optional
           output_location: "" # Built app content directory - optional
           github_id_token: ${{ steps.idtoken.outputs.result }}
+          # Branch names with "/" are not matched automatically; name the production branch explicitly.
+          production_branch: "claude/stoic-faraday-7hz15o"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

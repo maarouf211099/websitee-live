@@ -69,13 +69,34 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 - `purpose`: `general | zakat | sadaqa | hospital | oncology | cases`.
 - لو بنك مصر رفض بيانات المتبرع (`customer`)، الدفع بيكمل عادي بس `donor` هيوصل فاضي.
 
+## لوحة التحكم (`/admin/`)
+لوحة منفصلة على `https://<الموقع>/admin/`، الدخول بحساب مايكروسوفت (Microsoft Entra ID) بتاع `mersal-ngo.org`.
+كل حفظ من اللوحة = commit على فرع `main` في GitHub، والموقع بيتنشر تلقائياً خلال دقيقة تقريباً.
+
+**اللي تقدر تعدّله من اللوحة:** السلايدر، حملات التبرع وأرقامها (الهدف / تم توفير)، "مرسال بالأرقام"، كل صفحات المحتوى (`/p/*.html`)، الألبومات والصور، وضع الدفع بالبطاقة (مقفول / تجريبي / حقيقي)، وتقرير التبرعات بالبطاقة.
+
+### التفعيل (مرة واحدة)
+1. **مين يدخل:** Azure Portal → Static Web App → **Role management** → **Invite**: Provider `Microsoft Entra ID`، الإيميل، Domain = دومين الموقع، Role = `admin`. افتح رابط الدعوة بنفس الحساب. كل أدمن محتاج دعوة.
+2. **صلاحية الحفظ:** GitHub → Settings → Developer settings → Fine-grained tokens → token على ريبو `websitee-live` بصلاحية **Contents: Read and write** بس.
+   ثم في Static Web App → Settings → **Environment variables**:
+
+   | الاسم | القيمة |
+   |---|---|
+   | `GITHUB_TOKEN` | التوكن |
+   | `GITHUB_REPO` | `maarouf211099/websitee-live` |
+   | `GITHUB_BRANCH` | `main` |
+3. **تقرير التبرعات (اختياري):** اعمل Storage Account (أرخص خيار، Standard LRS) وخد **Connection string** من Access keys وحطه في `DONATIONS_STORAGE`. التبرعات المؤكدة من البنك بتتسجل تلقائياً في جدول `donations`.
+
+لو الحفظ طالع "غير متصل" في تبويب الإعدادات → راجع الخطوة 2. لو الدخول طالع "الحساب ده مش أدمن" → راجع الخطوة 1.
+
 ## المحتوى المنقول من الموقع القديم
 `tools/import_old_site.py` بيقرا الموقع القديم (القايمة، كل صفحات الـCMS، السلايدر، طرق التبرع، الأرقام، المشاريع)
 ويكتب `public/p/<id>.html` و`public/img/old/` و`public/data/menu.json` و`public/content.json`.
 الروابط القديمة `/DynamicPage/RenderPage?id=N` بتتحول تلقائياً لـ `/p/N.html`.
 بعد ما الموقع القديم يتقفل، عدّل الصفحات دي مباشرة.
 
-## تعديل المحتوى
+## تعديل المحتوى (يدوي من الكود)
+الأسهل من لوحة التحكم فوق. لو عايز تعدّل من الكود:
 - الحملات: `public/content.json` (عنوان، نص، صورة، رابط، واختياري `goal`/`raised` لشريط التقدم).
 - أرقام المحافظ/إنستاباي: `WALLETS` أول `public/js/donate.js`.
 - التليفونات والعنوان والسوشيال: `SITE` أول `public/js/layout.js`.

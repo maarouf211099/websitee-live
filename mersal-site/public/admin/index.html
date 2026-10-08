@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin.css">
+<title>لوحة تحكم مرسال</title>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><img src="/img/brand-logo.png" alt="مرسال" width="70" height="42"><span>لوحة التحكم</span></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="home" aria-selected="true">الرئيسية</button>
+      <button role="tab" data-tab="pages">الصفحات</button>
+      <button role="tab" data-tab="albums">الألبومات</button>
+      <button role="tab" data-tab="donations">التبرعات</button>
+      <button role="tab" data-tab="settings">الإعدادات</button>
+    </nav>
+    <div class="side-foot">
+      <div class="user" id="user">…</div>
+      <a class="link" href="/" target="_blank" rel="noopener">فتح الموقع ↗</a>
+      <a class="link" href="/logout">تسجيل الخروج</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="status" id="status" hidden></div>
+
+    <section class="panel" id="tab-home">
+      <header class="panel-head"><h1>الرئيسية</h1><button class="btn btn-gold" id="save-home">حفظ ونشر</button></header>
+
+      <h2>السلايدر</h2>
+      <p class="hint">صور عريضة 1920×640. اضغط "رفع صورة" لتغيير البانر، أو "إضافة شريحة" لإضافة بانر جديد.</p>
+      <div class="list" id="slides"></div>
+      <button class="btn btn-ghost" id="add-slide">+ إضافة شريحة</button>
+
+      <h2>حملات التبرع</h2>
+      <p class="hint">الأرقام دي بتظهر في الرئيسية. "تم توفير" حدّثه يدوياً لحد ما يتربط بالسيستم الجديد.</p>
+      <div class="list" id="campaigns"></div>
+      <button class="btn btn-ghost" id="add-campaign">+ إضافة حملة</button>
+
+      <h2>مرسال بالأرقام</h2>
+      <div class="list" id="numbers"></div>
+      <button class="btn btn-ghost" id="add-number">+ إضافة رقم</button>
+    </section>
+
+    <section class="panel" id="tab-pages" hidden>
+      <header class="panel-head"><h1>الصفحات</h1></header>
+      <div class="pages-layout">
+        <div class="pages-list"><input type="search" id="page-filter" placeholder="بحث في الصفحات…"><ul id="pages"></ul></div>
+        <div class="editor" id="editor" hidden>
+          <div class="field"><label>عنوان الصفحة</label><input id="pg-title"></div>
+          <div class="field"><label>وصف قصير (لمحركات البحث والمشاركة)</label><input id="pg-desc" maxlength="160"></div>
+          <div class="toolbar">
+            <button type="button" data-cmd="bold"><b>B</b></button>
+            <button type="button" data-cmd="formatBlock" data-val="h4">عنوان</button>
+            <button type="button" data-cmd="formatBlock" data-val="p">فقرة</button>
+            <button type="button" data-cmd="insertUnorderedList">• قائمة</button>
+            <button type="button" id="pg-link">رابط</button>
+            <button type="button" id="pg-img">صورة</button>
+            <button type="button" id="pg-html">HTML</button>
+          </div>
+          <div class="body legacy" id="pg-body" contenteditable="true"></div>
+          <textarea id="pg-src" hidden></textarea>
+          <div class="row"><button class="btn btn-gold" id="save-page">حفظ ونشر</button><a class="btn btn-ghost" id="pg-view" target="_blank" rel="noopener">معاينة ↗</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="tab-albums" hidden>
+      <header class="panel-head"><h1>الألبومات</h1><button class="btn btn-gold" id="save-albums">حفظ ونشر</button></header>
+      <p class="hint">الصور بتتصغّر على جهازك قبل الرفع (1600px للعرض و600px للمعاينة).</p>
+      <div class="list" id="albums"></div>
+      <button class="btn btn-ghost" id="add-album">+ ألبوم جديد</button>
+    </section>
+
+    <section class="panel" id="tab-donations" hidden>
+      <header class="panel-head"><h1>التبرعات بالبطاقة</h1><button class="btn btn-ghost" id="csv">تصدير CSV</button></header>
+      <div class="row filters"><label>من <input type="date" id="d-from"></label><label>إلى <input type="date" id="d-to"></label><button class="btn btn-teal" id="d-load">عرض</button><span id="d-total" class="hint"></span></div>
+      <div class="table-wrap"><table id="d-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الجهة</th><th>المتبرع</th><th>الموبايل</th><th>البريد</th><th>رقم العملية</th></tr></thead><tbody></tbody></table></div>
+      <p class="hint" id="d-note"></p>
+    </section>
+
+    <section class="panel" id="tab-settings" hidden>
+      <header class="panel-head"><h1>الإعدادات</h1></header>
+      <h2>الدفع بالبطاقة</h2>
+      <div class="radios" id="paymode">
+        <label><input type="radio" name="pm" value="off"><b>مقفول</b><span>تبويب البطاقة مخفي</span></label>
+        <label><input type="radio" name="pm" value="demo"><b>تجريبي</b><span>الخطوات شغالة وبتقف عند بوابة البنك، مفيش خصم</span></label>
+        <label><input type="radio" name="pm" value="live"><b>حقيقي</b><span>دفع فعلي عبر بنك مصر (محتاج إعدادات MPGS في Azure)</span></label>
+      </div>
+      <button class="btn btn-gold" id="save-settings">حفظ ونشر</button>
+      <h2>حالة الربط</h2>
+      <ul class="checks" id="checks"></ul>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script src="/admin/admin.js"></script>
+</body>
+</html>

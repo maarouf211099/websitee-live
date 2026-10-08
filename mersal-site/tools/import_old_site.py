@@ -197,7 +197,9 @@ def page_html(title, body, desc, cover=None, share_img=None):
   <section>
     <div class="wrap legacy">
       {cover_html}
+<!-- mersal:content -->
 {body}
+<!-- /mersal:content -->
     </div>
   </section>
   <section class="alt cta-band">

@@ -171,3 +171,23 @@
   .home .chip, .ring-fg { animation: none; transition: none; }
 }
 .hf-pic img, .about-pic img { height: auto; }
+
+/* about photo as a captioned card */
+.home .about-pic { margin: 0; position: relative; width: min(100%, 460px); }
+.home .about-pic img { width: 100%; aspect-ratio: 4 / 3.4; object-fit: cover; object-position: 50% 30%; display: block; }
+.home .about-pic figcaption { position: absolute; inset-inline: 0; bottom: 0; padding: 48px 18px 18px; border-radius: 0 0 32px 32px; color: #fff; background: linear-gradient(180deg, transparent, rgba(0,32,32,.85)); display: flex; flex-direction: column; gap: 2px; }
+.home .about-pic figcaption b { font-size: 18px; }
+.home .about-pic figcaption span { font-size: 13px; color: rgba(255,255,255,.85); }
+.home .about-pic .cap-eyebrow { color: var(--gold); font-weight: 800; font-size: 13px; }
+.home .about-chip { position: absolute; top: 16px; inset-inline-start: 16px; background: #fff; border-radius: 14px; padding: 8px 14px; display: flex; flex-direction: column; line-height: 1.2; color: var(--teal-dark); box-shadow: 0 12px 30px -12px rgba(0,48,48,.5); animation: float 6s ease-in-out infinite; }
+.home .about-chip b { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 22px; color: var(--teal); }
+.home .about-chip span { font-size: 12px; color: var(--muted); }
+@media (max-width: 760px) {
+  .home .about-intro .grid { display: flex; flex-direction: column-reverse; gap: 18px; }
+  .home .about-pic { width: 100%; }
+  .home .about-pic img { aspect-ratio: 16 / 10; border-radius: 20px; }
+  .home .about-pic figcaption { border-radius: 0 0 20px 20px; padding: 40px 14px 14px; }
+  .home .about-pic figcaption b { font-size: 16px; }
+  .home .about-chip { top: 12px; inset-inline-start: 12px; padding: 6px 12px; }
+  .home .about-chip b { font-size: 18px; }
+}

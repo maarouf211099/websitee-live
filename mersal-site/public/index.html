@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/home.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>مؤسسة مرسال للأعمال الخيرية والتنموية</title>
@@ -15,7 +16,7 @@
 <meta property="og:title" content="مؤسسة مرسال للأعمال الخيرية والتنموية">
 <meta property="og:description" content="مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم">
 </head>
-<body>
+<body class="home">
 <div id="site-header"></div>
 
 <main>
@@ -36,6 +37,7 @@
     <button class="sl-arrow sl-prev" type="button" aria-label="السابق">&#8250;</button>
     <button class="sl-arrow sl-next" type="button" aria-label="التالي">&#8249;</button>
     <div class="sl-dots" id="sl-dots" role="tablist"></div>
+    <svg class="hero-wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,28 C360,78 1080,-18 1440,36 L1440,70 L0,70 Z"/></svg>
   </section>
 
   <section class="quick-bar">
@@ -59,9 +61,20 @@
     </div>
   </section>
 
+  <div class="ticker" aria-label="مرسال في سطور">
+    <div class="ticker-track" id="ticker">
+      <span><b>+5,000</b> مريض شهرياً في العلاج الشهري</span>
+      <span><b>68</b> مستشفى دعمتها قوافل مرسال</span>
+      <span><b>+15</b> تخصص طبي في عيادات مرسال</span>
+      <span><b>+1,400</b> مريض في دار ضيافة مرسال</span>
+      <span><b>19340</b> الخط الساخن - مندوب لحد البيت</span>
+      <span class="hash"><b>#</b>ابعت_فرحة</span>
+    </div>
+  </div>
+
   <section class="campaigns-sec" id="campaigns-sec">
     <div class="wrap">
-      <div class="section-title"><h2>التبرعات</h2><p>حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، كما يمكنك التبرع لحالة أو أكثر.</p></div>
+      <div class="section-title split"><div><span class="eyebrow">حملات مفتوحة الآن</span><h2>التبرعات</h2></div><p>حالات تحتاج إلى مشاركتك بالمال (صدقات أو زكاة)، كما يمكنك التبرع لحالة أو أكثر.</p></div>
       <div class="carousel camp-carousel">
         <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8250;</button>
         <div class="car-track" id="donation-campaigns"></div>
@@ -74,7 +87,7 @@
     <div class="wrap grid grid-2" style="align-items:center">
       <div>
         <span class="eyebrow">من نحن</span>
-        <h2 class="big-title">مرسال… فتح باب أمل جديد</h2>
+        <h2 class="big-title">مرسال… <mark>فتح باب أمل جديد</mark></h2>
         <p>مرسال مؤسسة خيرية غير هادفة للربح تعمل في مجال الصحة، تسعى لتقديم كافة أنواع الرعاية الطبية بجودة عالية لكل من يحتاجها من غير القادرين بدون أي تفرقة، من خلال شبكة من الأطباء والمستشفيات المتعاقدة مع مرسال.</p>
         <ul class="values">
           <li><b>المريض أولاً</b><span>له الأولوية المطلقة في المؤسسة</span></li>
@@ -103,10 +116,10 @@
 
   <section class="hospital-feature">
     <div class="wrap grid grid-2" style="align-items:center">
-      <div class="hf-pic"><img src="/img/old/1-ce3f944d-sm.jpg" srcset="/img/old/1-ce3f944d-sm.jpg 600w, /img/old/1-ce3f944d.jpg 1200w" sizes="(max-width: 760px) 92vw, 560px" alt="مستشفى مرسال للأطفال" loading="lazy" width="1200" height="900"></div>
+      <div class="hf-pic"><div class="chip chip-a"><b data-count="5000">0</b><span>متر مربع</span></div><div class="chip chip-b"><b data-count="35">0</b><span>سرير إقامة</span></div><img src="/img/old/1-ce3f944d-sm.jpg" srcset="/img/old/1-ce3f944d-sm.jpg 600w, /img/old/1-ce3f944d.jpg 1200w" sizes="(max-width: 760px) 92vw, 560px" alt="مستشفى مرسال للأطفال" loading="lazy" width="1200" height="900"></div>
       <div>
         <span class="eyebrow">الحلم اللي بنكمله سوا</span>
-        <h2 class="big-title">مستشفى مرسال للأطفال</h2>
+        <h2 class="big-title">مستشفى <mark>مرسال للأطفال</mark></h2>
         <p>مستشفى متكاملة لعلاج حالات الأطفال الحرجة من سن يوم حتى 18 سنة، وتشمل وحدة زرع نخاع ومعمل تحاليل وقسم أشعة وصيدلية.</p>
         <div class="facts">
           <div><b data-count="5000">0</b><span>متر مربع</span></div>

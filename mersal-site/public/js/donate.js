@@ -10,7 +10,18 @@
     // { name: "فودافون كاش", value: "010xxxxxxxx" }
   ];
 
-  var KEY = "mersalPayment";
+  var KEY = "mersalPayment", DONOR_KEY = "mersalDonor";
+  // Remember the donor's name/phone/email on this device so the next donation is two taps
+  (function rememberDonor() {
+    var ids = ["name", "phone", "email"], els = ids.map(function (i) { return document.getElementById(i); });
+    if (els.some(function (e) { return !e; })) return;
+    var saved = {}; try { saved = JSON.parse(localStorage.getItem(DONOR_KEY) || "{}"); } catch (x) {}
+    els.forEach(function (e, i) { if (!e.value && saved[ids[i]]) e.value = saved[ids[i]]; });
+    els.forEach(function (e) { e.addEventListener("change", function () {
+      var o = {}; els.forEach(function (x, i) { if (x.value.trim()) o[ids[i]] = x.value.trim(); });
+      try { localStorage.setItem(DONOR_KEY, JSON.stringify(o)); } catch (x) {}
+    }); });
+  })();
   var MODE = (window.MERSAL_SITE && window.MERSAL_SITE.payMode) || "off";
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
@@ -91,7 +102,7 @@
     form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.toggle("on", x.dataset.v === String(amount.value)); });
   }
   form.querySelectorAll(".amounts button").forEach(function (b) {
-    b.addEventListener("click", function () { amount.value = b.dataset.v; syncChips(); updateImpact(); });
+    b.addEventListener("click", function () { amount.value = b.dataset.v; syncChips(); updateImpact(); if (window.mersalTap) window.mersalTap(8); });
   });
   amount.addEventListener("input", function () { syncChips(); updateImpact(); });
   purpose.addEventListener("change", updateImpact);

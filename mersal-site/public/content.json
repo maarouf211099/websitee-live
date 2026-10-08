@@ -1,5 +1,40 @@
 {
-  "_note": "Edit this file to change the campaigns on the home page. image = path under /img. goal/raised are optional (EGP); leave them out to hide the progress bar.",
+  "_note": "Edit this file to change the campaigns on the home page. image = path under /img. goal/raised are optional (EGP); leave them out to hide the progress bar. slides = home slider (image under /img, title, text, button text + link). stats = home counters, e.g. {\"label\":\"حالة تم علاجها\",\"value\":1200}; leave empty to hide.",
+  "slides": [
+    {
+      "image": "/img/hero.jpg",
+      "tag": "/img/far7aa.png",
+      "title": "مؤسسة مرسال للأعمال الخيرية والتنموية",
+      "text": "مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية، وإحداث فارق إيجابي في مستوى حياتهم.",
+      "button": "تبرع الآن",
+      "link": "/donate.html"
+    },
+    {
+      "image": "/img/hero.jpg",
+      "side": "/img/afia-card.png",
+      "title": "كارت عافية",
+      "text": "كارت خصومات عائلي على جميع الخدمات الطبية بنسب خصم تصل حتى 70%.",
+      "button": "اعرف أكثر",
+      "link": "/afia.html"
+    },
+    {
+      "image": "/img/hero.jpg",
+      "side": "/img/donate-imge1.png",
+      "title": "مندوبنا لحد باب البيت",
+      "text": "اتصل على الخط الساخن 19340 وهيوصلك مندوب مرسال لاستلام تبرعك.",
+      "button": "اتصل 19340",
+      "link": "tel:19340"
+    },
+    {
+      "image": "/img/hero.jpg",
+      "side": "/img/mega-5eer.jpg",
+      "title": "5 جنيه بتفرق",
+      "text": "ابعت رسالة على 9599 لمريض بمرسال.",
+      "button": "كل طرق التبرع",
+      "link": "/donate.html"
+    }
+  ],
+  "stats": [],
   "campaigns": [
     {
       "title": "مستشفى مرسال الخيري",

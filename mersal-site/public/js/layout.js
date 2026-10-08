@@ -37,6 +37,7 @@
   var NAV = [
     ["/", "الرئيسية"],
     ["/about.html", "عن مرسال"],
+    ["/afia.html", "كارت عافية"],
     ["/donate.html", "طرق التبرع"],
     ["/zakat.html", "حاسبة الزكاة"],
     ["/contact.html", "تواصل معنا"]
@@ -84,6 +85,26 @@
   if (!/donate\.html$/.test(location.pathname)) {
     document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="/donate.html">تبرع الآن</a>');
   }
+
+  // Header shadow once the page scrolls
+  var hdr = document.querySelector(".site-header");
+  addEventListener("scroll", function () { hdr.classList.toggle("scrolled", scrollY > 10); }, { passive: true });
+
+  // Fade-up on scroll for sections, cards and banners (skipped for reduced motion)
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var io = (!reduce && "IntersectionObserver" in window) ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: .12, rootMargin: "0px 0px -40px 0px" }) : null;
+  window.mersalReveal = function (els) {
+    if (!io) return;
+    Array.prototype.forEach.call(els, function (el) {
+      if (el.classList.contains("reveal")) return;
+      var sibs = el.parentNode ? Array.prototype.indexOf.call(el.parentNode.children, el) : 0;
+      el.style.setProperty("--d", Math.min(sibs, 5) * 0.08 + "s");
+      el.classList.add("reveal"); io.observe(el);
+    });
+  };
+  window.mersalReveal(document.querySelectorAll("main .section-title, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
 
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
   toggle.addEventListener("click", function () {

@@ -31,6 +31,10 @@
     setInterval(function () { items[i].classList.remove("active"); i = (i + 1) % items.length; items[i].classList.add("active"); }, 5000);
   });
 
+  // Donate links inside a project page pre-select that project on the donate page
+  var pid = (/^\/p\/(\d+)\.html$/.exec(location.pathname) || [])[1];
+  if (pid) document.querySelectorAll('main a[href^="/donate.html"]').forEach(function (a) { a.href = "/donate.html?for=p" + pid + "#online"; });
+
   // Breadcrumbs, share buttons and related pages (from the imported menu)
   var here = location.pathname;
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }

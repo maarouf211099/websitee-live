@@ -1,8 +1,11 @@
 // Shared header and footer for every page. Edit contact details here only.
 (function () {
   var SITE = {
-    // Card payment (Banque Misr). false = hidden everywhere until the API settings are added in Azure.
-    onlinePayment: false,
+    // Card payment (Banque Misr):
+    //   "off"  = hidden everywhere
+    //   "demo" = full donation flow that stops at the bank gateway (nothing is charged)
+    //   "live" = real payments (needs MPGS_MERCHANT / MPGS_API_PASSWORD in Azure)
+    payMode: "demo",
     phone: "01200002870",
     hotline: "19340",
     email: "info@mersal-ngo.org",
@@ -15,6 +18,7 @@
       youtube: "https://www.youtube.com/channel/UC30Ek5Wl1us6LD6BLkegsHQ"
     }
   };
+  SITE.onlinePayment = SITE.payMode !== "off";
   window.MERSAL_SITE = SITE;
   if (!SITE.onlinePayment) document.documentElement.classList.add("no-online-pay");
 
@@ -90,7 +94,12 @@
   document.getElementById("site-header").outerHTML = header;
   document.getElementById("site-footer").outerHTML = footer;
   if (!/donate\.html$/.test(location.pathname)) {
-    document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="/donate.html">تبرع الآن</a>');
+    var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname);
+    var dHref = "/donate.html" + (pm ? "?for=p" + pm[1] : "") + "#online";
+    document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>' +
+      '<nav class="m-bar" aria-label="تبرع سريع"><a class="m-call" href="tel:19340"><span aria-hidden="true">📞</span>19340</a>' +
+      '<a class="m-donate" href="' + dHref + '">💚 تبرع الآن</a><a class="m-zakat" href="/zakat.html"><span aria-hidden="true">🧮</span>الزكاة</a></nav>');
+    document.body.classList.add("has-mbar");
   }
 
   // Header shadow once the page scrolls

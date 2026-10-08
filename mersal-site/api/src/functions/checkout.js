@@ -26,7 +26,8 @@ app.http("checkout", {
     const name = clean(b.name, 80);
     const email = clean(b.email, 120);
     const phone = clean(b.phone, 20).replace(/[^\d+]/g, "");
-    const purpose = PURPOSES[b.purpose] ? b.purpose : "general";
+    // general/zakat/... or a project page from the old site ("p30" = /p/30.html)
+    const purpose = PURPOSES[b.purpose] || /^p\d{1,4}$/.test(b.purpose || "") ? b.purpose : "general";
     if (name.length < 2) return bad("من فضلك اكتب الاسم");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("البريد الإلكتروني غير صحيح");
     if (phone.length < 8) return bad("رقم الموبايل غير صحيح");

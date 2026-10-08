@@ -5,7 +5,7 @@
 
   var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
-  var fmt = new Intl.NumberFormat("ar-EG");
+  var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
 
   document.querySelectorAll(".copy").forEach(function (b) {
     b.addEventListener("click", function () {
@@ -25,7 +25,7 @@
   });
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "#online";
+    location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "&for=" + encodeURIComponent(document.getElementById("qp").value) + "#online";
   });
 
   // ---------- slider ----------

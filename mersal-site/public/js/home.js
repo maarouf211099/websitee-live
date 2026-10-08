@@ -25,7 +25,7 @@
   });
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "&for=" + encodeURIComponent(document.getElementById("qp").value) + "#online";
+    location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "#online";
   });
 
   // ---------- slider ----------

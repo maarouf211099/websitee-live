@@ -67,9 +67,10 @@
       els[cur].classList.add("on");
       if (!reduceMotion) els[cur].classList.add("kb");
       dotEls[cur].setAttribute("aria-selected", "true");
+      dotEls[cur].style.animation = "none"; void dotEls[cur].offsetWidth; dotEls[cur].style.animation = "";
     }
-    function play() { stop(); if (!reduceMotion && els.length > 1) timer = setInterval(function () { go(cur + 1); }, 6500); }
-    function stop() { if (timer) clearInterval(timer); timer = null; }
+    function play() { stop(); root.classList.remove("paused"); if (!reduceMotion && els.length > 1) timer = setInterval(function () { go(cur + 1); }, 6500); }
+    function stop() { if (timer) clearInterval(timer); timer = null; root.classList.add("paused"); }
     dotEls.forEach(function (d, i) { d.addEventListener("click", function () { go(i); play(); }); });
     root.querySelector(".sl-next").addEventListener("click", function () { go(cur + 1); play(); });
     root.querySelector(".sl-prev").addEventListener("click", function () { go(cur - 1); play(); });
@@ -158,26 +159,17 @@
     } else cards.forEach(animate);
   }
 
-  function channels(list) {
-    if (!list || !list.length) return;
-    document.getElementById("channels").innerHTML = list.map(function (c) {
-      return '<div class="card channel">' + (c.image ? '<img src="' + esc(c.image) + '" alt="" loading="lazy">' : "") +
-        "<div><h3>" + esc(c.title) + "</h3><p>" + esc(c.text) + "</p></div></div>";
-    }).join("");
-    document.getElementById("channels-sec").hidden = false;
-    if (window.mersalReveal) window.mersalReveal(document.getElementById("channels").children);
-  }
 
   // Count-up numbers in the hospital section
   (function () {
     var nums = document.querySelectorAll("[data-count]");
     function run(el) {
-      var to = Number(el.dataset.count), t0 = null;
-      if (reduceMotion) { el.textContent = fmt.format(to); return; }
+      var to = Number(el.dataset.count), t0 = null, pre = el.dataset.prefix || "";
+      if (reduceMotion) { el.textContent = pre + fmt.format(to); return; }
       requestAnimationFrame(function step(t) {
         t0 = t0 || t; var p = Math.min(1, (t - t0) / 1500);
-        el.textContent = fmt.format(Math.round(to * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(step);
+        el.textContent = pre + fmt.format(Math.round(to * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step); else el.classList.add("done");
       });
     }
     if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
@@ -186,6 +178,6 @@
   })();
 
   fetch("/content.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (data) {
-    slider(data.slides); donationCampaigns(data.campaigns); campaigns(data.projects); channels(data.channels);
+    slider(data.slides); donationCampaigns(data.campaigns); campaigns(data.projects);
   }).catch(function () {});
 })();

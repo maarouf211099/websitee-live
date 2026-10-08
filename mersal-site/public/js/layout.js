@@ -121,7 +121,8 @@
       el.classList.add("reveal"); io.observe(el);
     });
   };
-  window.mersalReveal(document.querySelectorAll("main .section-title, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
+  document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img").forEach(function (el) { el.classList.add("zoom"); });
+  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
 
   // Extra links added to the imported menu groups
   var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"], ["/albums.html", "ألبومات الصور"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
@@ -160,7 +161,11 @@
   var mainEl = document.querySelector("main"); if (mainEl && !mainEl.id) mainEl.id = "main";
   document.body.insertAdjacentHTML("beforeend", '<button type="button" class="to-top" aria-label="الرجوع لأعلى الصفحة">↑</button>');
   var toTop = document.querySelector(".to-top");
-  addEventListener("scroll", function () { toTop.classList.toggle("show", scrollY > 600); }, { passive: true });
+  var fab = document.querySelector(".fab-donate");
+  addEventListener("scroll", function () {
+    toTop.classList.toggle("show", scrollY > 600);
+    if (fab) fab.classList.toggle("show", scrollY > 500);
+  }, { passive: true });
   toTop.addEventListener("click", function () { scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
 
   // Site search over the imported pages + main pages

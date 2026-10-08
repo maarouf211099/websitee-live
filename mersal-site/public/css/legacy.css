@@ -93,3 +93,17 @@
 /* FAQ answers: plain text, not section bars */
 .legacy .accordion-body h4 { background: none; color: var(--ink); padding: 0; font-size: 16px; font-weight: 600; border-radius: 0; }
 .legacy .accordion-body h5 { color: var(--teal); }
+
+/* v3: content motion */
+.legacy li.reveal { transform: translateX(18px); }
+.legacy li.reveal.in { transform: none; }
+.legacy .row > *.reveal { transform: translateY(18px); }
+.legacy img:not(.img-icon) { transition: transform .5s ease, box-shadow .5s ease; }
+.legacy .row > * > img:not(.img-icon):hover, .legacy .box-info-card img:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 16px 36px rgba(0,48,48,.16); }
+.legacy h2, .legacy .content-sector h2 { position: relative; }
+.legacy h4, .legacy .content-sector h4 { box-shadow: inset 4px 0 0 var(--gold); }
+.legacy ul li:not(:has(.img-icon))::before { transition: transform .25s ease; }
+.legacy ul li:hover::before { transform: scale(1.15) rotate(-8deg); }
+.legacy .accordion-button:hover { background: var(--teal-dark); }
+.legacy .do-btn, .legacy a.btn { transition: transform .2s, box-shadow .2s; }
+.legacy .do-btn:hover, .legacy a.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(254,200,48,.4); }

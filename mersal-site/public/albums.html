@@ -31,9 +31,9 @@
   <button type="button" class="lb-next" aria-label="التالية">&#8249;</button>
 </div>
 <div id="site-footer"></div>
-<script src="/js/layout.js"></script>
+<script defer src="/js/layout.js"></script>
 <script>
-(function () {
+addEventListener("DOMContentLoaded", function () {
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   var lb = document.getElementById("lightbox"), img = lb.querySelector("img"), cap = lb.querySelector("figcaption");
   var cur = null, idx = 0, lastFocus = null;
@@ -59,7 +59,7 @@
     var box = document.getElementById("albums");
     box.innerHTML = albums.map(function (a, i) {
       return '<button type="button" class="card album" data-i="' + i + '">' +
-        '<div style="overflow:hidden"><div class="media" style="background-image:url(\'' + esc((a.thumbs || a.photos)[0]) + '\')"></div></div>' +
+        '<div style="overflow:hidden">' + window.mersalPic((a.thumbs || a.photos)[0], { alt: a.title, cls: "media", w: 600, h: 375 }) + "</div>" +
         '<div class="body"><h3>' + esc(a.title) + '</h3><p>' + a.photos.length + ' صورة' + (a.date ? " · " + esc(a.date.slice(0, 4)) : "") + "</p></div></button>";
     }).join("");
     box.querySelectorAll(".album").forEach(function (b) { b.addEventListener("click", function () { open(albums[+b.dataset.i], 0); }); });
@@ -67,7 +67,7 @@
     var q = new URLSearchParams(location.search).get("a");
     if (q !== null && albums[+q]) open(albums[+q], 0);
   });
-})();
+});
 </script>
 </body>
 </html>

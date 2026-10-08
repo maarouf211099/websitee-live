@@ -186,20 +186,44 @@ def head(title, desc):
 </head>"""
 
 
-def page_html(title, body, desc, cover=None, share_img=None):
+def hero_img(src):
+    """Page banner photo as <picture> (WebP sibling when tools/optimize_images.py produced one)."""
+    if not src:
+        return ""
+    webp = re.sub(r"\.(jpe?g|png)$", ".webp", src, flags=re.I)
+    source = f'<source type="image/webp" srcset="{webp}">' if webp != src and os.path.exists(os.path.join(PUB, webp.lstrip("/"))) else ""
+    return f'<picture>{source}<img class="ph-bg" src="{src}" alt="" fetchpriority="high" width="1200" height="800"></picture>'
+
+
+def side_html(pid, title):
+    t = html.escape(title)
+    amounts = "".join(f'<a href="/donate.html?for=p{pid}&amp;amount={a}#online">{a:,}<small>جنيه</small></a>' for a in (100, 250, 500, 1000))
+    return f"""<aside class="page-side" aria-label="تبرع وتواصل">
+        <div class="side-card donate"><h3>ادعم: {t}</h3><p>تبرعك بيوصل مباشرة لمستحقيه.</p>
+          <div class="side-amounts">{amounts}</div>
+          <a class="btn btn-gold" href="/donate.html?for=p{pid}#online">تبرع بمبلغ آخر</a></div>
+        <a class="side-card hot" href="tel:19340"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><span><b>19340</b><span>الخط الساخن - مندوبنا لحد باب البيت</span></span></a>
+      </aside>"""
+
+
+def page_html(title, body, desc, cover=None, share_img=None, pid=None):
     cover_html = f'<img class="legacy-cover" src="{cover}" alt="" loading="lazy">' if cover else ""
     og = f'<meta property="og:image" content="{SITE_URL}{share_img}">' if share_img else ""
+    side = side_html(pid, title) if pid else ""
     return f"""{head(title, desc).replace("</head>", og + chr(10) + "</head>")}
 <body>
 <div id="site-header"></div>
-<div class="page-head"><div class="wrap"><h1>{html.escape(title)}</h1></div></div>
+<div class="page-head{' has-photo' if share_img else ''}">{hero_img(share_img)}<div class="wrap"><h1>{html.escape(title)}</h1></div></div>
 <main id="main">
   <section>
-    <div class="wrap legacy">
+    <div class="wrap page-grid">
+      <div class="legacy">
       {cover_html}
 <!-- mersal:content -->
 {body}
 <!-- /mersal:content -->
+      </div>
+      {side}
     </div>
   </section>
   <section class="alt cta-band">
@@ -212,8 +236,8 @@ def page_html(title, body, desc, cover=None, share_img=None):
   </section>
 </main>
 <div id="site-footer"></div>
-<script src="/js/layout.js"></script>
-<script src="/js/legacy.js"></script>
+<script defer src="/js/layout.js"></script>
+<script defer src="/js/legacy.js"></script>
 </body>
 </html>
 """
@@ -256,7 +280,7 @@ def main():
             body = ('<div class="row align-items-center"><div class="col-md-7">' + body +
                     '</div><div class="col-md-5"><img src="/img/about-mersal.jpg" alt="مؤسسة مرسال" loading="lazy"></div></div>')
         with open(os.path.join(PUB, "p", f"{pid}.html"), "w", encoding="utf-8") as f:
-            f.write(page_html(title, body, desc, cover, cover or (photos[0] if photos else None)))
+            f.write(page_html(title, body, desc, cover, cover or (photos[0] if photos else None), pid))
         pages[pid] = {"title": title, "desc": desc, "cover": cover, "photo": photos[0] if photos else None}
         print("  page", pid, title)
 

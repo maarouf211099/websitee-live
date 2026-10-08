@@ -75,9 +75,9 @@
   </section>
 </main>
 <div id="site-footer"></div>
-<script src="/js/layout.js"></script>
+<script defer src="/js/layout.js"></script>
 <script>
-(function () {
+addEventListener("DOMContentLoaded", function () {
   var f = document.getElementById("zakat"), fmt = new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 2 });
   function v(n) { var x = parseFloat(f.elements[n].value); return isFinite(x) && x > 0 ? x : 0; }
   function calc() {
@@ -97,7 +97,7 @@
     document.getElementById("z-pay").href = window.MERSAL_SITE.onlinePayment ? "/donate.html?for=zakat" + (zakat >= 10 ? "&amount=" + Math.ceil(zakat) : "") + "#online" : "/donate.html";
   }
   f.addEventListener("input", calc); calc();
-})();
+});
 </script>
 </body>
 </html>

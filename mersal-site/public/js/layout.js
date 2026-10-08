@@ -19,6 +19,29 @@
     }
   };
   SITE.onlinePayment = SITE.payMode !== "off";
+
+  // Responsive <picture> with a WebP source. tools/optimize_images.py guarantees a .webp sibling for every
+  // jpg/png under /img/ (not /img/uploads/, where the admin console stores originals only).
+  function webpOf(u) { return /^\/img\/(?!uploads\/)[^?#]+\.(jpe?g|png)$/i.test(u || "") ? u.replace(/\.(jpe?g|png)$/i, ".webp") : null; }
+  function escA(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  // opt: { alt, cls, w, h, lazy (default true), priority ("high"), srcset: [[url, "1200w"], ...], sizes, attrs (raw string), defer (use data- attributes) }
+  window.mersalPic = function (src, opt) {
+    opt = opt || {};
+    var pre = opt.defer ? "data-" : "", wp = webpOf(src);
+    var set = (opt.srcset || []).map(function (e) { return escA(e[0]) + " " + e[1]; }).join(", ");
+    var setW = (opt.srcset || []).map(function (e) { return webpOf(e[0]); });
+    var hasW = wp && setW.every(Boolean);
+    var sizes = opt.sizes ? ' sizes="' + escA(opt.sizes) + '"' : "";
+    var html = "<picture>";
+    if (hasW) html += '<source type="image/webp" ' + pre + 'srcset="' + (set ? setW.map(function (u, i) { return u + " " + opt.srcset[i][1]; }).join(", ") : wp) + '"' + sizes + ">";
+    html += "<img " + pre + 'src="' + escA(src) + '"' + (set ? " " + pre + 'srcset="' + set + '"' + sizes : "") +
+      ' alt="' + escA(opt.alt) + '"' + (opt.cls ? ' class="' + escA(opt.cls) + '"' : "") +
+      (opt.w ? ' width="' + opt.w + '" height="' + opt.h + '"' : "") +
+      (opt.priority ? ' fetchpriority="' + opt.priority + '"' : opt.lazy === false ? "" : ' loading="lazy" decoding="async"') +
+      (opt.attrs ? " " + opt.attrs : "") + "></picture>";
+    return html;
+  };
+  window.mersalWebp = webpOf;
   window.MERSAL_SITE = SITE;
   if (!SITE.onlinePayment) document.documentElement.classList.add("no-online-pay");
 
@@ -125,7 +148,7 @@
     });
   };
   document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img").forEach(function (el) { el.classList.add("zoom"); });
-  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, .site-footer .cols > div"));
+  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, main .legacy .row > *, main .legacy li, main .legacy > img, main .page-side, main .share-bar, .site-footer .cols > div"));
 
   // Extra links added to the imported menu groups
   var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"], ["/albums.html", "ألبومات الصور"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };

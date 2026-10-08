@@ -23,6 +23,7 @@ function requireAdmin(req) {
 
 // Paths the admin may read/write, relative to the site root
 const ALLOWED = [
+  /^public\/index\.html$/,
   /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings)\.json$/,
   /^public\/p\/\d{1,4}\.html$/, /^public\/js\/layout\.js$/,
   /^public\/img\/uploads\/[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif)$/,

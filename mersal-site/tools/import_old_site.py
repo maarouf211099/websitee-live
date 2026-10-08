@@ -486,3 +486,6 @@ def add_small_copies():
 if __name__ == "__main__":
     main()
     add_small_copies()
+    # phone crops + WebP siblings, then bake the hero into index.html
+    subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "optimize_images.py")], check=False)
+    subprocess.run(["node", os.path.join(os.path.dirname(os.path.abspath(__file__)), "render-home.js")], check=False)

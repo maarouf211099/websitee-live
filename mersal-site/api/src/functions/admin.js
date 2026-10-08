@@ -3,6 +3,7 @@
 const { app } = require("@azure/functions");
 const { requireAdmin, readFile, commitFiles, json, fail } = require("../lib/admin");
 const donations = require("../lib/donations");
+const hero = require("../lib/hero");
 
 const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json" };
 const who = (p) => ({ name: p.userDetails || "Mersal admin", email: /@/.test(p.userDetails || "") ? p.userDetails : "admin@mersal-ngo.org" });
@@ -28,7 +29,13 @@ app.http("adminData", {
       if (!path) return json(404, { message: "ملف غير معروف" });
       if (req.method === "GET") return json(200, JSON.parse(await readFile(path)));
       const body = await req.json();
-      const sha = await commitFiles([{ path, content: JSON.stringify(body.data, null, 2) + "\n" }], body.message || `admin: update ${req.params.name}`, who(p));
+      const files = [{ path, content: JSON.stringify(body.data, null, 2) + "\n" }];
+      if (req.params.name === "content") {
+        // the hero is baked into index.html: regenerate it in the same commit so the two never drift
+        const idx = await readFile("public/index.html");
+        files.push({ path: "public/index.html", content: hero.apply(idx, body.data) });
+      }
+      const sha = await commitFiles(files, body.message || `admin: update ${req.params.name}`, who(p));
       return json(200, { ok: true, commit: sha });
     } catch (e) { return fail(e, ctx); }
   },

@@ -42,13 +42,15 @@
   });
 
   // ---------- image upload (resized in the browser) ----------
-  function resize(file, max, quality) {
+  // cropLeft (0-1): keep only that fraction of the width, from the left - the photo half of a banner for the phone hero
+  function resize(file, max, quality, cropLeft) {
     return new Promise(function (res, rej) {
       var img = new Image(), url = URL.createObjectURL(file);
       img.onload = function () {
-        var k = Math.min(1, max / Math.max(img.width, img.height)), w = Math.round(img.width * k), h = Math.round(img.height * k);
+        var sw = cropLeft ? Math.round(img.width * cropLeft) : img.width, sh = img.height;
+        var k = Math.min(1, max / Math.max(sw, sh)), w = Math.round(sw * k), h = Math.round(sh * k);
         var c = document.createElement("canvas"); c.width = w; c.height = h;
-        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        c.getContext("2d").drawImage(img, 0, 0, sw, sh, 0, 0, w, h);
         URL.revokeObjectURL(url);
         res(c.toDataURL("image/jpeg", quality || .82).split(",")[1]);
       };
@@ -62,19 +64,20 @@
     });
   }
   // returns [{url, urlSm}] after committing the images
-  function upload(files, maxBig, maxSm) {
+  function upload(files, maxBig, maxSm, mobileCrop) {
     return Promise.all(files.map(function (f) {
-      return Promise.all([resize(f, maxBig || 1600), maxSm ? resize(f, maxSm, .78) : null]).then(function (r) {
+      return Promise.all([resize(f, maxBig || 1600), maxSm ? resize(f, maxSm, .78) : null, mobileCrop ? resize(f, 900, .82, mobileCrop) : null]).then(function (r) {
         var stem = f.name.replace(/\.[^.]+$/, "");
         var out = [{ name: stem + ".jpg", data: r[0] }];
         if (r[1]) out.push({ name: stem + "-sm.jpg", data: r[1] });
+        if (r[2]) out.push({ name: stem + "-m.jpg", data: r[2] });
         return out;
       });
     })).then(function (groups) {
       var flat = [].concat.apply([], groups);
       return api("upload", { method: "POST", body: { files: flat } }).then(function (d) {
         var urls = d.urls, out = [], i = 0;
-        groups.forEach(function (g) { out.push({ url: urls[i], urlSm: g.length > 1 ? urls[i + 1] : urls[i] }); i += g.length; });
+        groups.forEach(function (g) { out.push({ url: urls[i], urlSm: g.length > 1 ? urls[i + 1] : urls[i], urlM: g.length > 2 ? urls[i + 2] : null }); i += g.length; });
         return out;
       });
     });
@@ -88,7 +91,12 @@
   function renderSlides() {
     $("#slides").innerHTML = (content.slides || []).map(function (s, i) {
       return '<div class="item" data-i="' + i + '"><img class="thumb wide" src="' + esc(s.bannerSm || s.banner || "") + '" alt="">' +
-        '<div class="fields"><div class="field"><label>الرابط عند الضغط</label><input data-k="link" value="' + esc(s.link || "/donate.html") + '"></div>' +
+        '<div class="fields"><div class="field"><label>سطر صغير فوق العنوان (اختياري)</label><input data-k="kicker" value="' + esc(s.kicker || "") + '"></div>' +
+        '<div class="field"><label>العنوان (بيظهر على الموبايل)</label><input data-k="title" value="' + esc(s.title || "") + '"></div>' +
+        '<div class="field"><label>سطر تحت العنوان</label><input data-k="text" value="' + esc(s.text || "") + '"></div>' +
+        '<div class="field"><label>نص الزرار</label><input data-k="button" value="' + esc(s.button || "تبرع الآن") + '"></div>' +
+        '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" value="' + esc(s.link || "/donate.html") + '"></div>' +
+        '<div class="field"><label>مكان الصورة على الموبايل (مثال 40% 50%)</label><input data-k="focus" value="' + esc(s.focus || "50% 50%") + '"></div>' +
         '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div></div>' +
         '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
@@ -100,6 +108,9 @@
         '<div class="fields">' +
         '<div class="field full"><label>اسم الحملة</label><input data-k="title" value="' + esc(c.title) + '"></div>' +
         '<div class="field full"><label>وصف قصير</label><input data-k="text" value="' + esc(c.text || "") + '"></div>' +
+        '<div class="field full"><label>أثر التبرع في سطر (بيظهر في الكارت)</label><input data-k="impact" value="' + esc(c.impact || "") + '"></div>' +
+        '<div class="field"><label>عدد المتبرعين (اختياري)</label><input data-k="donors" type="number" value="' + esc(c.donors || "") + '"></div>' +
+        '<div class="field"><label>آخر موعد (اختياري)</label><input data-k="deadline" type="date" value="' + esc(c.deadline || "") + '"></div>' +
         '<div class="field"><label>الوحدة (سهم/جرعة)</label><input data-k="unit" value="' + esc(c.unit || "سهم") + '"></div>' +
         '<div class="field"><label>سعر الوحدة (جنيه)</label><input data-k="unitPrice" type="number" value="' + esc(c.unitPrice || 0) + '"></div>' +
         '<div class="field"><label>الهدف</label><input data-k="goal" type="number" value="' + esc(c.goal || 0) + '"></div>' +
@@ -131,29 +142,29 @@
     $(listSel).addEventListener("click", function (e) {
       var b = e.target.closest("[data-act]"); if (!b) return;
       var it = b.closest(".item"), i = +it.dataset.i, arr = content[key];
-      collect(listSel, key, ["unitPrice", "goal", "raised", "value"]);
+      collect(listSel, key, ["unitPrice", "goal", "raised", "donors", "value"]);
       if (b.dataset.act === "del") { if (confirm("حذف العنصر ده؟")) { arr.splice(i, 1); render(); } }
       else if (b.dataset.act === "up" && i > 0) { arr.splice(i - 1, 0, arr.splice(i, 1)[0]); render(); }
       else if (b.dataset.act === "down" && i < arr.length - 1) { arr.splice(i + 1, 0, arr.splice(i, 1)[0]); render(); }
       else if (b.dataset.act === "img") {
         pick(false).then(function (files) {
           if (!files.length) return; busy(b, true);
-          return upload(files, imgOpts.big, imgOpts.sm).then(function (r) {
-            if (key === "slides") { arr[i].banner = r[0].url; arr[i].bannerSm = r[0].urlSm; } else { arr[i].image = r[0].url; arr[i].imageSm = r[0].urlSm; }
+          return upload(files, imgOpts.big, imgOpts.sm, imgOpts.mobile).then(function (r) {
+            if (key === "slides") { arr[i].banner = r[0].url; arr[i].bannerSm = r[0].urlSm; arr[i].mobile = r[0].urlM || ""; } else { arr[i].image = r[0].url; arr[i].imageSm = r[0].urlSm; }
             render(); toast("اترفعت الصورة، اضغط حفظ ونشر");
           });
         }).catch(function (err) { toast(err.message, true); busy(b, false); });
       }
     });
   }
-  listActions("#slides", "slides", renderSlides, { big: 1920, sm: 1200 });
+  listActions("#slides", "slides", renderSlides, { big: 1600, sm: 1200, mobile: .46 });
   listActions("#campaigns", "campaigns", renderCampaigns, { big: 900, sm: 600 });
   listActions("#numbers", "numbers", renderNumbers, {});
-  $("#add-slide").onclick = function () { collect("#slides", "slides"); (content.slides = content.slides || []).push({ banner: "", bannerSm: "", link: "/donate.html", alt: "" }); renderSlides(); };
-  $("#add-campaign").onclick = function () { collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised"]); (content.campaigns = content.campaigns || []).push({ title: "حملة جديدة", text: "", image: "", imageSm: "", unit: "سهم", unitPrice: 0, goal: 0, raised: 0, link: "/donate.html", purpose: "general" }); renderCampaigns(); };
+  $("#add-slide").onclick = function () { collect("#slides", "slides"); (content.slides = content.slides || []).push({ banner: "", bannerSm: "", kicker: "", title: "", text: "", button: "تبرع الآن", link: "/donate.html", focus: "50% 50%", alt: "" }); renderSlides(); };
+  $("#add-campaign").onclick = function () { collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); (content.campaigns = content.campaigns || []).push({ title: "حملة جديدة", text: "", image: "", imageSm: "", unit: "سهم", unitPrice: 0, goal: 0, raised: 0, link: "/donate.html", purpose: "general" }); renderCampaigns(); };
   $("#add-number").onclick = function () { collect("#numbers", "numbers", ["value"]); (content.numbers = content.numbers || []).push({ value: 0, prefix: "", label: "", link: "" }); renderNumbers(); };
   $("#save-home").onclick = function () {
-    var b = this; collect("#slides", "slides"); collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised"]); collect("#numbers", "numbers", ["value"]);
+    var b = this; collect("#slides", "slides"); collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); collect("#numbers", "numbers", ["value"]);
     content.slides = (content.slides || []).filter(function (s) { return s.banner; });
     busy(b, true);
     api("data/content", { method: "PUT", body: { data: content, message: "admin: home content" } }).then(published).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });

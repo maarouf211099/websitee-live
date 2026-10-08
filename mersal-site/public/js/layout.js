@@ -113,7 +113,7 @@
         '<li><a href="mailto:' + SITE.email + '">' + SITE.email + "</a></li>" +
       "</ul></div>" +
     "</div>" +
-    '<div class="copyright">© ' + year + " مؤسسة مرسال للأعمال الخيرية والتنموية - جميع الحقوق محفوظة</div></footer>";
+    '<div class="copyright">© ' + year + ' مؤسسة مرسال للأعمال الخيرية والتنموية - جميع الحقوق محفوظة <a class="admin-link" href="/admin/" rel="nofollow">لوحة التحكم</a></div></footer>';
 
   document.getElementById("site-header").outerHTML = header;
   document.getElementById("site-footer").outerHTML = footer;

@@ -203,5 +203,6 @@
 @media (max-width: 760px) {
   .home .slide.banner a { aspect-ratio: 1920 / 760; }
   .home .slide.banner > a > picture { position: absolute; inset: 0; display: block; }
-  .home .slide.banner > a > picture > img { height: 100%; width: 100%; aspect-ratio: auto; object-fit: contain; object-position: center; padding: 10px 0 34px; }
+  /* a touch larger than the screen (8% off each side, which is only background on these banners) */
+  .home .slide.banner > a > picture > img { height: 100%; width: 116%; margin-inline: -8%; aspect-ratio: auto; object-fit: contain; object-position: center; padding: 6px 0 30px; }
 }

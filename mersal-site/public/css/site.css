@@ -986,3 +986,6 @@ img.media { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover;
   .fab-donate { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .site-header, .brand, .m-bar a, .m-bar button, .m-bar .m-donate i { transition: none; animation: none; } .site-header::after { animation: none; } }
+
+.site-footer .admin-link { color: rgba(255,255,255,.45); font-size: 12px; margin-inline-start: 14px; text-decoration: underline dotted; }
+.site-footer .admin-link:hover { color: var(--gold); }

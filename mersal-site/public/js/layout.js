@@ -64,6 +64,7 @@
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return '<li><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
       }).join("") + "</ul>" +
+      '<button type="button" class="search-btn" aria-label="بحث في الموقع"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>' +
       '<a class="btn btn-gold" href="/donate.html">تبرع الآن</a>' +
     "</div></header>";
 
@@ -143,6 +144,53 @@
     document.getElementById("nav").innerHTML = '<li><a href="/"' + (here === "/" ? ' aria-current="page"' : "") + ">الرئيسية</a></li>" + tree.map(navItem).join("");
     bindSubs();
   }).catch(function () {});
+
+  // Skip link + back-to-top
+  document.body.insertAdjacentHTML("afterbegin", '<a class="skip-link" href="#main">تخطي إلى المحتوى</a>');
+  var mainEl = document.querySelector("main"); if (mainEl && !mainEl.id) mainEl.id = "main";
+  document.body.insertAdjacentHTML("beforeend", '<button type="button" class="to-top" aria-label="الرجوع لأعلى الصفحة">↑</button>');
+  var toTop = document.querySelector(".to-top");
+  addEventListener("scroll", function () { toTop.classList.toggle("show", scrollY > 600); }, { passive: true });
+  toTop.addEventListener("click", function () { scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
+
+  // Site search over the imported pages + main pages
+  var STATIC = [
+    { t: "طرق التبرع", u: "/donate.html", d: "الحسابات البنكية، المحافظ، إنستاباي، فوري، مندوب لحد البيت" },
+    { t: "حاسبة الزكاة", u: "/zakat.html", d: "احسب زكاة مالك وذهبك وتجارتك" },
+    { t: "كارت عافية", u: "/afia.html", d: "كارت خصومات عائلي على الخدمات الطبية حتى 70%" },
+    { t: "تواصل معنا", u: "/contact.html", d: "الخط الساخن 19340، العنوان، البريد" }
+  ];
+  var index = null;
+  function norm(t) { return String(t || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").toLowerCase(); }
+  document.body.insertAdjacentHTML("beforeend",
+    '<div class="search-panel" hidden role="dialog" aria-modal="true" aria-label="بحث في الموقع"><div class="search-box">' +
+    '<input type="search" placeholder="ابحث في موقع مرسال… (مثلاً: الأورام، العيادات، التطوع)" aria-label="كلمة البحث">' +
+    '<button type="button" class="search-close" aria-label="إغلاق">×</button><ul class="search-results"></ul></div></div>');
+  var panel = document.querySelector(".search-panel"), sInput = panel.querySelector("input"), sList = panel.querySelector(".search-results");
+  function openSearch() {
+    panel.hidden = false; sInput.value = ""; sList.innerHTML = ""; setTimeout(function () { sInput.focus(); }, 30);
+    if (!index) fetch("/data/pages.json").then(function (r) { return r.json(); }).then(function (pg) {
+      index = STATIC.concat(Object.keys(pg).map(function (id) { return { t: pg[id].title, u: "/p/" + id + ".html", d: pg[id].desc }; }));
+      runSearch();
+    }).catch(function () { index = STATIC; });
+  }
+  function closeSearch() { panel.hidden = true; }
+  function runSearch() {
+    var q = norm(sInput.value.trim());
+    if (!index || !q) { sList.innerHTML = ""; return; }
+    var hits = index.filter(function (x) { return norm(x.t + " " + x.d).indexOf(q) > -1; })
+      .sort(function (a, b) { return (norm(b.t).indexOf(q) > -1) - (norm(a.t).indexOf(q) > -1); }).slice(0, 8);
+    sList.innerHTML = hits.length ? hits.map(function (x) { return '<li><a href="' + esc(x.u) + '"><b>' + esc(x.t) + "</b><span>" + esc((x.d || "").slice(0, 90)) + "</span></a></li>"; }).join("")
+      : '<li class="none">مفيش نتايج. جرّب كلمة تانية أو كلمنا على 19340.</li>';
+  }
+  sInput.addEventListener("input", runSearch);
+  document.querySelector(".search-btn").addEventListener("click", openSearch);
+  panel.querySelector(".search-close").addEventListener("click", closeSearch);
+  panel.addEventListener("click", function (e) { if (e.target === panel) closeSearch(); });
+  addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !panel.hidden) closeSearch();
+    if (e.key === "/" && panel.hidden && !/input|textarea|select/i.test((document.activeElement || {}).tagName)) { e.preventDefault(); openSearch(); }
+  });
 
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
   toggle.addEventListener("click", function () {

@@ -148,6 +148,23 @@
     if (window.mersalReveal) window.mersalReveal(document.getElementById("channels").children);
   }
 
+  // Count-up numbers in the hospital section
+  (function () {
+    var nums = document.querySelectorAll("[data-count]");
+    function run(el) {
+      var to = Number(el.dataset.count), t0 = null;
+      if (reduceMotion) { el.textContent = fmt.format(to); return; }
+      requestAnimationFrame(function step(t) {
+        t0 = t0 || t; var p = Math.min(1, (t - t0) / 1500);
+        el.textContent = fmt.format(Math.round(to * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step);
+      });
+    }
+    if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
+    var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } }); }, { threshold: .6 });
+    nums.forEach(function (n) { io.observe(n); });
+  })();
+
   fetch("/content.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (data) {
     slider(data.slides); stats(data.stats, data.statsTitle); campaigns(data.projects && data.projects.length ? data.projects : data.campaigns); channels(data.channels);
   }).catch(function () {});

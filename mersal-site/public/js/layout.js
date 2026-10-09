@@ -2,10 +2,12 @@
 (function () {
   // SITE is edited from the admin console ("بيانات الموقع" -> PUT /api/console/site) and mirrored to /data/site.json:
   // the API rewrites everything between the mersal:site markers, so keep that block a plain object literal
-  // (one key per line, no comments). payMode is the card payment switch (Banque Misr), set from the console settings:
+  // (one key per line, no comments). payMode is the card payment switch, set from the console settings:
   //   "off"  = hidden everywhere
-  //   "demo" = full donation flow that stops at the bank gateway (nothing is charged)
-  //   "live" = real payments (needs MPGS_MERCHANT / MPGS_API_PASSWORD in Azure)
+  //   "demo" = full donation flow that stops before the payment gateway (nothing is charged)
+  //   "live" = real payments through the gateway in payProvider (needs that gateway's settings in Azure)
+  // payProvider (also from the console settings, "بوابة الدفع"; saved whenever payMode is set to "live"; absent = Banque
+  // Misr): "paymob" (Paymob Unified Checkout) | "mpgs" (Banque Misr Hosted Checkout).
   var SITE = /* mersal:site */ {
     payMode: "demo",
     hotline: "19340",

@@ -1,9 +1,9 @@
 // Site details (hotline, phone, WhatsApp, email, address, social links, footer text): GET / PUT /api/console/site.
 // They live in public/js/layout.js between the /* mersal:site */ … /* /mersal:site */ markers (the SITE object literal),
 // so pages need no extra request; the API rewrites that block and mirrors it to public/data/site.json in one commit.
-// payMode (card payment) stays inside the same object but is only changed by the settings endpoint (adminSettings).
-// Revision (X-Mersal-Sha / X-Mersal-Base, lib/commit.js) = the site details without payMode, so flipping the card
-// switch does not block a details save, but another admin's details edit does (409).
+// payMode (card payment) and payProvider (its gateway, lib/pay.js) stay inside the same object but are only changed by
+// the settings endpoint (adminSettings). Revision (X-Mersal-Sha / X-Mersal-Base, lib/commit.js) = the site details
+// without them, so flipping the card switch does not block a details save, but another admin's details edit does (409).
 const { app } = require("@azure/functions");
 const { requireAdmin, readFile, commitFiles, json, fail } = require("../lib/admin");
 const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
@@ -11,7 +11,7 @@ const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 const LAYOUT = "public/js/layout.js", COPY = "public/data/site.json";
 const MARK = /\/\* mersal:site \*\/([\s\S]*?)\/\* \/mersal:site \*\//;
 const SOCIAL = ["facebook", "instagram", "x", "linkedin", "youtube", "tiktok"];
-const PAY = ["off", "demo", "live"];
+const PAY = ["off", "demo", "live"], PROVIDERS = ["paymob", "mpgs"];
 const who = (p) => ({ name: p.userDetails || "Mersal admin", email: /@/.test(p.userDetails || "") ? p.userDetails : "admin@mersal-ngo.org" });
 const err = (status, message) => Object.assign(new Error(message), { status });
 
@@ -30,6 +30,7 @@ function normalize(src) {
   const social = src.social && typeof src.social === "object" ? src.social : {}, footer = src.footer && typeof src.footer === "object" ? src.footer : {};
   const out = {
     payMode: PAY.includes(src.payMode) ? src.payMode : "off",
+    ...(PROVIDERS.includes(src.payProvider) ? { payProvider: src.payProvider } : {}), // only once the console saved one
     hotline: str(src.hotline, 20), phone: str(src.phone, 20), whatsapp: str(src.whatsapp, 20),
     email: str(src.email, 120), address: str(src.address, 200), social: {},
     footer: { name: str(footer.name, 120), text: str(footer.text, 400) },
@@ -61,7 +62,8 @@ function render(js, site) {
   return js.replace(MARK, () => "/* mersal:site */ " + toJs(site, "  ") + " /* /mersal:site */");
 }
 
-const siteRev = (site) => rev(JSON.stringify({ ...site, payMode: "" }));
+// (the same text as before payProvider existed when it is not saved, so open consoles keep a valid revision)
+const siteRev = (site) => { const { payMode, payProvider, ...rest } = site || {}; return rev(JSON.stringify({ payMode: "", ...rest })); };
 const withRev = (res, sha) => ({ ...res, headers: { ...(res.headers || {}), [SHA_HEADER]: sha } });
 
 app.http("adminSite", {
@@ -71,7 +73,7 @@ app.http("adminSite", {
       const p = await requireAdmin(req);
       if (req.method === "GET") { const cur = parseSite(await readFile(LAYOUT)); return withRev(json(200, cur), siteRev(cur)); }
       const b = (await req.json().catch(() => ({}))) || {};
-      const draft = normalize({ ...(b.site || b), payMode: "off" });
+      const draft = normalize({ ...(b.site || b), payMode: "off", payProvider: null });
       const bad = validate(draft);
       if (bad) return json(400, { message: bad });
       const base = baseOf(req);
@@ -80,7 +82,7 @@ app.http("adminSite", {
       const sha = await retry(commitFiles, async () => {
         const js = await readFile(LAYOUT), cur = parseSite(js);
         checkBase(base, siteRev(cur));
-        next = { ...draft, payMode: cur.payMode }; // payMode is changed from the settings tab only
+        next = normalize({ ...draft, payMode: cur.payMode, payProvider: cur.payProvider }); // changed from the settings tab only
         return [{ path: LAYOUT, content: render(js, next) }, { path: COPY, content: JSON.stringify(next, null, 2) + "\n" }];
       }, b.message || "admin: site details", who(p));
       return withRev(json(200, { ok: true, commit: sha, site: next }), siteRev(next));

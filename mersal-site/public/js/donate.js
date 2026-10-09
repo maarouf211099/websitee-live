@@ -1,8 +1,11 @@
 // Donate page: tabs, copy buttons and the card donation stepper.
 // Card payment mode comes from js/layout.js (MERSAL_SITE.payMode):
 //   "off"  - card tab hidden
-//   "demo" - full flow, but it stops at the bank gateway (nothing is charged)
-//   "live" - Banque Misr Hosted Checkout v100 through /api/checkout
+//   "demo" - full flow, but it stops before the gateway (nothing is charged, nothing is recorded)
+//   "live" - /api/checkout starts the payment at the gateway chosen in the console (MERSAL_SITE.payProvider):
+//            "paymob" -> { redirect }: the donor goes to Paymob's Unified Checkout and comes back to ?gw=paymob&…
+//            "mpgs"   -> { sessionId }: Banque Misr Hosted Checkout v100, back to ?hcoReturn=1
+//            not saved yet -> whatever the server answers (Banque Misr until a gateway is saved)
 (function () {
   var KEY = "mersalPayment", DONOR_KEY = "mersalDonor";
   // PSA-22: explicit smooth scrolls follow the visitor's reduced-motion setting (like forms.js and impact.js)
@@ -34,6 +37,11 @@
     }); });
   })();
   var MODE = (window.MERSAL_SITE && window.MERSAL_SITE.payMode) || "off";
+  var PROVIDER = (window.MERSAL_SITE && window.MERSAL_SITE.payProvider) || "";
+  // what the donor is told about the gateway (Banque Misr wording unchanged; neutral while the server picks the gateway)
+  var GW = PROVIDER === "mpgs" ? { secure: "🔒 دفع آمن عبر بنك مصر", page: "صفحة بنك مصر", go: "جاري التحويل لبوابة بنك مصر…" }
+    : PROVIDER === "paymob" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري التحويل لصفحة الدفع الآمنة (Paymob)…" }
+    : { secure: "🔒 دفع آمن ومشفّر", page: "صفحة الدفع", go: "جاري التحويل لصفحة الدفع الآمنة…" };
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
 
@@ -163,9 +171,13 @@
     var f = d.foreign, box = document.getElementById("abroad-body");
     if (f && box && (f.image || f.link || f.text || f.iban)) box.innerHTML = abroadHtml(f);
   }).catch(function () {});
-  var q = new URLSearchParams(location.search);
-  // Back from the bank (?hcoReturn=1) is still verified when card payments were switched off in the meantime
-  var RETURNING = q.get("hcoReturn") === "1";
+  // (Paymob appends its result to redirection_url "…?gw=paymob" with "&"; a second "?" is tolerated all the same)
+  var SEARCH = location.search.replace(/^(\?gw=paymob)\?/, "$1&");
+  var q = new URLSearchParams(SEARCH);
+  // Back from the gateway (Banque Misr ?hcoReturn=1, Paymob ?gw=paymob&…) is still verified when card payments were
+  // switched off in the meantime
+  var PAYMOB_RETURN = q.get("gw") === "paymob";
+  var RETURNING = q.get("hcoReturn") === "1" || PAYMOB_RETURN;
   if (MODE === "off" && !RETURNING) return;
 
   // ---------- stepper ----------
@@ -173,6 +185,12 @@
   var result = document.getElementById("pay-result");
   var amount = document.getElementById("amount"), purpose = document.getElementById("purpose");
   if (MODE === "off") form.hidden = true; // only the payment result shows
+  (function gatewayWording() {
+    var sec = form.querySelector(".pay-methods .secure"); if (sec) sec.textContent = GW.secure;
+    var hint = form.querySelector('.step[data-step="3"] .hint');
+    if (hint && hint.firstChild && hint.firstChild.nodeType === 3) hint.firstChild.nodeValue = 'بالضغط على "ادفع" هيتم تحويلك ل' + GW.page + " الآمنة لإدخال بيانات " + (PROVIDER === "mpgs" ? "البطاقة" : "الدفع") + ". مرسال لا تحتفظ ببيانات بطاقتك. ";
+    var t = document.getElementById("gw-title"); if (t) t.textContent = GW.go;
+  })();
   // old codes and pages that are the same cause: p4 / p5 are pages of the oncology centre, whose code is p31
   var LEGACY = { hospital: "p30", oncology: "p31", cases: "general", p4: "p31", p5: "p31" };
   function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
@@ -308,7 +326,7 @@
     btn.disabled = true;
     stepEls.forEach(function (s) { s.hidden = true; }); sumBar(1);
     gw.hidden = false; gw.classList.remove("stopped");
-    document.getElementById("gw-title").textContent = "جاري التحويل لبوابة بنك مصر…";
+    document.getElementById("gw-title").textContent = GW.go;
     document.getElementById("gw-body").innerHTML = "";
     var run = ++payRun;
     if (MODE === "demo") return setTimeout(function () { if (run === payRun && !gw.hidden) stopAtGateway(); }, 1600);
@@ -320,7 +338,7 @@
     gw.classList.add("stopped");
     document.getElementById("gw-title").textContent = "بوابة الدفع الإلكتروني قيد التفعيل";
     document.getElementById("gw-body").innerHTML =
-      "<p>وصلت لآخر خطوة قبل صفحة بنك مصر. الدفع بالبطاقة هيتفعّل قريب جداً، <b>ولم يتم خصم أي مبلغ</b>.</p>" +
+      "<p>وصلت لآخر خطوة قبل " + GW.page + ". الدفع بالبطاقة هيتفعّل قريب جداً، <b>ولم يتم خصم أي مبلغ</b>.</p>" +
       '<p>تقدر تكمل تبرعك بـ <b>' + fmt.format(Number(amount.value)) + " جنيه</b> دلوقتي بطريقة من دول:</p>" +
       '<div class="gw-alt">' +
         '<a class="btn btn-teal" href="tel:19340">📞 مندوب لحد البيت 19340</a>' +
@@ -335,52 +353,84 @@
     document.getElementById("gw-back").addEventListener("click", function () { gw.hidden = true; btn.disabled = false; go(3); });
   }
 
-  // Live: Banque Misr Hosted Checkout (v100)
-  function startLivePayment(run) {
+  // Live: POST /api/checkout, then the gateway it answers for. Banque Misr's script is loaded first when the console
+  // chose Banque Misr (as before), or after the answer when the server picked it.
+  function requestCheckout() {
+    var anon = document.getElementById("anon").checked;
+    return fetch("/api/checkout", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: amount.value, purpose: purpose.value,
+        name: anon ? "فاعل خير" : document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(), phone: document.getElementById("phone").value.trim()
+      })
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw d; return d; }); });
+  }
+  // what the donor chose travels with the order: the page reloads empty when the gateway sends them back
+  function remember(d, gwName) {
+    try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, gw: gwName, successIndicator: d.successIndicator, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim() })); } catch (x) {}
+  }
+  function loadMpgs(done) {
     var s = document.createElement("script");
     s.src = "https://banquemisr.gateway.mastercard.com/static/checkout/checkout.min.js";
     s.setAttribute("data-error", "mersalPayError");
     s.setAttribute("data-cancel", "mersalPayCancel");
-    s.onload = function () {
-      var anon = document.getElementById("anon").checked;
-      fetch("/api/checkout", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: amount.value, purpose: purpose.value,
-          name: anon ? "فاعل خير" : document.getElementById("name").value.trim(),
-          email: document.getElementById("email").value.trim(), phone: document.getElementById("phone").value.trim()
-        })
-      })
-        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw d; return d; }); })
-        .then(function (d) {
-          if (run !== payRun || gw.hidden) return; // the amount or purpose changed while the session was being created
-          // what the donor chose travels with the order: the page reloads empty when the bank sends them back
-          try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, successIndicator: d.successIndicator, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim() })); } catch (x) {}
-          Checkout.configure({ session: { id: d.sessionId } });
-          Checkout.showPaymentPage();
-        })
-        .catch(function (err) { if (run === payRun) window.mersalPayError(err); });
-    };
+    s.onload = done;
     document.head.appendChild(s);
+  }
+  function openMpgs(d) {
+    remember(d, "mpgs");
+    Checkout.configure({ session: { id: d.sessionId } });
+    Checkout.showPaymentPage();
+  }
+  function startLivePayment(run) {
+    var stale = function () { return run !== payRun || gw.hidden; }; // the amount or purpose changed meanwhile
+    var failed = function (err) { if (run === payRun) window.mersalPayError(err); };
+    if (PROVIDER === "mpgs") {
+      return loadMpgs(function () { requestCheckout().then(function (d) { if (!stale()) openMpgs(d); }).catch(failed); });
+    }
+    requestCheckout().then(function (d) {
+      if (stale()) return;
+      if (d.redirect && /^https:\/\//.test(d.redirect)) { remember(d, "paymob"); location.assign(d.redirect); return; }
+      if (d.sessionId) { loadMpgs(function () { if (!stale()) openMpgs(d); }); return; }
+      throw d;
+    }).catch(failed);
   }
   window.mersalPayError = function (err) {
     gw.hidden = true; btn.disabled = false; go(3);
-    show("err", (err && err.message) ? esc(err.message) : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو كلمنا على 19340.");
+    var m = err && typeof err.message === "string" && err.message ? err.message : "";
+    show("err", m ? esc(m) + (/19340/.test(m) ? "" : " لو المشكلة استمرت كلمنا على 19340.") : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو كلمنا على 19340.");
   };
   window.mersalPayCancel = function () { gw.hidden = true; btn.disabled = false; go(3); show("info", "تم إلغاء عملية الدفع."); };
 
-  // Back from the bank: ?hcoReturn=1&resultIndicator=...
+  // Back from the gateway: Banque Misr ?hcoReturn=1&resultIndicator=... / Paymob ?gw=paymob&id=…&order=…&success=…&hmac=…
+  // The query is only passed on: /api/verify checks Paymob's hmac and asks the gateway itself before anything counts.
   if (RETURNING) {
     openTab("online");
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (x) {}
-    history.replaceState(null, "", location.pathname + "#online");
-    if (!saved.orderId) { show("err", "لم نجد عملية دفع محفوظة على هذا المتصفح. لو تم خصم المبلغ تواصل معنا على 19340."); return; }
-    show("info", "جارٍ التأكد من عملية الدفع مع البنك…");
-    fetch("/api/verify?orderId=" + encodeURIComponent(saved.orderId))
-      .then(function (r) { return r.json(); })
+    var search = SEARCH, rq = new URLSearchParams(search), verifyUrl = "";
+    // Paymob by our own saved reference: needs no signature, and Paymob's own record decides just the same
+    var byOrder = PAYMOB_RETURN && saved.gw === "paymob" && saved.orderId ? "/api/verify?gw=paymob&orderId=" + encodeURIComponent(saved.orderId) : "";
+    history.replaceState(null, "", location.pathname + "#online"); // the gateway's parameters leave the address bar
+    if (PAYMOB_RETURN && rq.get("hmac") && rq.get("id")) verifyUrl = "/api/verify?" + search.replace(/^\?/, "");
+    else if (byOrder) verifyUrl = byOrder;
+    else if (!PAYMOB_RETURN && saved.orderId) verifyUrl = "/api/verify?orderId=" + encodeURIComponent(saved.orderId);
+    if (!verifyUrl) { show("err", "لم نجد عملية دفع محفوظة على هذا المتصفح. لو تم خصم المبلغ تواصل معنا على 19340."); return; }
+    var ref = function (o) { var id = (o && o.orderId) || saved.orderId || ""; return id ? ' برقم العملية: <code dir="ltr">' + esc(id) + "</code>" : ""; };
+    show("info", PAYMOB_RETURN ? "جارٍ التأكد من عملية الدفع…" : "جارٍ التأكد من عملية الدفع مع البنك…");
+    var ask = function (url) {
+      return fetch(url).then(function (r) { return r.json().catch(function () { return {}; }).then(function (o) { if (!r.ok) throw { status: r.status, body: o }; return o; }); });
+    };
+    ask(verifyUrl)
+      // the return's signature did not check out (400): ask about the saved order instead of giving up
+      .catch(function (e) { if (e && e.status === 400 && byOrder && verifyUrl !== byOrder) return ask(byOrder); throw e; })
       .then(function (o) {
-        if (o.paid) {
+        if (o.paid && o.test) {
+          // Paymob's test keys: the whole flow ran, but no money moved and nothing is recorded as a donation
+          try { localStorage.removeItem(KEY); } catch (x) {}
+          show("info", "دي كانت <b>عملية دفع تجريبية</b> (مفاتيح Paymob التجريبية): مفيش أي مبلغ حقيقي اتخصم، ومش هتتسجل كتبرع" + ref(o) + ".");
+        } else if (o.paid) {
           try { localStorage.removeItem(KEY); } catch (x) {}
           form.hidden = true;
           recordDonation({ orderId: o.orderId, amount: Number(o.amount) || 0, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
@@ -388,11 +438,16 @@
             'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
             '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
           if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: Number(o.amount) || 0, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
+        } else if (o.status === "PENDING") {
+          // Paymob: an OTP or wallet confirmation still open; the gateway's callback records it once it completes
+          show("info", "عملية الدفع لسه بتتأكد من بوابة الدفع. لو اتخصم المبلغ هيتسجل تبرعك تلقائياً، ولو عندك أي سؤال كلمنا على 19340" + ref(o) + ".");
+        } else if (o.status === "MISMATCH") {
+          show("err", "مقدرناش نأكد عملية الدفع دي تلقائياً. لو تم خصم المبلغ تواصل معنا على 19340" + ref(o) + " وهنراجعها.");
         } else {
           show("err", "لم تكتمل عملية الدفع (حالة الطلب: " + esc(o.status || "غير معروفة") + "). لم يتم خصم أي مبلغ، " +
             (MODE === "off" ? 'وتقدر تتبرع بتحويل بنكي أو من المحافظ أو تكلمنا على 19340.' : "ويمكنك المحاولة مرة أخرى."));
         }
       })
-      .catch(function () { show("err", "تعذّر التأكد من عملية الدفع. لو تم خصم المبلغ تواصل معنا على 19340 برقم العملية: " + esc(saved.orderId)); });
+      .catch(function () { show("err", "تعذّر التأكد من عملية الدفع. لو تم خصم المبلغ تواصل معنا على 19340" + ref() + "."); });
   }
 })();

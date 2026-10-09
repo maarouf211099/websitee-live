@@ -76,11 +76,19 @@ td.num { font-family: "Titillium Web", sans-serif; font-weight: 700; }
 .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; max-width: 560px; }
 .checks li { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 9px 14px; display: flex; justify-content: space-between; gap: 10px; }
 .checks .ok { color: var(--ok); font-weight: 800; } .checks .no { color: var(--bad); font-weight: 800; }
-/* denied */
-body.center { display: grid; place-items: center; min-height: 100vh; padding: 16px; }
-.card-msg { background: #fff; border-radius: 20px; padding: 32px; max-width: 560px; text-align: center; box-shadow: 0 20px 50px -20px rgba(0,48,48,.3); }
-.card-msg h1 { margin: 12px 0 8px; }
-.card-msg code { background: #e4f3f3; padding: 2px 8px; border-radius: 6px; }
+/* login */
+.login { display: grid; place-items: center; min-height: 100vh; padding: 16px; background: var(--teal-dark) url(/img/pattern-white.png); background-size: 240px; }
+.login-card { background: #fff; border-radius: 22px; padding: 30px 26px; width: min(100%, 380px); display: grid; gap: 12px; text-align: center; box-shadow: 0 30px 60px -24px rgba(0,0,0,.5); }
+.login-card img { justify-self: center; height: 57px; width: auto; }
+.login-card h1 { margin: 0; font-size: 22px; }
+.login-card .hint { margin: 0; }
+.login-card .field { text-align: start; }
+.login-card .btn { justify-self: stretch; justify-content: center; padding: 11px; }
+.login-err { margin: 0; color: var(--bad); font-weight: 700; font-size: 14px; }
+.pw-form { display: grid; gap: 10px; max-width: 420px; }
+.pw-form .btn { justify-self: start; }
+.status.warn { background: #fff3d6; }
+code { background: #e4f3f3; padding: 2px 8px; border-radius: 6px; direction: ltr; unicode-bidi: isolate; }
 @media (max-width: 860px) {
   .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   .side { position: static; height: auto; padding: 12px; gap: 10px; }

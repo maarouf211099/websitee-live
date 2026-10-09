@@ -1,4 +1,4 @@
-// Mersal admin console. Talks to /api/admin/* (role "admin" via Static Web Apps auth).
+// Mersal admin console. Talks to /api/admin/* (username + password, cookie session).
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -10,27 +10,61 @@
   function api(path, opt) {
     opt = opt || {};
     return fetch("/api/admin/" + path, { method: opt.method || "GET", headers: opt.body ? { "Content-Type": "application/json" } : {}, body: opt.body ? JSON.stringify(opt.body) : undefined })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.message || ("HTTP " + r.status)); return d; }); });
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) { var err = new Error(d.message || ("HTTP " + r.status)); err.status = r.status; err.data = d; throw err; } return d; }); });
   }
   function busy(btn, on) { btn.disabled = on; btn.dataset.t = btn.dataset.t || btn.textContent; btn.textContent = on ? "جاري الحفظ…" : btn.dataset.t; }
   function published() { toast("تم الحفظ ✓ هيظهر على الموقع خلال دقيقة تقريباً"); }
 
-  // ---------- auth ----------
-  fetch("/.auth/me").then(function (r) { return r.json(); }).then(function (d) {
-    var p = d && d.clientPrincipal;
-    if (!p) { location.href = "/.auth/login/aad?post_login_redirect_uri=/admin/"; return; }
-    $("#user").textContent = p.userDetails || "";
-    if ((p.userRoles || []).indexOf("admin") < 0) { location.href = "/admin/denied.html"; return; }
-    return api("me").then(function (me) {
+  // ---------- auth: cookie session from /api/admin/login ----------
+  var booted = false;
+  function showLogin(on) {
+    $("#login").hidden = !on; $("#shell").hidden = on;
+    if (!on) return;
+    api("status").then(function (st) {
+      $("#l-user").value = $("#l-user").value || st.user || "admin";
+      $("#l-code-box").hidden = !st.setup;
+      $("#l-pass-label").textContent = st.setup ? "اختار كلمة سر (8 حروف على الأقل)" : "كلمة السر";
+      $("#l-pass").autocomplete = st.setup ? "new-password" : "current-password";
+      $("#login-hint").textContent = st.setup ? "أول دخول: اكتب كود التفعيل واختار كلمة السر اللي هتدخل بيها بعد كده." : (st.github ? "ادخل باسم المستخدم وكلمة السر" : "تنبيه: GITHUB_TOKEN مش متظبط في Azure، اللوحة مش هتقدر تحفظ.");
+    }).catch(function () {});
+    setTimeout(function () { ($("#l-pass").value ? $("#l-pass") : $("#l-user")).focus(); }, 50);
+  }
+  function start() {
+    api("me").then(function (me) {
+      showLogin(false);
+      $("#user").textContent = me.user || "";
       var s = $("#status");
       if (!me.github) { s.hidden = false; s.className = "status bad"; s.textContent = "الحفظ مش هيشتغل: GITHUB_TOKEN و GITHUB_REPO مش متظبطين في إعدادات Azure (شوف README)."; }
       $("#checks").innerHTML =
         '<li><span>الربط بـ GitHub (الحفظ والنشر)</span><b class="' + (me.github ? "ok" : "no") + '">' + (me.github ? "متصل" : "غير متصل") + "</b></li>" +
         '<li><span>تخزين التبرعات (DONATIONS_STORAGE)</span><b class="' + (me.donations ? "ok" : "no") + '">' + (me.donations ? "مفعّل" : "غير مفعّل") + "</b></li>" +
-        '<li><span>بوابة بنك مصر (MPGS)</span><b class="' + (me.mpgs ? "ok" : "no") + '">' + (me.mpgs ? "متظبطة - " + esc(me.merchant) : "غير متظبطة") + "</b></li>";
-      loadHome(); loadPages(); loadAlbums(); loadSettings();
+        '<li><span>بوابة بنك مصر (MPGS)</span><b class="' + (me.mpgs ? "ok" : "no") + '">' + (me.mpgs ? "متظبطة - " + esc(me.merchant) : "غير متظبطة") + "</b></li>" +
+        '<li><span>كلمة سر اللوحة</span><b class="ok">' + ({ env: "من إعدادات Azure", saved: "متظبطة من اللوحة", aad: "حساب مايكروسوفت" }[me.password] || "—") + "</b></li>";
+      $("#pw-user").textContent = me.user || "admin";
+      if (me.password === "env" || me.password === "aad") { $("#pw-form").hidden = true; $("#pw-hint").textContent = me.password === "env" ? "كلمة السر متظبطة من إعدادات Azure (ADMIN_PASSWORD)؛ غيّرها من هناك." : "داخل بحساب مايكروسوفت."; }
+      if (!booted) { booted = true; loadHome(); loadPages(); loadAlbums(); loadSettings(); }
+    }).catch(function (e) {
+      if (e.status === 401) showLogin(true); else toast("تعذّر الاتصال: " + e.message, true);
     });
-  }).catch(function (e) { toast("تعذّر الدخول: " + e.message, true); });
+  }
+  $("#login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var b = $("#login-btn"), err = $("#login-err"); err.hidden = true; busy(b, true); b.textContent = "جاري الدخول…";
+    api("login", { method: "POST", body: { user: $("#l-user").value.trim(), password: $("#l-pass").value, code: $("#l-code").value.trim() } })
+      .then(function () { $("#l-pass").value = ""; $("#l-code").value = ""; start(); })
+      .catch(function (x) { err.textContent = x.message; err.hidden = false; })
+      .then(function () { busy(b, false); });
+  });
+  $("#logout").addEventListener("click", function (e) { e.preventDefault(); api("logout", { method: "POST" }).then(function () { location.reload(); }); });
+  $("#pw-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if ($("#pw-new").value !== $("#pw-new2").value) { toast("كلمة السر الجديدة مش متطابقة", true); return; }
+    var b = e.target.querySelector("button"); busy(b, true);
+    api("password", { method: "POST", body: { current: $("#pw-cur").value, next: $("#pw-new").value } })
+      .then(function () { toast("اتغيّرت كلمة السر ✓"); e.target.reset(); start(); })
+      .catch(function (x) { toast(x.message, true); }).then(function () { busy(b, false); });
+  });
+  start();
 
   // ---------- tabs ----------
   $$(".tabs button").forEach(function (b) {

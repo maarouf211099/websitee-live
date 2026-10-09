@@ -1,5 +1,6 @@
-/* Public request forms: /volunteer.html (تطوع معنا) and /help.html (طلب مساعدة).
-   Loaded only by those two pages, on top of site.css (.field, .btn, .card, .stepper, .check, .alert). */
+/* Public request forms: /volunteer.html (تطوع معنا), /help.html (طلب مساعدة) and, on /donate.html,
+   "سجّل تبرعك" (transfer) and "مندوب لحد البيت" (pickup). Loaded only by those pages, on top of site.css
+   (.field, .btn, .card, .stepper, .check, .alert). The donate-page pieces are at the end of the file. */
 
 /* ---------- layout ---------- */
 .req-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
@@ -92,13 +93,13 @@
 .ref-box { display: inline-flex; align-items: center; gap: 14px; background: var(--teal-soft); border: 1px dashed var(--teal); border-radius: 14px; padding: 10px 16px; margin: 8px 0 12px; text-align: start; }
 .ref-box small { display: block; font-size: 12px; color: var(--muted); }
 .ref-box code { display: block; font: 800 22px/1.2 "Titillium Web", ui-monospace, Menlo, monospace; letter-spacing: .5px; color: var(--teal-dark); direction: ltr; }
-.ref-box button { font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--teal); background: #fff; color: var(--teal); cursor: pointer; min-height: 40px; white-space: nowrap; }
+.ref-box button { font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--teal); background: #fff; color: var(--teal); cursor: pointer; min-height: 44px; white-space: nowrap; }
 .req-success .actions { display: grid; gap: 10px; max-width: 440px; margin: 16px auto 0; }
 .req-success .actions .btn { padding-block: 13px; font-size: 16px; }
 .btn-wa { background: #25d366; color: #fff; }
 .btn-wa:hover { background: #1ebe5b; color: #fff; }
 .btn-wa svg { width: 20px; height: 20px; fill: currentColor; }
-.req-success .again { display: inline-block; margin-top: 16px; font-weight: 700; }
+.req-success .again { display: inline-block; margin-top: 8px; padding: 12px 10px; font-weight: 700; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 960px) {
@@ -113,8 +114,15 @@
   .req-form fieldset + fieldset { margin-top: 18px; padding-top: 18px; }
   .pills span { padding: 8px 14px 8px 16px; }
   .ref-box { width: 100%; justify-content: space-between; }
+  .ref-box code { white-space: nowrap; }
   .req-success .actions { max-width: none; }
   .req-intro { font-size: 15.5px; }
+}
+@media (max-width: 420px) {
+  /* the reference stays on one line: label + code on top, a full-width copy button under them */
+  .ref-box { flex-direction: column; align-items: stretch; gap: 8px; text-align: center; padding: 12px 14px; }
+  .ref-box code { font-size: 21px; }
+  .ref-box button { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) { .req-success .ok-ico { animation: none; } }
 
@@ -130,6 +138,7 @@
 .req-success > * { animation: rise-sm .5s var(--ease) both; }
 .req-success > :nth-child(2) { animation-delay: .35s; } .req-success > :nth-child(3) { animation-delay: .42s; } .req-success > :nth-child(4) { animation-delay: .5s; }
 .req-success > :nth-child(5) { animation-delay: .58s; } .req-success > :nth-child(6) { animation-delay: .66s; } .req-success > :nth-child(7) { animation-delay: .74s; }
+.req-success > :nth-child(8) { animation-delay: .82s; } .req-success > :nth-child(9) { animation-delay: .9s; }
 .req-success .ok-ico { animation: popin .5s var(--bounce) both; }
 .req-success .ok-ico path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw-check .5s .3s var(--ease) forwards; }
 @keyframes draw-check { to { stroke-dashoffset: 0; } }
@@ -140,3 +149,81 @@
   .req-success .ok-ico, .req-success > *, .f-err, .pills input:checked + span, .field.shake, .pills-field.shake, .check-field.shake { animation: none !important; opacity: 1; transform: none; }
   .req-success .ok-ico path { animation: none; stroke-dashoffset: 0; }
 }
+
+/* ---------- donate.html: "حوّلت؟ سجّل تبرعك" card (bank + wallets tabs) and the shared transfer form ---------- */
+.tr-cta { margin: 18px 0 6px; padding: 16px 18px; border-radius: 18px; background: var(--teal-soft); border: 1px solid #cde5e5; border-inline-start: 5px solid var(--gold); scroll-margin-top: 90px; }
+.tr-cta-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.tr-cta-ico { width: 52px; height: 52px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 2px 8px rgba(0, 72, 72, .08); }
+.tr-cta-ico svg { width: 28px; height: 28px; fill: none; stroke: var(--teal); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tr-cta-txt h3 { margin: 0 0 3px; font-size: 18px; line-height: 1.45; color: var(--teal-dark); }
+.tr-cta-txt p { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.6; }
+.tr-cta-btn { min-height: 48px; padding-inline: 22px; white-space: nowrap; transition: background .2s, color .2s, box-shadow .2s, transform .15s; }
+.tr-chev { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s var(--ease, ease); }
+.tr-cta.open .tr-chev { transform: rotate(180deg); }
+.tr-cta.open .tr-cta-btn { background: #fff; color: var(--teal-dark); box-shadow: inset 0 0 0 1.5px #b9dada; }
+.tr-cta-alt { margin: 10px 0 0; font-size: 13.5px; color: var(--muted); }
+.tr-cta-alt a { font-weight: 700; }
+.tr-box { margin-top: 14px; scroll-margin-top: 90px; }
+.tr-box:not([hidden]) { animation: rise-sm .32s var(--ease, ease) both; }
+.tr-box .req-form, .tr-box .req-success { box-shadow: 0 4px 18px rgba(0, 60, 60, .07); }
+
+/* amount + currency side by side (also on phones) */
+.amt-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, 190px); gap: 12px; }
+.req-form .field input[data-amount] { font: 800 19px/1.2 "Titillium Web", "Cairo", sans-serif; letter-spacing: .3px; }
+.req-form .field input[data-amount]::placeholder { font-weight: 400; color: #9aa6a6; }
+.req-form .field input[type="date"] { font-family: "Titillium Web", "Cairo", sans-serif; text-align: start; }
+/* a row whose second box is switched off by data-show-if: the first one takes the whole row */
+.req-form .row-2:has(> [data-show-if][hidden]) { grid-template-columns: minmax(0, 1fr); }
+[data-show-if].sif-in { animation: rise-sm .28s var(--ease, ease) both; }
+.req-note { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+/* two-choice segmented radios (pickup: فلوس / تبرع عيني) */
+.seg-l { font-size: 15px; font-weight: 600; color: var(--ink); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px; }
+.seg label { position: relative; cursor: pointer; display: block; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 60px; height: 100%; padding: 10px 14px; padding-inline-start: 44px; border: 1.5px solid var(--line); border-radius: 14px; background: #fff; position: relative; transition: background .15s, border-color .15s, box-shadow .15s; }
+.seg span::before { content: ""; position: absolute; inset-inline-start: 14px; top: 50%; width: 20px; height: 20px; margin-top: -10px; border-radius: 50%; border: 2px solid #b8cccc; background: #fff; box-sizing: border-box; transition: border-color .15s, box-shadow .15s; }
+.seg b { color: var(--teal-dark); font-size: 16px; line-height: 1.35; }
+.seg small { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.seg input:checked + span { border-color: var(--teal); background: var(--teal-soft); box-shadow: 0 0 0 1px var(--teal) inset; }
+.seg input:checked + span::before { border-color: var(--teal); box-shadow: inset 0 0 0 4px #fff; background: var(--teal); }
+.seg input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
+.seg label:active span { transform: scale(.98); }
+@media (hover: hover) { .seg input:not(:checked) + span:hover { border-color: var(--teal); } }
+.seg-field.invalid .seg span { border-color: #d9534f; }
+
+/* success extras: what was registered + the hotline line under the pickup form */
+.req-recap { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; max-width: 100%; margin: 0 0 10px !important; padding: 6px 14px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); color: var(--teal-dark) !important; font-weight: 700; font-size: 14.5px; line-height: 1.7; }
+.req-recap span + span::before { content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); margin: 0 8px; vertical-align: middle; }
+.pk-call { display: flex; align-items: center; gap: 10px; margin: 16px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--bg-2); color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+.pk-call svg { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--teal); stroke-width: 2; stroke-linejoin: round; }
+.pk-call a { font: 800 17px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); }
+#home > .req-intro { margin-top: 0; }
+
+@media (max-width: 760px) {
+  .tr-cta { padding: 14px; border-radius: 16px; }
+  .tr-cta-head { grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
+  .tr-cta-ico { width: 44px; height: 44px; }
+  .tr-cta-ico svg { width: 24px; height: 24px; }
+  .tr-cta-txt h3 { font-size: 16.5px; }
+  .tr-cta-txt p { font-size: 13.5px; }
+  .tr-cta-btn { grid-column: 1 / -1; width: 100%; }
+  .tr-cta.open { padding-inline: 10px; }
+  .tr-cta.open .tr-cta-head { padding-inline: 4px; }
+  .tr-cta-alt { padding-inline: 4px; }
+  .tr-box .req-form { padding: 16px 12px; }
+  .amt-row { grid-template-columns: minmax(0, 1fr) minmax(142px, 48%); gap: 10px; }
+  .req-form .amt-row .field select { padding-inline-start: 10px; padding-inline-end: 34px; background-position: left 10px center; }
+  .seg { gap: 8px; }
+  .seg span { padding: 10px 10px; padding-inline-start: 38px; min-height: 64px; }
+  .seg span::before { inset-inline-start: 11px; }
+  .seg b { font-size: 15.5px; }
+  .seg small { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tr-box:not([hidden]), [data-show-if].sif-in { animation: none !important; }
+  .tr-chev, .seg span, .tr-cta-btn { transition: none; }
+  .seg label:active span { transform: none; }
+}
+@media print { .tr-cta-btn, .tr-box, #pk-form, #pk-alert { display: none !important; } }

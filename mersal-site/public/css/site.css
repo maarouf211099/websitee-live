@@ -956,7 +956,6 @@ main .grid-2 > div > .bank:has(a[href^="tel:"]) { --ico: url("data:image/svg+xml
 main .grid-2 > div > .bank:has(a[href^="mailto:"]) { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23009091' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='M3 7l9 6 9-6'/%3E%3C/svg%3E"); }
 main .grid-2 > div > .bank:has(a[href*="wa.me"]) { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23009091'%3E%3Cpath d='M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4 8.1 8.1 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3.3 4.4c-.2 0-.5 0-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.3 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4l-.5-.3-1.8-.9c-.2-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.4 0-.5l-.9-2c-.2-.5-.4-.4-.6-.4h-.5z'/%3E%3C/svg%3E"); }
 main .grid-2 > div > .bank:has(span[data-site="address"]) { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23009091' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z'/%3E%3Ccircle cx='12' cy='10' r='2.6'/%3E%3C/svg%3E"); }
-main .grid-2 > div > .bank:has(a[href="tel:01099316592"]) { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23009091' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='5' width='20' height='14' rx='2'/%3E%3Cpath d='M2 10h20M6 15h4'/%3E%3C/svg%3E"); }
 main .grid-2 > div > a > img[alt*="خريطة"] { width: 100%; box-shadow: var(--shadow); transition: transform .3s; }
 main .grid-2 > div > a:hover > img[alt*="خريطة"] { transform: translateY(-2px); }
 form#contact.card { border-radius: 22px; }
@@ -1233,7 +1232,8 @@ body.menu-open .m-bar { z-index: 96; }
   .m-bar a, .m-bar button { position: relative; z-index: 1; transition: color .2s, transform .25s var(--spring); }
   .m-bar a:active, .m-bar button:active { transform: scale(.88); transition-duration: .08s; }
   .m-bar .m-ind { position: absolute; top: 6px; inset-inline-start: var(--pad); z-index: 0; width: calc((100% - var(--pad) * 2) / var(--n)); height: 52px; border-radius: 16px; background: rgba(0,144,145,.09); pointer-events: none; transform: translateX(calc(var(--i, 0) * -100%)); transition: transform .42s var(--spring), opacity .2s; }
-  .m-bar .m-ind::after { content: ""; position: absolute; bottom: 5px; inset-inline-start: calc(50% - 2.5px); width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  /* active item = the soft teal pill + teal label (the old gold dot sat on top of the label text) */
+  .m-bar .m-ind::after { content: none; }
   .m-bar:not(.has-on) .m-ind { opacity: 0; }
   .m-bar .on span::after { display: none; }
   .m-bar .on svg { animation: m-tap .5s var(--bounce); }
@@ -1329,6 +1329,91 @@ body.menu-open .m-bar { z-index: 96; }
 .nf-links a:nth-child(2) { animation-delay: .05s; } .nf-links a:nth-child(3) { animation-delay: .1s; } .nf-links a:nth-child(4) { animation-delay: .15s; }
 .nf-links a:nth-child(5) { animation-delay: .2s; } .nf-links a:nth-child(6) { animation-delay: .25s; } .nf-links a:nth-child(7) { animation-delay: .3s; } .nf-links a:nth-child(8) { animation-delay: .35s; }
 .nf .nf-code { animation: pop-in .6s .1s var(--bounce) both; }
+
+/* =====================================================================================================
+   Donate → "الحسابات البنكية": bank account cards. js/donate.js groups data/donate.json "banks" by bank name:
+   one .bk-card per bank (logo or a teal initials badge + name), one .bk-acc row per account (currency pill, number,
+   copy button). donate.html has the same markup as its no-JS fallback. 1 column on phones, 2 when the panel is wide
+   enough; a narrow card puts the currency pill above the number so 19-digit numbers never wrap.
+   ===================================================================================================== */
+#bank-accounts { container: bk-box / inline-size; margin: 16px 0 18px; }
+.bk-grid { display: grid; gap: 14px; align-items: start; }
+@container bk-box (min-width: 640px) { .bk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
+.bk-card { container: bk-card / inline-size; min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,48,48,.04), 0 12px 28px -22px rgba(0,60,60,.45); }
+.bk-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: linear-gradient(180deg, var(--teal-soft), rgba(228,243,243,.35)); border-bottom: 1px solid var(--line); }
+.bk-logo { flex: none; display: flex; align-items: center; justify-content: center; width: 124px; height: 54px; padding: 6px 8px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+.bk-logo picture { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.bk-logo img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.bk-initials { width: 54px; padding: 0; background: var(--teal); border-color: var(--teal); color: #fff; font: 800 17px/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.12); }
+.bk-name { margin: 0; min-width: 0; font-size: 16.5px; font-weight: 800; line-height: 1.45; color: var(--teal-dark); }
+.bk-list { list-style: none; margin: 0; padding: 2px 0; }
+.bk-acc { display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 14px; }
+.bk-acc + .bk-acc { border-top: 1px dashed var(--line); }
+.bk-cur { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 70px; padding: 2px 10px; border-radius: 999px;
+  max-width: 42%; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; font-weight: 700; line-height: 1.7; white-space: nowrap; background: var(--teal-soft); color: var(--teal-dark); }
+.bk-cur[data-cur="usd"] { background: #fff3cc; color: #6f5200; }
+.bk-cur[data-cur="eur"] { background: #fff; color: var(--teal); box-shadow: inset 0 0 0 1.5px #b9dddd; }
+.bk-cur[data-cur="code"], .bk-cur[data-cur="other"] { background: var(--bg-2); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); font-family: "Titillium Web", "Cairo", sans-serif; letter-spacing: .4px; }
+.bk-num { flex: 1 1 auto; min-width: 0; padding: 0; background: none; direction: ltr; unicode-bidi: isolate; text-align: right;
+  font: 700 17px/1.35 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; font-variant-numeric: tabular-nums;
+  color: var(--ink); overflow-wrap: anywhere; -webkit-user-select: all; user-select: all; }
+.bk-acc .copy { flex: none; min-height: 44px; min-width: 104px; padding: 6px 12px; border-radius: 10px; font-weight: 700; } /* wide enough for "تم النسخ": no jump on copy */
+.bk-acc .copy:not(.done) { background: #fff; color: var(--teal-dark); }
+.bk-acc .copy:not(.done):active { background: var(--teal-soft); }
+@media (hover: hover) {
+  .bk-acc { transition: background .2s; }
+  .bk-acc:hover { background: var(--bg-2); }
+  .bk-acc .copy:not(.done):hover { border-color: var(--teal); color: var(--teal); }
+}
+/* narrow card (phones, tablets, the 2-column desktop grid): pill on top, the number under it, the copy button beside
+   both; a 19-digit number never has to share its line. Wide single cards keep everything on one line. */
+@container bk-card (max-width: 439px) {
+  .bk-acc { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "cur copy" "num copy"; align-items: center; row-gap: 3px; column-gap: 10px; padding: 10px 14px; }
+  .bk-cur { grid-area: cur; justify-self: start; min-width: 0; max-width: 100%; padding: 0 10px; font-size: 12px; line-height: 1.75; }
+  /* the number shrinks with the card (cqi = 1% of the card width) so a 19-digit number fits next to the button down to ~330px */
+  .bk-num { grid-area: num; font-size: 16px; font-size: clamp(14px, 8.8cqi - 12.8px, 18px); }
+  .bk-acc .copy { grid-area: copy; }
+}
+@container bk-card (max-width: 389px) {
+  .bk-head { padding: 12px; }
+  .bk-logo { width: 112px; height: 50px; padding: 5px 7px; }
+  .bk-initials { width: 50px; }
+  .bk-name { font-size: 15.5px; }
+}
+@media print {
+  #bank-accounts { container-type: normal; }
+  .bk-grid { display: block; }
+  .bk-card { break-inside: avoid; page-break-inside: avoid; margin-bottom: 8px; border: 1px solid #000; box-shadow: none; }
+  .bk-head { background: none; border-bottom: 1px solid #000; }
+  .bk-num { color: #000; font-size: 12pt; }
+}
+
+/* --- Donate → المحافظ والتطبيقات: official donation channels (campaign "إزاي تتبرع لمرسال؟") --- */
+.pw-intro { margin: 0 0 12px; color: var(--muted); }
+.pay-ways { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 10px; }
+.pw { display: flex; gap: 14px; align-items: flex-start; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 10px 26px -20px rgba(0,60,60,.45); }
+.pw-badge { flex: none; width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font: 800 20px/1 "Titillium Web", "Cairo", sans-serif; color: #fff; background: var(--pw, var(--teal)); }
+.pw-badge svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pw[data-brand="instapay"] { --pw: linear-gradient(140deg, #8a2be2, #5b1fa6); }
+.pw[data-brand="wallets"] { --pw: linear-gradient(140deg, var(--teal), var(--teal-dark)); }
+.pw[data-brand="fawry"] { --pw: linear-gradient(140deg, #ffd21f, #f2b705); }
+.pw[data-brand="fawry"] .pw-badge { color: #0b4c8c; }
+.pw[data-brand="talabat"] { --pw: linear-gradient(140deg, #ff7a1a, #ff5a00); }
+.pw[data-brand="waffarha"] { --pw: linear-gradient(140deg, #ff8a3d, #f2611d); }
+.pw[data-brand="sms"] { --pw: linear-gradient(140deg, var(--gold), #e9ad0c); }
+.pw[data-brand="sms"] .pw-badge { color: var(--teal-dark); }
+.pw-body { min-width: 0; }
+.pw h3 { margin: 2px 0 4px; font-size: 17px; color: var(--teal-dark); }
+.pw p { margin: 0; color: var(--ink); font-size: 14.5px; line-height: 1.7; }
+.pw p b { color: var(--teal-dark); }
+.pw-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; }
+.pw-chips li { font-size: 12.5px; font-weight: 700; color: var(--teal-dark); background: var(--teal-soft); border-radius: 999px; padding: 5px 10px; }
+.pw-code { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.pw-code b { font: 700 30px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); letter-spacing: 1px; }
+.pw-code .copy { min-height: 44px; }
+.pw-more { margin: 4px 0 16px; }
+@media (max-width: 760px) { .pay-ways { grid-template-columns: 1fr; } .pw { padding: 14px; } }
 
 /* --- reduced motion: every animation and transition this stylesheet owns stops --- */
 @media (prefers-reduced-motion: reduce) {

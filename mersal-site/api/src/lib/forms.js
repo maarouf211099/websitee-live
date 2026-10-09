@@ -1,4 +1,6 @@
-// Public request forms (volunteer / help): validation, bot checks, rate limit and storage.
+// Public request forms: validation, bot checks, rate limit and storage.
+//   volunteer (MV) /volunteer.html, help (MH) /help.html,
+//   transfer (MT) "سجّل تبرعك" and pickup (MP) "مندوب لحد البيت" on /donate.html
 //
 // Storage, in order of preference:
 //   1. Azure Table "requests" in the DONATIONS_STORAGE account (partitionKey = type, rowKey = reference id)
@@ -16,13 +18,25 @@ const INDEX = "api/data/requests/index.json";
 const INDEX_MAX = 2000; // the GitHub contents API only returns files under 1 MB; older requests stay as single files
 const fileOf = (id) => `api/data/requests/${id}.json`;
 
-const TYPES = { volunteer: { prefix: "MV", label: "تطوع" }, help: { prefix: "MH", label: "طلب مساعدة" } };
+const TYPES = {
+  volunteer: { prefix: "MV", label: "تطوع" },
+  help: { prefix: "MH", label: "طلب مساعدة" },
+  transfer: { prefix: "MT", label: "تبرع مسجّل" },
+  pickup: { prefix: "MP", label: "مندوب" },
+};
 const STATUSES = ["new", "contacted", "done", "rejected"];
 const STATUS_LABELS = { new: "جديد", contacted: "تم التواصل", done: "تم", rejected: "مرفوض" };
 const HOW = { hospital: "مستشفى", convoys: "قوافل", design: "تصميم / سوشيال ميديا", fundraising: "جمع تبرعات", other: "أخرى" };
 const AVAILABILITY = { weekdays: "أيام الأسبوع", weekends: "نهاية الأسبوع", flexible: "مرن / حسب الحاجة", online: "أونلاين فقط" };
 const RELATION = { self: "المريض نفسه", parent: "الأب / الأم", child: "الابن / الابنة", spouse: "الزوج / الزوجة", sibling: "الأخ / الأخت", relative: "قريب", other: "أخرى" };
 const CASE_TYPES = { monthly: "علاج شهري", surgery: "عملية", oncology: "أورام", children: "أطفال", other: "أخرى" };
+// transfer / pickup. PURPOSES keys match the card donation select on donate.html (general, zakat, sadaqa, p<page id>)
+const METHODS = { bank: "تحويل بنكي", instapay: "إنستاباي", vodafone: "فودافون كاش", etisalat: "اتصالات كاش (e& cash)", wepay: "WE Pay", orange: "أورانج كاش", fawry: "فوري / MyFawry", masary: "مصاري", aman: "أمان", megakheir: "ميجا خير", bankwallet: "محافظ البنوك (من خلال فوري)" };
+const CURRENCIES = { EGP: "جنيه مصري", USD: "دولار أمريكي", EUR: "يورو", SAR: "ريال سعودي", AED: "درهم إماراتي" };
+const PURPOSES = { general: "تبرع عام - حيث الحاجة أكبر", zakat: "زكاة المال", sadaqa: "صدقة", p30: "مستشفى مرسال للأطفال", p31: "مركز مرسال لعلاج الأورام", cases: "حالات المرضى" };
+const KINDS = { money: "فلوس", goods: "تبرع عيني" };
+const SLOTS = { morning: "صباحاً", afternoon: "بعد الظهر", evening: "مساءً" };
+const MAX_AMOUNT = 10000000;
 const GOVERNORATES = ["القاهرة", "الجيزة", "الإسكندرية", "القليوبية", "الشرقية", "الدقهلية", "الغربية", "المنوفية", "البحيرة", "كفر الشيخ", "دمياط", "بورسعيد", "الإسماعيلية", "السويس", "شمال سيناء", "جنوب سيناء", "الفيوم", "بني سويف", "المنيا", "أسيوط", "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد", "مطروح"];
 
 // ---------- sanitising ----------
@@ -52,6 +66,26 @@ const isEmail = (s) => s.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s
 const toInt = (v) => { const s = latinDigits(v).replace(/[\s,]/g, ""); return /^-?\d+$/.test(s) ? parseInt(s, 10) : NaN; };
 const pickKey = (map, v) => (v != null && Object.prototype.hasOwnProperty.call(map, String(v)) ? String(v) : "");
 const truthy = (v) => v === true || v === 1 || v === "1" || v === "true" || v === "on" || v === "yes";
+// "5,000", "٥٠٠٠٫٥", 1500 -> number with at most 2 decimals; NaN when it is not a plain positive amount
+function toAmount(v) {
+  const s = latinDigits(v).replace(/[\s,\u066C]/g, "").replace("\u066B", ".");
+  if (!/^\d{1,9}(\.\d{1,2})?$/.test(s)) return NaN;
+  const n = Math.round(parseFloat(s) * 100) / 100;
+  return n > 0 && n <= MAX_AMOUNT ? n : NaN;
+}
+// Today's date in Egypt as YYYY-MM-DD; +/- days. Date checks allow one day of slack for visitors in other time zones.
+function cairoDay(offsetDays = 0, now = new Date()) {
+  const d = new Date(now.getTime() + offsetDays * 864e5);
+  try { return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit" }).format(d); }
+  catch { return d.toISOString().slice(0, 10); }
+}
+// a real calendar date "YYYY-MM-DD" (rejects 2026-02-30)
+function isDay(s) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s || "")) return false;
+  const d = new Date(s + "T00:00:00Z");
+  return !isNaN(d) && d.toISOString().slice(0, 10) === s;
+}
+const fmtAmount = (n) => (n == null || isNaN(n) ? "" : Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 }));
 
 // ---------- validation: { ok, errors: { field: message }, data } ----------
 function validate(type, body) {
@@ -75,6 +109,45 @@ function validate(type, body) {
     d.howOther = clean(b.howOther, 120); if (d.how.includes("other") && !d.howOther) err("howOther", "اكتب إزاي تحب تساعد");
     d.availability = pickKey(AVAILABILITY, b.availability); if (!d.availability) err("availability", "اختار الوقت المناسب ليك");
     d.message = clean(b.message, 1000, true);
+  } else if (type === "transfer") {
+    d.name = clean(b.name, 80); if (d.name.length < 2) err("name", "اكتب اسمك");
+    d.email = clean(b.email, 120).toLowerCase(); if (d.email && !isEmail(d.email)) err("email", "البريد الإلكتروني مش صحيح");
+    d.method = pickKey(METHODS, b.method); if (!d.method) err("method", "اختار طريقة التبرع");
+    d.bank = d.method === "bank" ? clean(b.bank, 80) : "";
+    if (d.method === "bank" && d.bank.length < 2) err("bank", "اختار البنك اللي حوّلت عليه");
+    d.amount = toAmount(b.amount); if (isNaN(d.amount)) { d.amount = null; err("amount", "اكتب المبلغ (رقم أكبر من صفر)"); }
+    d.currency = b.currency == null || b.currency === "" ? "EGP" : pickKey(CURRENCIES, String(b.currency).toUpperCase());
+    if (!d.currency) err("currency", "اختار العملة");
+    d.date = clean(b.date, 10);
+    if (!isDay(d.date)) { d.date = ""; err("date", "اختار تاريخ التحويل"); }
+    else if (d.date > cairoDay(1)) err("date", "تاريخ التحويل مينفعش يكون في المستقبل");
+    else if (d.date < cairoDay(-731)) err("date", "التاريخ ده قديم أوي - كلمنا على 19340");
+    d.txRef = clean(b.txRef, 60);
+    d.purpose = b.purpose == null || b.purpose === "" ? "general" : pickKey(PURPOSES, b.purpose); if (!d.purpose) err("purpose", "اختار الغرض من التبرع");
+    d.caseCode = latinDigits(clean(b.caseCode, 40)).replace(/\s+/g, "").toUpperCase();
+    if (d.caseCode && !/^[A-Z0-9-]{1,20}$/.test(d.caseCode)) err("caseCode", "كود الحالة حروف إنجليزي وأرقام بس (لحد 20)");
+    d.notes = clean(b.notes, 1000, true);
+  } else if (type === "pickup") {
+    d.name = clean(b.name, 80); if (d.name.length < 2) err("name", "اكتب اسمك");
+    d.altPhone = normalizePhone(b.altPhone); if (d.altPhone && !isEgyptMobile(d.altPhone)) err("altPhone", "الرقم التاني مش صحيح (01xxxxxxxxx)");
+    if (d.altPhone && d.altPhone === d.phone) d.altPhone = "";
+    d.gov = clean(b.gov, 40); if (!GOVERNORATES.includes(d.gov)) { d.gov = ""; err("gov", "اختار المحافظة"); }
+    d.area = clean(b.area, 80); if (d.area.length < 2) err("area", "اكتب المنطقة أو الحي");
+    d.address = clean(b.address, 300, true); if (d.address.length < 8) err("address", "اكتب العنوان بالتفصيل (الشارع ورقم العمارة والدور)");
+    d.kind = pickKey(KINDS, b.kind); if (!d.kind) err("kind", "اختار نوع التبرع");
+    d.amount = null; d.purpose = ""; d.goods = "";
+    if (d.kind === "money") {
+      d.amount = toAmount(b.amount); if (isNaN(d.amount)) { d.amount = null; err("amount", "اكتب المبلغ (رقم أكبر من صفر)"); }
+      d.purpose = b.purpose == null || b.purpose === "" ? "general" : pickKey(PURPOSES, b.purpose); if (!d.purpose) err("purpose", "اختار الغرض من التبرع");
+    } else if (d.kind === "goods") {
+      d.goods = clean(b.goods, 500, true); if (d.goods.length < 3) err("goods", "اكتب إيه اللي حابب تتبرع بيه");
+    }
+    d.date = clean(b.date, 10);
+    if (!isDay(d.date)) { d.date = ""; err("date", "اختار اليوم المناسب للتحصيل"); }
+    else if (d.date < cairoDay(-1)) err("date", "اختار يوم من النهارده أو بعده");
+    else if (d.date > cairoDay(62)) err("date", "اختار يوم خلال الشهرين الجايين");
+    d.slot = pickKey(SLOTS, b.slot); if (!d.slot) err("slot", "اختار الوقت المناسب");
+    d.notes = clean(b.notes, 1000, true);
   } else {
     d.patient = clean(b.patient, 80); if (d.patient.length < 2) err("patient", "اكتب اسم المريض");
     d.requester = clean(b.requester, 80); if (d.requester.length < 2) err("requester", "اكتب اسم مقدم الطلب");
@@ -128,28 +201,47 @@ function makeRef(type, date = new Date()) {
   const rnd = Array.from(crypto.randomBytes(5), (b) => ALPHABET[b % ALPHABET.length]).join("");
   return `${TYPES[type].prefix}-${ymd}-${rnd}`;
 }
-const ID_RE = /^M([VH])-\d{8}-[A-Z2-9]{5}$/;
-function typeOf(id) { const m = ID_RE.exec(String(id || "")); return m ? (m[1] === "V" ? "volunteer" : "help") : null; }
+const BY_PREFIX = Object.fromEntries(Object.entries(TYPES).map(([k, t]) => [t.prefix, k]));
+const ID_RE = /^(M[A-Z])-\d{8}-[A-Z2-9]{5}$/;
+function typeOf(id) { const m = ID_RE.exec(String(id || "")); return m ? BY_PREFIX[m[1]] || null : null; }
 
 function summary(type, d) {
   if (type === "volunteer") {
     const how = d.how.map((k) => (k === "other" && d.howOther ? d.howOther : HOW[k])).join("، ");
     return [how, AVAILABILITY[d.availability], d.message].filter(Boolean).join(" · ").slice(0, 160);
   }
+  if (type === "transfer") {
+    const via = METHODS[d.method] + (d.bank ? " - " + d.bank : "");
+    return [fmtAmount(d.amount) + " " + CURRENCIES[d.currency], via, d.date, PURPOSES[d.purpose], d.caseCode && "كود الحالة " + d.caseCode, d.notes].filter(Boolean).join(" · ").slice(0, 160);
+  }
+  if (type === "pickup") {
+    const what = d.kind === "money" ? "فلوس " + fmtAmount(d.amount) + " جنيه" : "تبرع عيني: " + d.goods;
+    return [what, d.kind === "money" && PURPOSES[d.purpose], d.date + " " + SLOTS[d.slot], d.notes].filter(Boolean).join(" · ").slice(0, 160);
+  }
   return [CASE_TYPES[d.caseType], d.hospital, d.description].filter(Boolean).join(" · ").slice(0, 160);
 }
+// meta = the few fields the admin list and its CSV need without the full data (the GitHub index has no .data)
+function metaOf(type, d) {
+  if (type === "transfer") return { amount: d.amount, currency: d.currency, method: d.method, bank: d.bank, date: d.date, purpose: d.purpose, caseCode: d.caseCode };
+  if (type === "pickup") return { kind: d.kind, amount: d.amount, currency: d.kind === "money" ? "EGP" : "", purpose: d.purpose, area: d.area, date: d.date, slot: d.slot };
+  return null;
+}
 function makeRecord(type, d, now = new Date()) {
-  return {
+  const rec = {
     id: makeRef(type, now), type, createdAt: now.toISOString(), status: "new", note: "",
     name: type === "help" ? d.patient : d.name, phone: d.phone, altPhone: d.altPhone || "", email: d.email || "",
-    city: d.city || "", gov: d.gov || "", summary: summary(type, d), source: "website", data: d,
+    city: (type === "pickup" ? d.area : d.city) || "", gov: d.gov || "", summary: summary(type, d), source: "website", data: d,
   };
+  const meta = metaOf(type, d); if (meta) rec.meta = meta;
+  return rec;
 }
 const compact = (r) => { const { data, ...rest } = r; return rest; };
-const toEntity = (r) => ({ partitionKey: r.type, rowKey: r.id, createdAt: r.createdAt, updatedAt: r.updatedAt || "", status: r.status, note: r.note || "", name: r.name, phone: r.phone, altPhone: r.altPhone || "", email: r.email || "", city: r.city || "", gov: r.gov || "", summary: r.summary || "", source: r.source || "website", payload: JSON.stringify(r.data || {}) });
+const toEntity = (r) => ({ partitionKey: r.type, rowKey: r.id, createdAt: r.createdAt, updatedAt: r.updatedAt || "", status: r.status, note: r.note || "", name: r.name, phone: r.phone, altPhone: r.altPhone || "", email: r.email || "", city: r.city || "", gov: r.gov || "", summary: r.summary || "", source: r.source || "website", payload: JSON.stringify(r.data || {}), ...(r.meta ? { meta: JSON.stringify(r.meta) } : {}) });
 function fromEntity(e) {
   let data = {}; try { data = JSON.parse(e.payload || "{}"); } catch { /* keep {} */ }
-  return { id: e.rowKey, type: e.partitionKey, createdAt: e.createdAt, updatedAt: e.updatedAt || "", status: e.status, note: e.note || "", name: e.name, phone: e.phone, altPhone: e.altPhone || "", email: e.email || "", city: e.city || "", gov: e.gov || "", summary: e.summary || "", source: e.source || "", data };
+  const r = { id: e.rowKey, type: e.partitionKey, createdAt: e.createdAt, updatedAt: e.updatedAt || "", status: e.status, note: e.note || "", name: e.name, phone: e.phone, altPhone: e.altPhone || "", email: e.email || "", city: e.city || "", gov: e.gov || "", summary: e.summary || "", source: e.source || "", data };
+  if (e.meta) { try { r.meta = JSON.parse(e.meta); } catch { /* skip */ } }
+  return r;
 }
 
 // ---------- storage ----------
@@ -268,8 +360,8 @@ async function forward(rec, log = () => {}) {
 }
 
 module.exports = {
-  TYPES, STATUSES, STATUS_LABELS, HOW, AVAILABILITY, RELATION, CASE_TYPES, GOVERNORATES, INDEX, fileOf,
-  latinDigits, clean, normalizePhone, isEgyptMobile, isEmail, validate, botCheck,
-  rateAllowed, rateHit, clientIp, makeRef, typeOf, summary, makeRecord, toEntity, fromEntity,
+  TYPES, STATUSES, STATUS_LABELS, HOW, AVAILABILITY, RELATION, CASE_TYPES, GOVERNORATES, METHODS, CURRENCIES, PURPOSES, KINDS, SLOTS, INDEX, fileOf,
+  latinDigits, clean, normalizePhone, isEgyptMobile, isEmail, toAmount, cairoDay, isDay, validate, botCheck,
+  rateAllowed, rateHit, clientIp, makeRef, typeOf, summary, metaOf, makeRecord, toEntity, fromEntity,
   enabled, save, list, get, update, forward, _hits: hits,
 };

@@ -66,13 +66,64 @@
   // Bank accounts, wallets and the account abroad come from /data/donate.json (edited from the console, "بيانات الموقع");
   // the markup already in donate.html is the fallback while it loads or if it fails.
   function row(label, value) { return '<div class="bank"><div><b>' + esc(label) + "</b><code>" + esc(value) + '</code></div><button class="copy" data-copy="' + esc(value) + '">' + CI + "<span>نسخ</span></button></div>"; }
+  // Bank accounts: consecutive entries with the same bank name become one card (logo, or a teal initials badge, + the
+  // name, then one row per account: currency pill, the number and a copy button). css: "bank account cards" in site.css.
+  // donate.html carries the same markup as the no-JS fallback.
+  function curKey(c) { return /جنيه|EGP/i.test(c) ? "egp" : /دولار|USD/i.test(c) ? "usd" : /يورو|EUR/i.test(c) ? "eur" : "other"; }
+  function bankBadge(name) {
+    var latin = /\b[A-Z]{2,5}\b/.exec(name);
+    if (latin) return latin[0];
+    var w = String(name).split(/\s+/).filter(function (x) { return x && !/^(ال)?(بنك|مصرف)$/.test(x); })[0] || String(name);
+    return w.replace(/^ال(?=..)/, "").charAt(0);
+  }
+  function bankLogo(g) {
+    if (!g.logo) return '<span class="bk-logo bk-initials" aria-hidden="true">' + esc(bankBadge(g.name)) + "</span>";
+    var wp = window.mersalWebp ? window.mersalWebp(g.logo) : null;
+    return '<span class="bk-logo"><picture>' + (wp ? '<source type="image/webp" srcset="' + esc(wp) + '">' : "") +
+      '<img src="' + esc(g.logo) + '" alt="" loading="lazy" decoding="async"></picture></span>';
+  }
+  function accRow(pill, key, value, what) {
+    return '<li class="bk-acc"><span class="bk-cur" data-cur="' + key + '">' + esc(pill) + '</span><code class="bk-num" dir="ltr">' + esc(value) +
+      '</code><button type="button" class="copy" data-copy="' + esc(value) + '" aria-label="' + esc("نسخ " + what) + '">' + CI + "<span>نسخ</span></button></li>";
+  }
+  function bankCards(banks) {
+    var groups = [];
+    banks.forEach(function (b) {
+      var name = String(b.name).trim(), g = groups[groups.length - 1];
+      if (!g || g.name !== name) groups.push(g = { name: name, logo: "", accs: [] });
+      if (!g.logo && b.logo) g.logo = String(b.logo).trim();
+      g.accs.push(b);
+    });
+    return '<div class="bk-grid">' + groups.map(function (g) {
+      var swift = {}, rows = g.accs.map(function (b) {
+        var cur = String(b.currency || "").trim(), of = g.name + (cur ? " " + cur : ""), sw = String(b.swift || "").trim();
+        var r = accRow(cur || "رقم الحساب", curKey(cur), String(b.number).trim(), "رقم حساب " + of);
+        if (b.iban) r += accRow("IBAN", "code", String(b.iban).trim(), "IBAN حساب " + of);
+        if (sw && !swift[sw]) { swift[sw] = 1; r += accRow("SWIFT", "code", sw, "SWIFT " + g.name); }
+        return r;
+      }).join("");
+      return '<article class="bk-card"><header class="bk-head">' + bankLogo(g) + '<h3 class="bk-name">' + esc(g.name) + "</h3></header>" +
+        '<ul class="bk-list" role="list">' + rows + "</ul></article>";
+    }).join("") + "</div>";
+  }
+  // a logo that fails to load (e.g. a deleted upload) turns into the initials badge
+  function bankLogoFallback(box) {
+    box.querySelectorAll(".bk-logo img").forEach(function (img) {
+      function fail() {
+        var s = img.closest(".bk-logo"), card = img.closest(".bk-card");
+        if (!s || !card) return;
+        s.className = "bk-logo bk-initials"; s.setAttribute("aria-hidden", "true");
+        s.textContent = bankBadge(card.querySelector(".bk-name").textContent);
+      }
+      if (img.complete && img.currentSrc && !img.naturalWidth) fail(); else img.addEventListener("error", fail);
+    });
+  }
   fetch("/data/donate.json").then(function (r) { return r.json(); }).then(function (d) {
     var banks = (d.banks || []).filter(function (b) { return b && b.name && b.number; });
     if (banks.length) {
-      document.getElementById("bank-accounts").innerHTML = banks.map(function (b) {
-        var label = b.name + (b.currency ? " - " + b.currency : "");
-        return row(label, b.number) + (b.iban ? row("IBAN - " + b.name, b.iban) : "") + (b.swift ? row("SWIFT - " + b.name, b.swift) : "");
-      }).join("");
+      var bankBox = document.getElementById("bank-accounts");
+      bankBox.innerHTML = bankCards(banks);
+      bankLogoFallback(bankBox);
     }
     var wallets = (d.wallets || []).filter(function (w) { return w && w.name && w.value; });
     document.getElementById("wallet-numbers").innerHTML = wallets.map(function (w) { return row(w.name, w.value); }).join("");
@@ -223,7 +274,7 @@
       '<p>تقدر تكمل تبرعك بـ <b>' + fmt.format(Number(amount.value)) + " جنيه</b> دلوقتي بطريقة من دول:</p>" +
       '<div class="gw-alt">' +
         '<a class="btn btn-teal" href="tel:19340">📞 مندوب لحد البيت 19340</a>' +
-        '<a class="btn btn-ghost-teal" href="#bank" data-tab="bank">🏦 تحويل بنكي CIB</a>' +
+        '<a class="btn btn-ghost-teal" href="#bank" data-tab="bank">🏦 تحويل بنكي</a>' +
         '<a class="btn btn-ghost-teal" href="#wallets" data-tab="wallets">📱 فوري 9200 / إنستاباي</a>' +
       "</div>" +
       '<button type="button" class="link-btn" id="gw-back">← رجوع لتعديل التبرع</button>';
@@ -261,7 +312,7 @@
   }
   window.mersalPayError = function (err) {
     gw.hidden = true; btn.disabled = false; go(3);
-    show("err", (err && err.message) ? esc(err.message) : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو اتصل بالدعم الفني 01099316592.");
+    show("err", (err && err.message) ? esc(err.message) : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو كلمنا على 19340.");
   };
   window.mersalPayCancel = function () { gw.hidden = true; btn.disabled = false; go(3); show("info", "تم إلغاء عملية الدفع."); };
 

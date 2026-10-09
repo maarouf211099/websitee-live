@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/impact.css">
+<link rel="stylesheet" href="/css/forms.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>طرق التبرع | مؤسسة مرسال</title>
@@ -32,7 +33,7 @@
         <div class="tabs" role="tablist">
           <button role="tab" class="only-online" id="t-online" aria-controls="online" aria-selected="true">بالبطاقة البنكية</button>
           <button role="tab" id="t-bank" aria-controls="bank" aria-selected="false">الحسابات البنكية</button>
-          <button role="tab" id="t-wallets" aria-controls="wallets" aria-selected="false">المحافظ وإنستاباي</button>
+          <button role="tab" id="t-wallets" aria-controls="wallets" aria-selected="false">المحافظ والتطبيقات</button>
           <button role="tab" id="t-home" aria-controls="home" aria-selected="false">مندوب لحد البيت</button>
           <button role="tab" id="t-abroad" aria-controls="abroad" aria-selected="false">من خارج مصر</button>
         </div>
@@ -118,7 +119,6 @@
               <h3 id="gw-title">جاري التحويل لبوابة بنك مصر…</h3>
               <div id="gw-body"></div>
             </div>
-            <p class="hint" style="margin-top:12px">في حالة وجود مشكلة في الدفع أونلاين برجاء الاتصال بالدعم الفني <a href="tel:01099316592" dir="ltr">01099316592</a></p>
           </form>
         </div>
 
@@ -126,30 +126,385 @@
           <p>يمكنك التبرع على حساب مؤسسة مرسال عن طريق تحويل بنكي من خلال البنوك التالية:</p>
           <!-- filled from /data/donate.json (banks) by js/donate.js; this markup is the no-JS fallback -->
           <div id="bank-accounts">
-          <div class="bank"><div><b>بنك CIB - بالجنيه</b><code>100034654454</code></div><button class="copy" data-copy="100034654454"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
-          <div class="bank"><div><b>بنك CIB - بالدولار</b><code>100034654357</code></div><button class="copy" data-copy="100034654357"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
-          <div class="bank"><div><b>بنك الإمارات دبي الوطني</b><code>1019409332701</code></div><button class="copy" data-copy="1019409332701"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
-          <div class="bank"><div><b>البنك العربي الأفريقي - بالجنيه أو الدولار</b><code>701840</code></div><button class="copy" data-copy="701840"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+          <div class="bk-grid">
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/qnb.webp"><img src="/img/banks/qnb.png" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">بنك QNB الأهلي</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">735-20311817142-68</code><button type="button" class="copy" data-copy="735-20311817142-68" aria-label="نسخ رقم حساب بنك QNB الأهلي بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="usd">بالدولار</span><code class="bk-num" dir="ltr">735-20312010316-82</code><button type="button" class="copy" data-copy="735-20312010316-82" aria-label="نسخ رقم حساب بنك QNB الأهلي بالدولار"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="eur">باليورو</span><code class="bk-num" dir="ltr">735-20312010318-68</code><button type="button" class="copy" data-copy="735-20312010318-68" aria-label="نسخ رقم حساب بنك QNB الأهلي باليورو"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/aaib.webp"><img src="/img/banks/aaib.png" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">البنك العربي الأفريقي الدولي</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">1015996610010201</code><button type="button" class="copy" data-copy="1015996610010201" aria-label="نسخ رقم حساب البنك العربي الأفريقي الدولي بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="usd">بالدولار</span><code class="bk-num" dir="ltr">1015996610010101</code><button type="button" class="copy" data-copy="1015996610010101" aria-label="نسخ رقم حساب البنك العربي الأفريقي الدولي بالدولار"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="eur">باليورو</span><code class="bk-num" dir="ltr">1015996610010301</code><button type="button" class="copy" data-copy="1015996610010301" aria-label="نسخ رقم حساب البنك العربي الأفريقي الدولي باليورو"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/banque-misr.webp"><img src="/img/banks/banque-misr.png" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">بنك مصر</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">5450001000003297</code><button type="button" class="copy" data-copy="5450001000003297" aria-label="نسخ رقم حساب بنك مصر بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="usd">بالدولار</span><code class="bk-num" dir="ltr">5450120000000214</code><button type="button" class="copy" data-copy="5450120000000214" aria-label="نسخ رقم حساب بنك مصر بالدولار"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="eur">باليورو</span><code class="bk-num" dir="ltr">5450130000000084</code><button type="button" class="copy" data-copy="5450130000000084" aria-label="نسخ رقم حساب بنك مصر باليورو"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/enbd.webp"><img src="/img/banks/enbd.jpg" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">بنك الإمارات دبي الوطني</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">1019409332701</code><button type="button" class="copy" data-copy="1019409332701" aria-label="نسخ رقم حساب بنك الإمارات دبي الوطني بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="usd">بالدولار</span><code class="bk-num" dir="ltr">1029409332702</code><button type="button" class="copy" data-copy="1029409332702" aria-label="نسخ رقم حساب بنك الإمارات دبي الوطني بالدولار"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="eur">باليورو</span><code class="bk-num" dir="ltr">1029409332703</code><button type="button" class="copy" data-copy="1029409332703" aria-label="نسخ رقم حساب بنك الإمارات دبي الوطني باليورو"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/cib.webp"><img src="/img/banks/cib.png" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">البنك التجاري الدولي CIB</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">100034654454</code><button type="button" class="copy" data-copy="100034654454" aria-label="نسخ رقم حساب البنك التجاري الدولي CIB بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="usd">بالدولار</span><code class="bk-num" dir="ltr">100034654357</code><button type="button" class="copy" data-copy="100034654357" aria-label="نسخ رقم حساب البنك التجاري الدولي CIB بالدولار"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="eur">باليورو</span><code class="bk-num" dir="ltr">100034654397</code><button type="button" class="copy" data-copy="100034654397" aria-label="نسخ رقم حساب البنك التجاري الدولي CIB باليورو"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/nbe.webp"><img src="/img/banks/nbe.png" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">البنك الأهلي المصري</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">1953071376769426268</code><button type="button" class="copy" data-copy="1953071376769426268" aria-label="نسخ رقم حساب البنك الأهلي المصري بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
+            <article class="bk-card"><header class="bk-head"><span class="bk-logo"><picture><source type="image/webp" srcset="/img/banks/adib.webp"><img src="/img/banks/adib.png" alt="" loading="lazy" decoding="async"></picture></span><h3 class="bk-name">مصرف أبوظبي الإسلامي</h3></header>
+            <ul class="bk-list" role="list">
+              <li class="bk-acc"><span class="bk-cur" data-cur="egp">بالجنيه</span><code class="bk-num" dir="ltr">100000913368</code><button type="button" class="copy" data-copy="100000913368" aria-label="نسخ رقم حساب مصرف أبوظبي الإسلامي بالجنيه"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+              <li class="bk-acc"><span class="bk-cur" data-cur="usd">بالدولار</span><code class="bk-num" dir="ltr">100000913369</code><button type="button" class="copy" data-copy="100000913369" aria-label="نسخ رقم حساب مصرف أبوظبي الإسلامي بالدولار"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></li>
+            </ul></article>
           </div>
-          <p class="hint">بعد التحويل، ابعتلنا صورة الإيصال على <a href="mailto:info@mersal-ngo.org" data-site="email">info@mersal-ngo.org</a> أو كلمنا على <a href="tel:19340" data-site="hotline">19340</a> لتأكيد التبرع.</p>
+          </div>
+          <div class="tr-cta" data-slot>
+            <div class="tr-cta-head">
+              <span class="tr-cta-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-2.2-1.4L13.6 21 12 19.6 10.4 21l-2.2-1.4L6 21z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/></svg></span>
+              <div class="tr-cta-txt">
+                <h3>حوّلت؟ سجّل تبرعك عشان نأكده ونخصصه</h3>
+                <p>دقيقة واحدة: المبلغ وتاريخ التحويل والغرض، وهتاخد رقم طلب تتابع بيه.</p>
+              </div>
+              <button type="button" class="btn btn-gold tr-cta-btn" data-open-transfer data-method="bank" aria-expanded="false" aria-controls="transfer-box"><span data-label>سجّل تبرعك</span><svg class="tr-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+            </div>
+            <p class="tr-cta-alt">أو ابعت صورة الإيصال على <a href="mailto:info@mersal-ngo.org" data-site="email">info@mersal-ngo.org</a> أو كلمنا على <a href="tel:19340" data-site="hotline">19340</a>.</p>
+            <!-- one transfer form for the bank and wallets tabs: js/forms.js moves it under the card whose button was pressed -->
+            <div id="transfer-box" class="tr-box" hidden>
+              <div id="tr-alert" class="req-alert" hidden aria-live="polite"></div>
+              <form id="tr-form" class="stepper req-form" data-form="transfer" data-alert="tr-alert" data-success="tr-success" novalidate>
+                <fieldset>
+                  <legend>بيانات التحويل</legend>
+                  <p class="hint sec-hint">كل الخانات مطلوبة إلا اللي مكتوب جنبها (اختياري).</p>
+                  <div class="row-2">
+                    <div class="field" data-field="method">
+                      <label for="tr-method">طريقة التبرع</label>
+                      <select id="tr-method" name="method" required>
+                        <option value="">اختار…</option>
+                        <option value="bank">تحويل بنكي</option>
+                        <option value="instapay">إنستاباي</option>
+                        <option value="vodafone">فودافون كاش</option>
+                        <option value="etisalat">اتصالات كاش (e&amp; cash)</option>
+                        <option value="wepay">WE Pay</option>
+                        <option value="orange">أورانج كاش</option>
+                        <option value="fawry">فوري / MyFawry</option>
+                        <option value="masary">مصاري</option>
+                        <option value="aman">أمان</option>
+                        <option value="megakheir">ميجا خير</option>
+                        <option value="bankwallet">محافظ البنوك (من خلال فوري)</option>
+                      </select>
+                      <p class="f-err"></p>
+                    </div>
+                    <div class="field" data-field="bank" data-show-if="method=bank" hidden>
+                      <label for="tr-bank">البنك اللي حوّلت عليه</label>
+                      <select id="tr-bank" name="bank" data-banks required>
+                        <option value="">اختار البنك…</option>
+                        <option>البنك التجاري الدولي CIB</option>
+                        <option>بنك الإمارات دبي الوطني</option>
+                        <option>البنك العربي الأفريقي الدولي</option>
+                        <option>بنك QNB الأهلي</option>
+                        <option>بنك مصر</option>
+                        <option>البنك الأهلي المصري</option>
+                        <option>مصرف أبوظبي الإسلامي</option>
+                        <option value="بنك آخر">بنك آخر</option>
+                      </select>
+                      <p class="f-err"></p>
+                    </div>
+                  </div>
+                  <div class="amt-row">
+                    <div class="field" data-field="amount">
+                      <label for="tr-amount">المبلغ</label>
+                      <input id="tr-amount" name="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="16" placeholder="1,000" data-amount required>
+                      <p class="f-err"></p>
+                    </div>
+                    <div class="field" data-field="currency">
+                      <label for="tr-currency">العملة</label>
+                      <select id="tr-currency" name="currency" required>
+                        <option value="EGP" selected>جنيه مصري</option>
+                        <option value="USD">دولار أمريكي</option>
+                        <option value="EUR">يورو</option>
+                        <option value="SAR">ريال سعودي</option>
+                        <option value="AED">درهم إماراتي</option>
+                      </select>
+                      <p class="f-err"></p>
+                    </div>
+                  </div>
+                  <div class="row-2">
+                    <div class="field" data-field="date">
+                      <label for="tr-date">تاريخ التحويل</label>
+                      <input id="tr-date" name="date" type="date" data-day="past" required>
+                      <p class="f-err"></p>
+                    </div>
+                    <div class="field" data-field="txRef">
+                      <label for="tr-ref">رقم العملية / التحويل <small>(اختياري)</small></label>
+                      <input id="tr-ref" name="txRef" dir="ltr" maxlength="60" autocomplete="off">
+                      <p class="f-err"></p>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>تخصيص التبرع</legend>
+                  <p class="hint sec-hint">عشان نوجّه تبرعك للمكان اللي اخترته.</p>
+                  <div class="row-2">
+                    <div class="field" data-field="purpose">
+                      <label for="tr-purpose">الغرض من التبرع</label>
+                      <select id="tr-purpose" name="purpose">
+                      <option value="general" selected>تبرع عام - حيث الحاجة أكبر</option>
+                      <option value="zakat">زكاة المال</option>
+                      <option value="sadaqa">صدقة</option>
+                      <option value="p30">مستشفى مرسال للأطفال</option>
+                      <option value="p31">مركز مرسال لعلاج الأورام</option>
+                      <option value="cases">حالات المرضى</option>
+                      </select>
+                      <p class="f-err"></p>
+                    </div>
+                    <div class="field" data-field="caseCode">
+                      <label for="tr-case">كود الحالة <small>(اختياري - لحالة معيّنة)</small></label>
+                      <input id="tr-case" name="caseCode" dir="ltr" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                      <p class="f-err"></p>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>بياناتك</legend>
+                  <p class="hint sec-hint">هنكلمك على الرقم ده لو احتجنا نأكد التحويل.</p>
+                  <div class="field" data-field="name">
+                    <label for="tr-name">الاسم</label>
+                    <input id="tr-name" name="name" autocomplete="name" maxlength="80" required>
+                    <p class="f-err"></p>
+                  </div>
+                  <div class="row-2">
+                    <div class="field" data-field="phone">
+                      <label for="tr-phone">رقم الموبايل</label>
+                      <input id="tr-phone" name="phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" maxlength="20" placeholder="01xxxxxxxxx" required>
+                      <p class="f-err"></p>
+                    </div>
+                    <div class="field" data-field="email">
+                      <label for="tr-email">البريد الإلكتروني <small>(اختياري)</small></label>
+                      <input id="tr-email" name="email" type="email" inputmode="email" dir="ltr" autocomplete="email" maxlength="120">
+                      <p class="f-err"></p>
+                    </div>
+                  </div>
+                  <div class="field" data-field="notes">
+                    <label for="tr-notes">ملاحظات <small>(اختياري)</small></label>
+                    <textarea id="tr-notes" name="notes" rows="3" maxlength="1000" placeholder="مثال: التبرع باسم والدي، أو جزء منه زكاة"></textarea>
+                    <small class="count" data-count="tr-notes"></small>
+                    <p class="f-err"></p>
+                  </div>
+                </fieldset>
+
+                <div class="hp" aria-hidden="true"><label for="tr-website">الموقع الإلكتروني</label><input id="tr-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+
+                <div class="req-submit"><button class="btn btn-gold btn-block" type="submit">سجّل التبرع</button></div>
+                <p class="req-note">بعد التسجيل هتاخد رقم طلب، وتقدر تبعتلنا صورة الإيصال على واتساب عشان نأكد تبرعك أسرع.</p>
+              </form>
+
+              <section id="tr-success" class="stepper req-success" hidden aria-live="polite">
+                <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+                <h2 tabindex="-1">سجّلنا تبرعك، شكراً ليك 💚</h2>
+                <p class="req-recap" data-recap hidden></p>
+                <p>هنراجع التحويل ونأكده ونخصصه للغرض اللي اخترته.</p>
+                <div class="ref-box"><div><small>رقم الطلب - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+                <p>ابعتلنا <b>صورة إيصال التحويل</b> على واتساب ومعاها رقم الطلب عشان نأكد تبرعك أسرع:</p>
+                <div class="actions">
+                  <a class="btn btn-wa" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> ابعت الإيصال على واتساب</a>
+                  <a class="btn btn-teal" href="tel:19340">اتصل بالخط الساخن 19340</a>
+                </div>
+                <a class="again" data-again href="#tr-form">تسجيل تبرع تاني</a>
+              </section>
+            </div>
+          </div>
         </div>
 
         <div class="tab-panel" id="wallets" role="tabpanel" aria-labelledby="t-wallets" hidden>
-          <div class="grid grid-3" style="margin-bottom:18px"><div class="card channel"><img src="/img/old/98894335english-logo-copy-f5f96cd8.png" alt="" loading="lazy"><div><h3>تقدر تتبرع عن طريق خدمة فورى</h3><p>كود مرسال 9200</p></div></div><div class="card channel"><img src="/img/old/4542logo-pic-9eed272a.jpg" alt="" loading="lazy"><div><h3>التبرع عن طريق الرسائل القصيرة</h3><p>ابعت رسالة فيها كلمة مرسال على 9599 ب 5 جنيه بس</p></div></div><div class="card channel"><img src="/img/old/3536unnamed-1c52e3b3.png" alt="" loading="lazy"><div><h3>إنستاباي</h3><p>تبرع باستخدام إنستاباي</p></div></div></div>
-          <p>كمان تقدر تتبرع من خلال:</p>
-          <ul class="chips">
-            <li>إنستاباي</li><li>فودافون كاش</li><li>اتصالات كاش</li><li>أورانج كاش</li><li>فوري</li>
-            <li>MyFawry</li><li>مصاري</li><li>أمان</li><li>ميجا خير</li><li>محافظ البنوك (من خلال فوري)</li>
-          </ul>
+          <p class="pw-intro">اختار الطريقة اللي تناسبك، وكلها بتوصل لمرسال على طول:</p>
+          <div class="pay-ways">
+            <article class="pw" data-brand="instapay">
+              <span class="pw-badge" aria-hidden="true">IP</span>
+              <div class="pw-body"><h3>إنستاباي</h3><p>من <b>قائمة التبرعات</b> في التطبيق اختار <b>مرسال</b> وخصص تبرعك.</p></div>
+            </article>
+            <article class="pw" data-brand="wallets">
+              <span class="pw-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M16 14.5h2"/></svg></span>
+              <div class="pw-body"><h3>كل المحافظ الإلكترونية</h3><p>من <b>قائمة التبرعات</b> في المحفظة اختار <b>مرسال</b>.</p>
+                <ul class="pw-chips"><li>فودافون كاش (ميجا خير)</li><li>اتصالات كاش e&amp;</li><li>WE Pay</li><li>أورانج كاش</li></ul></div>
+            </article>
+            <article class="pw" data-brand="fawry">
+              <span class="pw-badge" aria-hidden="true">ف</span>
+              <div class="pw-body"><h3>فوري</h3><p>من تطبيق فوري أو <b>أقرب منفذ فوري</b> بكود مرسال:</p>
+                <div class="pw-code"><b dir="ltr">9200</b><button type="button" class="copy" data-copy="9200" aria-label="نسخ كود فوري 9200"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div></div>
+            </article>
+            <article class="pw" data-brand="talabat">
+              <span class="pw-badge" aria-hidden="true">t</span>
+              <div class="pw-body"><h3>طلبات</h3><p>في تطبيق طلبات دوّر على <b dir="ltr">Mersal Foundation</b> واختار التبرع اللي تحبه، زي حضانات مرسال أو العلاج الشهري.</p></div>
+            </article>
+            <article class="pw" data-brand="waffarha">
+              <span class="pw-badge" aria-hidden="true">w</span>
+              <div class="pw-body"><h3>وفّرها</h3><p>من تطبيق وفّرها ادخل على <b>التبرعات</b> واختار <b>مؤسسة مرسال الخيرية</b> والمشروع والمبلغ.</p></div>
+            </article>
+            <article class="pw" data-brand="sms">
+              <span class="pw-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 3z"/><path d="M8 9h8M8 12h5"/></svg></span>
+              <div class="pw-body"><h3>رسالة قصيرة</h3><p>ابعت رسالة فيها كلمة <b>مرسال</b> على <b dir="ltr">9599</b> بـ 5 جنيه بس.</p></div>
+            </article>
+          </div>
+          <p class="hint pw-more">وكمان من خلال MyFawry ومصاري وأمان ومحافظ البنوك (من خلال فوري).</p>
           <!-- filled from /data/donate.json (wallets) by js/donate.js -->
           <div id="wallet-numbers"></div>
-          <p class="hint">بعد التحويل كلمنا على الخط الساخن <a href="tel:19340" data-site="hotline">19340</a> لتأكيد وتخصيص تبرعك.</p>
+          <div class="tr-cta" data-slot>
+            <div class="tr-cta-head">
+              <span class="tr-cta-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-2.2-1.4L13.6 21 12 19.6 10.4 21l-2.2-1.4L6 21z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/></svg></span>
+              <div class="tr-cta-txt">
+                <h3>حوّلت؟ سجّل تبرعك عشان نأكده ونخصصه</h3>
+                <p>حوّلت بإنستاباي أو محفظة أو فوري؟ سجّل المبلغ والتاريخ وهتاخد رقم طلب تتابع بيه.</p>
+              </div>
+              <button type="button" class="btn btn-gold tr-cta-btn" data-open-transfer data-method="instapay" aria-expanded="false" aria-controls="transfer-box"><span data-label>سجّل تبرعك</span><svg class="tr-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+            </div>
+            <p class="tr-cta-alt">أو كلمنا على الخط الساخن <a href="tel:19340" data-site="hotline">19340</a> لتأكيد وتخصيص تبرعك.</p>
+          </div>
         </div>
 
         <div class="tab-panel" id="home" role="tabpanel" aria-labelledby="t-home" hidden>
-          <div class="alert info">اتصل على الخط الساخن <a href="tel:19340"><b>19340</b></a> وهيوصلك مندوبنا لحد باب البيت لاستلام تبرعك.</div>
-          <p>تقدر كمان تتبرع بأي حاجة مش محتاجها - سجل معانا ومندوبنا هيجيلك لحد البيت.</p>
-          <a class="btn btn-teal" href="tel:19340">اتصل الآن 19340</a>
+          <p class="req-intro">سجّل عنوانك والميعاد اللي يناسبك، ومندوب مرسال هيكلمك يأكد ويجيلك لحد البيت يستلم تبرعك - <b>فلوس أو تبرع عيني</b>.</p>
+          <div id="pk-alert" class="req-alert" hidden aria-live="polite"></div>
+          <form id="pk-form" class="stepper req-form" data-form="pickup" data-alert="pk-alert" data-success="pk-success" novalidate>
+            <fieldset>
+              <legend>تبرعك</legend>
+              <p class="hint sec-hint">كل الخانات مطلوبة إلا اللي مكتوب جنبها (اختياري).</p>
+              <div class="field seg-field" data-field="kind">
+                <span class="seg-l" id="pk-kind-l">نوع التبرع</span>
+                <div class="seg" role="radiogroup" aria-labelledby="pk-kind-l">
+                  <label><input type="radio" name="kind" value="money" checked><span><b>فلوس</b><small>المندوب بيستلم ويدّيك إيصال</small></span></label>
+                  <label><input type="radio" name="kind" value="goods"><span><b>تبرع عيني</b><small>ملابس، بطاطين، أجهزة…</small></span></label>
+                </div>
+                <p class="f-err"></p>
+              </div>
+              <div class="row-2" data-show-if="kind=money">
+                <div class="field" data-field="amount">
+                  <label for="pk-amount">المبلغ <small>(بالجنيه)</small></label>
+                  <input id="pk-amount" name="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="16" placeholder="1,000" data-amount required>
+                  <p class="f-err"></p>
+                </div>
+                <div class="field" data-field="purpose">
+                  <label for="pk-purpose">الغرض من التبرع</label>
+                  <select id="pk-purpose" name="purpose">
+                  <option value="general" selected>تبرع عام - حيث الحاجة أكبر</option>
+                      <option value="zakat">زكاة المال</option>
+                      <option value="sadaqa">صدقة</option>
+                      <option value="p30">مستشفى مرسال للأطفال</option>
+                      <option value="p31">مركز مرسال لعلاج الأورام</option>
+                      <option value="cases">حالات المرضى</option>
+                  </select>
+                  <p class="f-err"></p>
+                </div>
+              </div>
+              <div class="field" data-field="goods" data-show-if="kind=goods" hidden>
+                <label for="pk-goods">إيه اللي حابب تتبرع بيه؟</label>
+                <textarea id="pk-goods" name="goods" rows="3" maxlength="500" placeholder="مثال: ملابس شتوي، بطاطين، كرسي متحرك، أدوية لسه صالحة…"></textarea>
+                <small class="count" data-count="pk-goods"></small>
+                <p class="f-err"></p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>العنوان</legend>
+              <p class="hint sec-hint">المندوب هيجيلك على العنوان ده.</p>
+              <div class="row-2">
+                <div class="field" data-field="gov">
+                  <label for="pk-gov">المحافظة</label>
+                  <select id="pk-gov" name="gov" data-govs required><option value="">اختار…</option></select>
+                  <p class="f-err"></p>
+                </div>
+                <div class="field" data-field="area">
+                  <label for="pk-area">المنطقة / الحي</label>
+                  <input id="pk-area" name="area" autocomplete="address-level2" maxlength="80" placeholder="مثال: المعادي">
+                  <p class="f-err"></p>
+                </div>
+              </div>
+              <div class="field" data-field="address">
+                <label for="pk-address">العنوان بالتفصيل</label>
+                <textarea id="pk-address" name="address" rows="2" maxlength="300" autocomplete="street-address" placeholder="الشارع، رقم العمارة، الدور والشقة، وأقرب علامة مميزة"></textarea>
+                <p class="f-err"></p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>أنسب ميعاد للتحصيل</legend>
+              <p class="hint sec-hint">المندوب هيكلمك يأكد الميعاد قبل ما ييجي.</p>
+              <div class="row-2">
+                <div class="field" data-field="date">
+                  <label for="pk-date">اليوم</label>
+                  <input id="pk-date" name="date" type="date" data-day="future" required>
+                  <p class="f-err"></p>
+                </div>
+                <div class="field" data-field="slot">
+                  <label for="pk-slot">الوقت</label>
+                  <select id="pk-slot" name="slot" required>
+                    <option value="">اختار…</option>
+                    <option value="morning">صباحاً</option>
+                    <option value="afternoon">بعد الظهر</option>
+                    <option value="evening">مساءً</option>
+                  </select>
+                  <p class="f-err"></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>بياناتك</legend>
+              <div class="field" data-field="name">
+                <label for="pk-name">الاسم</label>
+                <input id="pk-name" name="name" autocomplete="name" maxlength="80" required>
+                <p class="f-err"></p>
+              </div>
+              <div class="row-2">
+                <div class="field" data-field="phone">
+                  <label for="pk-phone">رقم الموبايل</label>
+                  <input id="pk-phone" name="phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" maxlength="20" placeholder="01xxxxxxxxx" required>
+                  <p class="f-err"></p>
+                </div>
+                <div class="field" data-field="altPhone">
+                  <label for="pk-alt">رقم تاني <small>(اختياري)</small></label>
+                  <input id="pk-alt" name="altPhone" type="tel" inputmode="tel" dir="ltr" maxlength="20" placeholder="01xxxxxxxxx">
+                  <p class="f-err"></p>
+                </div>
+              </div>
+              <div class="field" data-field="notes">
+                <label for="pk-notes">ملاحظات <small>(اختياري)</small></label>
+                <textarea id="pk-notes" name="notes" rows="3" maxlength="1000" placeholder="مثال: كلمني قبلها بساعة، أو العمارة مفيهاش أسانسير"></textarea>
+                <small class="count" data-count="pk-notes"></small>
+                <p class="f-err"></p>
+              </div>
+            </fieldset>
+
+            <div class="hp" aria-hidden="true"><label for="pk-website">الموقع الإلكتروني</label><input id="pk-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+
+            <div class="req-submit"><button class="btn btn-gold btn-block" type="submit">اطلب المندوب</button></div>
+          </form>
+
+          <section id="pk-success" class="stepper req-success" hidden aria-live="polite">
+            <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+            <h2 tabindex="-1">وصلنا طلبك 💚</h2>
+            <p class="req-recap" data-recap hidden></p>
+            <p>مندوب مرسال هيكلمك على الموبايل اللي كتبته يأكد الميعاد قبل ما ييجي.</p>
+            <p>يمكنك متابعة طلبك بالكود ده:</p>
+            <div class="ref-box"><div><small>كود المتابعة - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+            <div class="actions">
+              <a class="btn btn-wa" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> تابع طلبك على واتساب</a>
+              <a class="btn btn-teal" href="tel:19340">اتصل بالخط الساخن 19340</a>
+            </div>
+            <a class="again" data-again href="#pk-form">طلب مندوب تاني</a>
+          </section>
+          <p class="pk-call"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>بتفضّل التليفون؟ اتصل على الخط الساخن <a href="tel:19340" data-site="hotline">19340</a> ومندوبنا يوصلك لحد باب البيت.</span></p>
         </div>
 
         <div class="tab-panel" id="abroad" role="tabpanel" aria-labelledby="t-abroad" hidden>
@@ -180,5 +535,6 @@
 <script defer src="/js/layout.js"></script>
 <script defer src="/js/donate.js"></script>
 <script defer src="/js/impact.js"></script>
+<script defer src="/js/forms.js"></script>
 </body>
 </html>

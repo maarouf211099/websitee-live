@@ -48,14 +48,34 @@
   function acts() { return '<div class="item-actions"><button type="button" class="btn btn-ghost btn-sm" data-act="up">▲</button><button type="button" class="btn btn-ghost btn-sm" data-act="down">▼</button><button type="button" class="btn btn-danger btn-sm" data-act="del">حذف</button></div>'; }
   function renderBanks() {
     $("#banks", root).innerHTML = donate.banks.map(function (b, i) {
+      var first = !i || String(donate.banks[i - 1].name || "").trim() !== String(b.name || "").trim(); // first account of a bank card
       return '<div class="item" data-i="' + i + '" style="grid-template-columns:1fr"><div class="fields">' +
         '<div class="field"><label>اسم البنك</label><input data-k="name" value="' + esc(b.name || "") + '"></div>' +
         '<div class="field"><label>العملة (مثال: بالجنيه)</label><input data-k="currency" value="' + esc(b.currency || "") + '"></div>' +
         '<div class="field"><label>رقم الحساب</label><input data-k="number" dir="ltr" value="' + esc(b.number || "") + '"></div>' +
         '<div class="field"><label>IBAN (اختياري)</label><input data-k="iban" dir="ltr" value="' + esc(b.iban || "") + '"></div>' +
         '<div class="field"><label>SWIFT (اختياري)</label><input data-k="swift" dir="ltr" value="' + esc(b.swift || "") + '"></div>' +
+        '<div class="field full"><label>شعار البنك (رابط صورة)</label><div style="display:flex;gap:10px;align-items:center">' +
+          '<span data-logo-prev style="flex:none;display:flex;align-items:center;justify-content:center;width:104px;height:46px;padding:4px 6px;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden"></span>' +
+          '<input data-k="logo" dir="ltr" placeholder="/img/banks/….png أو https://…" value="' + esc(b.logo || "") + '"></div>' +
+          (first ? '<small style="color:var(--muted);font-size:12px">اختياري. الحسابات اللي ورا بعض بنفس اسم البنك بتظهر في كارت واحد بالشعار ده؛ من غير شعار بيظهر أول حرف من اسم البنك.</small>' : "") + "</div>" +
         "</div>" + acts() + "</div>";
     }).join("");
+    // logo preview: follows the field as it is typed (only site paths and http(s) links are loaded)
+    $$("#banks [data-k=\"logo\"]", root).forEach(function (inp) {
+      var box = inp.parentNode.querySelector("[data-logo-prev]");
+      function show() {
+        var v = inp.value.trim();
+        box.textContent = "";
+        if (/^(\/(?!\/)|https?:\/\/)\S+$/i.test(v)) {
+          var img = document.createElement("img");
+          img.alt = ""; img.style.cssText = "max-width:100%;max-height:100%;object-fit:contain";
+          img.addEventListener("error", function () { box.textContent = "الرابط مش شغال"; box.style.color = "#b42318"; box.style.fontSize = "11px"; });
+          img.src = v; box.style.color = ""; box.appendChild(img);
+        } else { box.textContent = "بدون شعار"; box.style.color = "var(--muted)"; box.style.fontSize = "11px"; }
+      }
+      inp.addEventListener("input", show); show();
+    });
   }
   function renderWallets() {
     $("#wallets", root).innerHTML = donate.wallets.map(function (w, i) {

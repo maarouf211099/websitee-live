@@ -1,5 +1,5 @@
 // Public forms + their admin side.
-//   POST  /api/forms/{type}            type = volunteer | help  (anonymous)  -> { ok, ref }
+//   POST  /api/forms/{type}            type = volunteer | help | transfer | pickup  (anonymous)  -> { ok, ref }
 //   GET   /api/console/requests?type=&status=&from=&to=           (admin)      -> { enabled, store, rows }
 //   GET   /api/console/requests/{id}                               (admin)      -> record with its full data
 //   PATCH /api/console/requests/{id}  { status, note }             (admin)      -> { ok, row }

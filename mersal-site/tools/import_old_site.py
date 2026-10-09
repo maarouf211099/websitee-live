@@ -186,6 +186,7 @@ def head(title, desc):
 <meta name="description" content="{html.escape(desc)}">
 <meta property="og:title" content="{html.escape(title)}">
 <meta property="og:description" content="{html.escape(desc)}">
+<meta name="twitter:card" content="summary_large_image">
 </head>"""
 
 
@@ -209,23 +210,37 @@ def side_html(pid, title):
       </aside>"""
 
 
-def page_html(title, body, desc, cover=None, share_img=None, pid=None):
-    cover_html = f'<img class="legacy-cover" src="{cover}" alt="" loading="lazy">' if cover else ""
-    og = f'<meta property="og:image" content="{SITE_URL}{share_img}">' if share_img else ""
+def crumbs_html(title, crumbs):
+    """Breadcrumbs baked into the page (no layout shift); crumbs = [(title, href_or_None), ...] of the parents."""
+    parts = ['<a href="/">الرئيسية</a>']
+    for t, href in crumbs or []:
+        parts.append("<span>›</span>")
+        parts.append(f'<a href="{html.escape(href, quote=True)}">{html.escape(t)}</a>' if href else f"<em>{html.escape(t)}</em>")
+    parts.append(f"<span>›</span><strong>{html.escape(title)}</strong>")
+    return '<nav class="crumbs" aria-label="مسار الصفحة">' + "".join(parts) + "</nav>"
+
+
+def page_html(title, body, desc, cover=None, share_img=None, pid=None, crumbs=None):
+    """One imported page. `cover` is shown inside the body only when it is not already the banner photo
+    (share_img); crumbs are pre-rendered when the menu is known (js/legacy.js builds them otherwise)."""
+    cover_html = f'<img class="legacy-cover" src="{cover}" alt="" loading="lazy">' if cover and cover != share_img else ""
+    og = f'<meta property="og:image" content="{SITE_URL}{share_img or "/img/hero.jpg"}">'
+    canon = f'<link rel="canonical" href="{SITE_URL}/p/{pid}.html">' if pid else ""
     side = side_html(pid, title) if pid else ""
-    return f"""{head(title, desc).replace("</head>", og + chr(10) + "</head>")}
+    head_html = head(title, desc).replace("</head>", og + chr(10) + canon + chr(10) + "</head>")
+    return f"""{head_html}
 <body>
 <div id="site-header"></div>
-<div class="page-head{' has-photo' if share_img else ''}">{hero_img(share_img)}<div class="wrap"><h1>{html.escape(title)}</h1></div></div>
+<div class="page-head{' has-photo' if share_img else ''}">{hero_img(share_img)}<div class="wrap">{crumbs_html(title, crumbs) if crumbs is not None else ''}<h1>{html.escape(title)}</h1></div></div>
 <main id="main">
   <section>
     <div class="wrap page-grid">
-      <div class="legacy">
+      <article class="legacy">
       {cover_html}
 <!-- mersal:content -->
 {body}
 <!-- /mersal:content -->
-      </div>
+      </article>
       {side}
     </div>
   </section>

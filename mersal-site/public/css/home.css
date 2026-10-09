@@ -202,7 +202,7 @@
   .home .slider { padding: 12px 0 38px; }
   .sl-track { gap: 10px; padding-inline: 16px; scroll-padding-inline: 16px; }
   .sl-track::after { content: ""; flex: 0 0 18px; } /* 18px + 10px gap = the 28px peek: lets the last card reach its start snap */
-  .sl-card { flex-basis: calc(100% - 28px); aspect-ratio: 4 / 5; max-height: min(58svh, 470px); border-radius: 24px; isolation: isolate; box-shadow: 0 24px 50px -24px rgba(0,0,0,.55); transition: scale .18s var(--spring); background-color: var(--teal-dark); }
+  .sl-card { flex-basis: calc(100% - 28px); aspect-ratio: 4 / 5.4; max-height: min(58svh, 470px); border-radius: 24px; isolation: isolate; box-shadow: 0 24px 50px -24px rgba(0,0,0,.55); transition: scale .18s var(--spring); background-color: var(--teal-dark); }
   .sl-card:active { scale: .985; }
   /* photo on top, copy on a teal panel below. The photo keeps a near-native shape (the banners' photo half is
      only 883px wide) so it is scaled ~1.3x on a 3x phone instead of ~2.5x: stretching it over the whole

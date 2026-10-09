@@ -1,20 +1,41 @@
-// Admin tab "requests": volunteer + help requests coming from /volunteer.html and /help.html (api/src/functions/forms.js).
+// Admin tab "requests": volunteer + help requests from /volunteer.html and /help.html, and the donate page's
+// "سجّل تبرعك" (transfer, MT-) and "مندوب لحد البيت" (pickup, MP-) forms (api/src/functions/forms.js).
+// transfer / pickup rows carry .meta (amount, currency, method, bank, date, slot...) so the list and the CSV work without .data.
 //   GET   /api/console/requests?type=&status=&from=&to=  -> { enabled: {table, github, webhook}, store, rows }
 //   GET   /api/console/requests/{id}                      -> full record (rows from the GitHub index carry no .data)
 //   PATCH /api/console/requests/{id} { status } | { note } -> { ok, row }
 // Status and note changes are saved the moment they change (no save button).
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
-  var TYPES = { volunteer: "تطوع", help: "طلب مساعدة" };
+  var TYPES = { volunteer: "تطوع", help: "طلب مساعدة", transfer: "تبرع مسجّل", pickup: "مندوب" };
   var STATUS = { new: "جديد", contacted: "تم التواصل", done: "تم", rejected: "مرفوض" };
   var HOW = { hospital: "مستشفى", convoys: "قوافل", design: "تصميم / سوشيال ميديا", fundraising: "جمع تبرعات", other: "أخرى" };
   var AVAIL = { weekdays: "أيام الأسبوع", weekends: "نهاية الأسبوع", flexible: "مرن / حسب الحاجة", online: "أونلاين فقط" };
   var REL = { self: "المريض نفسه", parent: "الأب / الأم", child: "الابن / الابنة", spouse: "الزوج / الزوجة", sibling: "الأخ / الأخت", relative: "قريب", other: "أخرى" };
   var CASE = { monthly: "علاج شهري", surgery: "عملية", oncology: "أورام", children: "أطفال", other: "أخرى" };
-  // [key, label, valueMap?] in display order
+  var METHOD = { bank: "تحويل بنكي", instapay: "إنستاباي", vodafone: "فودافون كاش", etisalat: "اتصالات كاش", orange: "أورانج كاش", fawry: "فوري / MyFawry", masary: "مصاري", aman: "أمان", megakheir: "ميجا خير", bankwallet: "محافظ البنوك (من خلال فوري)" };
+  var CUR = { EGP: "جنيه", USD: "دولار", EUR: "يورو", SAR: "ريال سعودي", AED: "درهم إماراتي" };
+  var PURPOSE = { general: "تبرع عام", zakat: "زكاة المال", sadaqa: "صدقة", p30: "مستشفى مرسال للأطفال", p31: "مركز مرسال لعلاج الأورام", cases: "حالات المرضى" };
+  var KIND = { money: "فلوس", goods: "تبرع عيني" };
+  var SLOT = { morning: "صباحاً", afternoon: "بعد الظهر", evening: "مساءً" };
+  var num = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+  function money(v, cur) { return v == null || v === "" || isNaN(v) ? "" : num.format(Number(v)) + " " + (CUR[cur] || cur || ""); }
+  // "2026-10-12" -> "الاثنين، 12 أكتوبر" (short: "12 أكتوبر"; + the year when it is not this year)
+  function dayLabel(v, short) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v || "")) return v || "";
+    var d = new Date(v + "T00:00:00"), o = { day: "numeric", month: "long" };
+    if (short !== true) o.weekday = "long";
+    if (d.getFullYear() !== new Date().getFullYear()) o.year = "numeric";
+    try { return d.toLocaleDateString("ar-EG-u-nu-latn", o); } catch (x) { return v; }
+  }
+  // a transfer / pickup field from .meta (always there) or .data (table rows and opened details)
+  function key(r, k) { var m = r.meta || {}, d = r.data || {}; return m[k] != null && m[k] !== "" ? m[k] : d[k]; }
+  // [key, label, valueMap or function(value, data)?] in display order
   var FIELDS = {
     volunteer: [["name", "الاسم"], ["phone", "الموبايل"], ["email", "البريد"], ["city", "المدينة / المنطقة"], ["age", "السن"], ["how", "طرق المساعدة", HOW], ["howOther", "أخرى - تفاصيل"], ["availability", "الوقت المناسب", AVAIL], ["message", "رسالة"]],
-    help: [["patient", "المريض"], ["caseType", "نوع الحالة", CASE], ["hospital", "المستشفى / التشخيص"], ["description", "وصف الحالة"], ["requester", "مقدم الطلب"], ["relation", "صلة القرابة", REL], ["phone", "الموبايل"], ["altPhone", "رقم بديل"], ["gov", "المحافظة"], ["city", "المدينة"], ["income", "الدخل الشهري"], ["consent", "موافقة على استخدام البيانات"]]
+    help: [["patient", "المريض"], ["caseType", "نوع الحالة", CASE], ["hospital", "المستشفى / التشخيص"], ["description", "وصف الحالة"], ["requester", "مقدم الطلب"], ["relation", "صلة القرابة", REL], ["phone", "الموبايل"], ["altPhone", "رقم بديل"], ["gov", "المحافظة"], ["city", "المدينة"], ["income", "الدخل الشهري"], ["consent", "موافقة على استخدام البيانات"]],
+    transfer: [["amount", "المبلغ", function (v, d) { return money(v, d.currency); }], ["method", "طريقة التبرع", METHOD], ["bank", "البنك"], ["date", "تاريخ التحويل", dayLabel], ["txRef", "رقم العملية"], ["purpose", "الغرض", PURPOSE], ["caseCode", "كود الحالة"], ["name", "الاسم"], ["phone", "الموبايل"], ["email", "البريد"], ["notes", "ملاحظات"]],
+    pickup: [["kind", "نوع التبرع", KIND], ["amount", "المبلغ", function (v) { return money(v, "EGP"); }], ["purpose", "الغرض", PURPOSE], ["goods", "التبرع العيني"], ["date", "يوم التحصيل", dayLabel], ["slot", "الوقت", SLOT], ["gov", "المحافظة"], ["area", "المنطقة / الحي"], ["address", "العنوان"], ["name", "الاسم"], ["phone", "الموبايل"], ["altPhone", "رقم تاني"], ["notes", "ملاحظات"]]
   };
   var rows = [], store = null, enabled = {}, root = null, inited = false;
 
@@ -29,6 +50,7 @@
     "#rq-table { font-size: 13.5px; } #rq-table th, #rq-table td { padding: 8px 7px; }" +
     "#rq-table td.sum { white-space: normal; min-width: 150px; max-width: 220px; font-size: 12.5px; color: var(--muted); line-height: 1.5; }" +
     "#rq-table td.who { white-space: normal; min-width: 90px; max-width: 140px; }" +
+    "#rq-table td.place { white-space: normal; min-width: 70px; max-width: 110px; }" +
     "#rq-table select.st { font: inherit; font-size: 13px; font-weight: 700; padding: 5px 8px; border-radius: 8px; border: 1.5px solid var(--line); background: #fff; }" +
     "#rq-table select.st.new { background: #fff3d6; } #rq-table select.st.contacted { background: #e4f3f3; } #rq-table select.st.done { background: #e6f6ee; } #rq-table select.st.rejected { background: #fdecea; }" +
     "#rq-table input.note { font: inherit; font-size: 13px; padding: 5px 8px; border: 1.5px solid var(--line); border-radius: 8px; width: 132px; background: #fff; }" +
@@ -36,15 +58,18 @@
     ".rq-dl-wrap { position: sticky; inset-inline-start: 0; width: min(760px, calc(100vw - 64px)); }" +
     ".rq-dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; font-size: 13.5px; max-width: 760px; } .rq-dl dt { color: var(--muted); } .rq-dl dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }" +
     ".rq-type { font-size: 12px; font-weight: 800; padding: 2px 9px; border-radius: 999px; white-space: nowrap; } .rq-type.volunteer { background: #e4f3f3; color: var(--teal-dark); } .rq-type.help { background: #fff3d6; color: #8a5a00; }" +
+    ".rq-type.transfer { background: #e6f6ee; color: #11683f; } .rq-type.pickup { background: #efeafc; color: #553c9a; }" +
+    "#rq-table td.sum .rq-key { display: block; color: var(--teal-dark); font-size: 13.5px; font-weight: 800; } #rq-table td.sum .rq-key bdi { font-family: 'Titillium Web', 'Cairo', sans-serif; }" +
+    "#rq-table td.sum .rq-sub { display: block; color: var(--ink); } #rq-table td.sum .rq-more { display: block; margin-top: 2px; } #rq-table td.sum .rq-code { white-space: nowrap; font-family: 'Titillium Web', sans-serif; }" +
     ".rq-empty { background: #fff; border: 1px dashed var(--line); border-radius: 14px; padding: 28px; text-align: center; color: var(--muted); margin-top: 12px; }" +
     "@media (max-width: 860px) { .rq-filters label { flex: 1 1 140px; } .rq-filters select, .rq-filters input { flex: 1; min-width: 0; } .rq-filters .btn { flex: 1 1 auto; justify-content: center; } }" +
     "</style>";
 
   function template() {
     return CSS +
-      '<p class="hint">الطلبات اللي بتوصل من صفحتي <a href="/volunteer.html" target="_blank" rel="noopener">تطوع معنا</a> و<a href="/help.html" target="_blank" rel="noopener">طلب مساعدة</a>. غيّر الحالة أو اكتب ملاحظة وبتتحفظ فوراً.</p>' +
+      '<p class="hint">الطلبات اللي بتوصل من صفحات <a href="/volunteer.html" target="_blank" rel="noopener">تطوع معنا</a> و<a href="/help.html" target="_blank" rel="noopener">طلب مساعدة</a>، ومن <a href="/donate.html#bank" target="_blank" rel="noopener">طرق التبرع</a>: <b>تبرع مسجّل</b> (حد حوّل بنكي أو محفظة وسجّل تبرعه عشان نأكده) و<b>مندوب</b> (طلب مندوب لحد البيت). غيّر الحالة أو اكتب ملاحظة وبتتحفظ فوراً.</p>' +
       '<div class="row filters rq-filters">' +
-        '<label>النوع <select id="rq-type"><option value="">الكل</option><option value="volunteer">تطوع</option><option value="help">طلب مساعدة</option></select></label>' +
+        '<label>النوع <select id="rq-type"><option value="">الكل</option>' + Object.keys(TYPES).map(function (k) { return '<option value="' + k + '">' + esc(TYPES[k]) + "</option>"; }).join("") + "</select></label>" +
         '<label>الحالة <select id="rq-status"><option value="">الكل</option>' + Object.keys(STATUS).map(function (k) { return '<option value="' + k + '">' + STATUS[k] + "</option>"; }).join("") + "</select></label>" +
         '<label>من <input type="date" id="rq-from"></label><label>إلى <input type="date" id="rq-to"></label>' +
         '<button class="btn btn-teal" id="rq-load">عرض</button><button class="btn btn-ghost" id="rq-csv">تصدير CSV</button>' +
@@ -95,7 +120,7 @@
     $("#rq-wrap").hidden = !list.length;
     var empty = $("#rq-empty");
     empty.hidden = !!list.length || !store;
-    empty.textContent = rows.length ? "مفيش طلبات بالحالة دي." : "مفيش طلبات في الفترة دي. لما حد يبعت من صفحة تطوع معنا أو طلب مساعدة هيظهر هنا.";
+    empty.textContent = rows.length ? "مفيش طلبات بالحالة دي." : "مفيش طلبات في الفترة دي. لما حد يبعت من صفحة تطوع معنا أو طلب مساعدة أو يسجّل تبرع / يطلب مندوب من طرق التبرع هيظهر هنا.";
   }
   function row(r) {
     var place = [r.gov, r.city].filter(Boolean).join(" - ");
@@ -105,20 +130,43 @@
       '<td><span class="rq-type ' + esc(r.type) + '">' + esc(TYPES[r.type] || r.type) + "</span></td>" +
       '<td class="who">' + name + "</td>" +
       '<td dir="ltr"><a href="tel:' + esc(r.phone) + '">' + esc(r.phone) + "</a>" + (r.altPhone ? '<br><a href="tel:' + esc(r.altPhone) + '">' + esc(r.altPhone) + "</a>" : "") + "</td>" +
-      "<td>" + esc(place) + "</td>" +
-      '<td class="sum">' + esc(r.summary) + "</td>" +
+      '<td class="place">' + esc(place) + "</td>" +
+      '<td class="sum">' + sumHtml(r) + "</td>" +
       '<td><select class="st ' + esc(r.status) + '" data-status aria-label="الحالة">' + Object.keys(STATUS).map(function (k) { return '<option value="' + k + '"' + (k === r.status ? " selected" : "") + ">" + STATUS[k] + "</option>"; }).join("") + "</select></td>" +
       '<td><input class="note" data-note value="' + esc(r.note || "") + '" placeholder="ملاحظة…" maxlength="500" aria-label="ملاحظة"></td>' +
       '<td><button type="button" class="btn btn-ghost btn-sm" data-details>تفاصيل</button></td></tr>';
+  }
+  // summary cell: the amount / what and the when for donate-page requests, the server's summary text otherwise
+  function sumHtml(r) {
+    if (r.type === "transfer") {
+      var via = METHOD[key(r, "method")] || key(r, "method") || "", bank = key(r, "bank"), code = key(r, "caseCode");
+      var more = [dayLabel(key(r, "date"), true), PURPOSE[key(r, "purpose")]].filter(Boolean).map(esc);
+      if (code) more.push('كود&nbsp;<bdi class="rq-code" dir="ltr">' + esc(code) + "</bdi>");
+      return '<span class="rq-key"><bdi>' + esc(money(key(r, "amount"), key(r, "currency"))) + "</bdi></span>" +
+        '<span class="rq-sub">' + esc(via + (bank ? " - " + bank : "")) + "</span>" +
+        '<span class="rq-more">' + more.join(" · ") + "</span>";
+    }
+    if (r.type === "pickup") {
+      var kind = key(r, "kind"), what = kind === "money" ? "فلوس · " + money(key(r, "amount"), "EGP") : KIND[kind] || "";
+      var rest = kind === "goods" ? String(r.summary || "").split(" · ")[0].replace(/^تبرع عيني: /, "") : PURPOSE[key(r, "purpose")] || "";
+      return '<span class="rq-key"><bdi>' + esc(what) + "</bdi></span>" +
+        '<span class="rq-sub">' + esc([dayLabel(key(r, "date")), SLOT[key(r, "slot")]].filter(Boolean).join(" · ")) + "</span>" +
+        (rest ? '<span class="rq-more">' + esc(rest) + "</span>" : "");
+    }
+    return esc(r.summary);
+  }
+  function show(f, v, d) {
+    if (typeof f[2] === "function") return f[2](v, d);
+    if (f[2]) return Array.isArray(v) ? v.map(function (k) { return f[2][k] || k; }).join("، ") : (f[2][v] || v);
+    return v === true ? "نعم" : v;
   }
   function detailsHtml(r) {
     var d = r.data || {};
     var parts = (FIELDS[r.type] || []).map(function (f) {
       var v = d[f[0]];
       if (v == null || v === "" || (Array.isArray(v) && !v.length)) return "";
-      if (f[2]) v = Array.isArray(v) ? v.map(function (k) { return f[2][k] || k; }).join("، ") : (f[2][v] || v);
-      if (v === true) v = "نعم";
-      return "<dt>" + esc(f[1]) + "</dt><dd" + (/phone|email/i.test(f[0]) ? ' dir="ltr"' : "") + ">" + esc(v) + "</dd>";
+      v = show(f, v, d);
+      return "<dt>" + esc(f[1]) + "</dt><dd" + (/phone|email|txRef|caseCode/i.test(f[0]) ? ' dir="ltr"' : "") + ">" + esc(v) + "</dd>";
     });
     if (r.updatedAt) parts.push('<dt>آخر تحديث</dt><dd dir="ltr">' + esc(when(r.updatedAt)) + "</dd>");
     return '<div class="rq-dl-wrap"><dl class="rq-dl">' + parts.join("") + "</dl></div>";
@@ -127,8 +175,7 @@
     var d = r.data; if (!d) return "";
     return (FIELDS[r.type] || []).map(function (f) {
       var v = d[f[0]]; if (v == null || v === "" || (Array.isArray(v) && !v.length)) return "";
-      if (f[2]) v = Array.isArray(v) ? v.map(function (k) { return f[2][k] || k; }).join("، ") : (f[2][v] || v);
-      return f[1] + ": " + (v === true ? "نعم" : v);
+      return f[1] + ": " + show(f, v, d);
     }).filter(Boolean).join(" | ");
   }
 
@@ -151,8 +198,15 @@
     $("#rq-status").addEventListener("change", render);
     $("#rq-csv").addEventListener("click", function () {
       var list = visible(); if (!list.length) { A.toast("مفيش طلبات للتصدير", true); return; }
-      var head = ["رقم الطلب", "التاريخ", "النوع", "الحالة", "الاسم", "الموبايل", "رقم بديل", "البريد", "المحافظة", "المدينة", "ملخص", "ملاحظة", "التفاصيل"];
-      var lines = [head].concat(list.map(function (r) { return [r.id, when(r.createdAt), TYPES[r.type] || r.type, STATUS[r.status] || r.status, r.name, r.phone, r.altPhone, r.email, r.gov, r.city, r.summary, r.note, detailsText(r)]; }))
+      // transfer / pickup columns (empty for volunteer / help): amount as a plain number so a spreadsheet can sum it
+      var head = ["رقم الطلب", "التاريخ", "النوع", "الحالة", "الاسم", "الموبايل", "رقم بديل", "البريد", "المحافظة", "المدينة / المنطقة", "المبلغ", "العملة", "طريقة التبرع", "البنك", "نوع التبرع", "الغرض", "كود الحالة", "تاريخ التحويل / التحصيل", "وقت التحصيل", "ملخص", "ملاحظة", "التفاصيل"];
+      var lines = [head].concat(list.map(function (r) {
+        var dn = r.type === "transfer" || r.type === "pickup", k = function (n) { return dn ? key(r, n) : ""; };
+        var amt = k("amount"), cur = k("currency") || (r.type === "pickup" && amt != null && amt !== "" ? "EGP" : "");
+        return [r.id, when(r.createdAt), TYPES[r.type] || r.type, STATUS[r.status] || r.status, r.name, r.phone, r.altPhone, r.email, r.gov, r.city,
+          amt == null ? "" : amt, cur, METHOD[k("method")] || k("method"), k("bank"), KIND[k("kind")] || k("kind"), PURPOSE[k("purpose")] || k("purpose"), k("caseCode"), k("date"), SLOT[k("slot")] || k("slot"),
+          r.summary, r.note, detailsText(r)];
+      }))
         .map(function (l) { return l.map(function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }).join(","); }).join("\r\n");
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([String.fromCharCode(65279) + lines], { type: "text/csv;charset=utf-8" })); a.download = "mersal-requests.csv"; a.click();
     });

@@ -1,32 +1,148 @@
 {
   "banks": [
     {
-      "name": "بنك CIB",
+      "name": "بنك QNB الأهلي",
       "currency": "بالجنيه",
-      "number": "100034654454",
+      "number": "735-20311817142-68",
       "iban": "",
-      "swift": ""
+      "swift": "",
+      "logo": "/img/banks/qnb.png"
     },
     {
-      "name": "بنك CIB",
+      "name": "بنك QNB الأهلي",
       "currency": "بالدولار",
-      "number": "100034654357",
+      "number": "735-20312010316-82",
       "iban": "",
-      "swift": ""
+      "swift": "",
+      "logo": "/img/banks/qnb.png"
+    },
+    {
+      "name": "بنك QNB الأهلي",
+      "currency": "باليورو",
+      "number": "735-20312010318-68",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/qnb.png"
+    },
+    {
+      "name": "البنك العربي الأفريقي الدولي",
+      "currency": "بالجنيه",
+      "number": "1015996610010201",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/aaib.png"
+    },
+    {
+      "name": "البنك العربي الأفريقي الدولي",
+      "currency": "بالدولار",
+      "number": "1015996610010101",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/aaib.png"
+    },
+    {
+      "name": "البنك العربي الأفريقي الدولي",
+      "currency": "باليورو",
+      "number": "1015996610010301",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/aaib.png"
+    },
+    {
+      "name": "بنك مصر",
+      "currency": "بالجنيه",
+      "number": "5450001000003297",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/banque-misr.png"
+    },
+    {
+      "name": "بنك مصر",
+      "currency": "بالدولار",
+      "number": "5450120000000214",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/banque-misr.png"
+    },
+    {
+      "name": "بنك مصر",
+      "currency": "باليورو",
+      "number": "5450130000000084",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/banque-misr.png"
     },
     {
       "name": "بنك الإمارات دبي الوطني",
-      "currency": "",
+      "currency": "بالجنيه",
       "number": "1019409332701",
       "iban": "",
-      "swift": ""
+      "swift": "",
+      "logo": "/img/banks/enbd.jpg"
     },
     {
-      "name": "البنك العربي الأفريقي",
-      "currency": "بالجنيه أو الدولار",
-      "number": "701840",
+      "name": "بنك الإمارات دبي الوطني",
+      "currency": "بالدولار",
+      "number": "1029409332702",
       "iban": "",
-      "swift": ""
+      "swift": "",
+      "logo": "/img/banks/enbd.jpg"
+    },
+    {
+      "name": "بنك الإمارات دبي الوطني",
+      "currency": "باليورو",
+      "number": "1029409332703",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/enbd.jpg"
+    },
+    {
+      "name": "البنك التجاري الدولي CIB",
+      "currency": "بالجنيه",
+      "number": "100034654454",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/cib.png"
+    },
+    {
+      "name": "البنك التجاري الدولي CIB",
+      "currency": "بالدولار",
+      "number": "100034654357",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/cib.png"
+    },
+    {
+      "name": "البنك التجاري الدولي CIB",
+      "currency": "باليورو",
+      "number": "100034654397",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/cib.png"
+    },
+    {
+      "name": "البنك الأهلي المصري",
+      "currency": "بالجنيه",
+      "number": "1953071376769426268",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/nbe.png"
+    },
+    {
+      "name": "مصرف أبوظبي الإسلامي",
+      "currency": "بالجنيه",
+      "number": "100000913368",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/adib.png"
+    },
+    {
+      "name": "مصرف أبوظبي الإسلامي",
+      "currency": "بالدولار",
+      "number": "100000913369",
+      "iban": "",
+      "swift": "",
+      "logo": "/img/banks/adib.png"
     }
   ],
   "wallets": [],

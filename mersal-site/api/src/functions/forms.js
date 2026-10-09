@@ -1,8 +1,8 @@
 // Public forms + their admin side.
 //   POST  /api/forms/{type}            type = volunteer | help  (anonymous)  -> { ok, ref }
-//   GET   /api/admin/requests?type=&status=&from=&to=           (admin)      -> { enabled, store, rows }
-//   GET   /api/admin/requests/{id}                               (admin)      -> record with its full data
-//   PATCH /api/admin/requests/{id}  { status, note }             (admin)      -> { ok, row }
+//   GET   /api/console/requests?type=&status=&from=&to=           (admin)      -> { enabled, store, rows }
+//   GET   /api/console/requests/{id}                               (admin)      -> record with its full data
+//   PATCH /api/console/requests/{id}  { status, note }             (admin)      -> { ok, row }
 // Storage and validation live in ../lib/forms.js.
 const { app } = require("@azure/functions");
 const { requireAdmin, json, fail } = require("../lib/admin");
@@ -41,7 +41,7 @@ app.http("formsSubmit", {
 });
 
 app.http("adminRequests", {
-  methods: ["GET"], authLevel: "anonymous", route: "admin/requests",
+  methods: ["GET"], authLevel: "anonymous", route: "console/requests",
   handler: async (req, ctx) => {
     try {
       requireAdmin(req);
@@ -53,7 +53,7 @@ app.http("adminRequests", {
 });
 
 app.http("adminRequest", {
-  methods: ["GET", "PATCH"], authLevel: "anonymous", route: "admin/requests/{id}",
+  methods: ["GET", "PATCH"], authLevel: "anonymous", route: "console/requests/{id}",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);

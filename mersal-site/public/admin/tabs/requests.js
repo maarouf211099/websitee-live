@@ -1,7 +1,7 @@
 // Admin tab "requests": volunteer + help requests coming from /volunteer.html and /help.html (api/src/functions/forms.js).
-//   GET   /api/admin/requests?type=&status=&from=&to=  -> { enabled: {table, github, webhook}, store, rows }
-//   GET   /api/admin/requests/{id}                      -> full record (rows from the GitHub index carry no .data)
-//   PATCH /api/admin/requests/{id} { status } | { note } -> { ok, row }
+//   GET   /api/console/requests?type=&status=&from=&to=  -> { enabled: {table, github, webhook}, store, rows }
+//   GET   /api/console/requests/{id}                      -> full record (rows from the GitHub index carry no .data)
+//   PATCH /api/console/requests/{id} { status } | { note } -> { ok, row }
 // Status and note changes are saved the moment they change (no save button).
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;

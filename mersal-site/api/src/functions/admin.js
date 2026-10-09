@@ -15,19 +15,19 @@ async function saveSettings(patch, message, p) {
   return commitFiles([{ path: "public/data/settings.json", content: JSON.stringify(settings, null, 2) + "\n" }], message, who(p));
 }
 
-// GET /api/admin/status (public): does the console still need its first-login setup?
+// GET /api/console/status (public): does the console still need its first-login setup?
 app.http("adminStatus", {
-  methods: ["GET"], authLevel: "anonymous", route: "admin/status",
+  methods: ["GET"], authLevel: "anonymous", route: "console/status",
   handler: async (req, ctx) => {
     try { return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) }); }
     catch (e) { return fail(e, ctx); }
   },
 });
 
-// POST /api/admin/login { user, password, code? } -> session cookie (12h).
+// POST /api/console/login { user, password, code? } -> session cookie (12h).
 // First login (no password yet): the one-time code from api/setup.json is required and the given password becomes the console password.
 app.http("adminLogin", {
-  methods: ["POST"], authLevel: "anonymous", route: "admin/login",
+  methods: ["POST"], authLevel: "anonymous", route: "console/login",
   handler: async (req, ctx) => {
     try {
       throttle(req);
@@ -46,12 +46,12 @@ app.http("adminLogin", {
   },
 });
 app.http("adminLogout", {
-  methods: ["POST"], authLevel: "anonymous", route: "admin/logout",
+  methods: ["POST"], authLevel: "anonymous", route: "console/logout",
   handler: async (req) => ({ ...json(200, { ok: true }), cookies: [sessionCookie(req, "", 0)] }),
 });
-// POST /api/admin/password { current, next } -> new scrypt hash in data/settings.json (unless ADMIN_PASSWORD is fixed in Azure)
+// POST /api/console/password { current, next } -> new scrypt hash in data/settings.json (unless ADMIN_PASSWORD is fixed in Azure)
 app.http("adminPassword", {
-  methods: ["POST"], authLevel: "anonymous", route: "admin/password",
+  methods: ["POST"], authLevel: "anonymous", route: "console/password",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
@@ -68,7 +68,7 @@ app.http("adminPassword", {
 });
 
 app.http("adminMe", {
-  methods: ["GET"], authLevel: "anonymous", route: "admin/me",
+  methods: ["GET"], authLevel: "anonymous", route: "console/me",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
@@ -79,9 +79,9 @@ app.http("adminMe", {
   },
 });
 
-// GET /api/admin/data/{name}   PUT /api/admin/data/{name}  { data, message? }
+// GET /api/console/data/{name}   PUT /api/console/data/{name}  { data, message? }
 app.http("adminData", {
-  methods: ["GET", "PUT"], authLevel: "anonymous", route: "admin/data/{name}",
+  methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/data/{name}",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
@@ -108,10 +108,10 @@ app.http("adminData", {
   },
 });
 
-// GET /api/admin/page/{id}  -> { title, desc, body, url, static }     PUT -> { title, desc, body }
+// GET /api/console/page/{id}  -> { title, desc, body, url, static }     PUT -> { title, desc, body }
 // id = number (imported page public/p/<id>.html) or one of the fixed static pages (public/<id>.html)
 app.http("adminPage", {
-  methods: ["GET", "PUT"], authLevel: "anonymous", route: "admin/page/{id}",
+  methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/page/{id}",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
@@ -149,10 +149,10 @@ app.http("adminPage", {
   },
 });
 
-// POST /api/admin/upload  { files: [{ name, data(base64) }], message? } -> { urls: [] }
+// POST /api/console/upload  { files: [{ name, data(base64) }], message? } -> { urls: [] }
 // Images are resized in the browser before upload; this only stores them.
 app.http("adminUpload", {
-  methods: ["POST"], authLevel: "anonymous", route: "admin/upload",
+  methods: ["POST"], authLevel: "anonymous", route: "console/upload",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
@@ -172,9 +172,9 @@ app.http("adminUpload", {
   },
 });
 
-// GET /api/admin/settings -> { payMode }   PUT { payMode }
+// GET /api/console/settings -> { payMode }   PUT { payMode }
 app.http("adminSettings", {
-  methods: ["GET", "PUT"], authLevel: "anonymous", route: "admin/settings",
+  methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/settings",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
@@ -192,9 +192,9 @@ app.http("adminSettings", {
   },
 });
 
-// GET /api/admin/donations?from=yyyy-mm-dd&to=yyyy-mm-dd
+// GET /api/console/donations?from=yyyy-mm-dd&to=yyyy-mm-dd
 app.http("adminDonations", {
-  methods: ["GET"], authLevel: "anonymous", route: "admin/donations",
+  methods: ["GET"], authLevel: "anonymous", route: "console/donations",
   handler: async (req, ctx) => {
     try {
       requireAdmin(req);

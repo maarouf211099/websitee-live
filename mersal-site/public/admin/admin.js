@@ -1,4 +1,4 @@
-// Mersal admin console. Talks to /api/admin/* (username + password, cookie session).
+// Mersal admin console. Talks to /api/console/* (username + password, cookie session).
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -9,13 +9,13 @@
   function toast(msg, err) { var t = $("#toast"); t.textContent = msg; t.classList.toggle("err", !!err); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, err ? 6000 : 3500); }
   function api(path, opt) {
     opt = opt || {};
-    return fetch("/api/admin/" + path, { method: opt.method || "GET", headers: opt.body ? { "Content-Type": "application/json" } : {}, body: opt.body ? JSON.stringify(opt.body) : undefined })
+    return fetch("/api/console/" + path, { method: opt.method || "GET", headers: opt.body ? { "Content-Type": "application/json" } : {}, body: opt.body ? JSON.stringify(opt.body) : undefined })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) { var err = new Error(d.message || ("HTTP " + r.status)); err.status = r.status; err.data = d; throw err; } return d; }); });
   }
   function busy(btn, on) { btn.disabled = on; btn.dataset.t = btn.dataset.t || btn.textContent; btn.textContent = on ? "جاري الحفظ…" : btn.dataset.t; }
   function published() { toast("تم الحفظ ✓ هيظهر على الموقع خلال دقيقة تقريباً"); }
 
-  // ---------- auth: cookie session from /api/admin/login ----------
+  // ---------- auth: cookie session from /api/console/login ----------
   var booted = false;
   function showLogin(on) {
     $("#login").hidden = !on; $("#shell").hidden = on;

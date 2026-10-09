@@ -28,8 +28,12 @@
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="home" aria-selected="true">الرئيسية</button>
       <button role="tab" data-tab="pages">الصفحات</button>
+      <button role="tab" data-tab="menu">القائمة</button>
       <button role="tab" data-tab="albums">الألبومات</button>
       <button role="tab" data-tab="donations">التبرعات</button>
+      <button role="tab" data-tab="requests">الطلبات</button>
+      <button role="tab" data-tab="site">بيانات الموقع</button>
+      <button role="tab" data-tab="community">الكوميونيتي</button>
       <button role="tab" data-tab="settings">الإعدادات</button>
     </nav>
     <div class="side-foot">
@@ -46,7 +50,7 @@
       <header class="panel-head"><h1>الرئيسية</h1><button class="btn btn-gold" id="save-home">حفظ ونشر</button></header>
 
       <h2>السلايدر</h2>
-      <p class="hint">صور عريضة 1600×475 (الصورة على الشمال والنص على اليمين). على الموبايل بيظهر جزء الصورة بس مع العنوان والسطر والزرار اللي تكتبهم هنا.</p>
+      <p class="hint">صور عريضة 1920×570 (الصورة على الشمال والنص على اليمين). على الموبايل بيظهر الجزء الشمال من الصورة بس مع العنوان والسطر والزرار اللي تكتبهم هنا. لو الصورة طلعت مش واضحة على الموبايل ارفع "صورة الموبايل" بجودة أعلى (عرض 900px أو أكتر).</p>
       <div class="list" id="slides"></div>
       <button class="btn btn-ghost" id="add-slide">+ إضافة شريحة</button>
 
@@ -54,6 +58,11 @@
       <p class="hint">الأرقام دي بتظهر في الرئيسية. "تم توفير" حدّثه يدوياً لحد ما يتربط بالسيستم الجديد.</p>
       <div class="list" id="campaigns"></div>
       <button class="btn btn-ghost" id="add-campaign">+ إضافة حملة</button>
+
+      <h2>مشاريع مرسال</h2>
+      <p class="hint">شريط المشاريع اللي بيظهر في الرئيسية بعد الحملات: صورة 900×600، اسم، وصف قصير، وصفحة المشروع (زرار "اعرف أكثر").</p>
+      <div class="list" id="projects"></div>
+      <button class="btn btn-ghost" id="add-project">+ إضافة مشروع</button>
 
       <h2>مرسال بالأرقام</h2>
       <div class="list" id="numbers"></div>
@@ -97,6 +106,26 @@
       <p class="hint" id="d-note"></p>
     </section>
 
+    <section class="panel" id="tab-menu" hidden>
+      <header class="panel-head"><h1>القائمة</h1><button class="btn btn-gold" id="save-menu">حفظ ونشر</button></header>
+      <div id="menu-root"></div>
+    </section>
+
+    <section class="panel" id="tab-requests" hidden>
+      <header class="panel-head"><h1>الطلبات</h1></header>
+      <div id="requests-root"></div>
+    </section>
+
+    <section class="panel" id="tab-site" hidden>
+      <header class="panel-head"><h1>بيانات الموقع</h1><button class="btn btn-gold" id="save-site">حفظ ونشر</button></header>
+      <div id="site-root"></div>
+    </section>
+
+    <section class="panel" id="tab-community" hidden>
+      <header class="panel-head"><h1>مرسال كوميونيتي</h1><button class="btn btn-gold" id="save-community">حفظ ونشر</button></header>
+      <div id="community-root"></div>
+    </section>
+
     <section class="panel" id="tab-settings" hidden>
       <header class="panel-head"><h1>الإعدادات</h1></header>
       <h2>الدفع بالبطاقة</h2>
@@ -121,5 +150,9 @@
 </div>
 <div class="toast" id="toast" hidden></div>
 <script src="/admin/admin.js"></script>
+<script src="/admin/tabs/menu.js"></script>
+<script src="/admin/tabs/site.js"></script>
+<script src="/admin/tabs/requests.js"></script>
+<script src="/admin/tabs/community.js"></script>
 </body>
 </html>

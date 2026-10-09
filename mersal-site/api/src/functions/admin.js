@@ -1,11 +1,11 @@
 // Admin API (console login with a cookie session). Every change is one git commit to
 // the deploy branch, so the site republishes itself about a minute later.
 const { app } = require("@azure/functions");
-const { requireAdmin, readFile, commitFiles, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL } = require("../lib/admin");
+const { requireAdmin, readFile, commitFiles, fileExists, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
 
-const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json" };
+const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json" };
 const who = (p) => ({ name: p.userDetails || "Mersal admin", email: /@/.test(p.userDetails || "") ? p.userDetails : "admin@mersal-ngo.org" });
 
 async function saveSettings(patch, message, p) {
@@ -92,6 +92,13 @@ app.http("adminData", {
       const files = [{ path, content: JSON.stringify(body.data, null, 2) + "\n" }];
       if (req.params.name === "content") {
         // the hero is baked into index.html: regenerate it in the same commit so the two never drift
+        for (const sl of body.data.slides || []) {
+          if (sl && sl.banner && !sl.mobile && /^\/img\/(?!uploads\/)/.test(sl.banner)) {
+            const m = sl.banner.replace(/\.(jpe?g|png)$/i, "-m.jpg");
+            if (m !== sl.banner && (await fileExists("public" + m))) sl.mobile = m;
+          }
+        }
+        files[0].content = JSON.stringify(body.data, null, 2) + "\n";
         const idx = await readFile("public/index.html");
         files.push({ path: "public/index.html", content: hero.apply(idx, body.data) });
       }
@@ -101,18 +108,22 @@ app.http("adminData", {
   },
 });
 
-// GET /api/admin/page/{id}  -> { title, desc, body }     PUT -> { title, desc, body }
+// GET /api/admin/page/{id}  -> { title, desc, body, url, static }     PUT -> { title, desc, body }
+// id = number (imported page public/p/<id>.html) or one of the fixed static pages (public/<id>.html)
 app.http("adminPage", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "admin/page/{id}",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
-      const id = String(req.params.id).replace(/\D/g, "");
-      const path = `public/p/${id}.html`;
+      const STATIC = ["about", "contact", "afia", "zakat"];
+      const raw = String(req.params.id || "").trim(), isStatic = STATIC.includes(raw);
+      const id = isStatic ? raw : raw.replace(/\D/g, "");
+      if (!id) return json(404, { message: "صفحة غير معروفة" });
+      const path = isStatic ? `public/${id}.html` : `public/p/${id}.html`;
       const html = await readFile(path);
       const m = /<!-- mersal:content -->([\s\S]*?)<!-- \/mersal:content -->/.exec(html);
       const get = (re) => (re.exec(html) || [])[1] || "";
-      const cur = { id, title: get(/<h1>([^<]*)<\/h1>/), desc: get(/<meta name="description" content="([^"]*)"/), body: m ? m[1].trim() : "" };
+      const cur = { id, static: isStatic, url: isStatic ? `/${id}.html` : `/p/${id}.html`, title: get(/<h1>([^<]*)<\/h1>/), desc: get(/<meta name="description" content="([^"]*)"/), body: m ? m[1].trim() : "" };
       if (req.method === "GET") return json(200, cur);
       if (!m) return json(409, { message: "الصفحة دي من غير علامات تحرير، شغّل سكربت النقل تاني" });
       const b = await req.json();
@@ -124,10 +135,15 @@ app.http("adminPage", {
         .replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="' + esc(b.desc) + '">')
         .replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="' + esc(b.title) + '">')
         .replace(/<meta property="og:description" content="[^"]*">/, '<meta property="og:description" content="' + esc(b.desc) + '">');
-      const pages = JSON.parse(await readFile(JSON_FILES.pages));
-      const photo = (/<img[^>]+src="(\/img\/[^"]+)"/.exec(b.body || "") || [])[1];
-      pages[id] = { ...(pages[id] || {}), title: b.title, desc: String(b.desc || "").slice(0, 140), ...(photo && !/checklist|logo/.test(photo) ? { photo, photoSm: photo } : {}) };
-      const sha = await commitFiles([{ path, content: out }, { path: JSON_FILES.pages, content: JSON.stringify(pages, null, 1) + "\n" }], `admin: edit page ${id} (${b.title})`, who(p));
+      const files = [{ path, content: out }];
+      if (!isStatic) {
+        // the imported pages are listed in pages.json (search + campaign links); the static ones are not
+        const pages = JSON.parse(await readFile(JSON_FILES.pages));
+        const photo = (/<img[^>]+src="(\/img\/[^"]+)"/.exec(b.body || "") || [])[1];
+        pages[id] = { ...(pages[id] || {}), title: b.title, desc: String(b.desc || "").slice(0, 140), ...(photo && !/checklist|logo/.test(photo) ? { photo, photoSm: photo } : {}) };
+        files.push({ path: JSON_FILES.pages, content: JSON.stringify(pages, null, 1) + "\n" });
+      }
+      const sha = await commitFiles(files, `admin: edit page ${id} (${b.title})`, who(p));
       return json(200, { ok: true, commit: sha });
     } catch (e) { return fail(e, ctx); }
   },

@@ -20,11 +20,11 @@ function picture(s, i, opts) {
     if (mw) h += `<source media="(max-width: 760px)" type="image/webp" ${pre}srcset="${esc(mw)}">`;
     h += `<source media="(max-width: 760px)" ${pre}srcset="${esc(mobile)}">`;
   }
-  const set = sm ? `${esc(sm)} 1200w, ${esc(full)} 1600w` : esc(full);
-  const setW = sm ? (webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1600w` : null) : webp(full);
+  const set = sm ? `${esc(sm)} 1200w, ${esc(full)} 1920w` : esc(full);
+  const setW = sm ? (webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1920w` : null) : webp(full);
   if (setW) h += `<source type="image/webp" ${pre}srcset="${setW}"${sm ? ` sizes="${SIZES}"` : ""}>`;
   const prio = i === 0 ? ' fetchpriority="high"' : i === 1 ? ' fetchpriority="low"' : "";
-  h += `<img ${pre}src="${esc(full)}"${sm ? ` ${pre}srcset="${set}" sizes="${SIZES}"` : ""} width="1600" height="475" alt="${esc(s.alt || s.title || "")}"${prio} decoding="async"></picture>`;
+  h += `<img ${pre}src="${esc(full)}"${sm ? ` ${pre}srcset="${set}" sizes="${SIZES}"` : ""} width="1920" height="570" alt="${esc(s.alt || s.title || "")}"${prio} decoding="async"></picture>`;
   return h;
 }
 
@@ -66,7 +66,7 @@ function preload(s, opts) {
     out.push(`<link rel="preload" as="image" media="(max-width: 760px)"${mw ? ` type="image/webp" href="${esc(mw)}"` : ` href="${esc(mobile)}"`} fetchpriority="high">`);
   }
   const sm = s.bannerSm, full = s.banner;
-  const setW = sm && webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1600w` : webp(full) || null;
+  const setW = sm && webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1920w` : webp(full) || null;
   const media = mobile ? ' media="(min-width: 761px)"' : "";
   if (setW && sm) out.push(`<link rel="preload" as="image"${media} type="image/webp" imagesrcset="${setW}" imagesizes="${SIZES}" fetchpriority="high">`);
   else out.push(`<link rel="preload" as="image"${media}${setW ? ' type="image/webp"' : ""} href="${esc(setW || full)}" fetchpriority="high">`);

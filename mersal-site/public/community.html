@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#005959">
+<link rel="apple-touch-icon" href="/img/icon-192.png">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/community.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<title>مرسال كوميونيتي - هدايا المتبرعين | مؤسسة مرسال</title>
+<meta name="description" content="صفحة خاصة بمتبرعي مرسال: شهادة شكر باسمك، كارت للمشاركة، وهدايا من المؤسسة.">
+</head>
+<body class="community">
+<div id="site-header"></div>
+<div class="page-head has-photo"><picture><source type="image/webp" srcset="/img/heart-in-hand.webp"><img class="ph-bg" src="/img/heart-in-hand.jpg" alt="" fetchpriority="high" width="760" height="600"></picture><div class="wrap">
+  <span class="chip">للمتبرعين بس</span>
+  <h1>مرسال كوميونيتي</h1>
+  <p>هدايا وشكر لكل اللي ساهم مع مرسال.</p>
+</div></div>
+<main id="main">
+  <section class="cm-gate" id="cm-gate" hidden>
+    <div class="wrap">
+      <div class="cm-card cm-locked">
+        <div class="cm-lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+        <h2>الصفحة دي بتتفتح بعد أول تبرع</h2>
+        <p>أول ما تتبرع من الموقع، مرسال كوميونيتي هتظهر لك في الشريط تحت، وهتلاقي فيها شهادة شكر باسمك وهدايا المتبرعين.</p>
+        <a class="btn btn-gold btn-lg" href="/donate.html#online">تبرع الآن</a>
+        <p class="hint">اتبرعت قبل كده من جهاز تاني؟ الهدايا مربوطة بالجهاز اللي اتبرعت منه، ولو محتاج مساعدة كلمنا على <a href="tel:19340">19340</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cm-main" id="cm-main" hidden>
+    <div class="wrap">
+      <div class="cm-welcome">
+        <div class="cm-avatar" aria-hidden="true"><span id="cm-initial">م</span></div>
+        <div>
+          <span class="eyebrow">أهلاً بيك في الكوميونيتي</span>
+          <h2 id="cm-hello">شكراً لمساهمتك</h2>
+          <p id="cm-sub"></p>
+        </div>
+        <div class="cm-badges" id="cm-badges"></div>
+      </div>
+
+      <div class="cm-stats" id="cm-stats"></div>
+
+      <h2 class="cm-h">هداياك</h2>
+      <p class="hint" id="cm-intro"></p>
+      <div class="cm-gifts" id="cm-gifts"></div>
+
+      <h2 class="cm-h">تبرعاتك على الجهاز ده</h2>
+      <ul class="cm-history" id="cm-history"></ul>
+
+      <div class="cm-cta">
+        <a class="btn btn-gold btn-lg" href="/donate.html#online">تبرع تاني</a>
+        <a class="btn btn-ghost-teal" href="/volunteer.html">تطوع معنا</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="cm-modal" id="cm-modal" hidden>
+    <div class="cm-modal-in" role="dialog" aria-modal="true" aria-labelledby="cm-modal-title">
+      <button type="button" class="cm-close" id="cm-close" aria-label="إغلاق">×</button>
+      <h3 id="cm-modal-title">شهادة شكر</h3>
+      <canvas id="cm-canvas" width="1080" height="1350" aria-label="شهادة الشكر"></canvas>
+      <div class="cm-modal-actions">
+        <button type="button" class="btn btn-gold" id="cm-share">مشاركة</button>
+        <a class="btn btn-ghost-teal" id="cm-download" download="mersal-thank-you.png">تحميل الصورة</a>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script defer src="/js/layout.js"></script>
+<script defer src="/js/community.js"></script>
+</body>
+</html>

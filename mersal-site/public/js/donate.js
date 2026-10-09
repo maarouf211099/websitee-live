@@ -4,13 +4,19 @@
 //   "demo" - full flow, but it stops at the bank gateway (nothing is charged)
 //   "live" - Banque Misr Hosted Checkout v100 through /api/checkout
 (function () {
-  // Fill these in to show wallet / InstaPay numbers on the page. Empty = hidden.
-  var WALLETS = [
-    // { name: "إنستاباي", value: "mersal@instapay" },
-    // { name: "فودافون كاش", value: "010xxxxxxxx" }
-  ];
-
   var KEY = "mersalPayment", DONOR_KEY = "mersalDonor";
+  function recordDonation(d) {
+    try {
+      var list = JSON.parse(localStorage.getItem("mersalDonations") || "[]");
+      if (d.orderId && list.some(function (x) { return x.orderId === d.orderId; })) return;
+      var opt = purpose && purpose.selectedOptions && purpose.selectedOptions[0];
+      d.purposeTitle = d.purposeTitle || (opt ? opt.textContent.trim() : "");
+      d.purposeLink = d.purposeLink || (/^p\d+$/.test(d.purpose || "") ? "/p/" + d.purpose.slice(1) + ".html" : "/#campaigns-sec");
+      d.date = d.date || new Date().toISOString();
+      list.push(d); localStorage.setItem("mersalDonations", JSON.stringify(list.slice(-50)));
+      localStorage.setItem("mersalDonated", "1");
+    } catch (x) {}
+  }
   // Remember the donor's name/phone/email on this device so the next donation is two taps
   (function rememberDonor() {
     var ids = ["name", "phone", "email"], els = ids.map(function (i) { return document.getElementById(i); });
@@ -46,18 +52,34 @@
   if (!hash) hash = "online";
   if (document.getElementById(hash) && document.getElementById(hash).getAttribute("role") === "tabpanel") openTab(hash);
 
-  document.querySelectorAll(".copy").forEach(function (b) {
-    b.addEventListener("click", function () {
-      navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(function () {
-        b.textContent = "تم النسخ ✓"; setTimeout(function () { b.textContent = "نسخ"; }, 1500);
-      });
+  // Copy buttons (bank rows are rendered later from donate.json, so listen on the document)
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".copy"); if (!b) return;
+    navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(function () {
+      b.textContent = "تم النسخ ✓"; setTimeout(function () { b.textContent = "نسخ"; }, 1500);
     });
   });
-  if (WALLETS.length) {
-    document.getElementById("wallet-numbers").innerHTML = WALLETS.map(function (w) {
-      return '<div class="bank"><div><b>' + esc(w.name) + "</b><code>" + esc(w.value) + '</code></div><button class="copy" data-copy="' + esc(w.value) + '">نسخ</button></div>';
-    }).join("");
-  }
+  // Bank accounts, wallets and the account abroad come from /data/donate.json (edited from the console, "بيانات الموقع");
+  // the markup already in donate.html is the fallback while it loads or if it fails.
+  function row(label, value) { return '<div class="bank"><div><b>' + esc(label) + "</b><code>" + esc(value) + '</code></div><button class="copy" data-copy="' + esc(value) + '">نسخ</button></div>'; }
+  fetch("/data/donate.json").then(function (r) { return r.json(); }).then(function (d) {
+    var banks = (d.banks || []).filter(function (b) { return b && b.name && b.number; });
+    if (banks.length) {
+      document.getElementById("bank-accounts").innerHTML = banks.map(function (b) {
+        var label = b.name + (b.currency ? " - " + b.currency : "");
+        return row(label, b.number) + (b.iban ? row("IBAN - " + b.name, b.iban) : "") + (b.swift ? row("SWIFT - " + b.name, b.swift) : "");
+      }).join("");
+    }
+    var wallets = (d.wallets || []).filter(function (w) { return w && w.name && w.value; });
+    document.getElementById("wallet-numbers").innerHTML = wallets.map(function (w) { return row(w.name, w.value); }).join("");
+    var f = d.foreign, box = document.getElementById("abroad-body");
+    if (f && box && (f.image || f.link || f.text)) {
+      var wp = f.image && window.mersalWebp ? window.mersalWebp(f.image) : null;
+      box.innerHTML = (f.text ? "<p>" + esc(f.text) + "</p>" : "") +
+        (f.image ? "<picture>" + (wp ? '<source type="image/webp" srcset="' + esc(wp) + '">' : "") + '<img src="' + esc(f.image) + '" alt="' + esc(f.alt || "") + '" width="960" height="960" loading="lazy" style="max-width:420px;height:auto;border-radius:12px;border:1px solid var(--line)"></picture>' : "") +
+        (f.link ? '<p style="margin-top:14px"><a class="btn btn-teal" href="' + esc(f.link) + '" target="_blank" rel="noopener">' + esc(f.linkText || "طرق أخرى للتبرع من الخارج") + "</a></p>" : "");
+    }
+  }).catch(function () {});
   if (MODE === "off") return;
 
   // ---------- stepper ----------
@@ -174,6 +196,7 @@
   // Demo: the flow ends here, before any card data or charge
   function stopAtGateway() {
     gw.classList.add("stopped");
+    recordDonation({ orderId: "DEMO-" + Date.now().toString(36), amount: Number(amount.value) || 0, purpose: purpose.value, monthly: freq() === "monthly", demo: true });
     document.getElementById("gw-title").textContent = "بوابة الدفع الإلكتروني قيد التفعيل";
     document.getElementById("gw-body").innerHTML =
       "<p>وصلت لآخر خطوة قبل صفحة بنك مصر. الدفع بالبطاقة هيتفعّل قريب جداً، <b>ولم يتم خصم أي مبلغ</b>.</p>" +
@@ -236,8 +259,10 @@
         if (o.paid) {
           try { localStorage.removeItem(KEY); } catch (x) {}
           form.hidden = true;
+          recordDonation({ orderId: o.orderId, amount: Number(o.amount) || 0, purpose: purpose.value, monthly: freq() === "monthly", demo: false });
           show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(o.amount) + " جنيه</b> بنجاح.<br>" +
-            'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه.");
+            'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
+            '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
         } else {
           show("err", "لم تكتمل عملية الدفع (حالة الطلب: " + esc(o.status || "غير معروفة") + "). لم يتم خصم أي مبلغ، ويمكنك المحاولة مرة أخرى.");
         }

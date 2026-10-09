@@ -1,0 +1,20 @@
+{
+  "payMode": "demo",
+  "hotline": "19340",
+  "phone": "01200002870",
+  "whatsapp": "",
+  "email": "info@mersal-ngo.org",
+  "address": "8 شارع 263 - المعادي الجديدة، القاهرة",
+  "social": {
+    "facebook": "https://www.facebook.com/Mersalfoundation",
+    "instagram": "https://www.instagram.com/mersal_foundation",
+    "x": "https://twitter.com/Mersalcharity",
+    "linkedin": "https://www.linkedin.com/company/18765843/",
+    "youtube": "https://www.youtube.com/channel/UC30Ek5Wl1us6LD6BLkegsHQ",
+    "tiktok": ""
+  },
+  "footer": {
+    "name": "مؤسسة مرسال للأعمال الخيرية والتنموية",
+    "text": "مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم."
+  }
+}

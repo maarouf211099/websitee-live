@@ -1,13 +1,16 @@
-// Shared header and footer for every page. Edit contact details here only.
+// Shared header and footer for every page. Contact details, social links and the footer text live in SITE below.
 (function () {
-  var SITE = {
-    // Card payment (Banque Misr):
-    //   "off"  = hidden everywhere
-    //   "demo" = full donation flow that stops at the bank gateway (nothing is charged)
-    //   "live" = real payments (needs MPGS_MERCHANT / MPGS_API_PASSWORD in Azure)
+  // SITE is edited from the admin console ("بيانات الموقع" -> PUT /api/admin/site) and mirrored to /data/site.json:
+  // the API rewrites everything between the mersal:site markers, so keep that block a plain object literal
+  // (one key per line, no comments). payMode is the card payment switch (Banque Misr), set from the console settings:
+  //   "off"  = hidden everywhere
+  //   "demo" = full donation flow that stops at the bank gateway (nothing is charged)
+  //   "live" = real payments (needs MPGS_MERCHANT / MPGS_API_PASSWORD in Azure)
+  var SITE = /* mersal:site */ {
     payMode: "demo",
-    phone: "01200002870",
     hotline: "19340",
+    phone: "01200002870",
+    whatsapp: "",
     email: "info@mersal-ngo.org",
     address: "8 شارع 263 - المعادي الجديدة، القاهرة",
     social: {
@@ -15,10 +18,19 @@
       instagram: "https://www.instagram.com/mersal_foundation",
       x: "https://twitter.com/Mersalcharity",
       linkedin: "https://www.linkedin.com/company/18765843/",
-      youtube: "https://www.youtube.com/channel/UC30Ek5Wl1us6LD6BLkegsHQ"
+      youtube: "https://www.youtube.com/channel/UC30Ek5Wl1us6LD6BLkegsHQ",
+      tiktok: ""
+    },
+    footer: {
+      name: "مؤسسة مرسال للأعمال الخيرية والتنموية",
+      text: "مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم."
     }
-  };
+  } /* /mersal:site */;
+  SITE.social = SITE.social || {}; SITE.footer = SITE.footer || {};
   SITE.onlinePayment = SITE.payMode !== "off";
+  // WhatsApp number -> wa.me link (an Egyptian 01xxxxxxxxx number gets the +20 country code)
+  function waLink(n) { var d = String(n || "").replace(/\D/g, ""); if (/^0\d{10}$/.test(d)) d = "20" + d.slice(1); return "https://wa.me/" + d; }
+  window.mersalWaLink = waLink;
 
   // Responsive <picture> with a WebP source. tools/optimize_images.py guarantees a .webp sibling for every
   // jpg/png under /img/ (not /img/uploads/, where the admin console stores originals only).
@@ -52,13 +64,16 @@
     instagram: '<path fill-rule="evenodd" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 5.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>',
     x: '<path d="M3 3h4.5l4.2 5.8L16.8 3H20l-6.8 7.8L21 21h-4.5l-4.6-6.3L6.3 21H3l7.4-8.5z"/>',
     linkedin: '<path d="M4 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM2 9h4v12H2zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.4 2.6 4.4 6V21h-4v-5.6c0-1.3 0-3-1.9-3s-2.1 1.4-2.1 2.9V21H9z"/>',
-    youtube: '<path fill-rule="evenodd" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15.1V8.9l5.7 3.1z"/>'
+    youtube: '<path fill-rule="evenodd" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15.1V8.9l5.7 3.1z"/>',
+    tiktok: '<path d="M16.6 2h-3.3v13.6a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9.4a6.2 6.2 0 1 0 5.3 6.2V8.7a7.6 7.6 0 0 0 4.4 1.4V6.8a4.4 4.4 0 0 1-4.4-4.8z"/>'
   };
-  var LABELS = { facebook: "فيسبوك", instagram: "إنستجرام", x: "إكس (تويتر)", linkedin: "لينكدإن", youtube: "يوتيوب" };
+  var LABELS = { facebook: "فيسبوك", instagram: "إنستجرام", x: "إكس (تويتر)", linkedin: "لينكدإن", youtube: "يوتيوب", tiktok: "تيك توك" };
 
   function social() {
-    return '<ul class="social">' + Object.keys(SITE.social).map(function (k) {
-      return '<li><a href="' + SITE.social[k] + '" target="_blank" rel="noopener" aria-label="' + LABELS[k] + '">' +
+    var keys = Object.keys(ICONS).filter(function (k) { return SITE.social[k]; });
+    if (!keys.length) return "";
+    return '<ul class="social">' + keys.map(function (k) {
+      return '<li><a href="' + escA(SITE.social[k]) + '" target="_blank" rel="noopener" aria-label="' + LABELS[k] + '">' +
         '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[k] + '</svg></a></li>';
     }).join("") + "</ul>";
   }
@@ -72,20 +87,20 @@
     ["/contact.html", "تواصل معنا"]
   ];
   var FOOT = [
-    ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"],
+    ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"], ["/help.html", "طلب مساعدة"],
     ["/p/30.html", "مستشفى مرسال"], ["/p/4.html", "المشاريع"], ["/p/46.html", "فروع مرسال"],
     ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/p/51.html", "الأسئلة الشائعة"],
     ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"]
-  ];
+  ].filter(function (n) { return n[0]; });
   var here = location.pathname.replace(/index\.html$/, "");
 
   var header =
     '<div class="topbar"><div class="wrap">' +
       '<div class="phones">' +
         '<a class="zakat-link" href="/zakat.html">حساب الزكاة</a>' +
-        '<a href="tel:' + SITE.hotline + '">الخط الساخن: <b>' + SITE.hotline + '</b></a>' +
-        '<a href="tel:' + SITE.phone + '">الهاتف: <b dir="ltr">' + SITE.phone + '</b></a>' +
-        '<a href="mailto:' + SITE.email + '">' + SITE.email + '</a>' +
+        '<a href="tel:' + escA(SITE.hotline) + '">الخط الساخن: <b>' + escA(SITE.hotline) + '</b></a>' +
+        '<a href="tel:' + escA(SITE.phone) + '">الهاتف: <b dir="ltr">' + escA(SITE.phone) + '</b></a>' +
+        '<a href="mailto:' + escA(SITE.email) + '">' + escA(SITE.email) + '</a>' +
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
@@ -103,33 +118,46 @@
     '<footer class="site-footer"><div class="wrap cols">' +
       "<div>" +
         '<div class="logo-box"><img src="/img/brand-logo-h.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="302" height="52"></div>' +
-        "<h3>مؤسسة مرسال للأعمال الخيرية والتنموية</h3>" +
-        "<p>مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم.</p>" +
+        "<h3>" + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + "</h3>" +
+        (SITE.footer.text ? "<p>" + escA(SITE.footer.text) + "</p>" : "") +
         social() +
       "</div>" +
-      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + n[0] + '">' + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
+      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + escA(n[0]) + '">' + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
       "<div><h3>تواصل معنا</h3><ul>" +
-        "<li>" + SITE.address + "</li>" +
-        '<li>الخط الساخن: <a href="tel:' + SITE.hotline + '">' + SITE.hotline + "</a></li>" +
-        '<li>الهاتف: <a href="tel:' + SITE.phone + '" dir="ltr">' + SITE.phone + "</a></li>" +
-        '<li><a href="mailto:' + SITE.email + '">' + SITE.email + "</a></li>" +
+        (SITE.address ? "<li>" + escA(SITE.address) + "</li>" : "") +
+        (SITE.hotline ? '<li>الخط الساخن: <a href="tel:' + escA(SITE.hotline) + '">' + escA(SITE.hotline) + "</a></li>" : "") +
+        (SITE.phone ? '<li>الهاتف: <a href="tel:' + escA(SITE.phone) + '" dir="ltr">' + escA(SITE.phone) + "</a></li>" : "") +
+        (SITE.whatsapp ? '<li>واتساب: <a href="' + waLink(SITE.whatsapp) + '" target="_blank" rel="noopener" dir="ltr">' + escA(SITE.whatsapp) + "</a></li>" : "") +
+        (SITE.email ? '<li><a href="mailto:' + escA(SITE.email) + '">' + escA(SITE.email) + "</a></li>" : "") +
       "</ul></div>" +
     "</div>" +
-    '<div class="copyright">© ' + year + ' مؤسسة مرسال للأعمال الخيرية والتنموية - جميع الحقوق محفوظة <a class="admin-link" href="/admin/" rel="nofollow">لوحة التحكم</a></div></footer>';
+    '<div class="copyright">© ' + year + " " + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + ' - جميع الحقوق محفوظة <a class="admin-link" href="/admin/" rel="nofollow">لوحة التحكم</a></div></footer>';
 
   document.getElementById("site-header").outerHTML = header;
   document.getElementById("site-footer").outerHTML = footer;
+  // Pages can show a site detail with data-site="hotline|phone|whatsapp|email|address" (text + href filled from SITE);
+  // a wrapper with data-site-box is hidden when that value is empty - e.g. the WhatsApp card on contact.html
+  document.querySelectorAll("[data-site]").forEach(function (el) {
+    var k = el.getAttribute("data-site"), v = String(SITE[k] || "").trim(), box = el.closest("[data-site-box]");
+    if (box) box.hidden = !v;
+    if (!v) return;
+    el.textContent = v;
+    if (el.tagName === "A") el.href = k === "email" ? "mailto:" + v : k === "whatsapp" ? waLink(v) : k === "address" ? el.getAttribute("href") || "#" : "tel:" + v;
+  });
+  var donated = false; try { donated = localStorage.getItem("mersalDonated") === "1"; } catch (e) {}
   if (!/donate\.html$/.test(location.pathname)) {
     var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname);
     var dHref = "/donate.html" + (pm ? "?for=p" + pm[1] : "") + "#online";
     document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>' +
       '<nav class="m-bar" aria-label="تنقل سريع">' +
         '<a class="m-home' + (/^\/(index\.html)?$/.test(location.pathname) ? " on" : "") + '" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></a>' +
-        '<a class="m-call" href="tel:19340"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>اتصل</span></a>' +
+        '<a class="m-call" href="tel:' + escA(SITE.hotline) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>اتصل</span></a>' +
         '<a class="m-donate" href="' + dHref + '"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg></i><span>تبرع</span></a>' +
         '<a class="m-zakat' + (/zakat\.html$/.test(location.pathname) ? " on" : "") + '" href="/zakat.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h6"/></svg><span>الزكاة</span></a>' +
+        (donated ? '<a class="m-gift' + (/community\.html$/.test(location.pathname) ? " on" : "") + '" href="/community.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-7-4-6 0M12 7c2-4 7-4 6 0"/></svg><span>هداياك</span></a>' : "") +
         '<button type="button" class="m-menu" aria-label="القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>القائمة</span></button>' +
       "</nav>");
+    if (donated) document.querySelector(".m-bar").classList.add("six");
     document.body.classList.add("has-mbar");
   }
 
@@ -162,14 +190,12 @@
   document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img").forEach(function (el) { el.classList.add("zoom"); });
   window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, main .legacy .row > *, main .legacy li, main .legacy > img, main .page-side, main .share-bar, .site-footer .cols > div"));
 
-  // Extra links added to the imported menu groups
-  var EXTRA = { "تواصل معنا": [["/contact.html", "اتصل بنا"], ["/albums.html", "ألبومات الصور"]], "ساعد مرسال": [["/donate.html", "تبرع الآن"], ["/zakat.html", "حساب الزكاة"]] };
+  // The whole menu (groups and their links) comes from /data/menu.json - edited from the console tab "القائمة"
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   function navItem(it) {
-    var kids = (it.children || []).slice();
-    (EXTRA[it.title] || []).forEach(function (e, i) { kids.splice(i, 0, { title: e[1], href: e[0] }); });
+    var kids = (it.children || []).filter(function (k) { return k && k.title && k.href; });
     var cur = it.href && here === it.href ? ' aria-current="page"' : "";
-    if (!kids.length) return '<li><a href="' + esc(it.href) + '"' + cur + ">" + esc(it.title) + "</a></li>";
+    if (!kids.length) return it.href ? '<li><a href="' + esc(it.href) + '"' + cur + ">" + esc(it.title) + "</a></li>" : "";
     var open = kids.some(function (k) { return k.href === here; });
     return '<li class="has-sub' + (open ? " active" : "") + '"><button type="button" class="sub-toggle" aria-expanded="false">' + esc(it.title) + '<span aria-hidden="true">▾</span></button>' +
       '<ul class="sub">' + (it.href ? '<li><a href="' + esc(it.href) + '">' + esc(it.title) + "</a></li>" : "") +
@@ -192,7 +218,54 @@
     if (!tree || !tree.length) return;
     document.getElementById("nav").innerHTML = '<li><a href="/"' + (here === "/" ? ' aria-current="page"' : "") + ">الرئيسية</a></li>" + tree.map(navItem).join("");
     bindSubs();
+    buildSheet(tree);
   }).catch(function () {});
+
+  // Phone menu: a full-height sheet (quick actions, groups as accordions, contact, social) built from the same tree
+  function buildSheet(tree) {
+    if (document.getElementById("m-sheet")) return;
+    var ic = {
+      donate: '<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg>',
+      zakat: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h6"/></svg>',
+      volunteer: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M21 20a5 5 0 0 0-4-4.9"/></svg>',
+      help: '<svg viewBox="0 0 24 24"><path d="M12 3l9 6v12H3V9z"/><path d="M12 10v6M9 13h6"/></svg>',
+      phone: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+      wa: '<svg viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.2A8 8 0 1 1 20 11.5z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z"/></svg>',
+      mail: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+      gift: '<svg viewBox="0 0 24 24"><path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-7-4-6 0M12 7c2-4 7-4 6 0"/></svg>',
+      chev: '<svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'
+    };
+    function row(k) { return '<a class="m-row" href="' + esc(k.href) + '"' + (k.href === here ? ' aria-current="page"' : "") + ">" + esc(k.title) + ic.chev + "</a>"; }
+    var groups = tree.map(function (it) {
+      var kids = (it.children || []).filter(function (k) { return k && k.title && k.href; });
+      if (!kids.length) return it.href ? row(it) : "";
+      var open = kids.some(function (k) { return k.href === here; }) || it.href === here;
+      return '<details class="m-group"' + (open ? " open" : "") + "><summary>" + esc(it.title) + ic.chev + "</summary><div class=\"m-sub\">" +
+        (it.href ? row({ href: it.href, title: "كل " + it.title }) : "") + kids.map(row).join("") + "</div></details>";
+    }).join("");
+    var wa = SITE.whatsapp ? String(SITE.whatsapp).replace(/\D/g, "") : "";
+    var html = '<div class="m-sheet" id="m-sheet" hidden><div class="m-sheet-in">' +
+      '<button type="button" class="m-search-row" id="m-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>ابحث في الموقع…</span></button>' +
+      '<div class="m-quick">' +
+        '<a href="/donate.html#online" class="q-donate">' + ic.donate + "<span>تبرع الآن</span></a>" +
+        '<a href="/zakat.html">' + ic.zakat + "<span>حاسبة الزكاة</span></a>" +
+        '<a href="/volunteer.html">' + ic.volunteer + "<span>تطوع معنا</span></a>" +
+        '<a href="/help.html">' + ic.help + "<span>طلب مساعدة</span></a>" +
+      "</div>" +
+      (donated ? '<a class="m-gift-row" href="/community.html">' + ic.gift + "<span><b>مرسال كوميونيتي</b><small>هداياك كمتبرع</small></span>" + ic.chev + "</a>" : "") +
+      '<nav class="m-groups" aria-label="أقسام الموقع">' + row({ href: "/", title: "الرئيسية" }) + groups + "</nav>" +
+      '<div class="m-contact">' +
+        '<a href="tel:' + escA(SITE.hotline) + '">' + ic.phone + "<span><b>" + escA(SITE.hotline) + "</b><small>الخط الساخن</small></span></a>" +
+        (wa ? '<a href="https://wa.me/' + wa + '" target="_blank" rel="noopener">' + ic.wa + "<span><b>واتساب</b><small>اكتبلنا</small></span></a>" : '<a href="tel:' + escA(SITE.phone) + '">' + ic.phone + '<span><b dir="ltr">' + escA(SITE.phone) + "</b><small>الهاتف</small></span></a>") +
+        '<a href="mailto:' + escA(SITE.email) + '">' + ic.mail + "<span><b>الإيميل</b><small>" + escA(SITE.email) + "</small></span></a>" +
+      "</div>" +
+      '<div class="m-social">' + social() + "</div>" +
+    "</div></div>";
+    document.body.insertAdjacentHTML("beforeend", html);
+    var sheet = document.getElementById("m-sheet");
+    sheet.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
+    document.getElementById("m-search").addEventListener("click", function () { setMenu(false); var b = document.querySelector(".search-btn"); if (b) b.click(); });
+  }
 
   // Skip link + back-to-top
   document.body.insertAdjacentHTML("afterbegin", '<a class="skip-link" href="#main">تخطي إلى المحتوى</a>');
@@ -212,7 +285,9 @@
     { t: "حاسبة الزكاة", u: "/zakat.html", d: "احسب زكاة مالك وذهبك وتجارتك" },
     { t: "كارت عافية", u: "/afia.html", d: "كارت خصومات عائلي على الخدمات الطبية حتى 70%" },
     { t: "تواصل معنا", u: "/contact.html", d: "الخط الساخن 19340، العنوان، البريد" },
-    { t: "ألبومات الصور", u: "/albums.html", d: "صور فعاليات وحملات مرسال: التبرع بالدم، فوانيس الفرحة، بازار عيد الأم" }
+    { t: "ألبومات الصور", u: "/albums.html", d: "صور فعاليات وحملات مرسال: التبرع بالدم، فوانيس الفرحة، بازار عيد الأم" },
+    { t: "تطوع معنا", u: "/volunteer.html", d: "سجل كمتطوع مع مرسال" },
+    { t: "طلب مساعدة", u: "/help.html", d: "قدّم طلب مساعدة طبية أو اجتماعية لمرسال" }
   ];
   var index = null;
   function norm(t) { return String(t || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").toLowerCase(); }
@@ -247,21 +322,26 @@
   });
 
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
+  // On phones the menu is the #m-sheet (built once menu.json arrives); before that, and on tablets, it is the nav list
+  function menuOpen() { var sheet = document.getElementById("m-sheet"); return sheet ? !sheet.hidden : nav.classList.contains("open"); }
   function setMenu(open) {
-    nav.classList.toggle("open", open);
+    var sheet = document.getElementById("m-sheet");
+    if (sheet) { sheet.hidden = !open; if (open) sheet.scrollTop = 0; nav.classList.remove("open"); }
+    else nav.classList.toggle("open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.setAttribute("aria-label", open ? "إغلاق القائمة" : "القائمة");
     document.body.classList.toggle("menu-open", open);
+    var mm = document.querySelector(".m-bar .m-menu"); if (mm) mm.setAttribute("aria-expanded", open ? "true" : "false");
   }
-  toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!nav.classList.contains("open")); });
+  toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!menuOpen()); });
   var mMenu = document.querySelector(".m-bar .m-menu");
-  if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); setMenu(!nav.classList.contains("open")); if (nav.classList.contains("open")) scrollTo({ top: 0, behavior: "smooth" }); });
+  if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); var open = !menuOpen(); setMenu(open); if (open && !document.getElementById("m-sheet")) scrollTo({ top: 0, behavior: "smooth" }); });
   nav.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
-  addEventListener("keydown", function (e) { if (e.key === "Escape" && nav.classList.contains("open")) { setMenu(false); toggle.focus(); } });
+  addEventListener("keydown", function (e) { if (e.key === "Escape" && menuOpen()) { setMenu(false); toggle.focus(); } });
   // Mobile menu footer: donate + hotline (added once the menu is built)
   function menuCta() {
     if (nav.querySelector(".m-menu-cta")) return;
-    nav.insertAdjacentHTML("beforeend", '<li class="m-menu-cta"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a><a class="btn btn-ghost-light" href="tel:19340">اتصل 19340</a></li>');
+    nav.insertAdjacentHTML("beforeend", '<li class="m-menu-cta"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a><a class="btn btn-ghost-light" href="tel:' + escA(SITE.hotline) + '">اتصل ' + escA(SITE.hotline) + '</a></li>');
   }
   menuCta();
   new MutationObserver(menuCta).observe(nav, { childList: true });

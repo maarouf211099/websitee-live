@@ -26,12 +26,17 @@
   <section>
     <div class="wrap grid grid-2">
       <div>
-        <div class="bank"><div><b>الخط الساخن</b><a href="tel:19340">19340</a></div></div>
-        <div class="bank"><div><b>الهاتف</b><a href="tel:01200002870" dir="ltr">01200002870</a></div></div>
-        <div class="bank"><div><b>البريد الإلكتروني</b><a href="mailto:info@mersal-ngo.org">info@mersal-ngo.org</a></div></div>
-        <div class="bank"><div><b>العنوان</b>8 شارع 263 - المعادي الجديدة، القاهرة</div></div>
+<!-- mersal:content -->
+        <p>يسعدنا تواصلك معنا في أي وقت: اتصل بالخط الساخن أو ابعتلنا رسالة من الفورم.</p>
+        <!-- data-site="…" values are filled from the site details in js/layout.js (edited from the console) -->
+        <div class="bank"><div><b>الخط الساخن</b><a href="tel:19340" data-site="hotline">19340</a></div></div>
+        <div class="bank"><div><b>الهاتف</b><a href="tel:01200002870" dir="ltr" data-site="phone">01200002870</a></div></div>
+        <div class="bank" data-site-box hidden><div><b>واتساب</b><a href="https://wa.me/" dir="ltr" target="_blank" rel="noopener" data-site="whatsapp"></a></div></div>
+        <div class="bank"><div><b>البريد الإلكتروني</b><a href="mailto:info@mersal-ngo.org" data-site="email">info@mersal-ngo.org</a></div></div>
+        <div class="bank"><div><b>العنوان</b><span data-site="address">8 شارع 263 - المعادي الجديدة، القاهرة</span></div></div>
         <div class="bank"><div><b>الدعم الفني للدفع أونلاين</b><a href="tel:01099316592" dir="ltr">01099316592</a></div></div>
         <a href="https://maps.google.com/?q=8+Street+263+New+Maadi+Cairo" target="_blank" rel="noopener"><img src="/img/mersalmap.png" alt="خريطة موقع مؤسسة مرسال" style="border-radius:var(--radius);margin-top:8px" loading="lazy"></a>
+<!-- /mersal:content -->
       </div>
       <form id="contact" class="card" style="padding:22px">
         <h2 style="margin:0 0 12px;color:var(--teal-dark);font-size:22px">ابعتلنا رسالة</h2>

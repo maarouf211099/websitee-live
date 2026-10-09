@@ -1,0 +1,40 @@
+{
+  "banks": [
+    {
+      "name": "بنك CIB",
+      "currency": "بالجنيه",
+      "number": "100034654454",
+      "iban": "",
+      "swift": ""
+    },
+    {
+      "name": "بنك CIB",
+      "currency": "بالدولار",
+      "number": "100034654357",
+      "iban": "",
+      "swift": ""
+    },
+    {
+      "name": "بنك الإمارات دبي الوطني",
+      "currency": "",
+      "number": "1019409332701",
+      "iban": "",
+      "swift": ""
+    },
+    {
+      "name": "البنك العربي الأفريقي",
+      "currency": "بالجنيه أو الدولار",
+      "number": "701840",
+      "iban": "",
+      "swift": ""
+    }
+  ],
+  "wallets": [],
+  "foreign": {
+    "text": "",
+    "image": "/img/gls.jpg",
+    "alt": "حساب Mersal Foundation e.V. في GLS Bank - ألمانيا",
+    "link": "http://bit.ly/MersalDonations",
+    "linkText": "طرق أخرى للتبرع من الخارج"
+  }
+}

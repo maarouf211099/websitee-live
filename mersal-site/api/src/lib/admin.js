@@ -109,7 +109,7 @@ function requireAdmin(req) {
 const ALLOWED = [
   /^public\/index\.html$/,
   /^public\/(about|contact|afia|zakat|donate|albums|volunteer|help)\.html$/,
-  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate)\.json$/,
+  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community)\.json$/,
   /^api\/data\/requests\/[A-Za-z0-9_-]+\.json$/, /^api\/data\/requests\/index\.json$/,
   /^public\/p\/\d{1,4}\.html$/, /^public\/js\/layout\.js$/,
   /^public\/img\/uploads\/[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif)$/,

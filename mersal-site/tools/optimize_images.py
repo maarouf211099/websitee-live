@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Shrink site images in place and add WebP siblings (needs ImageMagick `convert`/`identify`).
 
-- JPEGs: capped at 1600px (640px for *-sm files), quality 76, progressive, metadata stripped.
+- JPEGs: capped at 1600px (1200px for *-sm files), quality 76, progressive, metadata stripped.
+  Slide banners (content.json "slides") keep up to 1920px at quality 80: the phone hero shows the photo half alone.
 - Photo PNGs without transparency (>80KB) become JPEGs; references in HTML/CSS/JS/JSON are rewritten.
 - PNGs with transparency are only stripped.
 - Slide banners (content.json "slides") get a phone crop <banner>-m.jpg (left 46%: the photo half) for the hero.
@@ -25,8 +26,35 @@ def info(p):
     return int(w), int(h), alpha in ("True", "Blend"), kind
 
 
+def banners():
+    """Paths of the hero banners in content.json (they are allowed to stay bigger than the other photos)."""
+    cp = ROOT / "content.json"
+    if not cp.exists():
+        return set()
+    import json
+    out = set()
+    for s in json.loads(cp.read_text(encoding="utf-8")).get("slides", []):
+        b = s.get("banner") or ""
+        if b.startswith("/img/"):
+            out.add((ROOT / b.lstrip("/")).resolve())
+    return out
+
+
+BANNERS = banners()
+
+
+def is_banner(p):
+    return p.resolve() in BANNERS
+
+
 def cap(p):
-    return "1200x1200>" if p.stem.endswith("-sm") else "1600x1600>"  # -sm copies are made at 600/1200 by the importer
+    if p.stem.endswith("-sm"):
+        return "1200x1200>"  # -sm copies are made at 600/1200 by the importer
+    return "1920x1920>" if is_banner(p) else "1600x1600>"
+
+
+def quality(p):
+    return "80" if is_banner(p) else QUALITY
 
 
 def replace_refs(old_rel, new_rel):
@@ -82,10 +110,10 @@ def main():
             saved += before - new.stat().st_size
             p.unlink(); p = new; before = p.stat().st_size; tmp = None
             src = None
-        elif p.stem.endswith("-m") or (kind == "JPEG" and int(run("identify", "-format", "%Q", str(p))) <= int(QUALITY) and max(w, h) <= int(cap(p).split("x")[0])):
+        elif p.stem.endswith("-m") or (kind == "JPEG" and int(run("identify", "-format", "%Q", str(p))) <= int(quality(p)) and max(w, h) <= int(cap(p).split("x")[0])):
             tmp = None  # already optimized on a previous run: don't re-encode (each pass loses quality)
         else:
-            subprocess.run(["convert", str(p) + "[0]", "-strip", "-resize", cap(p), "-interlace", "Plane", "-sampling-factor", "4:2:0", "-quality", QUALITY, str(tmp)], check=True)
+            subprocess.run(["convert", str(p) + "[0]", "-strip", "-resize", cap(p), "-interlace", "Plane", "-sampling-factor", "4:2:0", "-quality", quality(p), str(tmp)], check=True)
             src = p
         if tmp is not None and tmp.exists():
             after = tmp.stat().st_size

@@ -10,7 +10,19 @@
 <title>لوحة تحكم مرسال</title>
 </head>
 <body>
-<div class="shell">
+<div class="login" id="login" hidden>
+  <form class="login-card" id="login-form" autocomplete="on">
+    <img src="/img/brand-logo.png" alt="مرسال" width="96" height="57">
+    <h1>لوحة تحكم مرسال</h1>
+    <p class="hint" id="login-hint">ادخل باسم المستخدم وكلمة السر</p>
+    <div class="field"><label for="l-user">اسم المستخدم</label><input id="l-user" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>
+    <div class="field"><label for="l-pass" id="l-pass-label">كلمة السر</label><input id="l-pass" name="password" type="password" autocomplete="current-password" required></div>
+    <div class="field" id="l-code-box" hidden><label for="l-code">كود التفعيل (أول مرة بس)</label><input id="l-code" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"></div>
+    <p class="login-err" id="login-err" hidden></p>
+    <button class="btn btn-gold" type="submit" id="login-btn">دخول</button>
+  </form>
+</div>
+<div class="shell" id="shell" hidden>
   <aside class="side">
     <div class="brand"><img src="/img/brand-logo.png" alt="مرسال" width="70" height="42"><span>لوحة التحكم</span></div>
     <nav class="tabs" role="tablist">
@@ -23,7 +35,7 @@
     <div class="side-foot">
       <div class="user" id="user">…</div>
       <a class="link" href="/" target="_blank" rel="noopener">فتح الموقع ↗</a>
-      <a class="link" href="/logout">تسجيل الخروج</a>
+      <a class="link" href="#" id="logout">تسجيل الخروج</a>
     </div>
   </aside>
 
@@ -96,6 +108,14 @@
       <button class="btn btn-gold" id="save-settings">حفظ ونشر</button>
       <h2>حالة الربط</h2>
       <ul class="checks" id="checks"></ul>
+      <h2>حساب الأدمن</h2>
+      <p class="hint" id="pw-hint">اسم المستخدم <code id="pw-user">admin</code>. غيّر كلمة السر من هنا، أو ظبّط <code>ADMIN_USER</code> و<code>ADMIN_PASSWORD</code> في إعدادات Azure لو عايز تتحكم فيها من هناك.</p>
+      <form class="pw-form" id="pw-form">
+        <div class="field"><label for="pw-cur">كلمة السر الحالية</label><input id="pw-cur" type="password" autocomplete="current-password" required></div>
+        <div class="field"><label for="pw-new">كلمة السر الجديدة (8 حروف على الأقل)</label><input id="pw-new" type="password" autocomplete="new-password" minlength="8" required></div>
+        <div class="field"><label for="pw-new2">تأكيد كلمة السر الجديدة</label><input id="pw-new2" type="password" autocomplete="new-password" minlength="8" required></div>
+        <button class="btn btn-teal" type="submit">تغيير كلمة السر</button>
+      </form>
     </section>
   </main>
 </div>

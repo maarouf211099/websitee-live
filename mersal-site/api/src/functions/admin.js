@@ -1,21 +1,81 @@
-// Admin API (role "admin" via Static Web Apps auth). Every change is one git commit to
+// Admin API (console login with a cookie session). Every change is one git commit to
 // the deploy branch, so the site republishes itself about a minute later.
 const { app } = require("@azure/functions");
-const { requireAdmin, readFile, commitFiles, json, fail } = require("../lib/admin");
+const { requireAdmin, readFile, commitFiles, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
 
 const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json" };
 const who = (p) => ({ name: p.userDetails || "Mersal admin", email: /@/.test(p.userDetails || "") ? p.userDetails : "admin@mersal-ngo.org" });
 
-app.http("adminMe", {
-  methods: ["GET"], authLevel: "anonymous", route: "admin/me",
-  handler: async (req) => {
+async function saveSettings(patch, message, p) {
+  let settings = {};
+  try { settings = JSON.parse(await readFile("public/data/settings.json")); } catch (e) { settings = {}; }
+  Object.assign(settings, patch);
+  return commitFiles([{ path: "public/data/settings.json", content: JSON.stringify(settings, null, 2) + "\n" }], message, who(p));
+}
+
+// GET /api/admin/status (public): does the console still need its first-login setup?
+app.http("adminStatus", {
+  methods: ["GET"], authLevel: "anonymous", route: "admin/status",
+  handler: async (req, ctx) => {
+    try { return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) }); }
+    catch (e) { return fail(e, ctx); }
+  },
+});
+
+// POST /api/admin/login { user, password, code? } -> session cookie (12h).
+// First login (no password yet): the one-time code from api/setup.json is required and the given password becomes the console password.
+app.http("adminLogin", {
+  methods: ["POST"], authLevel: "anonymous", route: "admin/login",
+  handler: async (req, ctx) => {
+    try {
+      throttle(req);
+      const b = await req.json().catch(() => ({}));
+      const user = String(b.user || "").trim(), pass = String(b.password || "");
+      const source = await passwordSource();
+      if (source === "setup") {
+        if (!setupCodeOk(b.code)) { loginFailed(req); return json(401, { message: "كود التفعيل غلط", setup: true }); }
+        if (user !== adminUser()) return json(400, { message: "اسم المستخدم لازم يكون " + adminUser(), setup: true });
+        if (pass.length < 8) return json(400, { message: "كلمة السر لازم 8 حروف على الأقل", setup: true });
+        await saveSettings({ adminPasswordHash: hashPassword(pass) }, "admin: set console password", { userDetails: user });
+      } else if (!(await verifyPassword(user, pass))) { loginFailed(req); return json(401, { message: "اسم المستخدم أو كلمة السر غلط" }); }
+      loginOk(req);
+      return { ...json(200, { ok: true, user }), cookies: [sessionCookie(req, makeToken(user), TTL)] };
+    } catch (e) { return fail(e, ctx); }
+  },
+});
+app.http("adminLogout", {
+  methods: ["POST"], authLevel: "anonymous", route: "admin/logout",
+  handler: async (req) => ({ ...json(200, { ok: true }), cookies: [sessionCookie(req, "", 0)] }),
+});
+// POST /api/admin/password { current, next } -> new scrypt hash in data/settings.json (unless ADMIN_PASSWORD is fixed in Azure)
+app.http("adminPassword", {
+  methods: ["POST"], authLevel: "anonymous", route: "admin/password",
+  handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
-      return json(200, { user: p.userDetails, roles: p.userRoles, github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO), donations: donations.enabled(),
+      if (p.via !== "password") return json(409, { message: "الحساب ده بيدخل بمايكروسوفت، مفيش كلمة سر هنا" });
+      if (process.env.ADMIN_PASSWORD) return json(409, { message: "كلمة السر متظبطة من إعدادات Azure (ADMIN_PASSWORD)، غيّرها من هناك" });
+      const b = await req.json().catch(() => ({}));
+      if (!(await verifyPassword(p.userDetails, String(b.current || "")))) return json(401, { message: "كلمة السر الحالية غلط" });
+      const next = String(b.next || "");
+      if (next.length < 8) return json(400, { message: "كلمة السر الجديدة لازم 8 حروف على الأقل" });
+      const sha = await saveSettings({ adminPasswordHash: hashPassword(next) }, "admin: change console password", p);
+      return json(200, { ok: true, commit: sha });
+    } catch (e) { return fail(e, ctx); }
+  },
+});
+
+app.http("adminMe", {
+  methods: ["GET"], authLevel: "anonymous", route: "admin/me",
+  handler: async (req, ctx) => {
+    try {
+      const p = requireAdmin(req);
+      return json(200, { user: p.userDetails, roles: p.userRoles, via: p.via, github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO), donations: donations.enabled(),
+        password: p.via === "password" ? await passwordSource() : "aad",
         mpgs: !!(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD), merchant: process.env.MPGS_MERCHANT || null });
-    } catch (e) { return fail(e); }
+    } catch (e) { return fail(e, ctx); }
   },
 });
 

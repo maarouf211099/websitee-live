@@ -70,24 +70,29 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 - لو بنك مصر رفض بيانات المتبرع (`customer`)، الدفع بيكمل عادي بس `donor` هيوصل فاضي.
 
 ## لوحة التحكم (`/admin/`)
-لوحة منفصلة على `https://<الموقع>/admin/`، الدخول بحساب مايكروسوفت (Microsoft Entra ID) بتاع `mersal-ngo.org`.
+لوحة منفصلة على `https://<الموقع>/admin/`، الدخول باسم مستخدم وكلمة سر (مفيش حساب مايكروسوفت).
 كل حفظ من اللوحة = commit على فرع `main` في GitHub، والموقع بيتنشر تلقائياً خلال دقيقة تقريباً.
 
-**اللي تقدر تعدّله من اللوحة:** السلايدر، حملات التبرع وأرقامها (الهدف / تم توفير)، "مرسال بالأرقام"، كل صفحات المحتوى (`/p/*.html`)، الألبومات والصور، وضع الدفع بالبطاقة (مقفول / تجريبي / حقيقي)، وتقرير التبرعات بالبطاقة.
+**اللي تقدر تعدّله من اللوحة:** السلايدر، حملات التبرع وأرقامها، "مرسال بالأرقام"، كل صفحات المحتوى، الألبومات والصور، وضع الدفع بالبطاقة، تقرير التبرعات، وكلمة سر اللوحة.
 
-### التفعيل (مرة واحدة)
-1. **مين يدخل:** Azure Portal → Static Web App → **Role management** → **Invite**: Provider `Microsoft Entra ID`، الإيميل، Domain = دومين الموقع، Role = `admin`. افتح رابط الدعوة بنفس الحساب. كل أدمن محتاج دعوة.
-2. **صلاحية الحفظ:** GitHub → Settings → Developer settings → Fine-grained tokens → token على ريبو `websitee-live` بصلاحية **Contents: Read and write** بس.
+### أول دخول
+- اسم المستخدم: `admin` (أو قيمة `ADMIN_USER` في Azure).
+- أول مرة اللوحة هتطلب **كود التفعيل** الموجود في `api/setup.json` وهتختار كلمة السر بنفسك؛ بتتحفظ كـ hash في `public/data/settings.json` والكود بيبطل بعدها.
+- تقدر تغيّر كلمة السر من تبويب الإعدادات ← حساب الأدمن. ولو عايز تثبّتها من Azure ظبّط `ADMIN_PASSWORD` (و`ADMIN_SECRET` اختياري لتوقيع الجلسة).
+- الجلسة كوكي آمنة لمدة 12 ساعة، و5 محاولات غلط بتقفل الدخول 10 دقايق.
+
+### الإعداد (مرة واحدة)
+1. **صلاحية الحفظ:** GitHub → Settings → Developer settings → Fine-grained tokens → token على ريبو `websitee-live` بصلاحية **Contents: Read and write** بس.
    ثم في Static Web App → Settings → **Environment variables**:
 
    | الاسم | القيمة |
    |---|---|
-   | `GITHUB_TOKEN` | التوكن |
+   | `GITHUB_TOKEN` | التوكن (مطلوب للحفظ وللدخول) |
    | `GITHUB_REPO` | `maarouf211099/websitee-live` |
    | `GITHUB_BRANCH` | `main` |
-3. **تقرير التبرعات (اختياري):** اعمل Storage Account (أرخص خيار، Standard LRS) وخد **Connection string** من Access keys وحطه في `DONATIONS_STORAGE`. التبرعات المؤكدة من البنك بتتسجل تلقائياً في جدول `donations`.
+2. **تقرير التبرعات (اختياري):** Storage Account وConnection string في `DONATIONS_STORAGE`.
 
-لو الحفظ طالع "غير متصل" في تبويب الإعدادات → راجع الخطوة 2. لو الدخول طالع "الحساب ده مش أدمن" → راجع الخطوة 1.
+لو الحفظ طالع "غير متصل" في تبويب الإعدادات → راجع الخطوة 1.
 
 ## الصفحة الرئيسية (السلايدر)
 - السلايدر مش بيتبني في المتصفح: `api/src/lib/hero.js` بيكتبه جاهز جوه `public/index.html` بين علامات `<!-- mersal:hero -->` عشان أول صورة تظهر فوراً من غير فلاش.

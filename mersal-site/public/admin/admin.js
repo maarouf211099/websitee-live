@@ -79,6 +79,7 @@
         '<li><span>بوابة بنك مصر (MPGS)</span><b class="' + (me.mpgs ? "ok" : "no") + '">' + (me.mpgs ? "متظبطة - " + esc(me.merchant) : "غير متظبطة") + "</b></li>" +
         // Paymob: configured, or the names of the Azure settings still missing (never values)
         '<li><span>بوابة Paymob</span><b class="' + (me.paymob ? "ok" : "no") + '">' + (me.paymob ? "متظبطة" + (me.paymobMode ? " - " + (me.paymobMode === "live" ? "حساب حقيقي" : "حساب تجريبي") : "") : "غير متظبطة" + (me.paymobMissing && me.paymobMissing.length ? " - ناقص: " + me.paymobMissing.map(esc).join("، ") : "")) + "</b></li>" +
+        '<li><span>Paymob عن طريق تطبيق مرسال</span><b class="' + (me.app !== false ? "ok" : "no") + '">' + (me.app !== false ? "جاهزة (من غير إعدادات)" : "MERSAL_SUPABASE_URL في Azure مش صحيح") + "</b></li>" +
         '<li id="chk-provider"><span>بوابة الدفع الشغالة</span><b class="ok">—</b></li>' +
         '<li><span>كلمة سر اللوحة</span><b class="ok">' + ({ env: "من إعدادات Azure", saved: "متظبطة من اللوحة", aad: "حساب مايكروسوفت" }[me.password] || "—") + "</b></li>";
       if (lastPay) showProvider(lastPay); // the list was just rebuilt
@@ -444,7 +445,7 @@
   };
 
   // ---------- settings ----------
-  var PROVIDER_NAMES = { paymob: "Paymob", mpgs: "بنك مصر (MPGS)" }, lastPay = null;
+  var PROVIDER_NAMES = { app: "Paymob (تطبيق مرسال)", paymob: "Paymob", mpgs: "بنك مصر (MPGS)" }, lastPay = null;
   // the gateway /api/checkout uses: the saved choice, else Banque Misr (never picked from which settings exist)
   function showProvider(s) {
     lastPay = s;

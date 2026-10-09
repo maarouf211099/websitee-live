@@ -7,10 +7,11 @@
   //   "demo" = full donation flow that stops before the payment gateway (nothing is charged)
   //   "live" = real payments through the gateway in payProvider (needs that gateway's settings in Azure)
   // payProvider (also from the console settings, "بوابة الدفع"; saved whenever payMode is set to "live"; absent = Banque
-  // Misr): "paymob" (Paymob Unified Checkout) | "mpgs" (Banque Misr Hosted Checkout).
+  // Misr): "app" (Paymob through the Mersal app's backend, no settings needed) | "paymob" (Paymob Unified Checkout with
+  // this site's own keys) | "mpgs" (Banque Misr Hosted Checkout).
   var SITE = /* mersal:site */ {
     payMode: "live",
-    payProvider: "paymob",
+    payProvider: "app",
     hotline: "19340",
     phone: "01200002870",
     whatsapp: "",

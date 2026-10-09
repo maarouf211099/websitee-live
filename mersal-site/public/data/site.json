@@ -1,6 +1,6 @@
 {
   "payMode": "live",
-  "payProvider": "paymob",
+  "payProvider": "app",
   "hotline": "19340",
   "phone": "01200002870",
   "whatsapp": "",

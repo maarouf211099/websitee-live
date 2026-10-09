@@ -419,6 +419,20 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 .gw-alt { display: grid; gap: 8px; margin: 14px 0; }
 .link-btn { background: none; border: 0; color: var(--teal-text); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Paymob checkout of the Mersal app (payProvider "app"), opened inside the donate page: full screen on phones, a tall
+   centred card on wider screens; above the header, the bottom bar and the lightbox */
+html.pm-open, html.pm-open body { overflow: hidden; }
+.pm-sheet { position: fixed; inset: 0; z-index: 400; background: rgba(0,24,24,.62); display: flex; align-items: center; justify-content: center; }
+.pm-box { display: flex; flex-direction: column; width: 100%; height: 100%; background: #fff; }
+.pm-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(8px + env(safe-area-inset-top)) 12px 8px; border-bottom: 1px solid var(--line); }
+.pm-title { font-weight: 700; color: var(--teal-ink); font-size: 15px; }
+.pm-close { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--teal-soft); color: var(--teal-ink); font-size: 18px; font-weight: 800; cursor: pointer; flex: none; }
+.pm-close:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.pm-note { margin: 0; padding: 6px 12px; font-size: 13px; color: var(--muted); background: #f6fafa; }
+.pm-frame { flex: 1; width: 100%; border: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); }
+@media (min-width: 720px) {
+  .pm-box { width: min(520px, 100% - 32px); height: min(820px, 100% - 32px); border-radius: 18px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+}
 
 /* home quick donate box */
 .quick-donate h2 { margin: 0; }

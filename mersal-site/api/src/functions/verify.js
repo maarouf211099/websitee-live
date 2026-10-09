@@ -8,6 +8,11 @@
 // GET /api/verify?gw=paymob&orderId=...             Paymob without redirect parameters: inquiry by our order reference;
 //                                                    only with the orders table (only this site's own saved orders reach
 //                                                    Paymob), else 400.
+// GET /api/verify?gw=app&orderId=mersal-…[&cancelled=1]  Paymob through the Mersal app's backend: the app's donation-status
+//                                                    function answers (it asks Paymob while the order is pending) and the
+//                                                    app records the donation itself. The donate page asks every 4 s while
+//                                                    the checkout is open, and once with cancelled=1 when the donor closes
+//                                                    it. Answer: { orderId, paid, status, amount, currency } (+ campaign).
 // Paymob is asked at most VERIFY_RATE_LIMIT (30) times per visitor IP per hour (lib/limits.js), so a replayed return
 // link cannot get the merchant account rate-limited.
 // Only then is it recorded and forwarded to the new system (lib/orders.js, the same routine the console's reconcile and the
@@ -18,6 +23,7 @@ const orders = require("../lib/orders");
 const paymob = require("../lib/paymob");
 const donations = require("../lib/donations");
 const limits = require("../lib/limits");
+const mersalapp = require("../lib/mersalapp");
 
 const answer = (s) => ({
   status: 200,
@@ -65,6 +71,17 @@ async function verifyPaymob(q, req, ctx) {
   return answer(s);
 }
 
+async function verifyApp(q, ctx) {
+  const orderId = q.get("orderId") || "";
+  if (!mersalapp.validOrderId(orderId)) return { status: 400, headers: { "Cache-Control": "no-store" }, jsonBody: { message: "رقم عملية غير صحيح" } };
+  const s = await mersalapp.donationStatus(orderId, { cancelled: q.get("cancelled") === "1" });
+  if (s.error) { ctx.warn("verify: app donation-status failed", orderId, s.error); return unsure(502); }
+  return {
+    status: 200, headers: { "Cache-Control": "no-store" },
+    jsonBody: { orderId, paid: s.paid, status: s.status, amount: s.amount, currency: "EGP", ...(s.campaign ? { campaign: s.campaign } : {}) },
+  };
+}
+
 app.http("verify", {
   methods: ["GET"],
   authLevel: "anonymous",
@@ -73,6 +90,7 @@ app.http("verify", {
     // URLSearchParams keeps Paymob's dotted keys (source_data.pan) literal and decodes %2B to +
     const q = req.query && typeof req.query.get === "function" ? req.query : new URL(req.url).searchParams;
     if (q.get("gw") === "paymob") return verifyPaymob(q, req, ctx);
+    if (q.get("gw") === "app") return verifyApp(q, ctx);
 
     const orderId = q.get("orderId") || "";
     if (!orders.validOrderId(orderId)) {

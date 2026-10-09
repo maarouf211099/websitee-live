@@ -11,7 +11,7 @@ const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 const LAYOUT = "public/js/layout.js", COPY = "public/data/site.json";
 const MARK = /\/\* mersal:site \*\/([\s\S]*?)\/\* \/mersal:site \*\//;
 const SOCIAL = ["facebook", "instagram", "x", "linkedin", "youtube", "tiktok"];
-const PAY = ["off", "demo", "live"], PROVIDERS = ["paymob", "mpgs"];
+const PAY = ["off", "demo", "live"], PROVIDERS = ["app", "paymob", "mpgs"];
 const who = (p) => ({ name: p.userDetails || "Mersal admin", email: /@/.test(p.userDetails || "") ? p.userDetails : "admin@mersal-ngo.org" });
 const err = (status, message) => Object.assign(new Error(message), { status });
 

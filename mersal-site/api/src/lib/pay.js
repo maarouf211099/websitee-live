@@ -1,18 +1,21 @@
 // The card payment switch, kept in public/js/layout.js inside the SITE block (one `key: "value"` per line):
 //   payMode:     "off" | "demo" | "live"      (the console's "الدفع بالبطاقة")
-//   payProvider: "paymob" | "mpgs"            (the console's "بوابة الدفع"; absent = Banque Misr, see defaultProvider)
+//   payProvider: "app" | "paymob" | "mpgs"    (the console's "بوابة الدفع"; absent = Banque Misr, see defaultProvider)
+//                "app" = Paymob through the Mersal app's own backend (lib/mersalapp.js), needs no settings here
 // Read by /api/checkout (cached there) and written by the console settings endpoint with plain token replacements, so the
 // rest of layout.js (and the site details block written by /api/console/site) is never touched.
 "use strict";
 const paymob = require("./paymob");
+const mersalapp = require("./mersalapp");
 
-const MODES = ["off", "demo", "live"], PROVIDERS = ["paymob", "mpgs"];
-const MODE_RE = /payMode:\s*"(off|demo|live)"/, PROVIDER_RE = /payProvider:\s*"(paymob|mpgs)"/;
+const MODES = ["off", "demo", "live"], PROVIDERS = ["app", "paymob", "mpgs"];
+const MODE_RE = /payMode:\s*"(off|demo|live)"/, PROVIDER_RE = /payProvider:\s*"(app|paymob|mpgs)"/;
 const env = (k) => String(process.env[k] || "").trim();
 const MPGS_REQUIRED = ["MPGS_MERCHANT", "MPGS_API_PASSWORD"];
 
 // Names (never values) of the application settings a gateway still needs (Paymob: + why its keys cannot take real money)
-const missingFor = (p) => (p === "paymob" ? paymob.missing().concat(paymob.keyProblem() || []) : p === "mpgs" ? MPGS_REQUIRED.filter((k) => !env(k)) : ["?"]);
+const missingFor = (p) => (p === "app" ? mersalapp.missing() : p === "paymob" ? paymob.missing().concat(paymob.keyProblem() || [])
+  : p === "mpgs" ? MPGS_REQUIRED.filter((k) => !env(k)) : ["?"]);
 const ready = (p) => missingFor(p).length === 0;
 // No saved choice: Banque Misr (MPGS), the gateway the site used before a gateway could be chosen. Never derived from
 // which settings exist, so adding or removing PAYMOB_* settings never moves live payments; Paymob takes over only once it
@@ -46,6 +49,6 @@ async function readDeployed() {
   if (!/mersal:site/.test(t)) throw new Error(`deployed layout.js: HTTP ${r.status}`);
   return read(t);
 }
-const label = (p) => (p === "paymob" ? "Paymob" : p === "mpgs" ? "بنك مصر (MPGS)" : String(p));
+const label = (p) => (p === "app" ? "Paymob (تطبيق مرسال)" : p === "paymob" ? "Paymob" : p === "mpgs" ? "بنك مصر (MPGS)" : String(p));
 
 module.exports = { MODES, PROVIDERS, MODE_RE, PROVIDER_RE, read, write, readDeployed, siteBase, missingFor, ready, defaultProvider, effective, label };

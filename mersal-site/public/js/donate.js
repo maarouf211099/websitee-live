@@ -3,6 +3,8 @@
 //   "off"  - card tab hidden
 //   "demo" - full flow, but it stops before the gateway (nothing is charged, nothing is recorded)
 //   "live" - /api/checkout starts the payment at the gateway chosen in the console (MERSAL_SITE.payProvider):
+//            "app"    -> { checkoutUrl }: Paymob through the Mersal app's backend, opened inside this page (the app's own
+//                        return page is not this site); /api/verify?gw=app is asked every 4 s until paid or failed
 //            "paymob" -> { redirect }: the donor goes to Paymob's Unified Checkout and comes back to ?gw=paymob&…
 //            "mpgs"   -> { sessionId }: Banque Misr Hosted Checkout v100, back to ?hcoReturn=1
 //            not saved yet -> whatever the server answers (Banque Misr until a gateway is saved)
@@ -42,9 +44,21 @@
   // what the donor is told about the gateway (Banque Misr wording unchanged; neutral while the server picks the gateway)
   var GW = PROVIDER === "mpgs" ? { secure: "🔒 دفع آمن عبر بنك مصر", page: "صفحة بنك مصر", go: "جاري التحويل لبوابة بنك مصر…" }
     : PROVIDER === "paymob" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري التحويل لصفحة الدفع الآمنة (Paymob)…" }
+    : PROVIDER === "app" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري فتح صفحة الدفع الآمنة (Paymob)…" }
     : { secure: "🔒 دفع آمن ومشفّر", page: "صفحة الدفع", go: "جاري التحويل لصفحة الدفع الآمنة…" };
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  // ٠١٢… / ۰۱۲… -> 012…
+  function asciiDigits(s) {
+    return String(s == null ? "" : s).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 0x660); })
+      .replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 0x6f0); });
+  }
+  // 01xxxxxxxxx from an Egyptian mobile typed any usual way (+20 / 0020 / Arabic digits), else null (the API's rule)
+  function egyptMobile(p) {
+    var d = asciiDigits(p).replace(/[^\d+]/g, "").replace(/^\+/, "").replace(/^00/, "");
+    if (/^20\d{10}$/.test(d)) d = "0" + d.slice(2); else if (/^1[0125]\d{8}$/.test(d)) d = "0" + d;
+    return /^01[0125]\d{8}$/.test(d) ? d : null;
+  }
 
   // ---------- tabs ----------
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
@@ -189,7 +203,9 @@
   (function gatewayWording() {
     var sec = form.querySelector(".pay-methods .secure"); if (sec) sec.textContent = GW.secure;
     var hint = form.querySelector('.step[data-step="3"] .hint');
-    if (hint && hint.firstChild && hint.firstChild.nodeType === 3) hint.firstChild.nodeValue = 'بالضغط على "ادفع" هيتم تحويلك ل' + GW.page + " الآمنة لإدخال بيانات " + (PROVIDER === "mpgs" ? "البطاقة" : "الدفع") + ". مرسال لا تحتفظ ببيانات بطاقتك. ";
+    if (hint && hint.firstChild && hint.firstChild.nodeType === 3) hint.firstChild.nodeValue = PROVIDER === "app"
+      ? 'بالضغط على "ادفع" هتفتح صفحة Paymob الآمنة جوه الصفحة دي لإدخال بيانات الدفع. مرسال لا تحتفظ ببيانات بطاقتك. '
+      : 'بالضغط على "ادفع" هيتم تحويلك ل' + GW.page + " الآمنة لإدخال بيانات " + (PROVIDER === "mpgs" ? "البطاقة" : "الدفع") + ". مرسال لا تحتفظ ببيانات بطاقتك. ";
     var t = document.getElementById("gw-title"); if (t) t.textContent = GW.go;
   })();
   // old codes and pages that are the same cause: p4 / p5 are pages of the oncology centre, whose code is p31
@@ -298,7 +314,9 @@
     if (ok && n === 1 && (Number(amount.value) < 10 || Number(amount.value) > 1000000)) { amount.setCustomValidity("المبلغ من 10 إلى 1,000,000 جنيه"); amount.reportValidity(); amount.setCustomValidity(""); ok = false; }
     if (ok && n === 2) {
       var ph = document.getElementById("phone");
-      if (ph.value.replace(/[^\d]/g, "").length < 10) { ph.setCustomValidity("اكتب رقم موبايل صحيح"); ph.reportValidity(); ph.setCustomValidity(""); ok = false; }
+      if (asciiDigits(ph.value).replace(/[^\d]/g, "").length < 10) { ph.setCustomValidity("اكتب رقم موبايل صحيح"); ph.reportValidity(); ph.setCustomValidity(""); ok = false; }
+      // Paymob through the app takes Egyptian mobile numbers only (its function's rule)
+      else if (PROVIDER === "app" && !egyptMobile(ph.value)) { ph.setCustomValidity("اكتب رقم موبايل مصري (11 رقم يبدأ بـ 01)"); ph.reportValidity(); ph.setCustomValidity(""); ok = false; }
     }
     return ok;
   }
@@ -369,7 +387,7 @@
   }
   // what the donor chose travels with the order: the page reloads empty when the gateway sends them back
   function remember(d, gwName) {
-    try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, gw: gwName, successIndicator: d.successIndicator, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim() })); } catch (x) {}
+    try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, gw: gwName, successIndicator: d.successIndicator, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim(), at: Date.now() })); } catch (x) {}
   }
   function loadMpgs(done) {
     var s = document.createElement("script");
@@ -394,6 +412,7 @@
     }
     requestCheckout().then(function (d) {
       if (stale()) return;
+      if (d.provider === "app" && d.checkoutUrl && /^https:\/\//.test(d.checkoutUrl)) { openEmbedded(d, run); return; }
       if (d.redirect && /^https:\/\//.test(d.redirect)) { remember(d, "paymob"); location.assign(d.redirect); return; }
       if (d.sessionId) { loadMpgs(function () { if (!stale()) openMpgs(d); }); return; }
       throw d;
@@ -405,6 +424,99 @@
     show("err", m ? esc(m) + (/19340/.test(m) ? "" : " لو المشكلة استمرت كلمنا على 19340.") : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو كلمنا على 19340.");
   };
   window.mersalPayCancel = function () { gw.hidden = true; btn.disabled = false; go(3); show("info", "تم إلغاء عملية الدفع."); };
+
+  // ---------- Paymob through the Mersal app (payProvider "app") ----------
+  // Its checkout opens in a sheet inside this page (Paymob then returns to the app's own page, not to this site), and the
+  // app's record is asked every 4 s (/api/verify?gw=app) until it says paid or failed. Closing the sheet asks once more
+  // with cancelled=1, so a payment that went through at the last second still shows as paid.
+  var APP_DONE = /^(FAILED|REFUNDED|CANCELLED|CANCELED|EXPIRED|DECLINED|VOIDED)$/, APP_POLL = 4000, APP_MAX = 30 * 60e3;
+  var sheet = null, pollT = null;
+  function askApp(orderId, cancelled) {
+    return fetch("/api/verify?gw=app&orderId=" + encodeURIComponent(orderId) + (cancelled ? "&cancelled=1" : ""), { cache: "no-store" })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (o) { if (!r.ok) throw o; return o; }); });
+  }
+  function stopPoll() { if (pollT) { clearInterval(pollT); pollT = null; } }
+  function closeSheet() {
+    stopPoll();
+    if (sheet) { sheet.remove(); sheet = null; }
+    document.documentElement.classList.remove("pm-open");
+  }
+  function openEmbedded(d, run) {
+    remember(d, "app");
+    closeSheet();
+    sheet = document.createElement("div");
+    sheet.className = "pm-sheet";
+    sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true"); sheet.setAttribute("aria-label", "الدفع الآمن عبر Paymob");
+    sheet.innerHTML = '<div class="pm-box"><div class="pm-head"><span class="pm-title">🔒 Paymob · <b dir="ltr">' + fmt.format(Number(amount.value) || 0) + "</b> جنيه</span>" +
+      '<button type="button" class="pm-close" aria-label="إقفل صفحة الدفع">✕</button></div>' +
+      '<p class="pm-note" role="status">بعد ما تدفع هنأكد تبرعك هنا تلقائياً، متقفلش الصفحة.</p>' +
+      '<iframe class="pm-frame" title="صفحة الدفع Paymob" allow="payment *"></iframe></div>';
+    sheet.querySelector("iframe").src = d.checkoutUrl;
+    document.body.appendChild(sheet);
+    document.documentElement.classList.add("pm-open");
+    var x = sheet.querySelector(".pm-close");
+    x.addEventListener("click", function () { userClosed(d.orderId, run); });
+    sheet.addEventListener("keydown", function (e) { if (e.key === "Escape") userClosed(d.orderId, run); });
+    x.focus();
+    document.getElementById("gw-title").textContent = "مستنيين تأكيد الدفع…";
+    var started = Date.now(), busy = false;
+    pollT = setInterval(function () {
+      if (run !== payRun || !sheet) return stopPoll();
+      if (Date.now() - started > APP_MAX) return stopPoll(); // the close button still asks once more
+      if (busy) return;
+      busy = true;
+      askApp(d.orderId).then(function (o) { if (run === payRun && sheet) appSettled(o, false); })
+        .catch(function () { /* keep asking */ }).then(function () { busy = false; });
+    }, APP_POLL);
+  }
+  // paid -> thanks screen; failed -> back to step 3 with nothing charged; still open -> keep waiting (or, after a close,
+  // say so: the app records a late payment by itself)
+  function appSettled(o, closed) {
+    var saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (x) {}
+    if (o.paid) { closeSheet(); gw.hidden = true; paidScreen(o, saved); return; }
+    if (APP_DONE.test(o.status || "")) {
+      closeSheet(); try { localStorage.removeItem(KEY); } catch (x) {}
+      gw.hidden = true; btn.disabled = false; go(3);
+      show("err", "لم تكتمل عملية الدفع ومفيش أي مبلغ اتخصم. تقدر تحاول تاني أو تكلمنا على 19340.");
+      return;
+    }
+    if (closed) {
+      gw.hidden = true; btn.disabled = false; go(3);
+      show("info", "اتقفلت صفحة الدفع ومفيش تبرع اتأكد لسه. لو كنت دفعت فعلاً هيتسجل تبرعك تلقائياً، ولو عندك سؤال كلمنا على 19340" +
+        ' برقم العملية: <code dir="ltr">' + esc(o.orderId || saved.orderId || "") + "</code>.");
+    }
+  }
+  function userClosed(orderId, run) {
+    if (!sheet) return;
+    closeSheet();
+    document.getElementById("gw-title").textContent = "جاري التأكد من عملية الدفع…";
+    askApp(orderId, true).then(function (o) { if (run === payRun) appSettled(o, true); })
+      .catch(function () { if (run === payRun) appSettled({ orderId: orderId, status: "UNKNOWN" }, true); });
+  }
+
+  // The thanks screen for a payment the gateway confirmed (Banque Misr / Paymob return, or the app's record)
+  function paidScreen(o, saved) {
+    var amt = Number(o.amount) || Number(saved.amount) || 0;
+    try { localStorage.removeItem(KEY); } catch (x) {}
+    form.hidden = true;
+    recordDonation({ orderId: o.orderId, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
+    show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(amt) + " جنيه</b> بنجاح.<br>" +
+      'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
+      '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
+    if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
+  }
+
+  // Back on the page (a reload, or the tab was closed) while an app checkout was open: its record is asked once.
+  // Older than a day = left alone and forgotten.
+  if (!RETURNING) (function resumeApp() {
+    var pend = null; try { pend = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (x) {}
+    if (!pend || pend.gw !== "app" || !pend.orderId) return;
+    if (!(Date.now() - Number(pend.at) < 864e5)) { try { localStorage.removeItem(KEY); } catch (x) {} return; }
+    askApp(pend.orderId).then(function (o) {
+      if (o.paid) { openTab("online"); paidScreen(o, pend); }
+      else if (APP_DONE.test(o.status || "")) { try { localStorage.removeItem(KEY); } catch (x) {} }
+    }).catch(function () {});
+  })();
 
   // Back from the gateway: Banque Misr ?hcoReturn=1&resultIndicator=... / Paymob ?gw=paymob&id=…&order=…&success=…&hmac=…
   // The query is only passed on: /api/verify checks Paymob's hmac and asks the gateway itself before anything counts.
@@ -434,13 +546,7 @@
           try { localStorage.removeItem(KEY); } catch (x) {}
           show("info", "دي كانت <b>عملية دفع تجريبية</b> (مفاتيح Paymob التجريبية): مفيش أي مبلغ حقيقي اتخصم، ومش هتتسجل كتبرع" + ref(o) + ".");
         } else if (o.paid) {
-          try { localStorage.removeItem(KEY); } catch (x) {}
-          form.hidden = true;
-          recordDonation({ orderId: o.orderId, amount: Number(o.amount) || 0, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
-          show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(o.amount) + " جنيه</b> بنجاح.<br>" +
-            'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
-            '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
-          if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: Number(o.amount) || 0, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
+          paidScreen(o, saved);
         } else if (o.status === "PENDING") {
           // Paymob: an OTP or wallet confirmation still open; the gateway's callback records it once it completes
           show("info", "عملية الدفع لسه بتتأكد من بوابة الدفع. لو اتخصم المبلغ هيتسجل تبرعك تلقائياً، ولو عندك أي سؤال كلمنا على 19340" + ref(o) + ".");

@@ -119,3 +119,9 @@ code { background: #e4f3f3; padding: 2px 8px; border-radius: 6px; direction: ltr
 [hidden] { display: none !important; }
 .thumbs { display: grid; gap: 6px; align-content: start; }
 .thumb.empty { display: grid; place-items: center; font-size: 11px; color: var(--muted, #6b7676); background: #f1f5f5; border: 1px dashed #cfd8d8; min-height: 56px; text-align: center; padding: 4px; }
+.login-settings { margin: 10px 0 4px; padding: 10px 12px; border-radius: 12px; background: #fff7e6; border: 1px solid #fde3a7; font-size: 13px; text-align: start; }
+.login-settings p { margin: 0 0 6px; }
+.login-settings ul { margin: 0 0 8px; padding: 0; list-style: none; display: grid; gap: 4px; }
+.login-settings li { color: #b45309; }
+.login-settings li.ok { color: #15803d; }
+.login-settings code { direction: ltr; unicode-bidi: isolate; font-weight: 700; }

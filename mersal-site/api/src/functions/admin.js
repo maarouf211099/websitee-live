@@ -19,8 +19,19 @@ async function saveSettings(patch, message, p) {
 app.http("adminStatus", {
   methods: ["GET"], authLevel: "anonymous", route: "console/status",
   handler: async (req, ctx) => {
-    try { return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) }); }
-    catch (e) { return fail(e, ctx); }
+    try {
+      // settings: which Azure application settings the API can see (names only, never values), so a
+      // misspelled or misplaced setting shows up on the login screen instead of a blind failure
+      const EXPECTED = ["GITHUB_TOKEN", "GITHUB_REPO", "GITHUB_BRANCH", "ADMIN_PASSWORD", "DONATIONS_STORAGE"];
+      const norm = (n) => n.replace(/[\s_-]+/g, "").toLowerCase();
+      const names = Object.keys(process.env), settings = {};
+      for (const k of EXPECTED) {
+        if (String(process.env[k] || "").trim()) settings[k] = "ok";
+        else if (k in process.env) settings[k] = "empty";
+        else { const near = names.find((n) => n !== k && norm(n) === norm(k)); settings[k] = near ? `found as "${near}"` : "missing"; }
+      }
+      return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO), settings });
+    } catch (e) { return fail(e, ctx); }
   },
 });
 

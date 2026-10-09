@@ -1,4 +1,0 @@
-{
-  "_comment": "One-time code for the FIRST login to /admin/. It stops working once a console password has been chosen (data/settings.json). Change it any time; it is only read by api/src/lib/admin.js.",
-  "code": "MERSAL-SETUP-7K4Q-2P9X"
-}

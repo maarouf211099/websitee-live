@@ -25,7 +25,7 @@
       $("#l-code-box").hidden = !st.setup;
       $("#l-pass-label").textContent = st.setup ? "اختار كلمة سر (8 حروف على الأقل)" : "كلمة السر";
       $("#l-pass").autocomplete = st.setup ? "new-password" : "current-password";
-      $("#login-hint").textContent = st.setup ? "أول دخول: اكتب كود التفعيل واختار كلمة السر اللي هتدخل بيها بعد كده." : (st.github ? "ادخل باسم المستخدم وكلمة السر" : "تنبيه: GITHUB_TOKEN مش متظبط في Azure، اللوحة مش هتقدر تحفظ.");
+      $("#login-hint").textContent = st.setup ? (st.setupHint === "env-code" ? "أول دخول: اكتب كود التفعيل (قيمة ADMIN_SETUP_CODE في Azure) واختار كلمة السر." : st.setupHint === "token-tail" ? "أول دخول: كود التفعيل هو آخر 8 حروف من GITHUB_TOKEN اللي حطيته في Azure. اختار كلمة السر اللي هتدخل بيها بعد كده." : "أول دخول: ضيف GITHUB_TOKEN في إعدادات Azure الأول، وبعدها كود التفعيل هو آخر 8 حروف منه.") : (st.github ? "ادخل باسم المستخدم وكلمة السر" : "تنبيه: GITHUB_TOKEN مش متظبط في Azure، اللوحة مش هتقدر تحفظ.");
       // Azure settings the API can see (names only): shows a typo or a setting saved in the wrong place
       var box = $("#l-settings");
       if (box && st.settings && !st.github) {

@@ -1,7 +1,7 @@
 // Admin API (console login with a cookie session). Every change is one git commit to
 // the deploy branch, so the site republishes itself about a minute later.
 const { app } = require("@azure/functions");
-const { requireAdmin, readFile, commitFiles, fileExists, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL, githubReady } = require("../lib/admin");
+const { requireAdmin, readFile, commitFiles, fileExists, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL, githubReady, setupHint } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
 
@@ -31,13 +31,14 @@ app.http("adminStatus", {
         else if (k in process.env) settings[k] = "empty";
         else { const near = names.find((n) => n !== k && norm(n) === norm(k)); settings[k] = near ? `found as "${near}"` : "missing"; }
       }
-      return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: githubReady(), settings });
+      return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", setupHint: setupHint(), github: githubReady(), settings });
     } catch (e) { return fail(e, ctx); }
   },
 });
 
 // POST /api/console/login { user, password, code? } -> session cookie (12h).
-// First login (no password yet): the one-time code from api/setup.json is required and the given password becomes the console password.
+// First login (no usable password yet): the setup code (ADMIN_SETUP_CODE, else the last 8 characters of GITHUB_TOKEN) is required
+// and the given password becomes the console password.
 app.http("adminLogin", {
   methods: ["POST"], authLevel: "anonymous", route: "console/login",
   handler: async (req, ctx) => {
@@ -47,6 +48,7 @@ app.http("adminLogin", {
       const user = String(b.user || "").trim(), pass = String(b.password || "");
       const source = await passwordSource();
       if (source === "setup") {
+        if (setupHint() === "unavailable") return json(503, { message: "ضيف GITHUB_TOKEN في إعدادات Azure الأول، وبعدها كود التفعيل هو آخر 8 حروف منه", setup: true });
         if (!setupCodeOk(b.code)) { loginFailed(req); return json(401, { message: "كود التفعيل غلط", setup: true }); }
         if (user !== adminUser()) return json(400, { message: "اسم المستخدم لازم يكون " + adminUser(), setup: true });
         if (pass.length < 8) return json(400, { message: "كلمة السر لازم 8 حروف على الأقل", setup: true });

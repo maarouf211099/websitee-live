@@ -76,6 +76,7 @@
         <div id="z-note" class="hint" style="color:rgba(255,255,255,.8)"></div>
         <a class="btn btn-gold" id="z-pay" href="/donate.html?for=zakat#online" style="width:100%;margin-top:10px">أخرج زكاتك الآن</a>
       </aside>
+      <div class="z-bar" id="z-bar" aria-hidden="true"><span><small>قيمة زكاتك</small><b id="z-bar-amt">0 جنيه</b></span><a class="btn btn-gold" id="z-bar-pay" tabindex="-1" href="/donate.html?for=zakat#online">أخرج زكاتك</a></div>
     </div>
   </section>
 </main>
@@ -114,6 +115,20 @@ addEventListener("DOMContentLoaded", function () {
     note.textContent = !p21 ? "اكتب سعر جرام الذهب عيار 21 لحساب الذهب والنصاب." :
       (net >= nisab ? "أموالك بلغت النصاب." : "أموالك لم تبلغ النصاب.");
     document.getElementById("z-pay").href = window.MERSAL_SITE.onlinePayment ? "/donate.html?for=zakat" + (zakat >= 10 ? "&amount=" + Math.ceil(zakat) : "") + "#online" : "/donate.html";
+    // slim bar (phones): same amount and link, shown once something is typed and the full card is off screen
+    document.getElementById("z-bar-amt").textContent = fmt.format(zakat) + " جنيه";
+    document.getElementById("z-bar-pay").href = document.getElementById("z-pay").href;
+    typed = typed || assets > 0 || debts > 0;
+    syncBar();
+  }
+  var bar = document.getElementById("z-bar"), typed = false, cardVisible = true;
+  function syncBar() {
+    var on = typed && !cardVisible;
+    bar.classList.toggle("show", on); bar.setAttribute("aria-hidden", on ? "false" : "true");
+    document.getElementById("z-bar-pay").tabIndex = on ? 0 : -1;
+  }
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (en) { cardVisible = en[0].isIntersecting; syncBar(); }, { threshold: 0.25 }).observe(document.querySelector(".zakat-result"));
   }
   f.addEventListener("input", calc); calc();
 });

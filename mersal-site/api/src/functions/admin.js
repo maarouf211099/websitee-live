@@ -6,6 +6,8 @@ const { app } = require("@azure/functions");
 const { requireAdmin, readFile, commitFiles, fileExists, json, fail, sessionFor, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, githubReady, setupHint, saveSettings } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
+const pay = require("../lib/pay");
+const paymob = require("../lib/paymob");
 const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 
 const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json" };
@@ -132,6 +134,8 @@ app.http("adminMe", {
       const res = json(200, { user: p.userDetails, roles: p.userRoles, via: p.via, github: githubReady(), donations: donations.enabled(),
         password: p.via === "password" ? await passwordSource() : "aad",
         mpgs: !!(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD), merchant: process.env.MPGS_MERCHANT || null,
+        // Paymob: configured or the NAMES of the missing settings (never values), and test/live from the key prefix
+        paymob: paymob.configured(), paymobMissing: paymob.missing(), paymobMode: paymob.mode(),
         payModeEnv: String(process.env.PAY_MODE || "").trim().toLowerCase() || null });
       return p.renew ? { ...res, cookies: [await sessionFor(req, p.userDetails, p.auth)] } : res;
     } catch (e) { return fail(e, ctx); }
@@ -267,23 +271,39 @@ app.http("adminUpload", {
   },
 });
 
-// GET /api/console/settings -> { payMode }   PUT { payMode }
-// Only the payMode token changes (read fresh on every try), so there is nothing to overwrite: no base revision needed.
+// GET /api/console/settings -> { payMode, payProvider, payProviderSaved, providers: { paymob, mpgs } }
+// PUT { payMode, payProvider? }  ("paymob" | "mpgs"; left out = keep the saved one)
+// Only the payMode / payProvider tokens change (lib/pay.js, read fresh on every try), so there is nothing to overwrite:
+// no base revision needed. payProvider not saved yet = Banque Misr; going live always saves the gateway it goes live
+// on, so the live gateway is always written down and never follows which settings exist.
 app.http("adminSettings", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/settings",
   handler: async (req, ctx) => {
     try {
       const p = await requireAdmin(req);
       const path = "public/js/layout.js";
-      const RE = /payMode:\s*"(off|demo|live)"/;
-      if (req.method === "GET") return json(200, { payMode: (RE.exec(await readFile(path)) || [])[1] || "off" });
-      const b = await req.json();
-      if (!["off", "demo", "live"].includes(b.payMode)) return json(400, { message: "قيمة غير صحيحة" });
-      if (b.payMode === "live" && !(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD)) return json(409, { message: "إعدادات بنك مصر (MPGS_MERCHANT / MPGS_API_PASSWORD) مش متظبطة في Azure" });
+      const providers = () => ({ paymob: pay.ready("paymob"), mpgs: pay.ready("mpgs") });
+      if (req.method === "GET") {
+        const s = pay.read(await readFile(path));
+        return json(200, { payMode: s.mode, payProvider: pay.effective(s.provider), payProviderSaved: s.provider, providers: providers() });
+      }
+      const b = (await req.json().catch(() => null)) || {};
+      if (!pay.MODES.includes(b.payMode)) return json(400, { message: "قيمة غير صحيحة" });
+      if (b.payProvider != null && !pay.PROVIDERS.includes(b.payProvider)) return json(400, { message: "بوابة دفع غير معروفة" });
       const fixed = String(process.env.PAY_MODE || "").trim().toLowerCase();
       if (fixed && fixed !== b.payMode) return json(409, { message: `PAY_MODE في إعدادات Azure = "${fixed}" وهو اللي /api/checkout بيمشي عليه. غيّره هناك الأول (أو امسحه) عشان الموقع والدفع يفضلوا متفقين` });
-      const sha = await retry(commitFiles, async () => [{ path, content: (await readFile(path)).replace(RE, `payMode: "${b.payMode}"`) }], `admin: payMode -> ${b.payMode}`, who(p));
-      return json(200, { ok: true, commit: sha, payMode: b.payMode });
+      let provider = null;
+      const sha = await retry(commitFiles, async () => {
+        const js = await readFile(path);
+        provider = b.payProvider || pay.effective(pay.read(js).provider);
+        // real payments only through a gateway whose settings are in Azure (names only in the message)
+        if (b.payMode === "live" && !pay.ready(provider)) {
+          throw Object.assign(new Error(provider === "mpgs" ? "إعدادات بنك مصر (MPGS_MERCHANT / MPGS_API_PASSWORD) مش متظبطة في Azure"
+            : "إعدادات Paymob مش متظبطة في Azure، ناقص: " + pay.missingFor("paymob").join("، ")), { status: 409 });
+        }
+        return [{ path, content: pay.write(js, b.payMode, b.payProvider || (b.payMode === "live" ? provider : null)) }];
+      }, `admin: payMode -> ${b.payMode}` + (b.payProvider ? `, payProvider -> ${b.payProvider}` : ""), who(p));
+      return json(200, { ok: true, commit: sha, payMode: b.payMode, payProvider: provider, providers: providers() });
     } catch (e) { return fail(e, ctx); }
   },
 });

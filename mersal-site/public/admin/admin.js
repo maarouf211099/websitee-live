@@ -77,7 +77,11 @@
         '<li><span>الربط بـ GitHub (الحفظ والنشر)</span><b class="' + (me.github ? "ok" : "no") + '">' + (me.github ? "متصل" : "غير متصل") + "</b></li>" +
         '<li><span>تخزين التبرعات والطلبات (DONATIONS_STORAGE)</span><b class="' + (me.donations ? "ok" : "no") + '">' + (me.donations ? "مفعّل" : "غير مفعّل - الطلبات مش بتتحفظ") + "</b></li>" +
         '<li><span>بوابة بنك مصر (MPGS)</span><b class="' + (me.mpgs ? "ok" : "no") + '">' + (me.mpgs ? "متظبطة - " + esc(me.merchant) : "غير متظبطة") + "</b></li>" +
+        // Paymob: configured, or the names of the Azure settings still missing (never values)
+        '<li><span>بوابة Paymob</span><b class="' + (me.paymob ? "ok" : "no") + '">' + (me.paymob ? "متظبطة" + (me.paymobMode ? " - " + (me.paymobMode === "live" ? "حساب حقيقي" : "حساب تجريبي") : "") : "غير متظبطة" + (me.paymobMissing && me.paymobMissing.length ? " - ناقص: " + me.paymobMissing.map(esc).join("، ") : "")) + "</b></li>" +
+        '<li id="chk-provider"><span>بوابة الدفع الشغالة</span><b class="ok">—</b></li>' +
         '<li><span>كلمة سر اللوحة</span><b class="ok">' + ({ env: "من إعدادات Azure", saved: "متظبطة من اللوحة", aad: "حساب مايكروسوفت" }[me.password] || "—") + "</b></li>";
+      if (lastPay) showProvider(lastPay); // the list was just rebuilt
       $("#pw-user").textContent = me.user || "admin";
       if (me.password === "env" || me.password === "aad") { $("#pw-form").hidden = true; $("#pw-hint").textContent = me.password === "env" ? "كلمة السر متظبطة من إعدادات Azure (ADMIN_PASSWORD)؛ غيّرها من هناك." : "داخل بحساب مايكروسوفت."; }
       if (!booted) { booted = true; loadHome(); loadPages(); loadAlbums(); loadSettings(); keepAlive(); }
@@ -420,26 +424,53 @@
     var head = ["التاريخ (القاهرة)", "المبلغ", "العملة", "الجهة", "المتبرع", "الموبايل", "البريد", "رقم العملية", "رقم عملية البنك"];
     downloadCsv([head].concat(rows.map(function (r) { return [cairoTime(r.paidAt), r.amount, r.currency, purposeName(r.purpose), r.donorName, r.phone, r.email, r.orderId, r.txnId]; })), "mersal-donations.csv");
   };
-  // card payments the donor's browser never confirmed (closed tab, lost network): ask the bank and record the paid ones
+  // card payments the donor's browser never confirmed (closed tab, lost network): ask the gateway (Banque Misr or Paymob)
+  // each one was started at and record the paid ones
   if ($("#d-reconcile")) $("#d-reconcile").onclick = function () {
     var b = this; busy(b, true); b.textContent = "جاري المراجعة…";
     api("donations/reconcile", { method: "POST", body: {} }).then(function (d) {
-      var parts = ["اتراجعت " + d.checked + " عملية معلقة"];
+      var parts = [d.checked ? "اتراجعت " + d.checked + " عملية معلقة" : "مفيش عمليات معلقة أقدم من 15 دقيقة"];
       if (d.captured) parts.push("اتسجّل " + d.captured + " تبرع جديد");
+      if (d.test) parts.push(d.test + " عملية تجريبية (مفاتيح Paymob التجريبية، مش تبرعات)");
       if (d.pending) parts.push(d.pending + " لسه معلقة");
       if (d.expired) parts.push(d.expired + " انتهت من غير دفع");
-      if (d.errors) parts.push(d.errors + " البنك مردّش عليها");
+      if (d.errors) parts.push(d.errors + " البنك أو البوابة مردّوش عليها");
+      // every order waiting for a person (not only this run's): the gateway says paid but it does not match, or it kept failing
+      if (d.review) parts.push(d.review + " محتاجة مراجعة يدوية في لوحة البوابة: " + (d.reviews || []).join("، ") + (d.review > (d.reviews || []).length ? "…" : ""));
       if (d.remaining) parts.push("فاضل " + d.remaining + " - دوس تاني");
-      toast(d.checked ? parts.join(" · ") : "مفيش عمليات معلقة أقدم من 15 دقيقة", !!d.errors);
+      toast(parts.join(" · "), !!(d.errors || d.review));
       if (d.captured) loadDonations();
     }).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });
   };
 
   // ---------- settings ----------
-  function loadSettings() { api("settings").then(function (s) { var r = $('#paymode input[value="' + s.payMode + '"]'); if (r) r.checked = true; }); }
+  var PROVIDER_NAMES = { paymob: "Paymob", mpgs: "بنك مصر (MPGS)" }, lastPay = null;
+  // the gateway /api/checkout uses: the saved choice, else Banque Misr (never picked from which settings exist)
+  function showProvider(s) {
+    lastPay = s;
+    var b = $("#chk-provider b"), name = PROVIDER_NAMES[s.payProvider];
+    if (b && name) {
+      var ready = !s.providers || s.providers[s.payProvider];
+      b.className = ready ? "ok" : "no";
+      b.textContent = name + (s.payProviderSaved ? "" : " (تلقائي)") + (ready ? "" : " - إعداداتها ناقصة");
+    }
+    var h = $("#pp-hint");
+    if (h) h.textContent = s.payProvider && !s.payProviderSaved ? "لسه محدش اختار بوابة، فالموقع شغال على " + name + " تلقائياً لحد ما تختار بوابة وتحفظ (البوابة بتتسجل كمان أول ما الدفع يبقى حقيقي)." : "";
+  }
+  function loadSettings() {
+    api("settings").then(function (s) {
+      var r = $('#paymode input[value="' + s.payMode + '"]'); if (r) r.checked = true;
+      var p = s.payProvider && $('#payprovider input[value="' + s.payProvider + '"]'); if (p) p.checked = true;
+      showProvider(s);
+    });
+  }
   $("#save-settings").onclick = function () {
-    var b = this, v = ($('#paymode input:checked') || {}).value; if (!v) return; busy(b, true);
-    api("settings", { method: "PUT", body: { payMode: v } }).then(published).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });
+    var b = this, v = ($('#paymode input:checked') || {}).value, pv = ($('#payprovider input:checked') || {}).value; if (!v) return; busy(b, true);
+    var body = { payMode: v }; if (pv) body.payProvider = pv;
+    api("settings", { method: "PUT", body: body }).then(function (r) {
+      published();
+      if (r && r.payProvider) showProvider({ payProvider: r.payProvider, payProviderSaved: pv || null, providers: r.providers });
+    }).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });
   };
   // ---------- shared helpers for the tab modules ----------
   window.MersalAdmin = {

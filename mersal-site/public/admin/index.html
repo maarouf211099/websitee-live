@@ -106,8 +106,8 @@
 
     <section class="panel" id="tab-donations" hidden>
       <header class="panel-head"><h1>التبرعات بالبطاقة</h1><button class="btn btn-ghost" id="csv">تصدير CSV</button></header>
-      <div class="row filters"><label>من <input type="date" id="d-from"></label><label>إلى <input type="date" id="d-to"></label><button class="btn btn-teal" id="d-load">عرض</button><button class="btn btn-ghost" id="d-reconcile" title="عمليات بدأت ومتأكدتش (المتبرع قفل الصفحة أو النت فصل): بنسأل البنك عنها ونسجّل المدفوع">مراجعة العمليات المعلقة</button><span id="d-total" class="hint"></span></div>
-      <p class="hint">التواريخ بتوقيت القاهرة. "مراجعة العمليات المعلقة" بتسأل بنك مصر عن أي دفع بدأ من أكتر من 15 دقيقة ومتأكدش، وبتسجّل اللي اتدفع فعلاً.</p>
+      <div class="row filters"><label>من <input type="date" id="d-from"></label><label>إلى <input type="date" id="d-to"></label><button class="btn btn-teal" id="d-load">عرض</button><button class="btn btn-ghost" id="d-reconcile" title="عمليات بدأت ومتأكدتش (المتبرع قفل الصفحة أو النت فصل): بنسأل بوابة الدفع (بنك مصر أو Paymob) عنها ونسجّل المدفوع">مراجعة العمليات المعلقة</button><span id="d-total" class="hint"></span></div>
+      <p class="hint">التواريخ بتوقيت القاهرة. "مراجعة العمليات المعلقة" بتسأل بوابة الدفع اللي العملية بدأت عليها (بنك مصر أو Paymob) عن أي دفع بدأ من أكتر من 15 دقيقة ومتأكدش، وبتسجّل اللي اتدفع فعلاً. العمليات التجريبية (مفاتيح Paymob التجريبية) مش بتظهر هنا.</p>
       <div class="table-wrap"><table id="d-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الجهة</th><th>المتبرع</th><th>الموبايل</th><th>البريد</th><th>رقم العملية</th></tr></thead><tbody></tbody></table></div>
       <p class="hint" id="d-note"></p>
     </section>
@@ -152,9 +152,15 @@
       <h2>الدفع بالبطاقة</h2>
       <div class="radios" id="paymode">
         <label><input type="radio" name="pm" value="off"><b>مقفول</b><span>تبويب البطاقة مخفي</span></label>
-        <label><input type="radio" name="pm" value="demo"><b>تجريبي</b><span>الخطوات شغالة وبتقف عند بوابة البنك، مفيش خصم</span></label>
-        <label><input type="radio" name="pm" value="live"><b>حقيقي</b><span>دفع فعلي عبر بنك مصر (محتاج إعدادات MPGS في Azure)</span></label>
+        <label><input type="radio" name="pm" value="demo"><b>تجريبي</b><span>الخطوات شغالة وبتقف قبل بوابة الدفع، مفيش خصم ومفيش تبرع بيتسجل</span></label>
+        <label><input type="radio" name="pm" value="live"><b>حقيقي</b><span>دفع فعلي عبر بوابة الدفع اللي تحت (محتاج إعداداتها في Azure)</span></label>
       </div>
+      <h2>بوابة الدفع</h2>
+      <div class="radios" id="payprovider">
+        <label><input type="radio" name="pp" value="paymob"><b>Paymob</b><span>كروت (فيزا / ماستركارد / ميزة) ومحافظ إلكترونية على صفحة Paymob (محتاج إعدادات PAYMOB_* في Azure)</span></label>
+        <label><input type="radio" name="pp" value="mpgs"><b>بنك مصر</b><span>صفحة الدفع الآمنة لبنك مصر (محتاج MPGS_MERCHANT و MPGS_API_PASSWORD في Azure)</span></label>
+      </div>
+      <p class="hint" id="pp-hint"></p>
       <button class="btn btn-gold" id="save-settings">حفظ ونشر</button>
       <h2>حالة الربط</h2>
       <ul class="checks" id="checks"></ul>

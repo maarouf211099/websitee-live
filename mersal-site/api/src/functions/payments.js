@@ -1,6 +1,10 @@
 // Card payments the donor's browser did not confirm (lib/orders.js does the work):
-//   POST /api/console/donations/reconcile   (admin) "مراجعة العمليات المعلقة": asks the bank about checkout sessions
-//        still pending after 15 minutes and records the CAPTURED ones -> { checked, captured, expired, pending, errors, remaining }
+//   POST /api/console/donations/reconcile   (admin) "مراجعة العمليات المعلقة": asks the gateway each checkout session was
+//        created at (Banque Misr: RETRIEVE ORDER, Paymob: transaction inquiry) about sessions still pending after 15 minutes
+//        and records the paid ones -> { checked, captured, test, expired, pending, errors, flagged, review, reviews, remaining }
+//        (flagged = moved to "review" in this run: Paymob says paid but it does not match the order, or the gateway kept
+//        failing to answer; review / reviews = every order waiting for a person; test = Paymob test-key payments)
+//   POST /api/paymob/callback               Paymob's own callback: functions/paymob.js
 //   POST /api/mpgs/notify                   (Banque Misr) webhook notification, only when MPGS_NOTIFICATION_SECRET is set:
 //        the X-Notification-Secret header must match it; the order is then read back from the bank, never from the body.
 const crypto = require("crypto");
@@ -8,6 +12,7 @@ const { app } = require("@azure/functions");
 const { requireAdmin, json, fail } = require("../lib/admin");
 const orders = require("../lib/orders");
 const donations = require("../lib/donations");
+const pay = require("../lib/pay");
 
 app.http("adminReconcile", {
   methods: ["POST"], authLevel: "anonymous", route: "console/donations/reconcile",
@@ -15,7 +20,7 @@ app.http("adminReconcile", {
     try {
       await requireAdmin(req);
       if (!donations.enabled()) return json(409, { message: "مراجعة العمليات محتاجة DONATIONS_STORAGE (Azure Table) في إعدادات Azure" });
-      if (!(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD)) return json(409, { message: "إعدادات بنك مصر (MPGS_MERCHANT / MPGS_API_PASSWORD) مش متظبطة في Azure" });
+      if (!pay.ready("mpgs") && !pay.ready("paymob")) return json(409, { message: "مفيش بوابة دفع متظبطة في Azure (إعدادات Paymob أو بنك مصر MPGS_MERCHANT / MPGS_API_PASSWORD)" });
       const res = await orders.reconcile({ log: (...a) => ctx.warn(...a) });
       if (!res) return json(409, { message: "مراجعة العمليات محتاجة DONATIONS_STORAGE (Azure Table) في إعدادات Azure" });
       ctx.log("reconcile", JSON.stringify({ ...res, captures: res.captures.length }));

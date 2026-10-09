@@ -5,7 +5,12 @@
 //   "live" - Banque Misr Hosted Checkout v100 through /api/checkout
 (function () {
   var KEY = "mersalPayment", DONOR_KEY = "mersalDonor";
+  // PSA-22: explicit smooth scrolls follow the visitor's reduced-motion setting (like forms.js and impact.js)
+  var SMOOTH = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  // A paid donation (verified by /api/verify) on this device: unlocks /community.html and the "هداياك" tab.
+  // The demo gateway charges nothing, so it never records anything here (community.js also ignores old demo rows).
   function recordDonation(d) {
+    if (!d || d.demo) return;
     try {
       var list = JSON.parse(localStorage.getItem("mersalDonations") || "[]");
       if (d.orderId && list.some(function (x) { return x.orderId === d.orderId; })) return;
@@ -51,6 +56,15 @@
   if (MODE === "off" && (hash === "online" || !hash)) hash = "bank";
   if (!hash) hash = "online";
   if (document.getElementById(hash) && document.getElementById(hash).getAttribute("role") === "tabpanel") openTab(hash);
+  // same-page links to a tab (the menu sheet's "تبرع الآن" -> #online, "#wallets" ...) change only the hash
+  addEventListener("hashchange", function () {
+    var h = location.hash.slice(1);
+    if (MODE === "off" && h === "online") h = "bank";
+    var el = document.getElementById(h);
+    if (!el || el.getAttribute("role") !== "tabpanel") return;
+    openTab(h);
+    var t = document.querySelector(".tabs"); if (t) t.scrollIntoView({ behavior: SMOOTH, block: "start" });
+  });
 
   // Copy buttons (bank rows are rendered later from donate.json, so listen on the document): the copy icon morphs
   // into a check (css .done) for 1.6 s
@@ -82,8 +96,8 @@
     return '<span class="bk-logo"><picture>' + (wp ? '<source type="image/webp" srcset="' + esc(wp) + '">' : "") +
       '<img src="' + esc(g.logo) + '" alt="" loading="lazy" decoding="async"></picture></span>';
   }
-  function accRow(pill, key, value, what) {
-    return '<li class="bk-acc"><span class="bk-cur" data-cur="' + key + '">' + esc(pill) + '</span><code class="bk-num" dir="ltr">' + esc(value) +
+  function accRow(pill, key, value, what, shown) {
+    return '<li class="bk-acc"><span class="bk-cur" data-cur="' + key + '">' + esc(pill) + '</span><code class="bk-num" dir="ltr">' + esc(shown || value) +
       '</code><button type="button" class="copy" data-copy="' + esc(value) + '" aria-label="' + esc("نسخ " + what) + '">' + CI + "<span>نسخ</span></button></li>";
   }
   function bankCards(banks) {
@@ -105,6 +119,25 @@
       return '<article class="bk-card"><header class="bk-head">' + bankLogo(g) + '<h3 class="bk-name">' + esc(g.name) + "</h3></header>" +
         '<ul class="bk-list" role="list">' + rows + "</ul></article>";
     }).join("") + "</div>";
+  }
+  // The account abroad (donate.json "foreign"): IBAN and BIC as copyable rows like the Egyptian accounts, the account
+  // holder as text, and the picture of the details (if any) as a small link to the full image
+  function abroadHtml(f) {
+    var str = function (v) { return String(v || "").trim(); };
+    var bank = str(f.bank), iban = str(f.iban).replace(/\s+/g, ""), bic = str(f.bic).replace(/\s+/g, ""), holder = str(f.holder);
+    var card = "";
+    if (iban || bic) {
+      card = '<article class="bk-card ab-card"><header class="bk-head"><span class="bk-logo bk-initials" aria-hidden="true">' + esc(bankBadge(bank || "IBAN")) + '</span><h3 class="bk-name">' + esc(bank || "الحساب في الخارج") + "</h3></header>" +
+        '<ul class="bk-list" role="list">' +
+          (iban ? accRow("IBAN", "code", iban, "IBAN " + (bank || "الحساب في الخارج"), iban.replace(/(.{4})(?=.)/g, "$1 ")) : "") +
+          (bic ? accRow("SWIFT / BIC", "code", bic, "SWIFT " + (bank || "الحساب في الخارج")) : "") +
+        "</ul>" + (holder ? '<p class="ab-holder">اسم صاحب الحساب: <b dir="ltr">' + esc(holder) + "</b></p>" : "") + "</article>";
+    }
+    var wp = f.image && window.mersalWebp ? window.mersalWebp(f.image) : null;
+    var pic = f.image ? "<picture>" + (wp ? '<source type="image/webp" srcset="' + esc(wp) + '">' : "") + '<img src="' + esc(f.image) + '" alt="' + esc(f.alt || "") + '" width="960" height="960" loading="lazy"></picture>' : "";
+    return (f.text ? "<p>" + esc(f.text) + "</p>" : "") + card +
+      (pic ? (card ? '<a class="ab-thumb" href="' + esc(f.image) + '" target="_blank" rel="noopener">' + pic + "<span>صورة بيانات الحساب</span></a>" : '<div class="ab-pic">' + pic + "</div>") : "") +
+      (f.link ? '<p class="ab-more"><a class="btn btn-teal" href="' + esc(f.link) + '" target="_blank" rel="noopener">' + esc(f.linkText || "طرق أخرى للتبرع من الخارج") + "</a></p>" : "");
   }
   // a logo that fails to load (e.g. a deleted upload) turns into the initials badge
   function bankLogoFallback(box) {
@@ -128,21 +161,21 @@
     var wallets = (d.wallets || []).filter(function (w) { return w && w.name && w.value; });
     document.getElementById("wallet-numbers").innerHTML = wallets.map(function (w) { return row(w.name, w.value); }).join("");
     var f = d.foreign, box = document.getElementById("abroad-body");
-    if (f && box && (f.image || f.link || f.text)) {
-      var wp = f.image && window.mersalWebp ? window.mersalWebp(f.image) : null;
-      box.innerHTML = (f.text ? "<p>" + esc(f.text) + "</p>" : "") +
-        (f.image ? "<picture>" + (wp ? '<source type="image/webp" srcset="' + esc(wp) + '">' : "") + '<img src="' + esc(f.image) + '" alt="' + esc(f.alt || "") + '" width="960" height="960" loading="lazy" style="max-width:420px;height:auto;border-radius:12px;border:1px solid var(--line)"></picture>' : "") +
-        (f.link ? '<p style="margin-top:14px"><a class="btn btn-teal" href="' + esc(f.link) + '" target="_blank" rel="noopener">' + esc(f.linkText || "طرق أخرى للتبرع من الخارج") + "</a></p>" : "");
-    }
+    if (f && box && (f.image || f.link || f.text || f.iban)) box.innerHTML = abroadHtml(f);
   }).catch(function () {});
-  if (MODE === "off") return;
+  var q = new URLSearchParams(location.search);
+  // Back from the bank (?hcoReturn=1) is still verified when card payments were switched off in the meantime
+  var RETURNING = q.get("hcoReturn") === "1";
+  if (MODE === "off" && !RETURNING) return;
 
   // ---------- stepper ----------
   var form = document.getElementById("pay-form");
   var result = document.getElementById("pay-result");
   var amount = document.getElementById("amount"), purpose = document.getElementById("purpose");
-  var q = new URLSearchParams(location.search);
-  var LEGACY = { hospital: "p30", oncology: "p31", cases: "general" };
+  if (MODE === "off") form.hidden = true; // only the payment result shows
+  // old codes and pages that are the same cause: p4 / p5 are pages of the oncology centre, whose code is p31
+  var LEGACY = { hospital: "p30", oncology: "p31", cases: "general", p4: "p31", p5: "p31" };
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
 
   if (q.get("amount")) amount.value = Math.max(10, parseInt(q.get("amount"), 10) || 500);
   syncChips();
@@ -152,28 +185,38 @@
     fetch("/content.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
     fetch("/data/menu.json").then(function (r) { return r.json(); }).catch(function () { return []; })
   ]).then(function (res) {
-    var groups = {}, seen = {};
+    // one option per cause: pages that are aliases of another code (LEGACY, e.g. p4/p5 -> p31) are skipped, and a
+    // second page with a title that is already listed becomes an alias of the first one (so ?for= still finds it)
+    var groups = {}, seen = {}, titles = {}, alias = {};
+    purpose.querySelectorAll("option").forEach(function (o) { titles[o.textContent.trim()] = o.value; });
+    function add(group, id, title) {
+      var t = String(title || "").trim(), v = "p" + id;
+      if (seen[id] || has(LEGACY, v) || !t) return;
+      seen[id] = 1;
+      if (titles[t]) { alias[v] = titles[t]; return; }
+      titles[t] = v;
+      (groups[group] = groups[group] || []).push({ v: v, t: t });
+    }
     (res[1] || []).forEach(function (top) {
       (top.children || []).forEach(function (k) {
         var m = /^\/p\/(\d+)\.html$/.exec(k.href || "");
-        if (!m || seen[m[1]] || /طرق التبرع|تطوع|فروع/.test(k.title)) return;
-        seen[m[1]] = 1;
-        (groups[top.title] = groups[top.title] || []).push({ v: "p" + m[1], t: k.title });
+        if (m && !/طرق التبرع|تطوع|فروع/.test(k.title)) add(top.title, m[1], k.title);
       });
     });
     ((res[0] || {}).projects || []).forEach(function (p) {
       var m = /^\/p\/(\d+)\.html$/.exec(p.link || "");
-      if (!m || seen[m[1]]) return;
-      seen[m[1]] = 1;
-      (groups["مشاريع أخرى"] = groups["مشاريع أخرى"] || []).push({ v: "p" + m[1], t: p.title });
+      if (m) add("مشاريع أخرى", m[1], p.title);
     });
     purpose.insertAdjacentHTML("beforeend", Object.keys(groups).map(function (g) {
       return '<optgroup label="' + esc(g) + '">' + groups[g].map(function (o) { return '<option value="' + o.v + '">' + esc(o.t) + "</option>"; }).join("") + "</optgroup>";
     }).join(""));
-    var want = q.get("for"); want = LEGACY[want] || want;
+    var want = q.get("for") || "";
+    if (has(LEGACY, want)) want = LEGACY[want];
+    if (has(alias, want)) want = alias[want];
+    want = want.replace(/[^\w-]/g, "");
     if (want && purpose.querySelector('option[value="' + want + '"]')) purpose.value = want;
     updateImpact();
-  });
+  }).catch(function () { updateImpact(); });
 
   function syncChips() {
     form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.toggle("on", x.dataset.v === String(amount.value)); });
@@ -181,8 +224,15 @@
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () { amount.value = b.dataset.v; syncChips(); updateImpact(); if (window.mersalTap) window.mersalTap(8); });
   });
-  amount.addEventListener("input", function () { syncChips(); updateImpact(); });
-  purpose.addEventListener("change", updateImpact);
+  // The amount or the purpose changed from outside step 1 (the impact calculator under the stepper fills them in
+  // place): go back to step 1, so the review, the pay button and the sticky strip never show an older amount than
+  // the one that is sent to the bank.
+  function changedLater() {
+    if (gw && !gw.hidden) { payRun++; gw.hidden = true; btn.disabled = false; } // a pending redirect to the bank is dropped
+    if (cur > 1) go(1);
+  }
+  amount.addEventListener("input", function () { syncChips(); updateImpact(); changedLater(); });
+  purpose.addEventListener("change", function () { updateImpact(); changedLater(); });
 
   // What a donation can do (figures from the old site's pages)
   function updateImpact() {
@@ -207,7 +257,7 @@
     return function (n) {
       el.hidden = n < 2;
       if (n < 2) return;
-      el.querySelector("b").textContent = fmt.format(Number(amount.value) || 0) + " جنيه" + (freq() === "monthly" ? " شهرياً" : "");
+      el.querySelector("b").textContent = fmt.format(Number(amount.value) || 0) + " جنيه";
       el.querySelector(".s-for").textContent = purposeText();
     };
   })();
@@ -220,7 +270,7 @@
     dots.forEach(function (d) { var k = Number(d.dataset.step); d.classList.toggle("on", k === n); d.classList.toggle("done", k < n); });
     if (n === 3) fillSummary();
     var first = form.querySelector('.step[data-step="' + n + '"] input, .step[data-step="' + n + '"] select');
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
+    form.scrollIntoView({ behavior: SMOOTH, block: "start" });
     if (first && n === 2) setTimeout(function () { first.focus({ preventScroll: true }); }, 300);
   }
   function valid(n) {
@@ -238,19 +288,19 @@
   dots.forEach(function (d) { d.addEventListener("click", function () { var k = Number(d.dataset.step); if (k < cur) go(k); }); });
 
   function purposeText() { var o = purpose.options[purpose.selectedIndex]; return o ? o.textContent : ""; }
-  function freq() { return (form.querySelector('input[name="freq"]:checked') || {}).value || "once"; }
   function fillSummary() {
     var a = Number(amount.value), anon = document.getElementById("anon").checked;
     document.getElementById("summary").innerHTML =
-      "<dt>المبلغ</dt><dd><b>" + fmt.format(a) + " جنيه</b>" + (freq() === "monthly" ? " شهرياً" : "") + "</dd>" +
+      "<dt>المبلغ</dt><dd><b>" + fmt.format(a) + " جنيه</b></dd>" +
       "<dt>تبرع لـ</dt><dd>" + esc(purposeText()) + "</dd>" +
       "<dt>المتبرع</dt><dd>" + (anon ? "فاعل خير" : esc(document.getElementById("name").value)) + "</dd>" +
-      "<dt>الموبايل</dt><dd dir=\"ltr\">" + esc(document.getElementById("phone").value) + "</dd>";
+      "<dt>الموبايل</dt><dd dir=\"ltr\">" + esc(document.getElementById("phone").value) + "</dd>" +
+      (window.MersalGift ? window.MersalGift.summaryRow() : "");
     document.getElementById("pay-amount").textContent = fmt.format(a) + " جنيه";
   }
 
-  function show(kind, html) { result.innerHTML = '<div class="alert ' + kind + '">' + html + "</div>"; result.scrollIntoView({ behavior: "smooth", block: "center" }); }
-  var gw = document.getElementById("gateway"), btn = document.getElementById("pay-btn");
+  function show(kind, html) { result.innerHTML = '<div class="alert ' + kind + '">' + html + "</div>"; result.scrollIntoView({ behavior: SMOOTH, block: "center" }); }
+  var gw = document.getElementById("gateway"), btn = document.getElementById("pay-btn"), payRun = 0;
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -260,14 +310,14 @@
     gw.hidden = false; gw.classList.remove("stopped");
     document.getElementById("gw-title").textContent = "جاري التحويل لبوابة بنك مصر…";
     document.getElementById("gw-body").innerHTML = "";
-    if (MODE === "demo") return setTimeout(stopAtGateway, 1600);
-    startLivePayment();
+    var run = ++payRun;
+    if (MODE === "demo") return setTimeout(function () { if (run === payRun && !gw.hidden) stopAtGateway(); }, 1600);
+    startLivePayment(run);
   });
 
   // Demo: the flow ends here, before any card data or charge
   function stopAtGateway() {
     gw.classList.add("stopped");
-    recordDonation({ orderId: "DEMO-" + Date.now().toString(36), amount: Number(amount.value) || 0, purpose: purpose.value, monthly: freq() === "monthly", demo: true });
     document.getElementById("gw-title").textContent = "بوابة الدفع الإلكتروني قيد التفعيل";
     document.getElementById("gw-body").innerHTML =
       "<p>وصلت لآخر خطوة قبل صفحة بنك مصر. الدفع بالبطاقة هيتفعّل قريب جداً، <b>ولم يتم خصم أي مبلغ</b>.</p>" +
@@ -278,14 +328,15 @@
         '<a class="btn btn-ghost-teal" href="#wallets" data-tab="wallets">📱 فوري 9200 / إنستاباي</a>' +
       "</div>" +
       '<button type="button" class="link-btn" id="gw-back">← رجوع لتعديل التبرع</button>';
+    if (window.MersalGift) window.MersalGift.afterDonation(document.getElementById("gw-body"), { paid: false, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim(), before: document.getElementById("gw-back") });
     gw.querySelectorAll("[data-tab]").forEach(function (a) {
-      a.addEventListener("click", function (ev) { ev.preventDefault(); openTab(a.dataset.tab); document.querySelector(".tabs").scrollIntoView({ behavior: "smooth" }); });
+      a.addEventListener("click", function (ev) { ev.preventDefault(); openTab(a.dataset.tab); document.querySelector(".tabs").scrollIntoView({ behavior: SMOOTH }); });
     });
     document.getElementById("gw-back").addEventListener("click", function () { gw.hidden = true; btn.disabled = false; go(3); });
   }
 
   // Live: Banque Misr Hosted Checkout (v100)
-  function startLivePayment() {
+  function startLivePayment(run) {
     var s = document.createElement("script");
     s.src = "https://banquemisr.gateway.mastercard.com/static/checkout/checkout.min.js";
     s.setAttribute("data-error", "mersalPayError");
@@ -302,11 +353,13 @@
       })
         .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw d; return d; }); })
         .then(function (d) {
-          try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, successIndicator: d.successIndicator })); } catch (x) {}
+          if (run !== payRun || gw.hidden) return; // the amount or purpose changed while the session was being created
+          // what the donor chose travels with the order: the page reloads empty when the bank sends them back
+          try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, successIndicator: d.successIndicator, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim() })); } catch (x) {}
           Checkout.configure({ session: { id: d.sessionId } });
           Checkout.showPaymentPage();
         })
-        .catch(function (err) { window.mersalPayError(err); });
+        .catch(function (err) { if (run === payRun) window.mersalPayError(err); });
     };
     document.head.appendChild(s);
   }
@@ -317,7 +370,7 @@
   window.mersalPayCancel = function () { gw.hidden = true; btn.disabled = false; go(3); show("info", "تم إلغاء عملية الدفع."); };
 
   // Back from the bank: ?hcoReturn=1&resultIndicator=...
-  if (q.get("hcoReturn") === "1") {
+  if (RETURNING) {
     openTab("online");
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (x) {}
@@ -330,12 +383,14 @@
         if (o.paid) {
           try { localStorage.removeItem(KEY); } catch (x) {}
           form.hidden = true;
-          recordDonation({ orderId: o.orderId, amount: Number(o.amount) || 0, purpose: purpose.value, monthly: freq() === "monthly", demo: false });
+          recordDonation({ orderId: o.orderId, amount: Number(o.amount) || 0, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
           show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(o.amount) + " جنيه</b> بنجاح.<br>" +
             'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
             '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
+          if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: Number(o.amount) || 0, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
         } else {
-          show("err", "لم تكتمل عملية الدفع (حالة الطلب: " + esc(o.status || "غير معروفة") + "). لم يتم خصم أي مبلغ، ويمكنك المحاولة مرة أخرى.");
+          show("err", "لم تكتمل عملية الدفع (حالة الطلب: " + esc(o.status || "غير معروفة") + "). لم يتم خصم أي مبلغ، " +
+            (MODE === "off" ? 'وتقدر تتبرع بتحويل بنكي أو من المحافظ أو تكلمنا على 19340.' : "ويمكنك المحاولة مرة أخرى."));
         }
       })
       .catch(function () { show("err", "تعذّر التأكد من عملية الدفع. لو تم خصم المبلغ تواصل معنا على 19340 برقم العملية: " + esc(saved.orderId)); });

@@ -44,6 +44,11 @@
     var q = new URLSearchParams(location.search), tag = q.get("tag") || "", shown = 0, cur = [];
     var tags = []; items.forEach(function (it) { if (tags.indexOf(it.tag) < 0) tags.push(it.tag); });
     if (tag && tags.indexOf(tag) < 0) tag = "";
+    // nothing published yet: no filter bar, a "coming soon" line instead of an empty grid
+    if (!items.length) {
+      var bar = filters.closest(".nw-bar"); if (bar) bar.hidden = true;
+      empty.textContent = "قريباً أخبار مرسال هنا.";
+    }
     filters.innerHTML = [["", "الكل"]].concat(tags.map(function (t) { return [t, t]; })).map(function (t) {
       var n = t[0] ? items.filter(function (it) { return it.tag === t[0]; }).length : items.length;
       return '<button type="button" data-tag="' + esc(t[0]) + '" aria-pressed="' + (t[0] === tag) + '">' + esc(t[1]) + " <b>" + n + "</b></button>";
@@ -111,6 +116,7 @@
       if (want) items.forEach(function (it, i) { if (it.id === id) idx = i; });
       if (idx < 0) { if (first) apply(); return; }
       if (tag || first || !document.getElementById("n-" + id)) {
+        if (new URLSearchParams(location.search).has("tag")) history.replaceState(null, "", location.pathname + location.hash);
         tag = ""; filters.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.tag === "" ? "true" : "false"); });
         apply(Math.max(PAGE, Math.ceil((idx + 1) / PAGE) * PAGE));
       }
@@ -129,13 +135,13 @@
     home.classList.add("nw-home-wrap");
     home.innerHTML = '<section class="nw-home" aria-labelledby="nw-home-title"><div class="wrap">' +
       '<div class="section-title split"><div><span class="eyebrow">آخر الأخبار</span><h2 id="nw-home-title">أخبار وقصص مرسال</h2></div><a class="nw-all" href="/news.html">كل الأخبار <span aria-hidden="true">←</span></a></div>' +
-      '<div class="nw-strip-wrap"><button type="button" class="nw-arrow nw-prev" aria-label="السابق">&#8250;</button>' +
+      '<div class="nw-strip-wrap"><button type="button" class="nw-arrow nw-prev" aria-label="السابق">&#8249;</button>' +
       '<div class="nw-strip" id="nw-strip">' + latest.map(function (it) {
         return '<a class="nw-mini" href="/news.html#n-' + encodeURIComponent(it.id) + '">' + pic(it, 600, 800, "(max-width: 760px) 66vw, 280px") +
           '<span class="nw-tag t-' + slug(it.tag) + '">' + esc(it.tag) + "</span>" +
           '<span class="nw-mini-body">' + (it.date ? '<time datetime="' + esc(it.date) + '">' + dateText(it.date) + "</time>" : "") + "<b>" + esc(it.title) + '</b><span>اقرأ المزيد <i aria-hidden="true">←</i></span></span></a>';
       }).join("") + "</div>" +
-      '<button type="button" class="nw-arrow nw-next" aria-label="التالي">&#8249;</button></div>' +
+      '<button type="button" class="nw-arrow nw-next" aria-label="التالي">&#8250;</button></div>' +
       '<div class="nw-dots" aria-hidden="true">' + latest.map(function (_, i) { return "<i" + (i ? "" : ' class="on"') + "></i>"; }).join("") + "</div>" +
       "</div></section>";
     var track = home.querySelector(".nw-strip"), wrap = home.querySelector(".nw-strip-wrap"), dots = home.querySelectorAll(".nw-dots i"), cards = Array.prototype.slice.call(track.children);

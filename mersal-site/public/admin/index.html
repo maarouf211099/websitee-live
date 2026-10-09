@@ -37,6 +37,7 @@
       <button role="tab" data-tab="community">الكوميونيتي</button>
       <button role="tab" data-tab="news">الأخبار</button>
       <button role="tab" data-tab="impact">أثر التبرع</button>
+      <button role="tab" data-tab="extras">شريط الإعلان والشركاء</button>
       <button role="tab" data-tab="settings">الإعدادات</button>
     </nav>
     <div class="side-foot">
@@ -51,6 +52,7 @@
 
     <section class="panel" id="tab-home">
       <header class="panel-head"><h1>الرئيسية</h1><button class="btn btn-gold" id="save-home">حفظ ونشر</button></header>
+      <div class="status bad" id="home-pages-status" hidden>قائمة الصفحات ما اتحمّلتش، فصفحات الحملات والمشاريع ظاهرة كروابط زي ما هي ومش هتتغير لو حفظت. <button type="button" class="btn btn-ghost btn-sm" id="home-pages-retry">حاول تاني</button></div>
 
       <h2>السلايدر</h2>
       <p class="hint">صور عريضة 1920×570 (الصورة على الشمال والنص على اليمين). على الموبايل بيظهر الجزء الشمال من الصورة بس مع العنوان والسطر والزرار اللي تكتبهم هنا. لو الصورة طلعت مش واضحة على الموبايل ارفع "صورة الموبايل" بجودة أعلى (عرض 900px أو أكتر).</p>
@@ -104,7 +106,8 @@
 
     <section class="panel" id="tab-donations" hidden>
       <header class="panel-head"><h1>التبرعات بالبطاقة</h1><button class="btn btn-ghost" id="csv">تصدير CSV</button></header>
-      <div class="row filters"><label>من <input type="date" id="d-from"></label><label>إلى <input type="date" id="d-to"></label><button class="btn btn-teal" id="d-load">عرض</button><span id="d-total" class="hint"></span></div>
+      <div class="row filters"><label>من <input type="date" id="d-from"></label><label>إلى <input type="date" id="d-to"></label><button class="btn btn-teal" id="d-load">عرض</button><button class="btn btn-ghost" id="d-reconcile" title="عمليات بدأت ومتأكدتش (المتبرع قفل الصفحة أو النت فصل): بنسأل البنك عنها ونسجّل المدفوع">مراجعة العمليات المعلقة</button><span id="d-total" class="hint"></span></div>
+      <p class="hint">التواريخ بتوقيت القاهرة. "مراجعة العمليات المعلقة" بتسأل بنك مصر عن أي دفع بدأ من أكتر من 15 دقيقة ومتأكدش، وبتسجّل اللي اتدفع فعلاً.</p>
       <div class="table-wrap"><table id="d-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الجهة</th><th>المتبرع</th><th>الموبايل</th><th>البريد</th><th>رقم العملية</th></tr></thead><tbody></tbody></table></div>
       <p class="hint" id="d-note"></p>
     </section>
@@ -139,6 +142,11 @@
       <div id="impact-root"></div>
     </section>
 
+    <section class="panel" id="tab-extras" hidden>
+      <header class="panel-head"><h1>شريط الإعلان والشركاء</h1><button class="btn btn-gold" id="save-extras">حفظ ونشر</button></header>
+      <div id="extras-root"></div>
+    </section>
+
     <section class="panel" id="tab-settings" hidden>
       <header class="panel-head"><h1>الإعدادات</h1></header>
       <h2>الدفع بالبطاقة</h2>
@@ -158,6 +166,8 @@
         <div class="field"><label for="pw-new2">تأكيد كلمة السر الجديدة</label><input id="pw-new2" type="password" autocomplete="new-password" minlength="8" required></div>
         <button class="btn btn-teal" type="submit">تغيير كلمة السر</button>
       </form>
+      <p class="hint" style="margin-top:14px">تغيير كلمة السر بيخرّج كل الأجهزة التانية. لو حد ممكن يكون دخل من جهاز مش بتاعك:</p>
+      <button type="button" class="btn btn-danger" id="logout-all">تسجيل الخروج من كل الأجهزة</button>
     </section>
   </main>
 </div>
@@ -169,5 +179,6 @@
 <script src="/admin/tabs/community.js"></script>
 <script src="/admin/tabs/news.js"></script>
 <script src="/admin/tabs/impact.js"></script>
+<script src="/admin/tabs/extras.js"></script>
 </body>
 </html>

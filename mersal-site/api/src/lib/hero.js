@@ -6,8 +6,11 @@
 "use strict";
 
 const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-// tools/optimize_images.py guarantees a .webp sibling for every jpg/png under /img/ except /img/uploads/
-const webp = (u) => (/^\/img\/(?!uploads\/)[^?#]+\.(jpe?g|png)$/i.test(u || "") ? u.replace(/\.(jpe?g|png)$/i, ".webp") : null);
+// tools/optimize_images.py guarantees a .webp sibling for every jpg/png under /img/ except /img/uploads/.
+// Only plain site paths get variants (no quotes, spaces or other characters that could leave an attribute), and every
+// value written into srcset / imagesrcset still goes through esc().
+const SAFE_IMG = /^\/img\/(?!uploads\/)[A-Za-z0-9._\/-]+\.(jpe?g|png)$/i;
+const webp = (u) => (SAFE_IMG.test(u || "") ? u.replace(/\.(jpe?g|png)$/i, ".webp") : null);
 const SIZES = "(max-width: 1400px) 100vw, 1400px";
 // Phone crops are landscape (the banner's photo half, 883x570) shown with object-fit:cover in a portrait card, so the
 // browser scales them by HEIGHT: the photo is 80% of a 4:5.4 card that is 100vw-28px wide, which draws the crop
@@ -34,7 +37,7 @@ function picture(s, i, opts) {
     h += `<source media="(max-width: 760px)" ${pre}srcset="${srcsetOf(mset, (u) => u)}"${sz}>`;
   }
   const set = sm ? `${esc(sm)} 1200w, ${esc(full)} 1920w` : esc(full);
-  const setW = sm ? (webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1920w` : null) : webp(full);
+  const setW = sm ? (webp(sm) && webp(full) ? `${esc(webp(sm))} 1200w, ${esc(webp(full))} 1920w` : null) : webp(full) && esc(webp(full));
   if (setW) h += `<source type="image/webp" ${pre}srcset="${setW}"${sm ? ` sizes="${SIZES}"` : ""}>`;
   const prio = i === 0 ? ' fetchpriority="high"' : i === 1 ? ' fetchpriority="low"' : "";
   h += `<img ${pre}src="${esc(full)}"${sm ? ` ${pre}srcset="${set}" sizes="${SIZES}"` : ""} width="1920" height="570" alt="${esc(s.alt || s.title || "")}"${prio} decoding="async"></picture>`;
@@ -81,10 +84,10 @@ function preload(s, opts) {
     else out.push(`<link rel="preload" as="image" media="(max-width: 760px)"${type} href="${esc(fn(mset[0].src))}" fetchpriority="high">`);
   }
   const sm = s.bannerSm, full = s.banner;
-  const setW = sm && webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1920w` : webp(full) || null;
+  const setW = sm && webp(sm) && webp(full) ? `${esc(webp(sm))} 1200w, ${esc(webp(full))} 1920w` : (webp(full) && esc(webp(full))) || null;
   const media = mobile ? ' media="(min-width: 761px)"' : "";
   if (setW && sm) out.push(`<link rel="preload" as="image"${media} type="image/webp" imagesrcset="${setW}" imagesizes="${SIZES}" fetchpriority="high">`);
-  else out.push(`<link rel="preload" as="image"${media}${setW ? ' type="image/webp"' : ""} href="${esc(setW || full)}" fetchpriority="high">`);
+  else out.push(`<link rel="preload" as="image"${media}${setW ? ' type="image/webp"' : ""} href="${setW || esc(full)}" fetchpriority="high">`);
   return out.join("\n");
 }
 

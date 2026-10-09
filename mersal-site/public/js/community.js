@@ -1,6 +1,6 @@
 // Mersal community: donor gifts. Unlocked on the device that donated (see recordDonation in donate.js).
 (function () {
-  var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
+  var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn"), LOC = "ar-EG-u-nu-latn"; // Latin digits, like the rest of the site
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   // Odometer like the home page numbers: each digit rolls to its value (transform only), the units digit first
@@ -15,7 +15,12 @@
     requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("od-go"); }); });
   }
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || "null") || fallback; } catch (e) { return fallback; } }
-  var donor = read("mersalDonor", {}), history = read("mersalDonations", []);
+  // Arabic count forms after a number: 1 -> one, 2 -> dual, 3-10 -> plural, 11+ -> singular
+  function plural(n, one, two, few) { return n === 1 ? one : n === 2 ? two : n >= 3 && n <= 10 ? few : one; }
+  var donor = read("mersalDonor", {}), all = read("mersalDonations", []);
+  // Only paid donations count: rows from the old demo gateway (nothing was charged) never unlock the page, the
+  // totals, the badges or the certificate
+  var history = (Array.isArray(all) ? all : []).filter(function (d) { return d && !d.demo && Number(d.amount) > 0; });
   var gate = document.getElementById("cm-gate"), main = document.getElementById("cm-main");
   if (!history.length) { gate.hidden = false; return; }
   main.hidden = false;
@@ -25,21 +30,22 @@
   var name = (donor.name || "").trim();
   document.getElementById("cm-initial").textContent = name ? name.trim()[0] : "م";
   document.getElementById("cm-hello").textContent = name ? "شكراً يا " + name.split(" ")[0] : "شكراً لمساهمتك";
-  document.getElementById("cm-sub").textContent = "عضو في مرسال كوميونيتي من " + new Date(first.date).toLocaleDateString("ar-EG", { month: "long", year: "numeric" });
+  document.getElementById("cm-sub").textContent = "عضو في مرسال كوميونيتي من " + new Date(first.date).toLocaleDateString(LOC, { month: "long", year: "numeric" });
 
   var badges = ["أول تبرع ✓"];
   if (history.length >= 3) badges.push("متبرع دائم");
   if (history.some(function (d) { return d.monthly; })) badges.push("متبرع شهري");
   if (total >= 5000) badges.push("داعم ذهبي");
   document.getElementById("cm-badges").innerHTML = badges.map(function (b) { return '<span class="cm-badge"><i></i>' + esc(b) + "</span>"; }).join("");
+  var shares = Math.max(1, Math.round(total / 100));
+  var statVals = [history.length, total, shares];
   document.getElementById("cm-stats").innerHTML =
-    '<div class="cm-stat"><b>0</b><span>تبرع</span></div>' +
+    '<div class="cm-stat"><b>0</b><span>' + plural(history.length, "تبرع", "تبرعين", "تبرعات") + "</span></div>" +
     '<div class="cm-stat"><b>0</b><span>جنيه ساهمت بيهم</span></div>' +
-    '<div class="cm-stat"><b>0</b><span>سهم علاج تقريباً</span></div>';
-  var statVals = [history.length, total, Math.max(1, Math.round(total / 100))];
+    '<div class="cm-stat"><b>0</b><span>' + plural(shares, "سهم", "سهمين", "أسهم") + " علاج تقريباً</span></div>";
   document.querySelectorAll("#cm-stats b").forEach(function (b, i) { odometer(b, statVals[i]); });
   document.getElementById("cm-history").innerHTML = history.slice().reverse().map(function (d) {
-    return "<li><span>" + esc(new Date(d.date).toLocaleDateString("ar-EG")) + (d.purposeTitle ? " · " + esc(d.purposeTitle) : "") + (d.demo ? ' <span class="demo">تجريبي</span>' : "") + "</span><b>" + fmt.format(d.amount) + " ج</b></li>";
+    return "<li><span>" + esc(new Date(d.date).toLocaleDateString(LOC)) + (d.purposeTitle ? " · " + esc(d.purposeTitle) : "") + "</span><b>" + fmt.format(d.amount) + " ج</b></li>";
   }).join("");
 
   var ICONS = {
@@ -93,10 +99,11 @@
     ctx.fillText(shareCard ? "تبرع من موقع مرسال أو اتصل 19340" : "كل جنيه وصل لمستحقيه، وكل تبرع رسم ابتسامة", W / 2, 860);
     // amount pill
     ctx.fillStyle = "#fec830"; rounded(W / 2 - 230, 940, 460, 110, 55); ctx.fill();
-    ctx.fillStyle = "#005959"; ctx.font = "800 54px 'Titillium Web', Cairo, sans-serif"; ctx.direction = "ltr";
-    ctx.fillText(shareCard ? "19340" : fmt.format(total) + " EGP", W / 2, 1015);
+    ctx.fillStyle = "#005959"; ctx.font = "800 54px 'Titillium Web', Cairo, sans-serif";
+    if (shareCard) { ctx.direction = "ltr"; ctx.fillText("19340", W / 2, 1015); }
+    else { ctx.direction = "rtl"; ctx.fillText(fmt.format(total) + " جنيه", W / 2, 1015); }
     ctx.direction = "rtl"; ctx.fillStyle = "#5f6b6b"; ctx.font = "600 30px Cairo, sans-serif";
-    ctx.fillText(new Date(last.date).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" }) + (last.orderId && !last.demo ? "  ·  " + last.orderId : ""), W / 2, 1130);
+    ctx.fillText(new Date(last.date).toLocaleDateString(LOC, { year: "numeric", month: "long", day: "numeric" }) + (last.orderId ? "  ·  " + last.orderId : ""), W / 2, 1130);
     ctx.fillStyle = "#fff"; ctx.font = "700 34px Cairo, sans-serif"; ctx.fillText("mersal-ngo.org  ·  الخط الساخن 19340", W / 2, H - 70);
     var logo = new Image(); logo.onload = function () { ctx.fillStyle = "#fff"; rounded(W / 2 - 120, 60, 240, 150, 28); ctx.fill(); ctx.drawImage(logo, W / 2 - 100, 70, 200, 118); }; logo.src = "/img/brand-logo.png";
   }
@@ -104,9 +111,10 @@
     document.getElementById("cm-modal-title").textContent = shareCard ? "كارت ابعت فرحة" : "شهادة شكر";
     modal.classList.remove("closing"); modal.hidden = false; document.body.style.overflow = "hidden";
     (document.fonts && document.fonts.load ? document.fonts.load("800 40px Cairo") : Promise.resolve()).then(function () { draw(shareCard); setTimeout(function () { draw(shareCard); }, 400); });
-    var dl = document.getElementById("cm-download");
-    setTimeout(function () { try { dl.href = canvas.toDataURL("image/png"); } catch (e) {} }, 600);
   }
+  // the download is generated from the canvas at the moment of the tap (fonts, redraw and the logo are async)
+  var dl = document.getElementById("cm-download");
+  dl.addEventListener("click", function () { try { dl.href = canvas.toDataURL("image/png"); } catch (e) {} });
   function closeModal() {
     if (modal.hidden || modal.classList.contains("closing")) return;
     document.body.style.overflow = "";

@@ -145,7 +145,7 @@
     var a = Math.round(Number(String(v).replace(/[^\d.]/g, "")) || 0);
     if (from === "change" && a < 10) a = 10;
     amount = a;
-    if (from !== "input" && from !== "change") els.input.value = a;
+    if (from !== "input") els.input.value = a; // on "change" too: a typed 3 becomes the 10 the CTA uses
     if (from !== "range") els.range.value = Math.min(Number(els.range.max), Math.max(Number(els.range.min), a));
     Array.prototype.forEach.call(els.chips, function (b) { var on = Number(b.dataset.v) === a; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
     els.amt.textContent = fmt.format(a);
@@ -198,10 +198,17 @@
     root.addEventListener("click", function (e) {
       var a = e.target.closest("a"); if (!a || !/^\/donate\.html/.test(a.getAttribute("href") || "")) return;
       e.preventDefault();
+      // card payments switched off (payMode "off"): the stepper is hidden, so open the bank accounts instead
+      if (document.documentElement.classList.contains("no-online-pay")) {
+        var b = document.getElementById("t-bank"); if (b) b.click();
+        var tabs = document.querySelector(".tabs"); if (tabs) tabs.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+        return;
+      }
       var q = new URLSearchParams(a.getAttribute("href").replace(/^[^?]*\??/, "").replace(/#.*$/, ""));
       var v = Math.max(10, parseInt(q.get("amount"), 10) || amount || 10);
+      var f = (q.get("for") || "").replace(/[^\w-]/g, "");
+      if (f && purpose && purpose.querySelector('option[value="' + f + '"]') && purpose.value !== f) { purpose.value = f; purpose.dispatchEvent(new Event("change", { bubbles: true })); }
       amt.value = v; amt.dispatchEvent(new Event("input", { bubbles: true }));
-      var f = q.get("for"); if (f && purpose && purpose.querySelector('option[value="' + f + '"]')) { purpose.value = f; purpose.dispatchEvent(new Event("change", { bubbles: true })); }
       var tab = document.getElementById("t-online"); if (tab && !tab.closest(".no-online-pay")) tab.click();
       history.replaceState(null, "", "?amount=" + v + (f ? "&for=" + encodeURIComponent(f) : "") + "#online");
       (document.querySelector(".stepper") || form).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });

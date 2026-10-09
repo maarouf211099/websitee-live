@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#005959">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<!-- Served by /sw.js in place of any page that is not saved on the device while there is no connection.
+     It only links /css/site.css (saved when the worker installs); everything else is inline, and the logo,
+     saved pages and bank accounts are read from the worker's caches, so nothing here waits on the network. -->
+<link rel="stylesheet" href="/css/site.css">
+<title>انت مش متصل بالإنترنت | مؤسسة مرسال</title>
+<style>
+  body.off-page { background: var(--bg-2, #f6f9f9); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+  .off-top { background: var(--teal-dark, #005959); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; }
+  .off-top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 0; }
+  .off-brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; font-weight: 800; font-size: 16px; }
+  .off-brand:hover { color: #fff; }
+  .off-mark { width: 40px; height: 40px; border-radius: 12px; background: #fff; display: grid; place-items: center; flex: none; }
+  .off-mark svg { width: 24px; height: 24px; fill: var(--teal, #009091); }
+  .off-logo { background: #fff; border-radius: 10px; padding: 5px 8px; display: inline-flex; }
+  .off-logo img { height: 34px; width: auto; }
+  .off-net { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.85); background: rgba(255,255,255,.1); border-radius: 999px; padding: 4px 12px 4px 10px; }
+  .off-net i { width: 8px; height: 8px; border-radius: 50%; background: #ff8a7a; box-shadow: 0 0 0 3px rgba(255,138,122,.25); }
+
+  .off { flex: 1; width: 100%; max-width: 620px; margin: 0 auto; padding: 26px 16px calc(28px + env(safe-area-inset-bottom)); text-align: center; }
+  .off-art { width: 104px; height: 104px; margin: 6px auto 14px; border-radius: 50%; display: grid; place-items: center;
+    background: radial-gradient(circle at 35% 35%, #ffe08a, var(--gold, #fec830) 55%, var(--gold-dark, #e9ad0c)); box-shadow: 0 16px 34px -12px rgba(237,183,31,.65); }
+  .off-art svg { width: 54px; height: 54px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .off h1 { font-size: clamp(23px, 6vw, 30px); line-height: 1.35; color: var(--teal-dark, #005959); margin: 0 0 8px; }
+  .off-lead { color: var(--muted, #5f6b6b); margin: 0 auto 18px; max-width: 460px; font-size: 15.5px; }
+  .off-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .off-actions .btn { min-height: 48px; padding-inline: 30px; font-size: 16px; }
+  .off-status { min-height: 1.8em; margin: 0 0 18px; font-size: 14px; font-weight: 700; color: var(--teal-text, #007879); }
+  .off-status.bad { color: #a53b2a; }
+
+  .off-hot { display: flex; align-items: center; gap: 14px; text-align: start; padding: 16px 18px; border-radius: 20px; color: #fff; margin: 0 0 22px;
+    background: var(--brand-grad, #006e6f); box-shadow: 0 16px 34px -18px rgba(0,60,60,.8); }
+  .off-hot:hover, .off-hot:focus-visible { color: #fff; }
+  .off-hot:active { transform: scale(.985); }
+  .off-hot .ic { flex: none; width: 52px; height: 52px; border-radius: 16px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .off-hot .ic svg { width: 28px; height: 28px; fill: none; stroke: var(--gold, #fec830); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .off-hot small { display: block; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.85); line-height: 1.5; }
+  .off-hot > span:last-child { flex: 1; min-width: 0; }
+  .off-hot b { display: block; font: 700 34px/1.15 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; color: #fff; }
+  .off-hot .hs { display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.9); line-height: 1.5; }
+
+  .off-box { background: #fff; border: 1px solid var(--line, #dde7e7); border-radius: 20px; padding: 16px; margin: 0 0 16px; text-align: start; }
+  .off-box h2 { font-size: 17px; color: var(--teal-dark, #005959); margin: 0 0 2px; }
+  .off-box > p { font-size: 13.5px; color: var(--muted, #5f6b6b); margin: 0 0 12px; }
+  .off-pages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .off-pages a { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 8px 12px; border-radius: 14px;
+    background: var(--bg-2, #f6f9f9); border: 1px solid var(--line, #dde7e7); color: var(--teal-dark, #005959); font-weight: 700; font-size: 14px; line-height: 1.45; }
+  .off-pages a:hover { border-color: var(--teal, #009091); }
+  .off-pages a span { min-width: 0; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .off-pages svg { flex: none; width: 16px; height: 16px; fill: none; stroke: var(--teal, #009091); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .off-pages .main-link a { background: var(--teal-soft, #e4f3f3); border-color: #cfe7e7; }
+
+  .off-banks summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; }
+  .off-banks summary::-webkit-details-marker { display: none; }
+  .off-banks summary .sum-t { display: block; font-size: 17px; font-weight: 700; color: var(--teal-dark, #005959); line-height: 1.5; }
+  .off-banks summary small { display: block; font-size: 12.5px; color: var(--muted, #5f6b6b); font-weight: 600; }
+  .off-banks summary svg { flex: none; width: 22px; height: 22px; fill: none; stroke: var(--teal, #009091); stroke-width: 2.2; stroke-linecap: round; transition: transform .25s; }
+  .off-banks[open] summary svg { transform: rotate(180deg); }
+  .off-banks > p { font-size: 13.5px; color: var(--muted, #5f6b6b); margin: 10px 0; }
+  .off-accs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .off-accs li { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 12px; padding-inline-start: 12px; border: 1px solid var(--line, #dde7e7); border-radius: 14px; }
+  .off-accs .acc { flex: 1; min-width: 0; }
+  .off-accs .acc b { display: block; font-size: 13.5px; color: var(--teal-dark, #005959); line-height: 1.4; }
+  .off-accs .acc small { color: var(--muted, #5f6b6b); font-weight: 600; }
+  .off-accs code { display: block; font: 700 15px/1.4 "Titillium Web", "Cairo", sans-serif; color: var(--ink, #1f2a2a); direction: ltr; text-align: start; overflow-wrap: anywhere; }
+  .off-copy { flex: none; min-width: 64px; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1.5px solid var(--teal, #009091); background: #fff; color: var(--teal-text, #007879);
+    font: 700 13.5px "Cairo", sans-serif; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .off-copy.done { background: var(--teal-text, #007879); border-color: var(--teal-text, #007879); color: #fff; }
+  .off-foot { text-align: center; font-size: 12.5px; color: var(--muted, #5f6b6b); padding: 0 16px calc(18px + env(safe-area-inset-bottom)); }
+  @media (max-width: 420px) { .off-pages { grid-template-columns: minmax(0, 1fr); } .off-actions .btn { flex: 1 1 100%; } }
+  @media (prefers-reduced-motion: reduce) { .off-banks summary svg { transition: none; } .off-hot:active { transform: none; } }
+</style>
+</head>
+<body class="off-page">
+<header class="off-top">
+  <div class="wrap">
+    <a class="off-brand" href="/" id="off-brand"><span class="off-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg></span><span>مؤسسة مرسال</span></a>
+    <span class="off-net" id="off-net"><i aria-hidden="true"></i>من غير إنترنت</span>
+  </div>
+</header>
+
+<main id="main" class="off">
+  <div class="off-art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 8.8a15 15 0 0 1 4.2-2.6M9.6 5.2A15 15 0 0 1 22 8.8M5 12.5a10 10 0 0 1 3.7-2.2M13.8 10a10 10 0 0 1 5.2 2.5M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.3" r=".9" fill="#fff"/><path d="M3 3l18 18"/></svg></div>
+  <h1>انت مش متصل بالإنترنت</h1>
+  <p class="off-lead">اتأكد إن الواي فاي أو باقة الموبايل شغالة وجرّب تاني. أول ما النت يرجع الصفحة هتفتح لوحدها.</p>
+  <div class="off-actions">
+    <button class="btn btn-gold" type="button" id="off-retry">حاول تاني</button>
+  </div>
+  <p class="off-status" id="off-status" role="status" aria-live="polite"></p>
+
+  <a class="off-hot" href="tel:19340" aria-label="اتصل بالخط الساخن 19340 ليصلك مندوبنا لحد باب البيت">
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span>
+    <span><small>المكالمة مش محتاجة إنترنت</small><b>19340</b><span class="hs">كلم الخط الساخن ومندوبنا يوصلك لحد باب البيت يستلم تبرعك</span></span>
+  </a>
+
+  <section class="off-box" id="off-saved" hidden>
+    <h2>صفحات تقدر تفتحها من غير نت</h2>
+    <p>دي صفحات فتحتها قبل كده واتحفظت على جهازك.</p>
+    <ul class="off-pages" id="off-pages"></ul>
+  </section>
+
+  <details class="off-box off-banks" id="off-banks" hidden>
+    <summary><span><span class="sum-t">حسابات التبرع البنكية</span><small>آخر نسخة اتحفظت على جهازك</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+    <p>انسخ رقم الحساب وحوّل من تطبيق البنك أو من أي فرع. القائمة الكاملة والمحدّثة في صفحة طرق التبرع لما النت يرجع.</p>
+    <ul class="off-accs" id="off-accs"></ul>
+  </details>
+  <p class="sr-only" id="off-copied" aria-live="polite"></p>
+</main>
+<footer class="off-foot">© مؤسسة مرسال للأعمال الخيرية والتنموية</footer>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var status = $("off-status"), retry = $("off-retry");
+  var ICON_CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+
+  // ----- try again: a HEAD request is never answered by the service worker, so it really asks the network -----
+  var busy = false;
+  function reachable() {
+    var ctl = "AbortController" in window ? new AbortController() : null;
+    var t = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
+    return fetch(location.href, { method: "HEAD", cache: "no-store", signal: ctl ? ctl.signal : undefined })
+      .then(function () { clearTimeout(t); return true; }, function () { clearTimeout(t); return false; });
+  }
+  retry.addEventListener("click", function () {
+    if (busy) return;
+    busy = true; retry.disabled = true;
+    status.className = "off-status"; status.textContent = "بنحاول نوصل…";
+    reachable().then(function (ok) {
+      if (ok) { status.textContent = "رجع النت، بنفتح الصفحة…"; location.reload(); return; }
+      busy = false; retry.disabled = false;
+      status.className = "off-status bad"; status.textContent = "لسه مفيش إنترنت. اتأكد من الاتصال وجرّب تاني.";
+    });
+  });
+  // the page opens by itself once the connection is back
+  addEventListener("online", function () { status.className = "off-status"; status.textContent = "رجع النت، بنفتح الصفحة…"; setTimeout(function () { location.reload(); }, 400); });
+
+  if (!("caches" in window)) return;
+  function match(url) { return caches.match(url, { ignoreVary: true }).catch(function () { return null; }); }
+
+  // ----- the real logo, only when it is already saved (no failed image request while offline) -----
+  var LOGOS = ["/img/brand-logo.webp", "/img/brand-logo.png"]; // the header shows the WebP, so that one is usually saved
+  LOGOS.reduce(function (p, u) { return p.then(function (hit) { return hit || match(u).then(function (r) { return r && r.ok ? u : null; }); }); }, Promise.resolve(null)).then(function (src) {
+    if (!src) return;
+    var a = $("off-brand"), img = new Image();
+    img.alt = "مؤسسة مرسال الخيرية"; img.width = 58; img.height = 34; img.src = src;
+    img.onload = function () { var box = document.createElement("span"); box.className = "off-logo"; box.appendChild(img); a.textContent = ""; a.appendChild(box); a.setAttribute("aria-label", "مؤسسة مرسال - الرئيسية"); };
+  });
+
+  // ----- pages saved by the worker (newest first, the home and donate pages lead) -----
+  function titleOf(html, path) {
+    if (path === "/" || path === "/index.html") return "الرئيسية";
+    var m = /<title>([^<]{1,200})<\/title>/i.exec(html);
+    if (!m) return "";
+    var t = document.createElement("textarea"); t.innerHTML = m[1]; // decodes &amp; and friends; never inserted in the page
+    return t.value.replace(/\s*[|\-–]\s*مؤسسة مرسال.*$/, "").trim();
+  }
+  caches.keys().then(function (keys) {
+    var name = keys.filter(function (k) { return /^mersal-pages-/.test(k); }).pop();
+    return name ? caches.open(name) : null;
+  }).then(function (cache) {
+    if (!cache) return;
+    return cache.keys().then(function (reqs) {
+      var seen = {}, here = location.pathname;
+      reqs = reqs.reverse().filter(function (r) {
+        var u; try { u = new URL(r.url); } catch (x) { return false; }
+        var p = u.pathname === "/index.html" ? "/" : u.pathname;
+        if (u.origin !== location.origin || seen[p] || p === here || /^\/(offline|404)\.html$/.test(p) || /^\/admin/.test(p)) return false;
+        seen[p] = 1; return true;
+      }).slice(0, 30);
+      return Promise.all(reqs.map(function (r) {
+        return cache.match(r).then(function (res) { return res ? res.text() : ""; }).then(function (html) {
+          var p = new URL(r.url).pathname;
+          return { path: p === "/index.html" ? "/" : p, title: titleOf(html, p) };
+        }).catch(function () { return null; });
+      }));
+    });
+  }).then(function (list) {
+    list = (list || []).filter(function (x) { return x && x.title; });
+    if (!list.length) return;
+    var rank = function (x) { return x.path === "/" ? 0 : x.path === "/donate.html" ? 1 : 2; };
+    list.sort(function (a, b) { return rank(a) - rank(b); }); // stable: newest first inside each group
+    var ul = $("off-pages");
+    list.slice(0, 12).forEach(function (x) {
+      var li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
+      if (rank(x) < 2) li.className = "main-link";
+      a.href = x.path; s.textContent = x.title;
+      a.appendChild(s); a.insertAdjacentHTML("beforeend", ICON_CHEV);
+      li.appendChild(a); ul.appendChild(li);
+    });
+    $("off-saved").hidden = false;
+  }).catch(function () {});
+
+  // ----- bank accounts, only when /data/donate.json is saved (it is once the donate page was opened) -----
+  match("/data/donate.json").then(function (res) { return res && res.ok ? res.json() : null; }).then(function (d) {
+    if (!d) return;
+    var rows = (d.banks || []).filter(function (b) { return b && b.name && b.number; }).map(function (b) {
+      return { name: String(b.name).trim(), sub: String(b.currency || "").trim(), value: String(b.number).trim() };
+    });
+    var f = d.foreign || {};
+    if (f.iban) rows.push({ name: String(f.bank || "الحساب في الخارج").trim(), sub: "IBAN - من خارج مصر", value: String(f.iban).replace(/\s+/g, "") });
+    if (!rows.length) return;
+    var ul = $("off-accs");
+    rows.forEach(function (r) {
+      var li = document.createElement("li"), box = document.createElement("div"), b = document.createElement("b"), sm = document.createElement("small"),
+        code = document.createElement("code"), btn = document.createElement("button");
+      box.className = "acc"; b.textContent = r.name; sm.textContent = r.sub ? " " + r.sub : "";
+      b.appendChild(sm); code.textContent = r.value; code.setAttribute("dir", "ltr");
+      btn.type = "button"; btn.className = "off-copy"; btn.textContent = "نسخ";
+      btn.setAttribute("aria-label", "نسخ رقم حساب " + r.name + (r.sub ? " " + r.sub : ""));
+      btn.addEventListener("click", function () { copy(r.value, btn); });
+      box.appendChild(b); box.appendChild(code); li.appendChild(box); li.appendChild(btn); ul.appendChild(li);
+    });
+    $("off-banks").hidden = false;
+  }).catch(function () {});
+
+  function copy(text, btn) {
+    function done() {
+      btn.classList.add("done"); btn.textContent = "تم النسخ"; $("off-copied").textContent = "تم نسخ رقم الحساب";
+      clearTimeout(btn._t); btn._t = setTimeout(function () { btn.classList.remove("done"); btn.textContent = "نسخ"; $("off-copied").textContent = ""; }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+    function fallback() {
+      var t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
+      document.body.appendChild(t); t.select();
+      try { if (document.execCommand("copy")) done(); } catch (x) {}
+      t.remove();
+    }
+  }
+})();
+</script>
+</body>
+</html>

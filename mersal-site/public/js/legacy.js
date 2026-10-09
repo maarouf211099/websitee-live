@@ -6,7 +6,8 @@
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   var pid = (/^\/p\/(\d+)\.html$/.exec(location.pathname) || [])[1];
-  var donateHref = "/donate.html" + (pid ? "?for=p" + pid : "") + "#online";
+  var forId = pid === "4" || pid === "5" ? "31" : pid; // p4 / p5 are pages of the oncology centre, whose code is p31
+  var donateHref = "/donate.html" + (forId ? "?for=p" + forId : "") + "#online";
 
   // ---------- 1. clean-up of what the old CMS left behind ----------
   if (legacyWrap) {
@@ -33,7 +34,29 @@
     });
     // donate links inside a project page pre-select that project on the donate page
     if (pid) $$('a[href^="/donate.html"]', legacyWrap).forEach(function (a) { a.href = donateHref; });
+    // accessibility safety net for imported markup: decorative pictures, icon-only links, the map frame
+    $$("img:not([alt])", legacyWrap).forEach(function (i) { i.alt = ""; });
+    $$("a", legacyWrap).forEach(function (a) {
+      if (a.textContent.trim() || a.getAttribute("aria-label")) return;
+      var alt = $$("img[alt]", a).map(function (i) { return i.alt.trim(); }).filter(Boolean)[0];
+      if (alt) return;
+      var h = a.getAttribute("href") || "", label = "";
+      if (/^tel:/.test(h)) label = "اتصل " + h.slice(4);
+      else if (/facebook\.com/i.test(h)) label = "فيسبوك";
+      else if (/linkedin\.com/i.test(h)) label = "لينكدإن";
+      else if (/instagram\.com/i.test(h)) label = "إنستجرام";
+      else if (/youtube\.com|youtu\.be/i.test(h)) label = "يوتيوب";
+      else if (/^https?:/i.test(h)) label = "رابط خارجي: " + h.replace(/^https?:\/\/(www\.)?/i, "").split(/[/?#]/)[0];
+      if (label) a.setAttribute("aria-label", label);
+    });
+    $$("iframe:not([title])", legacyWrap).forEach(function (f) { f.title = /google\.com\/maps/i.test(f.src) ? "خريطة الموقع" : "محتوى مضمّن"; });
   }
+  // header photos smaller than the banner (most imported pictures are 512px) become a soft backdrop on wide screens
+  (function () {
+    var ph = document.querySelector(".page-head .ph-bg"); if (!ph) return;
+    function judge() { if (ph.naturalWidth && ph.naturalWidth < 1000) ph.closest(".page-head").classList.add("ph-small"); }
+    if (ph.complete) judge(); else ph.addEventListener("load", judge, { once: true });
+  })();
 
   // ---------- 2. picture strips: old Bootstrap carousels + rows of pictures -> one swipeable strip ----------
   function strip(items, opts) {
@@ -45,8 +68,8 @@
     g.appendChild(track);
     if (items.length > 1) {
       g.insertAdjacentHTML("beforeend",
-        '<button type="button" class="gal-arrow gal-prev" aria-label="الصورة السابقة">&#8250;</button>' +
-        '<button type="button" class="gal-arrow gal-next" aria-label="الصورة التالية">&#8249;</button>' +
+        '<button type="button" class="gal-arrow gal-prev" aria-label="الصورة السابقة">&#8249;</button>' +
+        '<button type="button" class="gal-arrow gal-next" aria-label="الصورة التالية">&#8250;</button>' +
         '<span class="gal-count" aria-hidden="true">1 / ' + items.length + '</span>' +
         '<div class="gal-dots" role="tablist" aria-label="الصور">' + items.map(function (_, i) {
           return '<button type="button" role="tab" aria-label="صورة ' + (i + 1) + '"' + (i ? "" : ' class="on" aria-selected="true"') + "></button>";
@@ -122,9 +145,11 @@
       var items = imgs.map(function (img) {
         img.loading = "lazy"; img.decoding = "async"; img.removeAttribute("style");
         if (!img.alt || /\.(jpe?g|png|gif|webp)\s*$/i.test(img.alt)) img.alt = "";
-        var a = img.closest("a");
-        if (a && a.getAttribute("href") && a.getAttribute("href") !== "/" && a.getAttribute("href") !== "#") { a.appendChild(img); return a; }
-        return img;
+        var a = img.closest("a"), el = img.closest("picture") || img;
+        // links into the old CMS image folder (/ClientFilesLayout/...) do not exist on the new site: the picture stays, the dead link goes
+        var href = a && a.getAttribute("href");
+        if (href && href !== "/" && href !== "#" && !/^\/ClientFilesLayout\//i.test(href)) { a.appendChild(el); return a; }
+        return el;
       });
       car.parentNode.replaceChild(strip(items, { label: "صور " + (document.querySelector(".page-head h1") || {}).textContent }), car);
     });
@@ -137,7 +162,7 @@
         return img && !k.textContent.replace(/[\s ]+/g, "") && k.querySelectorAll("img").length === 1;
       });
       if (!only) return;
-      var items = kids.map(function (k) { var img = k.querySelector("img"); img.loading = "lazy"; var a = img.closest("a"); if (a) { a.appendChild(img); return a; } return img; });
+      var items = kids.map(function (k) { var img = k.querySelector("img"), el = img.closest("picture") || img; img.loading = "lazy"; var a = img.closest("a"); if (a) { a.appendChild(el); return a; } return el; });
       row.parentNode.replaceChild(strip(items, { free: true }), row);
     });
   }

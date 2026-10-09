@@ -54,7 +54,7 @@
       "number": "5450001000003297",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/banque-misr.png"
+      "logo": "/img/banks/banque-misr.svg"
     },
     {
       "name": "بنك مصر",
@@ -62,7 +62,7 @@
       "number": "5450120000000214",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/banque-misr.png"
+      "logo": "/img/banks/banque-misr.svg"
     },
     {
       "name": "بنك مصر",
@@ -70,7 +70,7 @@
       "number": "5450130000000084",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/banque-misr.png"
+      "logo": "/img/banks/banque-misr.svg"
     },
     {
       "name": "بنك الإمارات دبي الوطني",
@@ -102,7 +102,7 @@
       "number": "100034654454",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/cib.png"
+      "logo": "/img/banks/cib.svg"
     },
     {
       "name": "البنك التجاري الدولي CIB",
@@ -110,7 +110,7 @@
       "number": "100034654357",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/cib.png"
+      "logo": "/img/banks/cib.svg"
     },
     {
       "name": "البنك التجاري الدولي CIB",
@@ -118,7 +118,7 @@
       "number": "100034654397",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/cib.png"
+      "logo": "/img/banks/cib.svg"
     },
     {
       "name": "البنك الأهلي المصري",
@@ -126,7 +126,7 @@
       "number": "1953071376769426268",
       "iban": "",
       "swift": "",
-      "logo": "/img/banks/nbe.png"
+      "logo": "/img/banks/nbe.svg"
     },
     {
       "name": "مصرف أبوظبي الإسلامي",
@@ -148,9 +148,13 @@
   "wallets": [],
   "foreign": {
     "text": "",
+    "bank": "GLS Bank",
+    "iban": "DE49430609671318318400",
+    "bic": "GENODEM1GLS",
+    "holder": "Mersal Foundation e.V.",
     "image": "/img/gls.jpg",
     "alt": "حساب Mersal Foundation e.V. في GLS Bank - ألمانيا",
-    "link": "http://bit.ly/MersalDonations",
+    "link": "https://bit.ly/MersalDonations",
     "linkText": "طرق أخرى للتبرع من الخارج"
   }
 }

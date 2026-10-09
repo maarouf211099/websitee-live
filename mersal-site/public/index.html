@@ -11,9 +11,7 @@
 <link rel="preload" as="image" media="(max-width: 760px)" type="image/webp" imagesrcset="/img/old/9270-381d6513-ms.webp 1324w, /img/old/9270-381d6513-m.webp 1766w" imagesizes="(max-width: 760px) 140vw" fetchpriority="high">
 <link rel="preload" as="image" media="(min-width: 761px)" type="image/webp" imagesrcset="/img/old/9270-381d6513-sm.webp 1200w, /img/old/9270-381d6513.webp 1920w" imagesizes="(max-width: 1400px) 100vw, 1400px" fetchpriority="high">
 <!-- /mersal:hero-preload -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/home.css">
 <link rel="stylesheet" href="/css/news.css">
@@ -24,6 +22,12 @@
 <meta name="description" content="مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم">
 <meta property="og:title" content="مؤسسة مرسال للأعمال الخيرية والتنموية">
 <meta property="og:description" content="مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/">
+<script type="application/ld+json" data-org>{"@context":"https://schema.org","@type":"NGO","@id":"https://www.mersal-ngo.org/#org","name":"مؤسسة مرسال للأعمال الخيرية والتنموية","alternateName":"Mersal Foundation","url":"https://www.mersal-ngo.org/","logo":"https://www.mersal-ngo.org/img/brand-logo.png","image":"https://www.mersal-ngo.org/img/hero.jpg","description":"مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم.","telephone":"19340","email":"info@mersal-ngo.org","address":{"@type":"PostalAddress","streetAddress":"8 شارع 263 - المعادي الجديدة","addressLocality":"القاهرة","addressCountry":"EG"},"areaServed":{"@type":"Country","name":"Egypt"},"contactPoint":[{"@type":"ContactPoint","telephone":"19340","contactType":"customer service","areaServed":"EG","availableLanguage":"ar"},{"@type":"ContactPoint","telephone":"+20-120-000-2870","contactType":"customer service","areaServed":"EG","availableLanguage":"ar"}],"sameAs":["https://www.facebook.com/Mersalfoundation","https://www.instagram.com/mersal_foundation","https://twitter.com/Mersalcharity","https://www.linkedin.com/company/18765843/","https://www.youtube.com/channel/UC30Ek5Wl1us6LD6BLkegsHQ"],"potentialAction":{"@type":"DonateAction","name":"تبرع لمرسال","target":"https://www.mersal-ngo.org/donate.html","recipient":{"@id":"https://www.mersal-ngo.org/#org"}}}</script>
 </head>
 <body class="home">
 <!-- mersal:home-data -->
@@ -50,8 +54,8 @@
     </div>
     <button class="sl-pause" id="sl-pause" type="button" aria-label="إيقاف التحريك التلقائي"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7z"/></svg></button>
     </div>
-    <button class="sl-arrow sl-prev" type="button" aria-label="السابق">&#8250;</button>
-    <button class="sl-arrow sl-next" type="button" aria-label="التالي">&#8249;</button>
+    <button class="sl-arrow sl-prev" type="button" aria-label="السابق">&#8249;</button>
+    <button class="sl-arrow sl-next" type="button" aria-label="التالي">&#8250;</button>
     <svg class="hero-wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C300,70 980,-10 1440,34 L1440,70 L0,70 Z"/></svg>
   </section>
 
@@ -69,7 +73,7 @@
         <button class="btn btn-gold qd-go" type="submit">تبرع الآن</button>
       </form>
       <div class="hero-card quick-offline only-offline">
-        <div class="qo-item"><span>الخط الساخن - مندوب لحد البيت</span><a href="tel:19340"><b>19340</b></a></div>
+        <div class="qo-item"><span>الخط الساخن - مندوب لحد البيت</span><a href="tel:19340" data-site-href="hotline"><b data-site="hotline">19340</b></a></div>
         <div class="qo-item"><span>بنك CIB - بالجنيه</span><span><code>100034654454</code> <button class="copy" type="button" data-copy="100034654454">نسخ</button></span></div>
         <a class="btn btn-gold" href="/donate.html">كل طرق التبرع</a>
       </div>
@@ -78,7 +82,7 @@
 
   <div class="ticker" aria-label="مرسال في سطور">
     <div class="ticker-track" id="ticker">
-      <span><b>+5,000</b> مريض شهرياً في العلاج الشهري</span>
+      <span><b dir="ltr">+5,000</b> مريض شهرياً في العلاج الشهري</span>
       <span><b>68</b> مستشفى دعمتها قوافل مرسال</span>
       <span><b>+15</b> تخصص طبي في عيادات مرسال</span>
       <span><b>+1,400</b> مريض في دار ضيافة مرسال</span>
@@ -91,15 +95,17 @@
     <div class="wrap">
       <div class="section-title split camp-title"><div><span class="eyebrow live">حملات مفتوحة الآن</span><h2>التبرعات <small class="count" id="camp-count"></small></h2></div><p>اختار حملة، حدّد عدد الأسهم، وتبرعك يوصل لمستحقيه.</p></div>
       <div class="carousel camp-carousel">
-        <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8250;</button>
+        <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8249;</button>
         <div class="car-track" id="donation-campaigns"></div>
-        <button class="car-arrow car-next" type="button" aria-label="التالي">&#8249;</button>
+        <button class="car-arrow car-next" type="button" aria-label="التالي">&#8250;</button>
       </div>
       <div class="car-dots" id="camp-dots" aria-hidden="true"></div>
     </div>
   </section>
 
   <div id="news-home"></div>
+
+  <section id="partners"></section>
 
   <section class="about-intro">
     <div class="wrap grid grid-2" style="align-items:center">
@@ -116,9 +122,9 @@
         <a class="btn btn-teal" href="/p/3.html">اعرف أكثر عن مرسال</a>
       </div>
       <figure class="about-pic">
-        <img src="/img/about-mersal.jpg" alt="طفلة تضحك بعد تلقي المساعدة من مرسال" loading="lazy" width="377" height="382">
+        <picture><source type="image/webp" srcset="/img/about-mersal.webp"><img src="/img/about-mersal.jpg" alt="طفلة تضحك بعد تلقي المساعدة من مرسال" loading="lazy" width="377" height="382"></picture>
         <figcaption><span class="cap-eyebrow">#ابعت_فرحة</span><b>فرحة طفلة بعد العلاج</b><span>كل تبرع بيوصل لمريض محتاج وبيرسم ابتسامة زي دي</span></figcaption>
-        <a class="about-chip" href="/p/37.html"><b>+5,000</b><span>مريض شهرياً</span></a>
+        <a class="about-chip" href="/p/37.html"><b dir="ltr">+5,000</b><span>مريض شهرياً</span></a>
       </figure>
     </div>
   </section>
@@ -138,7 +144,7 @@
 
   <section class="hospital-feature">
     <div class="wrap grid grid-2" style="align-items:center">
-      <div class="hf-pic"><div class="chip chip-a"><b data-count="5000">0</b><span>متر مربع</span></div><div class="chip chip-b"><b data-count="35">0</b><span>سرير إقامة</span></div><img src="/img/old/1-ce3f944d-sm.jpg" srcset="/img/old/1-ce3f944d-sm.jpg 600w, /img/old/1-ce3f944d.jpg 1200w" sizes="(max-width: 760px) 92vw, 560px" alt="مستشفى مرسال للأطفال" loading="lazy" width="1200" height="900"></div>
+      <div class="hf-pic"><div class="chip chip-a"><b data-count="5000">0</b><span>متر مربع</span></div><div class="chip chip-b"><b data-count="35">0</b><span>سرير إقامة</span></div><picture><source type="image/webp" srcset="/img/old/1-ce3f944d-sm.webp 600w, /img/old/1-ce3f944d.webp 1200w" sizes="(max-width: 760px) 92vw, 560px"><img src="/img/old/1-ce3f944d-sm.jpg" srcset="/img/old/1-ce3f944d-sm.jpg 600w, /img/old/1-ce3f944d.jpg 1200w" sizes="(max-width: 760px) 92vw, 560px" alt="مستشفى مرسال للأطفال" loading="lazy" width="1200" height="900"></picture></div>
       <div>
         <span class="eyebrow">الحلم اللي بنكمله سوا</span>
         <h2 class="big-title">مستشفى <mark>مرسال للأطفال</mark></h2>
@@ -173,13 +179,13 @@
   </section>
 
 
-  <section class="alt">
+  <section class="alt" id="projects">
     <div class="wrap">
       <div class="section-title"><h2>مشاريع مرسال</h2></div>
       <div class="carousel">
-        <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8250;</button>
+        <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8249;</button>
         <div class="car-track" id="campaigns"></div>
-        <button class="car-arrow car-next" type="button" aria-label="التالي">&#8249;</button>
+        <button class="car-arrow car-next" type="button" aria-label="التالي">&#8250;</button>
       </div>
     </div>
   </section>
@@ -208,9 +214,9 @@
       <p>كل تبرع بيرسم ابتسامة على وش مريض. شاركنا وابعت فرحة لمرضى مرسال.</p>
       <a class="btn btn-gold btn-lg" href="/donate.html">تبرع الآن</a>
       <div class="contact-cards">
-        <a href="tel:19340"><span>الخط الساخن</span><b>19340</b></a>
-        <a href="tel:01200002870"><span>الهاتف</span><b dir="ltr">01200002870</b></a>
-        <a href="mailto:info@mersal-ngo.org"><span>البريد</span><b>info@mersal-ngo.org</b></a>
+        <a href="tel:19340" data-site-href="hotline"><span>الخط الساخن</span><b data-site="hotline">19340</b></a>
+        <a href="tel:01200002870" data-site-href="phone"><span>الهاتف</span><b dir="ltr" data-site="phone">01200002870</b></a>
+        <a href="mailto:info@mersal-ngo.org" data-site-href="email"><span>البريد</span><b data-site="email">info@mersal-ngo.org</b></a>
         <a href="/p/46.html"><span>الفروع</span><b>عناوين فروع مرسال</b></a>
       </div>
     </div>
@@ -220,6 +226,7 @@
 
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script defer src="/js/home.js"></script>
 <script defer src="/js/news.js"></script>
 <script defer src="/js/impact.js"></script>

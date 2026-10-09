@@ -3,7 +3,7 @@
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
   var root, tree = null;
-  var FIXED = [["/", "الرئيسية"], ["/about.html", "عن مرسال"], ["/donate.html", "طرق التبرع"], ["/zakat.html", "حاسبة الزكاة"], ["/contact.html", "تواصل معنا"],
+  var FIXED = [["/", "الرئيسية"], ["/p/3.html", "عن مرسال"], ["/donate.html", "طرق التبرع"], ["/zakat.html", "حاسبة الزكاة"], ["/contact.html", "تواصل معنا"],
     ["/afia.html", "كارت عافية"], ["/albums.html", "ألبومات الصور"], ["/volunteer.html", "تطوع معنا"], ["/help.html", "طلب مساعدة"]];
 
   function options() {

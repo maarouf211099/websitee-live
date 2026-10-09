@@ -1,6 +1,10 @@
 /* Styles for pages imported from the old site (their HTML uses Bootstrap-like classes). Loaded after site.css. */
 .legacy { line-height: 1.9; font-size: 16.5px; }
 .legacy img { max-width: 100%; height: auto; border-radius: 12px; }
+/* content photos are <picture> (WebP + JPG/PNG, tools/import_old_site.py content_markup): the picture box takes no
+   part in the layout, except as an item of a picture strip */
+.legacy picture { display: contents; }
+.legacy .gal-track > picture, .legacy .gal-track a > picture { display: block; }
 /* the old CMS wrote fixed pixel sizes on pictures: never let them widen or squash */
 .legacy img[style*="height"] { height: auto !important; }
 .legacy img[style*="width"] { max-width: 100% !important; }
@@ -41,10 +45,10 @@
   border-inline-start: 4px solid var(--gold);
 }
 .legacy h4, .legacy .content-sector h4 {
-  display: block; background: var(--teal); color: #fff; border-radius: 0 12px 0 12px; box-shadow: inset 4px 0 0 var(--gold);
+  display: block; background: var(--teal-text); color: #fff; border-radius: 0 12px 0 12px; box-shadow: inset 4px 0 0 var(--gold);
   padding: 4px 16px; font-size: 17px; margin: 22px 0 12px;
 }
-.legacy h5 { color: var(--teal); font-size: 17px; margin: 16px 0 8px; }
+.legacy h5 { color: var(--teal-text); font-size: 17px; margin: 16px 0 8px; }
 .legacy :is(h1, h2, h3, h4) > *:first-child { margin-top: 0; }
 .legacy :is(h1, h2, h3, h4, h5) span[style*="color"], .legacy :is(h1, h2, h3, h4, h5) font { color: inherit !important; }
 .legacy [style*="font-family"] { font-family: inherit !important; }
@@ -79,7 +83,7 @@
 .legacy iframe { width: 100%; max-width: 100%; border: 0; border-radius: 12px; aspect-ratio: 4 / 3; height: auto; min-height: 220px; box-shadow: var(--shadow); }
 .legacy iframe[src*="youtube"] { aspect-ratio: 16 / 9; }
 .legacy .box-info-card img:not(.img-icon) { margin-bottom: 12px; }
-.legacy .item > img, .legacy .item > a > img, .legacy .box-info-card > img:not(.img-icon) { width: 100%; box-shadow: var(--shadow); }
+.legacy .item > img, .legacy .item > a > img, .legacy .item > picture > img, .legacy .item > a > picture > img, .legacy .box-info-card > img:not(.img-icon), .legacy .box-info-card > picture > img { width: 100%; box-shadow: var(--shadow); }
 .legacy .logo-shape, .legacy .proceed { display: none; }
 .legacy-cover { width: 100%; max-height: 420px; object-fit: cover; margin-bottom: 24px; box-shadow: var(--shadow); }
 .legacy .hotline img { width: 120px; margin: 8px 0; border-radius: 0; box-shadow: none; }
@@ -122,9 +126,10 @@
 .legacy .accordion-collapse.show { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows .3s ease; }
 .legacy .accordion-collapse > * { overflow: hidden; min-height: 0; }
 .legacy .accordion-body { padding: 14px 18px 18px; }
+.legacy .accordion-collapse:not(.show) > .accordion-body { padding-block: 0; } /* the 0fr row cannot clip padding */
 .legacy .accordion-body > :first-child { margin-top: 0; }
 .legacy .accordion-body h4 { background: none; box-shadow: none; color: var(--ink); padding: 0; margin: 0 0 8px; font-size: 16px; font-weight: 600; border-radius: 0; }
-.legacy .accordion-body h5 { color: var(--teal); }
+.legacy .accordion-body h5 { color: var(--teal-text); }
 .legacy .accordion-body ul { margin-bottom: 8px; }
 
 /* ---------- picture strips: old Bootstrap 3 carousels and rows of pictures become one swipeable strip ---------- */
@@ -145,9 +150,11 @@
 .legacy .gallery.free .gal-track > * { flex-basis: min(82%, 360px); }
 .legacy .gal-track img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; box-shadow: var(--shadow); margin: 0; }
 .legacy .gal-track a { display: block; text-decoration: none; }
-.legacy .gal-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
-.legacy .gal-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: var(--line); cursor: pointer; transition: width .25s, background .25s; }
-.legacy .gal-dots button.on { width: 22px; border-radius: 4px; background: var(--gold); }
+.legacy .gal-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; margin-top: 2px; }
+/* each dot is a 28px tap target; the visible dot (8px, the current one 22px) is drawn by ::before */
+.legacy .gal-dots button { position: relative; width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
+.legacy .gal-dots button::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; background: var(--line); transition: inset .25s, background .25s, border-radius .25s; }
+.legacy .gal-dots button.on::before { inset: 10px 3px; border-radius: 4px; background: var(--gold); }
 .legacy .gal-arrow { position: absolute; top: calc(50% - 32px); z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: var(--teal-dark); font-size: 24px; line-height: 1; cursor: pointer; box-shadow: var(--shadow); display: none; }
 .legacy .gal-prev { right: 10px; } .legacy .gal-next { left: 10px; }
 .legacy .gal-arrow:hover { background: var(--gold); }
@@ -155,10 +162,10 @@
 @media (hover: hover) and (min-width: 761px) { .legacy .gallery.multi .gal-arrow { display: grid; place-items: center; } }
 
 /* ---------- breadcrumbs, share bar, related pages ---------- */
-.crumbs { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; font-size: 13.5px; color: rgba(255,255,255,.75); margin-bottom: 6px; max-width: 100%; overflow: hidden; }
+.crumbs { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; font-size: 13.5px; color: rgba(255,255,255,.75); margin-bottom: 6px; max-width: 100%; overflow-x: clip; overflow-y: visible; }
 .crumbs > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
 .crumbs > span { flex: none; opacity: .7; }
-.crumbs a { color: rgba(255,255,255,.9); flex: none; max-width: 40%; }
+.crumbs a { color: rgba(255,255,255,.9); flex: none; max-width: 40%; padding-block: 6px; margin-block: -6px; } /* 34px tap height, same layout */
 .crumbs a:first-child { max-width: none; }
 .crumbs a:hover { color: var(--gold); }
 .crumbs strong { color: #fff; font-weight: 600; }
@@ -172,21 +179,22 @@
   transition: transform .15s, background .2s, border-color .2s, color .2s; -webkit-tap-highlight-color: transparent;
 }
 .share-bar svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
-.share-bar a:hover, .share-bar button:hover { border-color: var(--teal); color: var(--teal); }
+.share-bar a:hover, .share-bar button:hover { border-color: var(--teal); color: var(--teal-text); }
 .share-bar a:active, .share-bar button:active { transform: scale(.94); }
-.share-bar .sh-wa { background: #25d366; border-color: #25d366; color: #fff; }
-.share-bar .sh-fb { background: #1877f2; border-color: #1877f2; color: #fff; }
+.share-bar .sh-wa { background: #25d366; border-color: #25d366; color: #003c3c; } /* dark label: white on WhatsApp green is 1.98:1 */
+.share-bar .sh-fb { background: #0866ff; border-color: #0866ff; color: #fff; } /* Facebook blue that keeps 4.8:1 with white */
 .share-bar .sh-x { background: #111; border-color: #111; color: #fff; }
-.share-bar .sh-wa:hover, .share-bar .sh-fb:hover, .share-bar .sh-x:hover { color: #fff; filter: brightness(1.08); }
+.share-bar .sh-fb:hover, .share-bar .sh-x:hover { color: #fff; filter: brightness(1.08); }
+.share-bar .sh-wa:hover { color: #003c3c; filter: brightness(1.05); }
 .share-bar .sh-copy.done { background: var(--teal-soft); border-color: var(--teal); color: var(--teal-dark); }
-.share-bar .sh-native { background: var(--teal); border-color: var(--teal); color: #fff; }
+.share-bar .sh-native { background: var(--teal-text); border-color: var(--teal-text); color: #fff; }
 
 .related { background: var(--bg-2); }
 .related .card { color: inherit; text-decoration: none; border-radius: 22px; border: 0; box-shadow: 0 14px 40px -20px rgba(0,48,48,.35); }
 .related .card .body { gap: 6px; }
 .related .card h3 { font-size: 17.5px; line-height: 1.45; }
 .related .card p { font-size: 14px; line-height: 1.7; }
-.related .card .more { color: var(--teal); font-weight: 800; font-size: 14px; margin-top: 4px; }
+.related .card .more { color: var(--teal-text); font-weight: 800; font-size: 14px; margin-top: 4px; }
 .related .card .more::after { content: "←"; margin-inline-start: 6px; display: inline-block; transition: transform .2s; }
 .related .card:hover .more::after { transform: translateX(-4px); }
 
@@ -196,7 +204,7 @@
 .legacy .row > *.reveal { transform: translateY(18px); }
 .legacy img:not(.img-icon) { transition: transform .5s ease, box-shadow .5s ease; }
 @media (hover: hover) {
-  .legacy .row > * > img:not(.img-icon):hover, .legacy .box-info-card img:hover, .legacy .item img:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 16px 36px rgba(0,48,48,.16); }
+  .legacy .row > * > img:not(.img-icon):hover, .legacy .row > * > picture > img:hover, .legacy .box-info-card img:hover, .legacy .item img:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 16px 36px rgba(0,48,48,.16); }
   .legacy ul li:not(:has(> .img-icon))::before { transition: transform .25s ease; }
   .legacy ul li:hover::before { transform: scale(1.15) rotate(-8deg); }
 }
@@ -245,15 +253,15 @@
   .related .card h3 { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .legacy .accordion-collapse, .legacy .accordion-button::after, .legacy img, .legacy .gal-track, .legacy .gal-dots button, .related .card .more::after { transition: none; }
+  .legacy .accordion-collapse, .legacy .accordion-button::after, .legacy img, .legacy .gal-track, .legacy .gal-dots button, .legacy .gal-dots button::before, .related .card .more::after { transition: none; }
   .legacy .gal-track, .related .grid { scroll-behavior: auto; }
 }
 
 /* ---------- v7 motion: a smoother FAQ accordion, the share bar comes in button by button, mouse users drag the picture strips ---------- */
 .legacy .accordion-collapse { transition: grid-template-rows .38s var(--ease), visibility 0s .38s; }
 .legacy .accordion-collapse.show { transition: grid-template-rows .38s var(--ease); }
-.legacy .accordion-body { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .28s var(--ease); }
-.legacy .accordion-collapse.show .accordion-body { opacity: 1; transform: none; transition: opacity .3s .08s, transform .42s .08s var(--spring); }
+.legacy .accordion-body { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .28s var(--ease), padding .38s var(--ease); }
+.legacy .accordion-collapse.show .accordion-body { opacity: 1; transform: none; transition: opacity .3s .08s, transform .42s .08s var(--spring), padding .38s var(--ease); }
 .legacy .accordion-button { transition: background .2s, transform .22s var(--spring); }
 .legacy .accordion-button:active { transform: scale(.985); transition-duration: .08s; }
 .legacy .accordion-button::after { transition: transform .42s var(--spring), background-color .2s; }

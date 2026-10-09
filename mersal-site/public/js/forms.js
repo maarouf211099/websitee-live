@@ -1,6 +1,7 @@
 // Public request forms, one script for all of them. Every <form data-form="..."> on the page is wired up:
 //   volunteer  /volunteer.html (تطوع معنا)        help    /help.html (طلب مساعدة)
 //   transfer   /donate.html "سجّل تبرعك"         pickup  /donate.html "مندوب لحد البيت"
+//   contact    /contact.html "ابعتلنا رسالة" (falls back to an e-mail link when the API cannot take it)
 // A form finds its alert and success boxes by id from data-alert / data-success (default #form-alert / #form-success);
 // inside the success box: [data-ref] or #ref, [data-wa] or #wa, [data-copy-ref] or #copy-ref, [data-again] or #again, [data-recap].
 // A box with data-show-if="name=value|value2" only shows, validates and sends its fields while that control has one of those values.
@@ -12,7 +13,7 @@
   var SITE = window.MERSAL_SITE || {};
   var HOTLINE = SITE.hotline || "19340";
   var WA = String(SITE.whatsapp || SITE.phone || "01200002870").replace(/\D/g, "").replace(/^0/, "20");
-  var PREFIX = { volunteer: "MV", help: "MH", transfer: "MT", pickup: "MP" };
+  var PREFIX = { volunteer: "MV", help: "MH", transfer: "MT", pickup: "MP", contact: "MC" };
   var REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var SMOOTH = REDUCED ? "auto" : "smooth";
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -34,13 +35,16 @@
   var isEmail = function (s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); };
   // "5,000" / "٥٠٠٠٫٥" -> 5000.5; NaN unless a plain amount with at most 2 decimals
   function num(v) { var s = latin(v).replace(/[\s,٬]/g, "").replace("٫", "."); return /^\d{1,9}(\.\d{1,2})?$/.test(s) ? parseFloat(s) : NaN; }
+  // whole numbers only (age, income), like toInt on the server: "25.5" or "١٬٥٠٠٫٥" is NaN, "١٬٥٠٠" is 1500
+  function int(v) { var s = latin(v).replace(/[\s,٬]/g, ""); return /^\d{1,9}$/.test(s) ? parseInt(s, 10) : NaN; }
   var fmt = function (n) { return Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 }); };
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function day(offset) { var d = new Date(); d.setDate(d.getDate() + (offset || 0)); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function longDay(v) { try { return new Date(v + "T00:00:00").toLocaleDateString("ar-EG-u-nu-latn", { weekday: "long", day: "numeric", month: "long" }); } catch (x) { return v; } }
   var GOVS = ["القاهرة", "الجيزة", "الإسكندرية", "القليوبية", "الشرقية", "الدقهلية", "الغربية", "المنوفية", "البحيرة", "كفر الشيخ", "دمياط", "بورسعيد", "الإسماعيلية", "السويس", "شمال سيناء", "جنوب سيناء", "الفيوم", "بني سويف", "المنيا", "أسيوط", "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد", "مطروح"];
   var DONOR = {}; try { DONOR = JSON.parse(localStorage.getItem("mersalDonor") || "{}") || {}; } catch (x) {} // saved by js/donate.js
-  var LEGACY_FOR = { hospital: "p30", oncology: "p31" };
+  var LEGACY_FOR = { hospital: "p30", oncology: "p31", p4: "p31", p5: "p31" }; // p4/p5: pages of the oncology centre (p31)
+  var pagesJson = null; // /data/pages.json, fetched once for the titles of ?for=p<id> purposes
 
   forms.forEach(setup);
   transferCards();
@@ -64,7 +68,7 @@
       volunteer: {
         name: req(2, "اكتب اسمك"),
         phone: phoneRule(false),
-        age: function (v) { var n = parseInt(latin(v), 10); return n >= 16 && n <= 80 ? "" : "السن من 16 إلى 80 سنة"; },
+        age: function (v) { var n = int(v); if (isNaN(n)) return v ? "اكتب رقم صحيح من غير كسور" : "السن من 16 إلى 80 سنة"; return n >= 16 && n <= 80 ? "" : "السن من 16 إلى 80 سنة"; },
         email: emailRule,
         city: req(2, "اكتب المدينة أو المنطقة"),
         how: function (v) { return v.length ? "" : "اختار طريقة واحدة على الأقل"; },
@@ -83,7 +87,7 @@
         altPhone: phoneRule(true),
         gov: req(1, "اختار المحافظة"),
         city: none,
-        income: function (v) { if (!v) return ""; var n = parseInt(latin(v).replace(/[\s,]/g, ""), 10); return n >= 0 && n <= 1000000 ? "" : "الدخل الشهري رقم من 0 إلى 1,000,000"; },
+        income: function (v) { if (!v) return ""; var n = int(v); if (isNaN(n)) return "اكتب رقم صحيح من غير كسور"; return n <= 1000000 ? "" : "الدخل الشهري رقم من 0 إلى 1,000,000"; },
         consent: function (v) { return v ? "" : "لازم توافق على استخدام بياناتك عشان نقدر نتواصل معاك"; }
       },
       transfer: {
@@ -122,6 +126,12 @@
         phone: phoneRule(false),
         altPhone: phoneRule(true),
         notes: none
+      },
+      contact: {
+        name: req(2, "اكتب اسمك"),
+        phone: function (v) { if (!v && !valueOf("email")) return "اكتب رقم موبايل أو إيميل عشان نرد عليك"; return phoneRule(true)(v); },
+        email: function (v) { var pb = boxOf("phone"); if (pb && pb.classList.contains("invalid")) setTimeout(function () { check("phone"); }, 0); return emailRule(v); },
+        message: req(10, "اكتب رسالتك (10 حروف على الأقل)")
       }
     }[TYPE] || {};
     var NAMES = Object.keys(RULES);
@@ -183,7 +193,7 @@
         if (c.el.hidden !== on) return;
         c.el.hidden = !on;
         if (on) { c.el.classList.remove("sif-in"); void c.el.offsetWidth; c.el.classList.add("sif-in"); } // not "reveal": site.css uses that for scroll reveal (opacity 0 until .in)
-        else $$("[data-field]", c.el).forEach(function (b) { setError(b.getAttribute("data-field"), ""); b.classList.remove("invalid", "valid"); delete b.dataset.touched; });
+        else [c.el].concat($$("[data-field]", c.el)).filter(function (b) { return b.hasAttribute("data-field"); }).forEach(function (b) { setError(b.getAttribute("data-field"), ""); b.classList.remove("invalid", "valid"); delete b.dataset.touched; });
       });
     }
     form.addEventListener("change", function (e) { if (e.target.name && conds.some(function (c) { return c.name === e.target.name; })) syncShow(); });
@@ -210,8 +220,21 @@
       if (TYPE !== "transfer" && TYPE !== "pickup") return;
       ["name", "phone", "email"].forEach(function (k) { var el = form.elements[k]; if (el && !el.value && DONOR[k]) el.value = String(DONOR[k]).slice(0, Number(el.getAttribute("maxlength")) || 120); });
       var want = new URLSearchParams(location.search).get("for") || "", sel = form.elements.purpose;
-      want = (LEGACY_FOR[want] || want).replace(/[^\w-]/g, "");
-      if (want && sel && sel.querySelector && sel.querySelector('option[value="' + want + '"]')) sel.value = want;
+      if (Object.prototype.hasOwnProperty.call(LEGACY_FOR, want)) want = LEGACY_FOR[want];
+      want = want.replace(/[^\w-]/g, "");
+      if (!want || !sel || !sel.querySelector) return;
+      if (sel.querySelector('option[value="' + want + '"]')) { sel.value = want; return; }
+      // a project page (p<id>) that is not in the short list: add it, named like the page, and select it
+      if (!/^p\d{1,4}$/.test(want)) return;
+      pagesJson = pagesJson || fetch("/data/pages.json").then(function (r) { return r.json(); }).catch(function () { return {}; });
+      pagesJson.then(function (pages) {
+        var pg = pages && pages[want.slice(1)], card = document.querySelector('#purpose option[value="' + want + '"]');
+        var title = String((card && card.textContent) || (pg && pg.title) || "").trim();
+        if (!title || sel.querySelector('option[value="' + want + '"]')) return;
+        var o = document.createElement("option"); o.value = want; o.textContent = title; sel.appendChild(o);
+        var box = boxOf("purpose");
+        if (!(box && box.dataset.touched) && (sel.value === "general" || !sel.value)) sel.value = want;
+      });
     }
     prefill();
 
@@ -237,6 +260,11 @@
       d.website = (form.elements.website && form.elements.website.value) || "";
       d.t = Math.round((Date.now() - started) / 1000);
       return d;
+    }
+    // contact form: the same message as an e-mail to the address in the site details (fallback when the API fails)
+    function mailto(d) {
+      return "mailto:" + SITE.email + "?subject=" + encodeURIComponent("رسالة من الموقع - " + (d.name || "")) +
+        "&body=" + encodeURIComponent((d.message || "") + "\n\n" + (d.name || "") + (d.phone ? "\n" + d.phone : "") + (d.email ? "\n" + d.email : ""));
     }
     function optText(name) { var s = form.elements[name]; return s && s.options && s.selectedIndex > -1 ? s.options[s.selectedIndex].textContent.trim() : ""; }
     // the parts of one line on the success screen that repeats what was registered
@@ -271,7 +299,8 @@
             focusField(keys[0]);
           } else {
             var msg = err && err.status ? err.message : "مفيش اتصال بالإنترنت أو الخدمة مش متاحة دلوقتي.";
-            showAlert("<b>" + esc(msg || "تعذّر إرسال الطلب") + "</b><br>جرّب تاني بعد شوية، أو كلمنا على الخط الساخن <a href=\"tel:" + esc(HOTLINE) + "\">" + esc(HOTLINE) + "</a>.");
+            showAlert("<b>" + esc(msg || "تعذّر إرسال الطلب") + "</b><br>جرّب تاني بعد شوية، أو كلمنا على الخط الساخن <a href=\"tel:" + esc(HOTLINE) + "\">" + esc(HOTLINE) + "</a>." +
+              (TYPE === "contact" && SITE.email ? '<br>أو <a href="' + esc(mailto(d)) + '">ابعت رسالتك على الإيميل ' + esc(SITE.email) + "</a>." : ""));
           }
         })
         .then(function () { clearTimeout(timer); busy(false); });
@@ -281,7 +310,8 @@
       volunteer: "السلام عليكم، قدمت طلب تطوع على موقع مرسال. رقم الطلب: ",
       help: "السلام عليكم، قدمت طلب مساعدة على موقع مرسال. رقم الطلب: ",
       transfer: "السلام عليكم، سجلت تبرعي على موقع مرسال ومرفق صورة إيصال التحويل. رقم الطلب: ",
-      pickup: "السلام عليكم، طلبت مندوب لحد البيت من موقع مرسال. رقم الطلب: "
+      pickup: "السلام عليكم، طلبت مندوب لحد البيت من موقع مرسال. رقم الطلب: ",
+      contact: "السلام عليكم، بعتلكم رسالة من موقع مرسال. رقم الرسالة: "
     };
     function showSuccess(ref, d) {
       form.hidden = true; success.hidden = false;

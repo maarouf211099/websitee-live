@@ -130,3 +130,9 @@ code { background: #e4f3f3; padding: 2px 8px; border-radius: 6px; direction: ltr
 .news-item .thumb { aspect-ratio: 16 / 10; }
 .news-item textarea { resize: vertical; line-height: 1.6; }
 .ic-preview { grid-column: 1 / -1; font-size: 13px; font-weight: 700; color: var(--teal-dark); background: #e4f3f3; border-radius: 10px; padding: 6px 10px; }
+
+/* ---- review2: inline links follow the theme (:where() has no specificity, so .btn / .link / sidebar colours still win) ---- */
+:where(a), :where(a:visited) { color: var(--teal-dark, #005959); }
+:where(a:hover) { color: var(--teal, #009091); }
+#home-pages-status .btn { margin-inline-start: 8px; vertical-align: middle; }
+.rq-type.contact { background: #fdeef3; color: #9b2c55; }

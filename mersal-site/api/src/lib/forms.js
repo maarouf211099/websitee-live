@@ -1,28 +1,30 @@
 // Public request forms: validation, bot checks, rate limit and storage.
-//   volunteer (MV) /volunteer.html, help (MH) /help.html,
+//   volunteer (MV) /volunteer.html, help (MH) /help.html, contact (MC) /contact.html,
 //   transfer (MT) "سجّل تبرعك" and pickup (MP) "مندوب لحد البيت" on /donate.html
 //
-// Storage, in order of preference:
-//   1. Azure Table "requests" in the DONATIONS_STORAGE account (partitionKey = type, rowKey = reference id)
-//   2. GitHub: api/data/requests/<id>.json + api/data/requests/index.json committed through lib/admin.js
-//      (api/ is not served publicly, and only those paths are whitelisted there)
+// Storage: the Azure Table "requests" in the DONATIONS_STORAGE account (partitionKey = type, rowKey = reference id).
+// Nothing else: the GitHub repository is public, so patient details, phones and home addresses must never be
+// committed there. Without the table (or when it fails) a request is only delivered when FORMS_WEBHOOK_URL accepts
+// it; otherwise the visitor gets a 503 with the 19340 hotline and the console's requests tab shows a red blocker.
 // Optional: FORMS_WEBHOOK_URL gets a POST per request, signed with FORMS_WEBHOOK_SECRET (or DONATION_WEBHOOK_SECRET)
-// the same way verify.js forwards donations. FORMS_RATE_LIMIT (default 5) = submissions per IP per hour.
+// the same way verify.js forwards donations.
+// Limits (lib/limits.js, shared by every instance when the table is set): FORMS_RATE_LIMIT (default 5) accepted
+// submissions per visitor IP per hour, FORMS_GLOBAL_LIMIT (default 300) accepted submissions per hour from everyone.
 const crypto = require("crypto");
-const admin = require("./admin");
+const cairo = require("./cairo");
+const limits = require("./limits");
 let TableClient = null;
 try { ({ TableClient } = require("@azure/data-tables")); } catch { /* dependency not installed */ }
 
 const TABLE = "requests";
-const INDEX = "api/data/requests/index.json";
-const INDEX_MAX = 2000; // the GitHub contents API only returns files under 1 MB; older requests stay as single files
-const fileOf = (id) => `api/data/requests/${id}.json`;
+const has = (map, k) => k != null && Object.prototype.hasOwnProperty.call(map, String(k));
 
 const TYPES = {
   volunteer: { prefix: "MV", label: "تطوع" },
   help: { prefix: "MH", label: "طلب مساعدة" },
   transfer: { prefix: "MT", label: "تبرع مسجّل" },
   pickup: { prefix: "MP", label: "مندوب" },
+  contact: { prefix: "MC", label: "رسالة" },
 };
 const STATUSES = ["new", "contacted", "done", "rejected"];
 const STATUS_LABELS = { new: "جديد", contacted: "تم التواصل", done: "تم", rejected: "مرفوض" };
@@ -30,7 +32,8 @@ const HOW = { hospital: "مستشفى", convoys: "قوافل", design: "تصمي
 const AVAILABILITY = { weekdays: "أيام الأسبوع", weekends: "نهاية الأسبوع", flexible: "مرن / حسب الحاجة", online: "أونلاين فقط" };
 const RELATION = { self: "المريض نفسه", parent: "الأب / الأم", child: "الابن / الابنة", spouse: "الزوج / الزوجة", sibling: "الأخ / الأخت", relative: "قريب", other: "أخرى" };
 const CASE_TYPES = { monthly: "علاج شهري", surgery: "عملية", oncology: "أورام", children: "أطفال", other: "أخرى" };
-// transfer / pickup. PURPOSES keys match the card donation select on donate.html (general, zakat, sadaqa, p<page id>)
+// transfer / pickup. PURPOSES keys match the card donation select on donate.html; any campaign page "p<id>" is accepted too
+// (the same rule as /api/checkout), labelled from pages.json in the console.
 const METHODS = { bank: "تحويل بنكي", instapay: "إنستاباي", vodafone: "فودافون كاش", etisalat: "اتصالات كاش (e& cash)", wepay: "WE Pay", orange: "أورانج كاش", fawry: "فوري / MyFawry", masary: "مصاري", aman: "أمان", megakheir: "ميجا خير", bankwallet: "محافظ البنوك (من خلال فوري)" };
 const CURRENCIES = { EGP: "جنيه مصري", USD: "دولار أمريكي", EUR: "يورو", SAR: "ريال سعودي", AED: "درهم إماراتي" };
 const PURPOSES = { general: "تبرع عام - حيث الحاجة أكبر", zakat: "زكاة المال", sadaqa: "صدقة", p30: "مستشفى مرسال للأطفال", p31: "مركز مرسال لعلاج الأورام", cases: "حالات المرضى" };
@@ -64,7 +67,10 @@ function normalizePhone(v) {
 const isEgyptMobile = (s) => /^01[0125]\d{8}$/.test(s);
 const isEmail = (s) => s.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
 const toInt = (v) => { const s = latinDigits(v).replace(/[\s,]/g, ""); return /^-?\d+$/.test(s) ? parseInt(s, 10) : NaN; };
-const pickKey = (map, v) => (v != null && Object.prototype.hasOwnProperty.call(map, String(v)) ? String(v) : "");
+const pickKey = (map, v) => (has(map, v) ? String(v) : "");
+// "" -> general; a PURPOSES key; or a campaign page "p<id>". "" when it is none of those.
+const pickPurpose = (v) => (v == null || v === "" ? "general" : has(PURPOSES, v) ? String(v) : /^p\d{1,4}$/.test(String(v)) ? String(v) : "");
+const purposeLabel = (p) => PURPOSES[p] || (/^p(\d{1,4})$/.test(p || "") ? "مشروع " + p.slice(1) : p || "");
 const truthy = (v) => v === true || v === 1 || v === "1" || v === "true" || v === "on" || v === "yes";
 // "5,000", "٥٠٠٠٫٥", 1500 -> number with at most 2 decimals; NaN when it is not a plain positive amount
 function toAmount(v) {
@@ -74,11 +80,7 @@ function toAmount(v) {
   return n > 0 && n <= MAX_AMOUNT ? n : NaN;
 }
 // Today's date in Egypt as YYYY-MM-DD; +/- days. Date checks allow one day of slack for visitors in other time zones.
-function cairoDay(offsetDays = 0, now = new Date()) {
-  const d = new Date(now.getTime() + offsetDays * 864e5);
-  try { return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit" }).format(d); }
-  catch { return d.toISOString().slice(0, 10); }
-}
+const cairoDay = cairo.cairoDay;
 // a real calendar date "YYYY-MM-DD" (rejects 2026-02-30)
 function isDay(s) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s || "")) return false;
@@ -90,13 +92,16 @@ const fmtAmount = (n) => (n == null || isNaN(n) ? "" : Number(n).toLocaleString(
 // ---------- validation: { ok, errors: { field: message }, data } ----------
 function validate(type, body) {
   const errors = {};
-  if (!TYPES[type]) return { ok: false, errors: { type: "نوع الطلب غير معروف" }, data: null };
+  if (!has(TYPES, type)) return { ok: false, errors: { type: "نوع الطلب غير معروف" }, data: null };
   const b = body && typeof body === "object" ? body : {};
   const err = (k, m) => { errors[k] = m; };
   const d = {};
 
   d.phone = normalizePhone(b.phone);
-  if (!isEgyptMobile(d.phone)) err("phone", "اكتب رقم موبايل مصري صحيح (01xxxxxxxxx)");
+  // the contact form may leave the phone empty when it gives an email instead (checked in its branch)
+  const phoneGiven = String(b.phone == null ? "" : b.phone).trim() !== "";
+  if ((type !== "contact" || phoneGiven) && !isEgyptMobile(d.phone)) err("phone", "اكتب رقم موبايل مصري صحيح (01xxxxxxxxx)");
+  if (type === "contact" && !phoneGiven) d.phone = "";
 
   if (type === "volunteer") {
     d.name = clean(b.name, 80); if (d.name.length < 2) err("name", "اكتب اسمك");
@@ -123,7 +128,7 @@ function validate(type, body) {
     else if (d.date > cairoDay(1)) err("date", "تاريخ التحويل مينفعش يكون في المستقبل");
     else if (d.date < cairoDay(-731)) err("date", "التاريخ ده قديم أوي - كلمنا على 19340");
     d.txRef = clean(b.txRef, 60);
-    d.purpose = b.purpose == null || b.purpose === "" ? "general" : pickKey(PURPOSES, b.purpose); if (!d.purpose) err("purpose", "اختار الغرض من التبرع");
+    d.purpose = pickPurpose(b.purpose); if (!d.purpose) err("purpose", "اختار الغرض من التبرع");
     d.caseCode = latinDigits(clean(b.caseCode, 40)).replace(/\s+/g, "").toUpperCase();
     if (d.caseCode && !/^[A-Z0-9-]{1,20}$/.test(d.caseCode)) err("caseCode", "كود الحالة حروف إنجليزي وأرقام بس (لحد 20)");
     d.notes = clean(b.notes, 1000, true);
@@ -138,7 +143,7 @@ function validate(type, body) {
     d.amount = null; d.purpose = ""; d.goods = "";
     if (d.kind === "money") {
       d.amount = toAmount(b.amount); if (isNaN(d.amount)) { d.amount = null; err("amount", "اكتب المبلغ (رقم أكبر من صفر)"); }
-      d.purpose = b.purpose == null || b.purpose === "" ? "general" : pickKey(PURPOSES, b.purpose); if (!d.purpose) err("purpose", "اختار الغرض من التبرع");
+      d.purpose = pickPurpose(b.purpose); if (!d.purpose) err("purpose", "اختار الغرض من التبرع");
     } else if (d.kind === "goods") {
       d.goods = clean(b.goods, 500, true); if (d.goods.length < 3) err("goods", "اكتب إيه اللي حابب تتبرع بيه");
     }
@@ -148,6 +153,11 @@ function validate(type, body) {
     else if (d.date > cairoDay(62)) err("date", "اختار يوم خلال الشهرين الجايين");
     d.slot = pickKey(SLOTS, b.slot); if (!d.slot) err("slot", "اختار الوقت المناسب");
     d.notes = clean(b.notes, 1000, true);
+  } else if (type === "contact") {
+    d.name = clean(b.name, 80); if (d.name.length < 2) err("name", "اكتب اسمك");
+    d.email = clean(b.email, 120).toLowerCase(); if (d.email && !isEmail(d.email)) err("email", "البريد الإلكتروني مش صحيح");
+    if (!phoneGiven && !d.email && !errors.email) err("phone", "اكتب رقم موبايل أو بريد إلكتروني عشان نقدر نرد عليك");
+    d.message = clean(b.message, 2000, true); if (d.message.length < 10) err("message", "اكتب رسالتك (10 حروف على الأقل)");
   } else {
     d.patient = clean(b.patient, 80); if (d.patient.length < 2) err("patient", "اكتب اسم المريض");
     d.requester = clean(b.requester, 80); if (d.requester.length < 2) err("requester", "اكتب اسم مقدم الطلب");
@@ -166,44 +176,36 @@ function validate(type, body) {
   return { ok: !Object.keys(errors).length, errors, data: d };
 }
 
-// Honeypot field "website" must stay empty; "t" = seconds the person spent on the page (sent by the page)
+// Honeypot field "website" must stay empty; "t" = seconds the person spent on the page (js/forms.js always sends it).
+// "honeypot" / "too-fast" are dropped quietly (the bot sees a success); "no-time" (t missing or not a number) is a 400.
 function botCheck(body) {
   const b = body && typeof body === "object" ? body : {};
   if (String(b.website || "").trim()) return "honeypot";
-  if (b.t !== undefined && b.t !== null && b.t !== "") { const t = Number(b.t); if (!(t >= 2)) return "too-fast"; }
+  const t = typeof b.t === "number" ? b.t : typeof b.t === "string" && /^\s*\d{1,7}(\.\d+)?\s*$/.test(b.t) ? Number(b.t) : NaN;
+  if (!Number.isFinite(t)) return "no-time";
+  if (t < 2) return "too-fast";
   return null;
 }
 
-// ---------- rate limit: FORMS_RATE_LIMIT (5) accepted submissions per IP per hour, per function instance ----------
-const hits = new Map();
-const WINDOW = 3600e3;
-function rateAllowed(ip, now = Date.now()) {
-  const limit = Math.max(1, parseInt(process.env.FORMS_RATE_LIMIT, 10) || 5);
-  const arr = (hits.get(ip) || []).filter((t) => now - t < WINDOW);
-  hits.set(ip, arr);
-  return arr.length < limit;
+// ---------- rate limit (lib/limits.js): per visitor IP and for everyone, per hour ----------
+const perIp = () => limits.setting("FORMS_RATE_LIMIT", 5);
+const perHour = () => limits.setting("FORMS_GLOBAL_LIMIT", 300);
+async function rateAllowed(ip, now = Date.now(), log) {
+  return (await limits.allowed("forms", ip, perIp(), now, log)) && (await limits.allowed("forms", "*", perHour(), now, log));
 }
-function rateHit(ip, now = Date.now()) {
-  const arr = (hits.get(ip) || []).filter((t) => now - t < WINDOW); arr.push(now); hits.set(ip, arr);
-  if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < WINDOW)) hits.delete(k);
-}
-function clientIp(req) {
-  let ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
-  if (/^\d{1,3}(\.\d{1,3}){3}:\d+$/.test(ip)) ip = ip.replace(/:\d+$/, "");
-  else if (ip.startsWith("[")) ip = ip.slice(1, ip.indexOf("]"));
-  return ip || "local";
-}
+async function rateHit(ip, now = Date.now(), log) { await limits.hit("forms", ip, now, log); await limits.hit("forms", "*", now, log); }
+const clientIp = limits.clientIp;
 
 // ---------- records ----------
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function makeRef(type, date = new Date()) {
-  const ymd = date.toISOString().slice(0, 10).replace(/-/g, "");
+  const ymd = cairoDay(0, date).replace(/-/g, ""); // the Egyptian calendar day, like the console's date filters
   const rnd = Array.from(crypto.randomBytes(5), (b) => ALPHABET[b % ALPHABET.length]).join("");
   return `${TYPES[type].prefix}-${ymd}-${rnd}`;
 }
 const BY_PREFIX = Object.fromEntries(Object.entries(TYPES).map(([k, t]) => [t.prefix, k]));
 const ID_RE = /^(M[A-Z])-\d{8}-[A-Z2-9]{5}$/;
-function typeOf(id) { const m = ID_RE.exec(String(id || "")); return m ? BY_PREFIX[m[1]] || null : null; }
+function typeOf(id) { const m = ID_RE.exec(String(id || "")); return m && has(BY_PREFIX, m[1]) ? BY_PREFIX[m[1]] : null; }
 
 function summary(type, d) {
   if (type === "volunteer") {
@@ -212,15 +214,16 @@ function summary(type, d) {
   }
   if (type === "transfer") {
     const via = METHODS[d.method] + (d.bank ? " - " + d.bank : "");
-    return [fmtAmount(d.amount) + " " + CURRENCIES[d.currency], via, d.date, PURPOSES[d.purpose], d.caseCode && "كود الحالة " + d.caseCode, d.notes].filter(Boolean).join(" · ").slice(0, 160);
+    return [fmtAmount(d.amount) + " " + CURRENCIES[d.currency], via, d.date, purposeLabel(d.purpose), d.caseCode && "كود الحالة " + d.caseCode, d.notes].filter(Boolean).join(" · ").slice(0, 160);
   }
   if (type === "pickup") {
     const what = d.kind === "money" ? "فلوس " + fmtAmount(d.amount) + " جنيه" : "تبرع عيني: " + d.goods;
-    return [what, d.kind === "money" && PURPOSES[d.purpose], d.date + " " + SLOTS[d.slot], d.notes].filter(Boolean).join(" · ").slice(0, 160);
+    return [what, d.kind === "money" && purposeLabel(d.purpose), d.date + " " + SLOTS[d.slot], d.notes].filter(Boolean).join(" · ").slice(0, 160);
   }
+  if (type === "contact") return d.message.replace(/\s+/g, " ").slice(0, 160);
   return [CASE_TYPES[d.caseType], d.hospital, d.description].filter(Boolean).join(" · ").slice(0, 160);
 }
-// meta = the few fields the admin list and its CSV need without the full data (the GitHub index has no .data)
+// meta = the few fields the admin list and its CSV need without parsing the full data
 function metaOf(type, d) {
   if (type === "transfer") return { amount: d.amount, currency: d.currency, method: d.method, bank: d.bank, date: d.date, purpose: d.purpose, caseCode: d.caseCode };
   if (type === "pickup") return { kind: d.kind, amount: d.amount, currency: d.kind === "money" ? "EGP" : "", purpose: d.purpose, area: d.area, date: d.date, slot: d.slot };
@@ -244,79 +247,49 @@ function fromEntity(e) {
   return r;
 }
 
-// ---------- storage ----------
+// ---------- storage: Azure Table only ----------
 function tableClient() {
   const cs = process.env.DONATIONS_STORAGE;
   if (!cs || !TableClient) return null;
   return TableClient.fromConnectionString(cs, TABLE);
 }
-const githubReady = () => admin.githubReady();
-const enabled = () => ({ table: !!(process.env.DONATIONS_STORAGE && TableClient), github: githubReady(), webhook: !!process.env.FORMS_WEBHOOK_URL });
-const BOT = { name: "Mersal website", email: "forms@mersal-ngo.org" };
+const enabled = () => ({ table: !!(process.env.DONATIONS_STORAGE && TableClient), webhook: !!process.env.FORMS_WEBHOOK_URL });
+const unavailable = (message) => Object.assign(new Error(message), { status: 503 });
+const NO_TABLE = "الطلبات مش بتتحفظ: ضيف DONATIONS_STORAGE (Azure Table) في إعدادات Azure";
 
-async function readJson(path, fallback) {
-  try { return JSON.parse(await admin.readFile(path)); }
-  catch (e) { if (/GitHub 404/.test(e.message)) return fallback; throw e; }
-}
-// commitFiles refuses a stale parent (force: false); two requests in the same second just retry.
-// build() returns the files to commit, or null to skip (e.g. unknown id).
-async function commitRetry(build, message, who) {
-  for (let i = 0; ; i++) {
-    try { const files = await build(); return files ? await admin.commitFiles(files, message, who) : null; }
-    catch (e) { if (i >= 2 || !/GitHub (409|422)/.test(e.message)) throw e; }
-  }
-}
-
-// Returns "table" | "github" | null (nothing configured). A failing table falls back to GitHub.
+// Returns "table", or null when no table is configured. Throws (status 503) when the table write fails.
 async function save(rec, log = () => {}) {
   const c = tableClient();
-  if (c) {
-    try { try { await c.createTable(); } catch { /* exists */ } await c.upsertEntity(toEntity(rec), "Merge"); return "table"; }
-    catch (e) { log("requests: table save failed, trying GitHub", e.message); if (!githubReady()) throw e; }
-  }
-  if (!githubReady()) return null;
-  await commitRetry(async () => {
-    const index = await readJson(INDEX, []);
-    const next = [compact(rec)].concat((Array.isArray(index) ? index : []).filter((r) => r.id !== rec.id)).slice(0, INDEX_MAX);
-    return [{ path: fileOf(rec.id), content: JSON.stringify(rec, null, 2) + "\n" }, { path: INDEX, content: JSON.stringify(next) + "\n" }];
-  }, `request: ${TYPES[rec.type].label} ${rec.id}`, BOT);
-  return "github";
+  if (!c) return null;
+  try { try { await c.createTable(); } catch { /* exists */ } await c.upsertEntity(toEntity(rec), "Merge"); return "table"; }
+  catch (e) { log("requests: table save failed", e.message); const x = unavailable("تعذّر حفظ الطلب دلوقتي"); x.cause = e; throw x; }
 }
 
-const dateOk = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || "");
-// { store: "table" | "github" | null, rows } - newest first. Table rows carry .data; GitHub index rows need get(id) for it.
+// { store: "table" | null, rows } - newest first. from / to are Cairo calendar days.
 async function list(f = {}) {
-  let rows = null, store = null;
   const c = tableClient();
-  if (c) {
-    try { await c.createTable(); } catch { /* exists */ }
-    rows = [];
-    const opts = TYPES[f.type] ? { queryOptions: { filter: `PartitionKey eq '${f.type}'` } } : undefined;
-    for await (const e of c.listEntities(opts)) rows.push(fromEntity(e));
-    store = "table";
-  } else if (githubReady()) {
-    const idx = await readJson(INDEX, []); rows = Array.isArray(idx) ? idx : []; store = "github";
-  }
-  if (!rows) return { store: null, rows: [] };
-  rows = rows.filter((r) => (!TYPES[f.type] || r.type === f.type) && (!STATUSES.includes(f.status) || r.status === f.status)
-    && (!dateOk(f.from) || r.createdAt >= f.from) && (!dateOk(f.to) || r.createdAt <= f.to + "T23:59:59.999Z"));
+  if (!c) return { store: null, rows: [] };
+  try { await c.createTable(); } catch { /* exists */ }
+  const type = has(TYPES, f.type) ? f.type : "";
+  let rows = [];
+  const opts = type ? { queryOptions: { filter: `PartitionKey eq '${type}'` } } : undefined;
+  for await (const e of c.listEntities(opts)) rows.push(fromEntity(e));
+  const r = cairo.range(f.from, f.to);
+  rows = rows.filter((x) => (!type || x.type === type) && (!STATUSES.includes(f.status) || x.status === f.status) && cairo.inRange(x.createdAt, r));
   rows.sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));
-  return { store, rows };
+  return { store: "table", rows };
 }
 
 async function get(id) {
   const type = typeOf(id); if (!type) return null;
   const c = tableClient();
-  if (c) {
-    try { return fromEntity(await c.getEntity(type, id)); }
-    catch (e) { if (e.statusCode === 404 || /ResourceNotFound/.test(e.message)) return null; throw e; }
-  }
-  if (!githubReady()) return null;
-  return readJson(fileOf(id), null);
+  if (!c) return null;
+  try { return fromEntity(await c.getEntity(type, id)); }
+  catch (e) { if (e.statusCode === 404 || /ResourceNotFound/.test(e.message)) return null; throw e; }
 }
 
 // patch = { status?, note? } -> updated record (or null when the id is unknown)
-async function update(id, patch, who) {
+async function update(id, patch) {
   const type = typeOf(id);
   if (!type) { const e = new Error("رقم طلب غير صحيح"); e.status = 400; throw e; }
   const p = {};
@@ -325,23 +298,10 @@ async function update(id, patch, who) {
   if (!Object.keys(p).length) { const e = new Error("مفيش حاجة تتعدل"); e.status = 400; throw e; }
   p.updatedAt = new Date().toISOString();
   const c = tableClient();
-  if (c) {
-    try { await c.updateEntity({ partitionKey: type, rowKey: id, ...p }, "Merge"); }
-    catch (e) { if (e.statusCode === 404 || /ResourceNotFound/.test(e.message)) return null; throw e; }
-    return fromEntity(await c.getEntity(type, id));
-  }
-  if (!githubReady()) { const e = new Error("مفيش مكان تخزين متظبط (DONATIONS_STORAGE أو GITHUB_TOKEN)"); e.status = 503; throw e; }
-  let out = null;
-  await commitRetry(async () => {
-    const rec = await readJson(fileOf(id), null);
-    if (!rec) return null;
-    Object.assign(rec, p); out = rec;
-    const index = await readJson(INDEX, []);
-    const next = (Array.isArray(index) ? index : []).map((r) => (r.id === id ? { ...r, ...p } : r));
-    if (!next.some((r) => r.id === id)) next.unshift(compact(rec));
-    return [{ path: fileOf(id), content: JSON.stringify(rec, null, 2) + "\n" }, { path: INDEX, content: JSON.stringify(next.slice(0, INDEX_MAX)) + "\n" }];
-  }, `request: ${id} -> ${p.status || "note"}`, who || BOT);
-  return out;
+  if (!c) throw unavailable(NO_TABLE);
+  try { await c.updateEntity({ partitionKey: type, rowKey: id, ...p }, "Merge"); }
+  catch (e) { if (e.statusCode === 404 || /ResourceNotFound/.test(e.message)) return null; throw e; }
+  return fromEntity(await c.getEntity(type, id));
 }
 
 // ---------- webhook (same shape as the donation forward in lib/mpgs.js) ----------
@@ -360,8 +320,8 @@ async function forward(rec, log = () => {}) {
 }
 
 module.exports = {
-  TYPES, STATUSES, STATUS_LABELS, HOW, AVAILABILITY, RELATION, CASE_TYPES, GOVERNORATES, METHODS, CURRENCIES, PURPOSES, KINDS, SLOTS, INDEX, fileOf,
-  latinDigits, clean, normalizePhone, isEgyptMobile, isEmail, toAmount, cairoDay, isDay, validate, botCheck,
+  TYPES, STATUSES, STATUS_LABELS, HOW, AVAILABILITY, RELATION, CASE_TYPES, GOVERNORATES, METHODS, CURRENCIES, PURPOSES, KINDS, SLOTS,
+  latinDigits, clean, normalizePhone, isEgyptMobile, isEmail, toAmount, cairoDay, isDay, validate, botCheck, pickPurpose, purposeLabel, hasType: (t) => has(TYPES, t),
   rateAllowed, rateHit, clientIp, makeRef, typeOf, summary, metaOf, makeRecord, toEntity, fromEntity,
-  enabled, save, list, get, update, forward, _hits: hits,
+  enabled, save, list, get, update, forward, _hits: limits._mem,
 };

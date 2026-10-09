@@ -77,6 +77,7 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 
 ## لوحة التحكم (`/admin/`)
 لوحة منفصلة على `https://<الموقع>/admin/`، الدخول باسم مستخدم وكلمة سر (مفيش حساب مايكروسوفت).
+الـAPI بتاعها على `/api/console/*` (مش `/api/admin/*`: مسار `admin` محجوز في Azure Functions وبيرجّع 404).
 كل حفظ من اللوحة = commit على فرع `main` في GitHub، والموقع بيتنشر تلقائياً خلال دقيقة تقريباً.
 
 **اللي تقدر تعدّله من اللوحة:** السلايدر، حملات التبرع وأرقامها، "مرسال بالأرقام"، شريط المشاريع، كل صفحات المحتوى والصفحات الثابتة، القائمة، الألبومات والصور، بيانات التواصل والسوشيال والفوتر، الحسابات البنكية والمحافظ، هدايا الكوميونيتي، طلبات التطوع والمساعدة، وضع الدفع بالبطاقة، تقرير التبرعات، وكلمة سر اللوحة.
@@ -185,8 +186,8 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 
 **فين البيانات؟**
 - التواصل/السوشيال/الفوتر: جوه `public/js/layout.js` بين العلامتين `/* mersal:site */ … /* /mersal:site */` (الكائن `SITE`) عشان الصفحات متعملش طلب إضافي، ونسخة في `public/data/site.json` لأي أداة تانية.
-  الـAPI (`api/src/functions/site.js` → `GET/PUT /api/admin/site`) بيعيد كتابة الكتلة دي بالكامل بعد التحقق من القيم، فلو عدّلتها يدوياً خلّيها كائن عادي (مفتاح: قيمة في كل سطر، من غير تعليقات جواها). `payMode` بيفضل جوه نفس الكائن وبيتغير من endpoint الإعدادات بس.
-- طرق التبرع: `public/data/donate.json` (`banks`, `wallets`, `foreign`) → `PUT /api/admin/data/donate`. صفحة `donate.html` بتقراه عند التحميل (`js/donate.js`)، والـHTML اللي فيها هو النسخة الاحتياطية لو الملف فشل.
+  الـAPI (`api/src/functions/site.js` → `GET/PUT /api/console/site`) بيعيد كتابة الكتلة دي بالكامل بعد التحقق من القيم، فلو عدّلتها يدوياً خلّيها كائن عادي (مفتاح: قيمة في كل سطر، من غير تعليقات جواها). `payMode` بيفضل جوه نفس الكائن وبيتغير من endpoint الإعدادات بس.
+- طرق التبرع: `public/data/donate.json` (`banks`, `wallets`, `foreign`) → `PUT /api/console/data/donate`. صفحة `donate.html` بتقراه عند التحميل (`js/donate.js`)، والـHTML اللي فيها هو النسخة الاحتياطية لو الملف فشل.
 - أي صفحة تقدر تعرض بيانات الموقع بـ `data-site="hotline|phone|whatsapp|email|address"` (النص والرابط بيتملوا من `SITE`)، وعنصر `data-site-box` بيتخفي لو القيمة فاضية.
 
 ### تبويب "القائمة"
@@ -199,7 +200,7 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 ### الصفحات الثابتة
 في تبويب الصفحات القائمة بتبدأ بعنوان **"صفحات ثابتة"**: عن مرسال، تواصل معنا، كارت عافية، حاسبة الزكاة (`public/<id>.html`)، وبعدها "صفحات المحتوى" (`public/p/<id>.html`).
 الجزء القابل للتعديل في كل صفحة ثابتة محاط بـ `<!-- mersal:content --> … <!-- /mersal:content -->` (عن مرسال: كل المحتوى، تواصل معنا: المقدمة وكروت التواصل من غير الفورم، كارت عافية وحاسبة الزكاة: نص المقدمة).
-نفس الـendpoint `GET/PUT /api/admin/page/{id}`؛ الـid لازم يكون رقم أو واحد من القائمة الثابتة دي، والصفحات الثابتة مش بتتسجل في `pages.json`.
+نفس الـendpoint `GET/PUT /api/console/page/{id}`؛ الـid لازم يكون رقم أو واحد من القائمة الثابتة دي، والصفحات الثابتة مش بتتسجل في `pages.json`.
 
 ### ملاحظة
 في `admin/admin.css` سطر `[hidden] { display: none !important; }` لأن `.login` و`.shell` و`.field` عندهم `display` صريح؛ أي عنصر جديد في اللوحة بيستخدم `hidden` بيشتغل زي المتوقع.
@@ -227,9 +228,9 @@ Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal
 | | |
 |---|---|
 | `POST /api/forms/volunteer` و`POST /api/forms/help` | عام. يرجّع `{ ok, ref }`. أخطاء: 400 `{ message, errors: { field: msg } }`، 429 (الحد الأقصى)، 503 (مفيش تخزين). |
-| `GET /api/admin/requests?type=&status=&from=&to=` | أدمن. `{ enabled: { table, github, webhook }, store: "table" \| "github" \| null, rows }` (الأحدث الأول). |
-| `GET /api/admin/requests/{id}` | أدمن. الطلب كامل بالتفاصيل (صفوف فهرس GitHub بتيجي من غير `data`، التبويب بيجيبها عند الضغط على "تفاصيل"). |
-| `PATCH /api/admin/requests/{id}` body `{ status: new \| contacted \| done \| rejected }` أو `{ note }` | أدمن. Merge في الجدول أو إعادة كتابة الملف والفهرس في GitHub. |
+| `GET /api/console/requests?type=&status=&from=&to=` | أدمن. `{ enabled: { table, github, webhook }, store: "table" \| "github" \| null, rows }` (الأحدث الأول). |
+| `GET /api/console/requests/{id}` | أدمن. الطلب كامل بالتفاصيل (صفوف فهرس GitHub بتيجي من غير `data`، التبويب بيجيبها عند الضغط على "تفاصيل"). |
+| `PATCH /api/console/requests/{id}` body `{ status: new \| contacted \| done \| rejected }` أو `{ note }` | أدمن. Merge في الجدول أو إعادة كتابة الملف والفهرس في GitHub. |
 
 ### تبويب الطلبات في اللوحة (`public/admin/tabs/requests.js`)
 فلاتر (النوع / الحالة / من - إلى)، عدّادات لكل حالة (وعدد "جديد" على زرار التبويب)، جدول (التاريخ، النوع، الاسم، الموبايل كرابط اتصال، المكان، ملخص، الحالة، ملاحظة، تفاصيل)، تصدير CSV. تغيير الحالة أو الملاحظة بيتحفظ فوراً من غير زرار حفظ.

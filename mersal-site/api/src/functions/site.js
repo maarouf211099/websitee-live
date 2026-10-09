@@ -1,4 +1,4 @@
-// Site details (hotline, phone, WhatsApp, email, address, social links, footer text): GET / PUT /api/admin/site.
+// Site details (hotline, phone, WhatsApp, email, address, social links, footer text): GET / PUT /api/console/site.
 // They live in public/js/layout.js between the /* mersal:site */ … /* /mersal:site */ markers (the SITE object literal),
 // so pages need no extra request; the API rewrites that block and mirrors it to public/data/site.json in one commit.
 // payMode (card payment) stays inside the same object but is only changed by the settings endpoint (adminSettings).
@@ -59,7 +59,7 @@ function render(js, site) {
 }
 
 app.http("adminSite", {
-  methods: ["GET", "PUT"], authLevel: "anonymous", route: "admin/site",
+  methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/site",
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);

@@ -1,5 +1,5 @@
-// Admin tab "بيانات الموقع": contact details, social links and footer text (PUT /api/admin/site -> js/layout.js + data/site.json)
-// plus the donate page's bank accounts, wallets and the account abroad (PUT /api/admin/data/donate -> data/donate.json).
+// Admin tab "بيانات الموقع": contact details, social links and footer text (PUT /api/console/site -> js/layout.js + data/site.json)
+// plus the donate page's bank accounts, wallets and the account abroad (PUT /api/console/data/donate -> data/donate.json).
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
   var root, site = null, donate = null, siteLoaded = "", donateLoaded = "";

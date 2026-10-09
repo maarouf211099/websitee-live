@@ -1,5 +1,5 @@
 // Admin tab "القائمة": nested editor for /data/menu.json (top-level items + one level of links).
-// Saves through PUT /api/admin/data/menu; js/layout.js builds the header menu from that file on every page.
+// Saves through PUT /api/console/data/menu; js/layout.js builds the header menu from that file on every page.
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
   var root, tree = null;

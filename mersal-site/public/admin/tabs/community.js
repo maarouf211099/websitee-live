@@ -1,4 +1,4 @@
-// Admin tab "الكوميونيتي": donor gifts page (/community.html) -> PUT /api/admin/data/community -> data/community.json
+// Admin tab "الكوميونيتي": donor gifts page (/community.html) -> PUT /api/console/data/community -> data/community.json
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
   var root, cfg = null, loaded = "";

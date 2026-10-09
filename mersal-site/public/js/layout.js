@@ -1,6 +1,6 @@
 // Shared header and footer for every page. Contact details, social links and the footer text live in SITE below.
 (function () {
-  // SITE is edited from the admin console ("بيانات الموقع" -> PUT /api/admin/site) and mirrored to /data/site.json:
+  // SITE is edited from the admin console ("بيانات الموقع" -> PUT /api/console/site) and mirrored to /data/site.json:
   // the API rewrites everything between the mersal:site markers, so keep that block a plain object literal
   // (one key per line, no comments). payMode is the card payment switch (Banque Misr), set from the console settings:
   //   "off"  = hidden everywhere

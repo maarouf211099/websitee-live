@@ -206,9 +206,11 @@
         bar = '<div class="progress" aria-label="' + pct + '%"><i style="width:' + pct + '%"></i></div>' +
           '<div class="meta-row"><span>تم جمع ' + fmt.format(c.raised || 0) + ' جنيه</span><span>الهدف ' + fmt.format(c.goal) + "</span></div>";
       }
+      // imported blurbs are cut at 110 characters: end them on a whole word with an ellipsis
+      var t = String(c.text || "").trim(); if (t.length >= 110) t = t.replace(/\s+\S*$/, "").replace(/[\s،,.:؛]+$/, "") + "…";
       return '<article class="card"><div class="media-box">' + window.mersalPic(c.imageSm || c.image, { alt: c.title, cls: "media", w: 600, h: 375 }) + "</div>" +
-        '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(c.text) + "</p>" + bar +
-        '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + (c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
+        '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(t) + "</p>" + bar +
+        '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + esc(c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
     }).join("");
     carouselArrows(track);
     fitMedia(track);
@@ -267,7 +269,7 @@
     // progress as lit segments: each one fills in turn as --p counts up, colour follows the percentage (--hue)
     var SEGS = 20, segs = "";
     for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';
-    return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (c.maxUnits || 50) + '" style="--p:0">' +
+    return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (Number(c.maxUnits) || 50) + '" style="--p:0">' +
       // the image link is a duplicate of the title link (hidden from AT); the price badge and the state chip sit beside it so they are read
       '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, 380px" : "" }) + "</a>" +
         (price ? '<span class="camp-badge">' + esc(badge) + "</span>" : "") + (hot ? '<span class="camp-hot">' + hot + "</span>" : "") + "</div>" +

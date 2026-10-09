@@ -12,7 +12,7 @@
 }
 .home .quick-donate .qd-text b { font-size: 19px; }
 .home .quick-donate .amounts button { border-radius: 12px; border-width: 2px; }
-.home .quick-donate .amounts button.on { background: var(--teal); border-color: var(--teal); color: #fff; box-shadow: 0 8px 18px -8px var(--teal); }
+.home .quick-donate .amounts button.on { background: var(--teal-text); border-color: var(--teal-text); color: #fff; box-shadow: 0 8px 18px -8px var(--teal); }
 .home .qd-go { border-radius: 14px; padding: 12px 30px; }
 
 /* ---------- ticker ---------- */
@@ -22,7 +22,7 @@
 .ticker-track span { white-space: nowrap; padding: 0 26px; font-size: 15px; color: var(--muted); font-weight: 600; position: relative; }
 .ticker-track span::after { content: "✦"; position: absolute; inset-inline-end: -8px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 12px; }
 .ticker-track b { color: var(--teal-dark); font-family: "Titillium Web", "Cairo", sans-serif; font-size: 18px; margin-inline-end: 4px; }
-.ticker-track .hash { color: var(--teal); }
+.ticker-track .hash { color: var(--teal-text); }
 .ticker-track .hash b { color: var(--gold-dark); font-size: 18px; }
 @keyframes tick { to { transform: translateX(50%); } }
 
@@ -48,7 +48,7 @@
 .home .numbers::before { width: 360px; height: 360px; background: var(--gold); inset-inline-start: -120px; top: -120px; }
 .home .numbers::after { width: 420px; height: 420px; background: #00c2c4; inset-inline-end: -160px; bottom: -200px; }
 .home .numbers .wrap { position: relative; }
-.home .num { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); border-radius: 22px; backdrop-filter: blur(8px); }
+.home .num { background: rgba(0,40,40,.32); border: 1px solid rgba(255,255,255,.18); border-radius: 22px; backdrop-filter: blur(8px); }
 .home .num b { font-size: clamp(38px, 5vw, 56px); letter-spacing: -1px; }
 
 /* ---------- hospital story ---------- */
@@ -147,7 +147,7 @@
 @supports (animation-timing-function: linear(0, 1)) {
   :root { --spring: linear(0, .28 8%, .6 16%, .86 24%, 1.03 32%, 1.08 40%, 1.05 50%, 1.01 62%, 1); --odo-spring: linear(0, .32 12%, .66 24%, .9 36%, 1.012 48%, 1.028 58%, 1.012 72%, 1); }
 }
-.home .slider { position: relative; overflow: hidden; color: #fff; background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad); background-size: 240px 240px, cover; }
+.home .slider { position: relative; overflow: hidden; color: #fff; background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad); background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")), var(--brand-grad); background-size: 240px 240px, cover; }
 .sl-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
 .sl-track::-webkit-scrollbar { display: none; }
 /* .sl-card is the slide (role=group); .sl-link inside it is the whole-card link */
@@ -279,7 +279,7 @@
 .camp-hot { position: absolute; z-index: 1; inset-inline-end: 12px; bottom: 12px; background: rgba(255,255,255,.92); color: #b45309; font-weight: 800; font-size: 12px; line-height: 1; padding: 7px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; pointer-events: none; }
 .camp-hot::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #f97316; animation: live 2s infinite; }
 .is-near .camp-hot, .is-fresh .camp-hot { color: var(--teal-dark); } .is-near .camp-hot::before, .is-fresh .camp-hot::before { background: var(--teal); }
-.is-done .camp-hot { color: var(--teal); } .is-done .camp-hot::before { background: var(--teal); animation: none; }
+.is-done .camp-hot { color: var(--teal-text); } .is-done .camp-hot::before { background: var(--teal); animation: none; }
 @keyframes live { 70% { box-shadow: 0 0 0 8px rgba(249,115,22,0); } 100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); } }
 .home .camp .body { padding: 16px 18px 18px; gap: 8px; }
 .home .camp h3 { font-size: 19px; }
@@ -303,7 +303,7 @@
 @keyframes sweep { from { transform: translateX(120%); } to { transform: translateX(-120%); } }
 @keyframes tipPulse { from { box-shadow: 0 0 0 0 rgba(254,200,48,.6); } to { box-shadow: 0 0 0 14px rgba(254,200,48,0); } }
 .camp-foot { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); }
-.camp-foot b { color: var(--teal-dark); font-family: "Titillium Web", "Cairo", sans-serif; } .camp-foot .left b { color: #b45309; } .camp-foot .ok { color: var(--teal); font-weight: 700; }
+.camp-foot b { color: var(--teal-dark); font-family: "Titillium Web", "Cairo", sans-serif; } .camp-foot .left b { color: #b45309; } .camp-foot .ok { color: var(--teal-text); font-weight: 700; }
 .camp-cta { display: grid; grid-template-columns: auto 1fr; gap: 8px; margin-top: 4px; }
 .camp-cta.single { grid-template-columns: 1fr; }
 .camp-qty { display: inline-flex; align-items: center; height: 46px; border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; }
@@ -314,7 +314,7 @@
 .home .camp .camp-give { height: 46px; border-radius: 14px; font-size: 15px; gap: 4px; margin: 0; padding: 0 10px; min-width: 0; justify-content: center; align-self: stretch; white-space: nowrap; transition: transform .12s, background .2s; }
 .camp-give b { font: 700 17px/1 "Titillium Web", "Cairo", sans-serif; }
 .camp-give:active { transform: scale(.96); } .camp-give.bump b { animation: pop .3s var(--spring); }
-.camp-more { font-size: 13px; color: var(--teal); text-align: center; font-weight: 700; text-decoration: none; }
+.camp-more { font-size: 13px; color: var(--teal-text); text-align: center; font-weight: 700; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
 .home .camp-carousel .car-arrow { background: #fff; color: var(--teal-dark); border: 1px solid var(--line); }
 .home .camp-carousel .car-arrow:hover { background: var(--gold); border-color: var(--gold); }
 .car-dots { display: none; justify-content: center; gap: 6px; margin-top: 4px; }
@@ -366,13 +366,12 @@
   .home .about-intro, .home .hospital-feature, .home .services-sec, .home .projects-sec, .home .ways-sec, .home .slogan-band { content-visibility: auto; contain-intrinsic-size: auto 600px; }
   .m-bar .m-donate i { animation-iteration-count: 3; }
   body.has-mbar { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-  html { scroll-padding-bottom: 96px; }
 }
 
 /* ===== v5: lighter on phones + odometer counters + share ===== */
 @media (max-width: 760px) {
   .home .quick-donate { backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; }
-  .home .num { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,.1); }
+  .home .num { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(0,40,40,.32); }
 }
 .ticker { -webkit-mask: none; mask: none; position: relative; }
 .ticker::before, .ticker::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 1; pointer-events: none; }
@@ -393,9 +392,9 @@
 @keyframes odoBlur { 0% { filter: blur(0); } 25% { filter: blur(1.3px); } 70% { filter: blur(.4px); } 100% { filter: blur(0); } }
 @media (prefers-reduced-motion: reduce) { .odo .od-roll { transition: none; } .odo .od { animation: none; } }
 .camp-links { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.camp-share { display: inline-flex; align-items: center; gap: 6px; font: 700 13px "Cairo", sans-serif; color: var(--muted); background: none; border: 0; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
+.camp-share { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font: 700 13px "Cairo", sans-serif; color: var(--muted); background: none; border: 0; padding: 4px 10px; border-radius: 8px; cursor: pointer; }
 .camp-share svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.camp-share:hover, .camp-share:active { color: var(--teal); background: var(--teal-soft); }
+.camp-share:hover, .camp-share:active { color: var(--teal-text); background: var(--teal-soft); }
 .odo span { font-size: inherit; color: inherit; font-weight: inherit; font-family: inherit; margin: 0; }
 
 /* ===== progress v5: segmented bar, colour follows the amount collected ===== */
@@ -422,3 +421,5 @@
 /* card pictures that are not photos (logos, square posters) are shown whole, never cropped */
 .card .media-box { overflow: hidden; background: var(--teal-soft); }
 .card img.media.fit { object-fit: contain; padding: 14px; background: linear-gradient(135deg, #e4f3f3, #f4f8f8); }
+/* the about / hospital photos are <picture> (WebP): the picture box itself takes no part in the layout */
+.home .about-pic picture, .home .hf-pic picture { display: contents; }

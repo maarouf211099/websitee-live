@@ -40,12 +40,12 @@
   window.mersalPic = function (src, opt) {
     opt = opt || {};
     var pre = opt.defer ? "data-" : "", wp = webpOf(src);
-    var set = (opt.srcset || []).map(function (e) { return escA(e[0]) + " " + e[1]; }).join(", ");
+    var set = (opt.srcset || []).map(function (e) { return escA(e[0]) + " " + escA(e[1]); }).join(", ");
     var setW = (opt.srcset || []).map(function (e) { return webpOf(e[0]); });
     var hasW = wp && setW.every(Boolean);
     var sizes = opt.sizes ? ' sizes="' + escA(opt.sizes) + '"' : "";
     var html = "<picture>";
-    if (hasW) html += '<source type="image/webp" ' + pre + 'srcset="' + (set ? setW.map(function (u, i) { return u + " " + opt.srcset[i][1]; }).join(", ") : wp) + '"' + sizes + ">";
+    if (hasW) html += '<source type="image/webp" ' + pre + 'srcset="' + (set ? setW.map(function (u, i) { return escA(u) + " " + escA(opt.srcset[i][1]); }).join(", ") : escA(wp)) + '"' + sizes + ">";
     html += "<img " + pre + 'src="' + escA(src) + '"' + (set ? " " + pre + 'srcset="' + set + '"' + sizes : "") +
       ' alt="' + escA(opt.alt) + '"' + (opt.cls ? ' class="' + escA(opt.cls) + '"' : "") +
       (opt.w ? ' width="' + opt.w + '" height="' + opt.h + '"' : "") +
@@ -58,6 +58,27 @@
   window.mersalTap = function (ms) { try { if (navigator.vibrate && matchMedia("(hover: none)").matches) navigator.vibrate(ms || 8); } catch (e) {} };
   window.MERSAL_SITE = SITE;
   if (!SITE.onlinePayment) document.documentElement.classList.add("no-online-pay");
+
+  // Structured data for search engines (home page only), built from SITE so the console edits stay in sync.
+  // Only facts that are on the site: name, contact details, address, social profiles and the donate page.
+  if (/^\/(index\.html)?$/.test(location.pathname) && !document.querySelector("script[data-org]")) (function () {
+    var BASE = "https://www.mersal-ngo.org", parts = String(SITE.address || "").split(/\s*[،,]\s*/).filter(Boolean);
+    var locality = parts.length > 1 ? parts.pop() : "";
+    var ld = {
+      "@context": "https://schema.org", "@type": "NGO", "@id": BASE + "/#org",
+      name: SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية", alternateName: "Mersal Foundation",
+      url: BASE + "/", logo: BASE + "/img/brand-logo.png",
+      sameAs: Object.keys(SITE.social).map(function (k) { return String(SITE.social[k] || "").trim(); }).filter(function (u) { return /^https:\/\//.test(u); }),
+      potentialAction: { "@type": "DonateAction", target: BASE + "/donate.html", recipient: { "@id": BASE + "/#org" } }
+    };
+    if (SITE.email) ld.email = SITE.email;
+    if (SITE.hotline) ld.telephone = SITE.hotline;
+    if (parts.length) ld.address = { "@type": "PostalAddress", streetAddress: parts.join("، "), addressCountry: "EG" };
+    if (ld.address && locality) ld.address.addressLocality = locality;
+    var sc = document.createElement("script"); sc.type = "application/ld+json";
+    sc.textContent = JSON.stringify(ld).replace(/</g, "\\u003c");
+    document.head.appendChild(sc);
+  })();
 
   var ICONS = {
     facebook: '<path d="M14 8h3V4h-3c-2.8 0-5 2.2-5 5v2H6v4h3v7h4v-7h3l1-4h-4V9c0-.6.4-1 1-1z"/>',
@@ -80,7 +101,7 @@
 
   var NAV = [
     ["/", "الرئيسية"],
-    ["/about.html", "عن مرسال"],
+    ["/p/3.html", "عن مرسال"],
     ["/afia.html", "كارت عافية"],
     ["/donate.html", "طرق التبرع"],
     ["/zakat.html", "حاسبة الزكاة"],
@@ -88,9 +109,10 @@
   ];
   var FOOT = [
     ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"], ["/help.html", "طلب مساعدة"],
-    ["/p/30.html", "مستشفى مرسال"], ["/p/4.html", "المشاريع"], ["/p/46.html", "فروع مرسال"],
-    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/p/51.html", "الأسئلة الشائعة"],
-    ["/news.html", "أخبار مرسال"], ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"]
+    ["/p/30.html", "مستشفى مرسال"], ["/#projects", "المشاريع"], ["/p/46.html", "فروع مرسال"],
+    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/gift.html", "اهدي تبرع"], ["/p/51.html", "الأسئلة الشائعة"],
+    ["/news.html", "أخبار مرسال"], ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"],
+    ["/privacy.html", "سياسة الخصوصية"], ["/terms.html", "شروط الاستخدام"]
   ].filter(function (n) { return n[0]; });
   var here = location.pathname.replace(/index\.html$/, "");
 
@@ -104,7 +126,7 @@
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
-      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><img src="/img/brand-logo.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></a>' +
+      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo.webp"><img src="/img/brand-logo.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></picture></a>' +
       '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return '<li><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
@@ -117,7 +139,7 @@
   var footer =
     '<footer class="site-footer"><div class="wrap cols">' +
       "<div>" +
-        '<div class="logo-box"><img src="/img/brand-logo-h.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="302" height="52"></div>' +
+        '<div class="logo-box"><picture><source type="image/webp" srcset="/img/brand-logo-h.webp"><img src="/img/brand-logo-h.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="302" height="52" loading="lazy" decoding="async"></picture></div>' +
         "<h3>" + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + "</h3>" +
         (SITE.footer.text ? "<p>" + escA(SITE.footer.text) + "</p>" : "") +
         social() +
@@ -131,7 +153,7 @@
         (SITE.email ? '<li><a href="mailto:' + escA(SITE.email) + '">' + escA(SITE.email) + "</a></li>" : "") +
       "</ul></div>" +
     "</div>" +
-    '<div class="copyright">© ' + year + " " + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + ' - جميع الحقوق محفوظة <a class="admin-link" href="/admin/" rel="nofollow">لوحة التحكم</a></div></footer>';
+    '<div class="copyright">© ' + year + " " + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + ' - جميع الحقوق محفوظة</div></footer>';
 
   document.getElementById("site-header").outerHTML = header;
   document.getElementById("site-footer").outerHTML = footer;
@@ -142,13 +164,25 @@
     if (box) box.hidden = !v;
     if (!v) return;
     el.textContent = v;
-    if (el.tagName === "A") el.href = k === "email" ? "mailto:" + v : k === "whatsapp" ? waLink(v) : k === "address" ? el.getAttribute("href") || "#" : "tel:" + v;
+    if (el.tagName === "A") el.href = siteHref(k, v, el);
   });
-  var donated = false; try { donated = localStorage.getItem("mersalDonated") === "1"; } catch (e) {}
+  // data-site-href="hotline|phone|whatsapp|email": only the link target comes from SITE (for links that hold more markup)
+  document.querySelectorAll("a[data-site-href]").forEach(function (el) {
+    var k = el.getAttribute("data-site-href"), v = String(SITE[k] || "").trim();
+    if (v) el.href = siteHref(k, v, el);
+  });
+  function siteHref(k, v, el) { return k === "email" ? "mailto:" + v : k === "whatsapp" ? waLink(v) : k === "address" ? el.getAttribute("href") || "#" : "tel:" + v; }
+  var donated = false;
+  try {
+    donated = localStorage.getItem("mersalDonated") === "1" &&
+      (JSON.parse(localStorage.getItem("mersalDonations") || "[]") || []).some(function (d) { return d && !d.demo && Number(d.amount) > 0; });
+  } catch (e) {}
   if (!/donate\.html$/.test(location.pathname)) {
-    var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname);
-    var dHref = "/donate.html" + (pm ? "?for=p" + pm[1] : "") + "#online";
-    document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>' +
+    var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname), pid = pm ? (pm[1] === "4" || pm[1] === "5" ? "31" : pm[1]) : ""; // p4/p5 = oncology centre (p31)
+    var dHref = "/donate.html" + (pid ? "?for=p" + pid : "") + "#online";
+    // the floating donate button (phones; desktop has the sticky header button) stays off the request/contact forms
+    if (!/(help|volunteer|contact)\.html$/.test(location.pathname)) document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>');
+    document.body.insertAdjacentHTML("beforeend",
       '<nav class="m-bar" aria-label="تنقل سريع">' +
         '<a class="m-home' + (/^\/(index\.html)?$/.test(location.pathname) ? " on" : "") + '" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></a>' +
         '<a class="m-call" href="tel:' + escA(SITE.hotline) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>اتصل</span></a>' +
@@ -288,8 +322,9 @@
     document.body.insertAdjacentHTML("beforeend", html);
     var sheet = document.getElementById("m-sheet");
     // a tapped link closes the sheet at once, so the page transition starts from a clean page
-    sheet.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false, true); });
-    document.getElementById("m-search").addEventListener("click", function () { setMenu(false, true); var b = document.querySelector(".search-btn"); if (b) b.click(); });
+    sheet.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { setMenu(false, true, true); })) setMenu(false, true); });
+    // the sheet's history entry is handed over to the search panel (no Back in between)
+    document.getElementById("m-search").addEventListener("click", function () { setMenu(false, true, true); openSearch(); });
     // groups: <details> opens at once (so the rows exist), then .is-open grows the height (css grid-rows); closing runs the other way
     sheet.querySelectorAll(".m-group > summary").forEach(function (sm) {
       sm.addEventListener("click", function (e) {
@@ -319,16 +354,38 @@
   }, { passive: true });
   toTop.addEventListener("click", function () { scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
 
+  // Back button (F19): the open phone menu sheet or search panel owns one history entry, so Android/browser Back
+  // closes it instead of leaving the page. A link tapped inside it replaces that entry, so no dead entry stays behind.
+  try { if (history.state && history.state.overlay) history.replaceState(null, ""); } catch (e) {} // after a reload
+  function overlayOpen(kind) {
+    try { if (history.state && history.state.overlay) history.replaceState({ overlay: kind }, ""); else history.pushState({ overlay: kind }, ""); } catch (e) {}
+  }
+  function overlayClosed(kind) { try { if (history.state && history.state.overlay === kind) history.back(); } catch (e) {} }
+  function followFromOverlay(e, a, close) {
+    var href = a.getAttribute("href") || "";
+    if (!(history.state && history.state.overlay) || e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return false;
+    if ((a.target && a.target !== "_self") || a.hasAttribute("download") || !/^(https?:|\/|#|\?)/.test(href) && /^[a-z][\w+.-]*:/i.test(href)) return false;
+    e.preventDefault(); close(); location.replace(a.href);
+    return true;
+  }
+  addEventListener("popstate", function () {
+    if (menuOpen()) setMenu(false, true, true);
+    if (!panel.hidden) closeSearch(true);
+  });
+
   // Site search over the imported pages + main pages
   var STATIC = [
     { t: "طرق التبرع", u: "/donate.html", d: "الحسابات البنكية، المحافظ، إنستاباي، فوري، مندوب لحد البيت" },
     { t: "حاسبة الزكاة", u: "/zakat.html", d: "احسب زكاة مالك وذهبك وتجارتك" },
+    { t: "اهدي تبرعك", u: "/gift.html", d: "صدقة جارية على روح حد غالي، هدية، شفاء أو عيد ميلاد: كارت إهداء باسمه + تذكير شهري بالتبرع" },
     { t: "كارت عافية", u: "/afia.html", d: "كارت خصومات عائلي على الخدمات الطبية حتى 70%" },
     { t: "تواصل معنا", u: "/contact.html", d: "الخط الساخن 19340، العنوان، البريد" },
     { t: "أخبار وقصص مرسال", u: "/news.html", d: "آخر أخبار مرسال، قصص نجاح المرضى، فعاليات المستشفى ومركز الأورام والقوافل" },
     { t: "ألبومات الصور", u: "/albums.html", d: "صور فعاليات وحملات مرسال: التبرع بالدم، فوانيس الفرحة، بازار عيد الأم" },
     { t: "تطوع معنا", u: "/volunteer.html", d: "سجل كمتطوع مع مرسال" },
-    { t: "طلب مساعدة", u: "/help.html", d: "قدّم طلب مساعدة طبية أو اجتماعية لمرسال" }
+    { t: "طلب مساعدة", u: "/help.html", d: "قدّم طلب مساعدة طبية أو اجتماعية لمرسال" },
+    { t: "سياسة الخصوصية", u: "/privacy.html", d: "إيه البيانات اللي بنجمعها، فين بتتحفظ، الكوكيز، وإزاي تطلب حذف بياناتك" },
+    { t: "شروط الاستخدام", u: "/terms.html", d: "التبرع تطوعي، توجيه التبرع والزكاة، استرداد التبرع، ملكية المحتوى" }
   ];
   var index = null;
   function norm(t) { return String(t || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").toLowerCase(); }
@@ -337,14 +394,24 @@
     '<input type="search" placeholder="ابحث في موقع مرسال… (مثلاً: الأورام، العيادات، التطوع)" aria-label="كلمة البحث">' +
     '<button type="button" class="search-close" aria-label="إغلاق">×</button><ul class="search-results"></ul></div></div>');
   var panel = document.querySelector(".search-panel"), sInput = panel.querySelector("input"), sList = panel.querySelector(".search-results");
+  var searchFrom = null;
   function openSearch() {
+    searchFrom = document.activeElement;
+    if (panel.hidden) overlayOpen("search");
     panel.hidden = false; sInput.value = ""; sList.innerHTML = ""; setTimeout(function () { sInput.focus(); }, 30);
     if (!index) fetch("/data/pages.json").then(function (r) { return r.json(); }).then(function (pg) {
       index = STATIC.concat(Object.keys(pg).map(function (id) { return { t: pg[id].title, u: "/p/" + id + ".html", d: pg[id].desc }; }));
       runSearch();
     }).catch(function () { index = STATIC; });
   }
-  function closeSearch() { panel.hidden = true; }
+  function closeSearch(fromHistory) {
+    if (panel.hidden) return;
+    panel.hidden = true;
+    if (!fromHistory) overlayClosed("search");
+    // focus goes back to what opened the search (or the header search button), not to <body>
+    var back = searchFrom && searchFrom !== document.body && searchFrom.getClientRects().length ? searchFrom : document.querySelector(".search-btn");
+    if (back && back.getClientRects().length) back.focus({ preventScroll: true });
+  }
   function runSearch() {
     var q = norm(sInput.value.trim());
     if (!index || !q) { sList.innerHTML = ""; return; }
@@ -354,7 +421,7 @@
       : '<li class="none">مفيش نتايج. جرّب كلمة تانية أو كلمنا على 19340.</li>';
   }
   sInput.addEventListener("input", runSearch);
-  sList.addEventListener("click", function (e) { if (e.target.closest("a")) closeSearch(); });
+  sList.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { closeSearch(true); })) closeSearch(); });
   document.querySelector(".search-btn").addEventListener("click", openSearch);
   panel.querySelector(".search-close").addEventListener("click", closeSearch);
   panel.addEventListener("click", function (e) { if (e.target === panel) closeSearch(); });
@@ -367,8 +434,10 @@
   // On phones the menu is the #m-sheet (built once menu.json arrives); before that, and on tablets, it is the nav list
   function menuOpen() { var sheet = document.getElementById("m-sheet"); return sheet ? !sheet.hidden : nav.classList.contains("open"); }
   var sheetTimer = null;
-  function setMenu(open, instant) {
-    var sheet = document.getElementById("m-sheet");
+  // noHistory: the caller handles the history entry (Back already popped it, or a link / the search takes it over)
+  function setMenu(open, instant, noHistory) {
+    var sheet = document.getElementById("m-sheet"), was = menuOpen();
+    if (!noHistory) { if (open && !was) overlayOpen("menu"); else if (!open && was) overlayClosed("menu"); }
     if (sheet) {
       clearTimeout(sheetTimer); sheet.classList.remove("closing");
       if (open) { sheet.hidden = false; sheet.scrollTop = 0; }
@@ -386,8 +455,14 @@
   toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!menuOpen()); });
   var mMenu = document.querySelector(".m-bar .m-menu");
   if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); document.body.classList.remove("hdr-hide"); var open = !menuOpen(); setMenu(open); if (open && !document.getElementById("m-sheet")) scrollTo({ top: 0, behavior: "smooth" }); });
-  nav.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
-  addEventListener("keydown", function (e) { if (e.key === "Escape" && menuOpen()) { setMenu(false); toggle.focus(); } });
+  nav.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { setMenu(false, true, true); })) setMenu(false); });
+  addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (menuOpen()) { setMenu(false); toggle.focus(); return; }
+    // an open desktop dropdown closes too, and the focus goes back to its button
+    var sub = document.querySelector("#nav .has-sub.open");
+    if (sub) { sub.classList.remove("open"); var t = sub.querySelector(".sub-toggle"); if (t) { t.setAttribute("aria-expanded", "false"); t.focus(); } }
+  });
   // Mobile menu footer: donate + hotline (added once the menu is built)
   function menuCta() {
     if (nav.querySelector(".m-menu-cta")) return;
@@ -395,4 +470,18 @@
   }
   menuCta();
   new MutationObserver(menuCta).observe(nav, { childList: true });
+
+  // Extras: js/extras.js + css/extras.css (announcement bar under the header, WhatsApp button, "بتتبرع من خلال" strip).
+  // A page that showed the bar last time gets its room back before the first paint (extras.js keeps its height), so nothing jumps.
+  (function () {
+    var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "/css/extras.css"; document.head.appendChild(css);
+    try {
+      var a = JSON.parse(localStorage.getItem("mersalAnn") || "null"), h = a && Math.round(+a.h);
+      if (h > 0 && h < 160 && !(a.exp && Date.now() > a.exp) && !document.getElementById("ann-bar"))
+        document.querySelector(".site-header").insertAdjacentHTML("afterend", '<div id="ann-bar" class="ann-bar t-' + (/^(gold|teal|red)$/.test(a.tone) ? a.tone : "gold") + '" style="min-height:' + h + 'px" aria-hidden="true"></div>');
+    } catch (e) {}
+    var js = document.createElement("script"); js.src = "/js/extras.js";
+    js.onerror = function () { var s = document.getElementById("ann-bar"); if (s && !s.firstChild) s.parentNode.removeChild(s); }; // no script: no empty room
+    document.body.appendChild(js);
+  })();
 })();

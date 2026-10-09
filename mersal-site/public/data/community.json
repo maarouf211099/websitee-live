@@ -8,7 +8,6 @@
     { "icon": "share", "title": "كارت \"ابعت فرحة\"", "text": "كارت جاهز للمشاركة على واتساب أو إنستجرام يشجّع غيرك يتبرع.", "action": "share" },
     { "icon": "impact", "title": "تابع أثر تبرعك", "text": "شوف الحملة اللي دعمتها وصلت لفين.", "action": "impact" },
     { "icon": "group", "title": "جروب متبرعين مرسال", "text": "أخبار وفعاليات وشكر خاص لأعضاء الكوميونيتي.", "action": "whatsapp" },
-    { "icon": "volunteer", "title": "تطوع معنا", "text": "لو حابب تدّي وقت مش بس فلوس، احجز مكانك في فريق مرسال.", "action": "link", "link": "/volunteer.html" },
-    { "icon": "monthly", "title": "متبرع شهري", "text": "اختار التبرع الشهري ويبقى اسمك من أعضاء الكوميونيتي الدائمين.", "action": "link", "link": "/donate.html#online" }
+    { "icon": "volunteer", "title": "تطوع معنا", "text": "لو حابب تدّي وقت مش بس فلوس، احجز مكانك في فريق مرسال.", "action": "link", "link": "/volunteer.html" }
   ]
 }

@@ -36,8 +36,12 @@
       '<div class="list" id="banks"></div><button type="button" class="btn btn-ghost" id="add-bank">+ إضافة حساب</button>' +
       '<h2>المحافظ وإنستاباي</h2><p class="hint">أرقام المحافظ (فودافون كاش، إنستاباي…) في تبويب المحافظ. فاضي = مفيش أرقام معروضة.</p>' +
       '<div class="list" id="wallets"></div><button type="button" class="btn btn-ghost" id="add-wallet">+ إضافة محفظة</button>' +
-      '<h2>التبرع من خارج مصر</h2><p class="hint">تبويب "من خارج مصر": صورة بيانات الحساب في ألمانيا ورابط طرق التبرع الأخرى.</p>' +
+      '<h2>التبرع من خارج مصر</h2><p class="hint">تبويب "من خارج مصر": بيانات الحساب (البنك، صاحب الحساب، IBAN، BIC)، صورة بيانات الحساب، ورابط طرق التبرع الأخرى.</p>' +
       '<div class="item"><img class="thumb" src="' + esc(f.image || "") + '" alt=""><div class="fields">' +
+        D("البنك", "foreign.bank", f.bank || "") +
+        D("اسم صاحب الحساب", "foreign.holder", f.holder || "") +
+        D("IBAN", "foreign.iban", f.iban || "", { ltr: true, ph: "DE00 0000 0000 0000 0000 00" }) +
+        D("BIC / SWIFT", "foreign.bic", f.bic || "", { ltr: true }) +
         D("نص إضافي فوق الصورة (اختياري)", "foreign.text", f.text || "", { full: true }) +
         D("وصف الصورة", "foreign.alt", f.alt || "", { full: true }) +
         D("رابط طرق أخرى للتبرع من الخارج", "foreign.link", f.link || "", { ltr: true, ph: "https://…" }) +
@@ -85,9 +89,14 @@
         "</div>" + acts() + "</div>";
     }).join("");
   }
+  function has(obj, path) { var ks = path.split("."), o = obj; for (var i = 0; i < ks.length; i++) { if (!o || typeof o !== "object" || !Object.prototype.hasOwnProperty.call(o, ks[i])) return false; o = o[ks[i]]; } return true; }
   function collect() {
     $$("[data-s]", root).forEach(function (el) { set(site, el.dataset.s, el.value.trim()); });
-    $$("[data-d]", root).forEach(function (el) { set(donate, el.dataset.d, el.value.trim()); });
+    $$("[data-d]", root).forEach(function (el) {
+      var v = el.value.trim();
+      if (el.dataset.d === "foreign.iban") v = v.replace(/\s+/g, ""); // shown grouped on the site, stored without spaces
+      if (v || has(donate, el.dataset.d)) set(donate, el.dataset.d, v); // an empty new field adds no empty key
+    });
     ["banks", "wallets"].forEach(function (key) {
       $$("#" + key + " .item", root).forEach(function (it) { var o = donate[key][+it.dataset.i]; if (o) $$("[data-k]", it).forEach(function (i) { o[i.dataset.k] = i.value.trim(); }); });
     });

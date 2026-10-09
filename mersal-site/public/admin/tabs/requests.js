@@ -1,21 +1,29 @@
-// Admin tab "requests": volunteer + help requests from /volunteer.html and /help.html, and the donate page's
-// "سجّل تبرعك" (transfer, MT-) and "مندوب لحد البيت" (pickup, MP-) forms (api/src/functions/forms.js).
-// transfer / pickup rows carry .meta (amount, currency, method, bank, date, slot...) so the list and the CSV work without .data.
-//   GET   /api/console/requests?type=&status=&from=&to=  -> { enabled: {table, github, webhook}, store, rows }
-//   GET   /api/console/requests/{id}                      -> full record (rows from the GitHub index carry no .data)
+// Admin tab "requests": volunteer + help requests from /volunteer.html and /help.html, messages from /contact.html (MC-),
+// and the donate page's "سجّل تبرعك" (transfer, MT-) and "مندوب لحد البيت" (pickup, MP-) forms (api/src/functions/forms.js).
+// transfer / pickup rows carry .meta (amount, currency, method, bank, date, slot...) for the list and the CSV.
+// Requests are kept in the Azure Table of DONATIONS_STORAGE only (never in the public GitHub repository).
+//   GET   /api/console/requests?type=&status=&from=&to=  -> { enabled: {table, webhook}, store: "table" | null, rows }
+//   GET   /api/console/requests/{id}                      -> full record
 //   PATCH /api/console/requests/{id} { status } | { note } -> { ok, row }
-// Status and note changes are saved the moment they change (no save button).
+// Status and note changes are saved the moment they change (no save button). Dates are Cairo time.
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
-  var TYPES = { volunteer: "تطوع", help: "طلب مساعدة", transfer: "تبرع مسجّل", pickup: "مندوب" };
+  var TYPES = { volunteer: "تطوع", help: "طلب مساعدة", transfer: "تبرع مسجّل", pickup: "مندوب", contact: "رسالة" };
   var STATUS = { new: "جديد", contacted: "تم التواصل", done: "تم", rejected: "مرفوض" };
   var HOW = { hospital: "مستشفى", convoys: "قوافل", design: "تصميم / سوشيال ميديا", fundraising: "جمع تبرعات", other: "أخرى" };
   var AVAIL = { weekdays: "أيام الأسبوع", weekends: "نهاية الأسبوع", flexible: "مرن / حسب الحاجة", online: "أونلاين فقط" };
   var REL = { self: "المريض نفسه", parent: "الأب / الأم", child: "الابن / الابنة", spouse: "الزوج / الزوجة", sibling: "الأخ / الأخت", relative: "قريب", other: "أخرى" };
   var CASE = { monthly: "علاج شهري", surgery: "عملية", oncology: "أورام", children: "أطفال", other: "أخرى" };
-  var METHOD = { bank: "تحويل بنكي", instapay: "إنستاباي", vodafone: "فودافون كاش", etisalat: "اتصالات كاش", orange: "أورانج كاش", fawry: "فوري / MyFawry", masary: "مصاري", aman: "أمان", megakheir: "ميجا خير", bankwallet: "محافظ البنوك (من خلال فوري)" };
+  var METHOD = { bank: "تحويل بنكي", instapay: "إنستاباي", vodafone: "فودافون كاش", etisalat: "اتصالات كاش (e& cash)", wepay: "WE Pay", orange: "أورانج كاش", fawry: "فوري / MyFawry", masary: "مصاري", aman: "أمان", megakheir: "ميجا خير", bankwallet: "محافظ البنوك (من خلال فوري)" };
   var CUR = { EGP: "جنيه", USD: "دولار", EUR: "يورو", SAR: "ريال سعودي", AED: "درهم إماراتي" };
   var PURPOSE = { general: "تبرع عام", zakat: "زكاة المال", sadaqa: "صدقة", p30: "مستشفى مرسال للأطفال", p31: "مركز مرسال لعلاج الأورام", cases: "حالات المرضى" };
+  // a campaign page purpose "p42" -> its title from pages.json (like the donations tab), else "مشروع 42"
+  function purposeName(k) {
+    if (!k) return "";
+    if (Object.prototype.hasOwnProperty.call(PURPOSE, k)) return PURPOSE[k];
+    var m = /^p(\d{1,4})$/.exec(k), pg = A.pages() || {};
+    return m ? (pg[m[1]] && pg[m[1]].title) || "مشروع " + m[1] : k;
+  }
   var KIND = { money: "فلوس", goods: "تبرع عيني" };
   var SLOT = { morning: "صباحاً", afternoon: "بعد الظهر", evening: "مساءً" };
   var num = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
@@ -34,8 +42,9 @@
   var FIELDS = {
     volunteer: [["name", "الاسم"], ["phone", "الموبايل"], ["email", "البريد"], ["city", "المدينة / المنطقة"], ["age", "السن"], ["how", "طرق المساعدة", HOW], ["howOther", "أخرى - تفاصيل"], ["availability", "الوقت المناسب", AVAIL], ["message", "رسالة"]],
     help: [["patient", "المريض"], ["caseType", "نوع الحالة", CASE], ["hospital", "المستشفى / التشخيص"], ["description", "وصف الحالة"], ["requester", "مقدم الطلب"], ["relation", "صلة القرابة", REL], ["phone", "الموبايل"], ["altPhone", "رقم بديل"], ["gov", "المحافظة"], ["city", "المدينة"], ["income", "الدخل الشهري"], ["consent", "موافقة على استخدام البيانات"]],
-    transfer: [["amount", "المبلغ", function (v, d) { return money(v, d.currency); }], ["method", "طريقة التبرع", METHOD], ["bank", "البنك"], ["date", "تاريخ التحويل", dayLabel], ["txRef", "رقم العملية"], ["purpose", "الغرض", PURPOSE], ["caseCode", "كود الحالة"], ["name", "الاسم"], ["phone", "الموبايل"], ["email", "البريد"], ["notes", "ملاحظات"]],
-    pickup: [["kind", "نوع التبرع", KIND], ["amount", "المبلغ", function (v) { return money(v, "EGP"); }], ["purpose", "الغرض", PURPOSE], ["goods", "التبرع العيني"], ["date", "يوم التحصيل", dayLabel], ["slot", "الوقت", SLOT], ["gov", "المحافظة"], ["area", "المنطقة / الحي"], ["address", "العنوان"], ["name", "الاسم"], ["phone", "الموبايل"], ["altPhone", "رقم تاني"], ["notes", "ملاحظات"]]
+    transfer: [["amount", "المبلغ", function (v, d) { return money(v, d.currency); }], ["method", "طريقة التبرع", METHOD], ["bank", "البنك"], ["date", "تاريخ التحويل", dayLabel], ["txRef", "رقم العملية"], ["purpose", "الغرض", purposeName], ["caseCode", "كود الحالة"], ["name", "الاسم"], ["phone", "الموبايل"], ["email", "البريد"], ["notes", "ملاحظات"]],
+    pickup: [["kind", "نوع التبرع", KIND], ["amount", "المبلغ", function (v) { return money(v, "EGP"); }], ["purpose", "الغرض", purposeName], ["goods", "التبرع العيني"], ["date", "يوم التحصيل", dayLabel], ["slot", "الوقت", SLOT], ["gov", "المحافظة"], ["area", "المنطقة / الحي"], ["address", "العنوان"], ["name", "الاسم"], ["phone", "الموبايل"], ["altPhone", "رقم تاني"], ["notes", "ملاحظات"]],
+    contact: [["name", "الاسم"], ["phone", "الموبايل"], ["email", "البريد"], ["message", "الرسالة"]]
   };
   var rows = [], store = null, enabled = {}, root = null, inited = false;
 
@@ -49,7 +58,7 @@
     ".tabs button .rq-n { background: var(--gold); color: var(--teal-dark); border-radius: 999px; padding: 0 8px; font-size: 12px; margin-inline-start: 6px; font-family: 'Titillium Web', sans-serif; }" +
     "#rq-table { font-size: 13.5px; } #rq-table th, #rq-table td { padding: 8px 7px; }" +
     "#rq-table td.sum { white-space: normal; min-width: 150px; max-width: 220px; font-size: 12.5px; color: var(--muted); line-height: 1.5; }" +
-    "#rq-table td.who { white-space: normal; min-width: 90px; max-width: 140px; }" +
+    "#rq-table td.who { white-space: normal; min-width: 90px; max-width: 140px; overflow-wrap: anywhere; }" +
     "#rq-table td.place { white-space: normal; min-width: 70px; max-width: 110px; }" +
     "#rq-table select.st { font: inherit; font-size: 13px; font-weight: 700; padding: 5px 8px; border-radius: 8px; border: 1.5px solid var(--line); background: #fff; }" +
     "#rq-table select.st.new { background: #fff3d6; } #rq-table select.st.contacted { background: #e4f3f3; } #rq-table select.st.done { background: #e6f6ee; } #rq-table select.st.rejected { background: #fdecea; }" +
@@ -58,7 +67,7 @@
     ".rq-dl-wrap { position: sticky; inset-inline-start: 0; width: min(760px, calc(100vw - 64px)); }" +
     ".rq-dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; font-size: 13.5px; max-width: 760px; } .rq-dl dt { color: var(--muted); } .rq-dl dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }" +
     ".rq-type { font-size: 12px; font-weight: 800; padding: 2px 9px; border-radius: 999px; white-space: nowrap; } .rq-type.volunteer { background: #e4f3f3; color: var(--teal-dark); } .rq-type.help { background: #fff3d6; color: #8a5a00; }" +
-    ".rq-type.transfer { background: #e6f6ee; color: #11683f; } .rq-type.pickup { background: #efeafc; color: #553c9a; }" +
+    ".rq-type.transfer { background: #e6f6ee; color: #11683f; } .rq-type.pickup { background: #efeafc; color: #553c9a; } .rq-type.contact { background: #fdeef3; color: #9b2c55; }" +
     "#rq-table td.sum .rq-key { display: block; color: var(--teal-dark); font-size: 13.5px; font-weight: 800; } #rq-table td.sum .rq-key bdi { font-family: 'Titillium Web', 'Cairo', sans-serif; }" +
     "#rq-table td.sum .rq-sub { display: block; color: var(--ink); } #rq-table td.sum .rq-more { display: block; margin-top: 2px; } #rq-table td.sum .rq-code { white-space: nowrap; font-family: 'Titillium Web', sans-serif; }" +
     ".rq-empty { background: #fff; border: 1px dashed var(--line); border-radius: 14px; padding: 28px; text-align: center; color: var(--muted); margin-top: 12px; }" +
@@ -67,7 +76,7 @@
 
   function template() {
     return CSS +
-      '<p class="hint">الطلبات اللي بتوصل من صفحات <a href="/volunteer.html" target="_blank" rel="noopener">تطوع معنا</a> و<a href="/help.html" target="_blank" rel="noopener">طلب مساعدة</a>، ومن <a href="/donate.html#bank" target="_blank" rel="noopener">طرق التبرع</a>: <b>تبرع مسجّل</b> (حد حوّل بنكي أو محفظة وسجّل تبرعه عشان نأكده) و<b>مندوب</b> (طلب مندوب لحد البيت). غيّر الحالة أو اكتب ملاحظة وبتتحفظ فوراً.</p>' +
+      '<p class="hint">الطلبات اللي بتوصل من صفحات <a href="/volunteer.html" target="_blank" rel="noopener">تطوع معنا</a> و<a href="/help.html" target="_blank" rel="noopener">طلب مساعدة</a> و<a href="/contact.html" target="_blank" rel="noopener">تواصل معنا</a> (<b>رسالة</b>)، ومن <a href="/donate.html#bank" target="_blank" rel="noopener">طرق التبرع</a>: <b>تبرع مسجّل</b> (حد حوّل بنكي أو محفظة وسجّل تبرعه عشان نأكده) و<b>مندوب</b> (طلب مندوب لحد البيت). غيّر الحالة أو اكتب ملاحظة وبتتحفظ فوراً.</p>' +
       '<div class="row filters rq-filters">' +
         '<label>النوع <select id="rq-type"><option value="">الكل</option>' + Object.keys(TYPES).map(function (k) { return '<option value="' + k + '">' + esc(TYPES[k]) + "</option>"; }).join("") + "</select></label>" +
         '<label>الحالة <select id="rq-status"><option value="">الكل</option>' + Object.keys(STATUS).map(function (k) { return '<option value="' + k + '">' + STATUS[k] + "</option>"; }).join("") + "</select></label>" +
@@ -82,7 +91,7 @@
 
   function find(id) { for (var i = 0; i < rows.length; i++) if (rows[i].id === id) return rows[i]; return null; }
   function visible() { var st = $("#rq-status").value; return rows.filter(function (r) { return !st || r.status === st; }); }
-  function when(iso) { return String(iso || "").replace("T", " ").slice(0, 16); }
+  function when(iso) { return A.cairoTime ? A.cairoTime(iso) : String(iso || "").replace("T", " ").slice(0, 16); }
 
   function load() {
     var b = $("#rq-load"); b.disabled = true;
@@ -107,20 +116,19 @@
     renderBadges();
     var note = $("#rq-store");
     if (!store) {
+      // blocker: without the Azure Table nothing is kept (the public GitHub repository is never used for requests)
       note.hidden = false; note.className = "status bad";
-      note.textContent = enabled.webhook
-        ? "الطلبات بتتبعت للـ webhook (FORMS_WEBHOOK_URL) بس ومش بتتحفظ هنا. عشان تشوفها في اللوحة ضيف DONATIONS_STORAGE (Azure Table) أو GITHUB_TOKEN + GITHUB_REPO في إعدادات Azure."
-        : "مفيش مكان تخزين للطلبات متظبط: ضيف DONATIONS_STORAGE (اتصال Storage Account - الأفضل) أو GITHUB_TOKEN + GITHUB_REPO في إعدادات Azure، وبعدها الطلبات الجديدة هتظهر هنا تلقائياً (شوف README).";
-    } else if (store === "github" && !enabled.table) {
-      note.hidden = false; note.className = "status warn";
-      note.textContent = "الطلبات بتتحفظ كملفات في GitHub (api/data/requests). ده شغال، بس لو العدد كبر ضيف DONATIONS_STORAGE عشان التخزين يبقى أسرع ومن غير commits.";
+      note.innerHTML = "<b>ضيف DONATIONS_STORAGE (Azure Table) - الطلبات مش بتتحفظ.</b> " + (enabled.webhook
+        ? "دلوقتي الطلبات بتتبعت للـ webhook (FORMS_WEBHOOK_URL) بس ومش بتظهر هنا."
+        : "دلوقتي أي حد يبعت فورم بيشوف رسالة إن الخدمة مش متاحة ويكلم 19340.") +
+        " الإعداد: Static Web App ← Settings ← Environment variables ← <code>DONATIONS_STORAGE</code> = Connection string بتاع Storage Account (شوف README).";
     } else note.hidden = true;
     var list = visible();
     $("#rq-table tbody").innerHTML = list.map(row).join("");
     $("#rq-wrap").hidden = !list.length;
     var empty = $("#rq-empty");
     empty.hidden = !!list.length || !store;
-    empty.textContent = rows.length ? "مفيش طلبات بالحالة دي." : "مفيش طلبات في الفترة دي. لما حد يبعت من صفحة تطوع معنا أو طلب مساعدة أو يسجّل تبرع / يطلب مندوب من طرق التبرع هيظهر هنا.";
+    empty.textContent = rows.length ? "مفيش طلبات بالحالة دي." : "مفيش طلبات في الفترة دي. لما حد يبعت من صفحة تطوع معنا أو طلب مساعدة أو تواصل معنا أو يسجّل تبرع / يطلب مندوب من طرق التبرع هيظهر هنا.";
   }
   function row(r) {
     var place = [r.gov, r.city].filter(Boolean).join(" - ");
@@ -129,7 +137,7 @@
       '<td><span dir="ltr">' + esc(when(r.createdAt)) + '</span><br><small class="hint" dir="ltr">' + esc(r.id) + "</small></td>" +
       '<td><span class="rq-type ' + esc(r.type) + '">' + esc(TYPES[r.type] || r.type) + "</span></td>" +
       '<td class="who">' + name + "</td>" +
-      '<td dir="ltr"><a href="tel:' + esc(r.phone) + '">' + esc(r.phone) + "</a>" + (r.altPhone ? '<br><a href="tel:' + esc(r.altPhone) + '">' + esc(r.altPhone) + "</a>" : "") + "</td>" +
+      '<td dir="ltr">' + (r.phone ? '<a href="tel:' + esc(r.phone) + '">' + esc(r.phone) + "</a>" : r.email ? '<a href="mailto:' + esc(r.email) + '">' + esc(r.email) + "</a>" : "") + (r.altPhone ? '<br><a href="tel:' + esc(r.altPhone) + '">' + esc(r.altPhone) + "</a>" : "") + "</td>" +
       '<td class="place">' + esc(place) + "</td>" +
       '<td class="sum">' + sumHtml(r) + "</td>" +
       '<td><select class="st ' + esc(r.status) + '" data-status aria-label="الحالة">' + Object.keys(STATUS).map(function (k) { return '<option value="' + k + '"' + (k === r.status ? " selected" : "") + ">" + STATUS[k] + "</option>"; }).join("") + "</select></td>" +
@@ -140,7 +148,7 @@
   function sumHtml(r) {
     if (r.type === "transfer") {
       var via = METHOD[key(r, "method")] || key(r, "method") || "", bank = key(r, "bank"), code = key(r, "caseCode");
-      var more = [dayLabel(key(r, "date"), true), PURPOSE[key(r, "purpose")]].filter(Boolean).map(esc);
+      var more = [dayLabel(key(r, "date"), true), purposeName(key(r, "purpose"))].filter(Boolean).map(esc);
       if (code) more.push('كود&nbsp;<bdi class="rq-code" dir="ltr">' + esc(code) + "</bdi>");
       return '<span class="rq-key"><bdi>' + esc(money(key(r, "amount"), key(r, "currency"))) + "</bdi></span>" +
         '<span class="rq-sub">' + esc(via + (bank ? " - " + bank : "")) + "</span>" +
@@ -148,7 +156,7 @@
     }
     if (r.type === "pickup") {
       var kind = key(r, "kind"), what = kind === "money" ? "فلوس · " + money(key(r, "amount"), "EGP") : KIND[kind] || "";
-      var rest = kind === "goods" ? String(r.summary || "").split(" · ")[0].replace(/^تبرع عيني: /, "") : PURPOSE[key(r, "purpose")] || "";
+      var rest = kind === "goods" ? String(r.summary || "").split(" · ")[0].replace(/^تبرع عيني: /, "") : purposeName(key(r, "purpose"));
       return '<span class="rq-key"><bdi>' + esc(what) + "</bdi></span>" +
         '<span class="rq-sub">' + esc([dayLabel(key(r, "date")), SLOT[key(r, "slot")]].filter(Boolean).join(" · ")) + "</span>" +
         (rest ? '<span class="rq-more">' + esc(rest) + "</span>" : "");
@@ -157,7 +165,7 @@
   }
   function show(f, v, d) {
     if (typeof f[2] === "function") return f[2](v, d);
-    if (f[2]) return Array.isArray(v) ? v.map(function (k) { return f[2][k] || k; }).join("، ") : (f[2][v] || v);
+    if (f[2]) return Array.isArray(v) ? v.map(function (k) { return f[2][k] || k; }).join("، ") : (Object.prototype.hasOwnProperty.call(f[2], v) ? f[2][v] : v);
     return v === true ? "نعم" : v;
   }
   function detailsHtml(r) {
@@ -199,16 +207,16 @@
     $("#rq-csv").addEventListener("click", function () {
       var list = visible(); if (!list.length) { A.toast("مفيش طلبات للتصدير", true); return; }
       // transfer / pickup columns (empty for volunteer / help): amount as a plain number so a spreadsheet can sum it
-      var head = ["رقم الطلب", "التاريخ", "النوع", "الحالة", "الاسم", "الموبايل", "رقم بديل", "البريد", "المحافظة", "المدينة / المنطقة", "المبلغ", "العملة", "طريقة التبرع", "البنك", "نوع التبرع", "الغرض", "كود الحالة", "تاريخ التحويل / التحصيل", "وقت التحصيل", "ملخص", "ملاحظة", "التفاصيل"];
+      var head = ["رقم الطلب", "التاريخ (القاهرة)", "النوع", "الحالة", "الاسم", "الموبايل", "رقم بديل", "البريد", "المحافظة", "المدينة / المنطقة", "المبلغ", "العملة", "طريقة التبرع", "البنك", "نوع التبرع", "الغرض", "كود الحالة", "تاريخ التحويل / التحصيل", "وقت التحصيل", "ملخص", "ملاحظة", "التفاصيل"];
       var lines = [head].concat(list.map(function (r) {
         var dn = r.type === "transfer" || r.type === "pickup", k = function (n) { return dn ? key(r, n) : ""; };
         var amt = k("amount"), cur = k("currency") || (r.type === "pickup" && amt != null && amt !== "" ? "EGP" : "");
         return [r.id, when(r.createdAt), TYPES[r.type] || r.type, STATUS[r.status] || r.status, r.name, r.phone, r.altPhone, r.email, r.gov, r.city,
-          amt == null ? "" : amt, cur, METHOD[k("method")] || k("method"), k("bank"), KIND[k("kind")] || k("kind"), PURPOSE[k("purpose")] || k("purpose"), k("caseCode"), k("date"), SLOT[k("slot")] || k("slot"),
+          amt == null ? "" : amt, cur, METHOD[k("method")] || k("method"), k("bank"), KIND[k("kind")] || k("kind"), purposeName(k("purpose")), k("caseCode"), k("date"), SLOT[k("slot")] || k("slot"),
           r.summary, r.note, detailsText(r)];
-      }))
-        .map(function (l) { return l.map(function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }).join(","); }).join("\r\n");
-      var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([String.fromCharCode(65279) + lines], { type: "text/csv;charset=utf-8" })); a.download = "mersal-requests.csv"; a.click();
+      }));
+      // A.downloadCsv quotes every cell and neutralises a leading = + - @ (public-form text must not run as a formula)
+      A.downloadCsv(lines, "mersal-requests.csv");
     });
     root.addEventListener("change", function (e) {
       var tr = e.target.closest("tr[data-id]"); if (!tr) return;

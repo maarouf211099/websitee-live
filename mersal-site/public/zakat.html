@@ -7,14 +7,19 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>حاسبة الزكاة | مؤسسة مرسال</title>
 <meta name="description" content="احسب زكاة مالك وذهبك وتجارتك بسهولة، وأخرجها مع مؤسسة مرسال.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/zakat.html">
+<meta property="og:title" content="حاسبة الزكاة">
+<meta property="og:description" content="احسب زكاة مالك وذهبك وتجارتك بسهولة، وأخرجها مع مؤسسة مرسال.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/zakat.html">
 </head>
 <body>
 <div id="site-header"></div>
@@ -31,33 +36,33 @@
 <!-- /mersal:content -->
 
         <div class="zakat-group"><h3>سعر الذهب اليوم</h3>
-          <table class="zakat-table"><tr><td>سعر جرام الذهب عيار 21 (جنيه)</td><td><input name="gold21price" type="number" min="0" step="any" inputmode="decimal"></td></tr></table>
+          <table class="zakat-table"><tr><td><label for="zi-gold21price">سعر جرام الذهب عيار 21 (جنيه)</label></td><td><input id="zi-gold21price" name="gold21price" type="number" min="0" step="any" inputmode="decimal"></td></tr></table>
         </div>
         <div class="zakat-group"><h3>النقود</h3>
           <table class="zakat-table">
-            <tr><td>النقد في اليد</td><td><input data-add name="cash" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>النقد في البنك (حسابات جارية وتوفير)</td><td><input data-add name="bank" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>الودائع والشهادات</td><td><input data-add name="deposits" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-cash">النقد في اليد</label></td><td><input id="zi-cash" data-add name="cash" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-bank">النقد في البنك (حسابات جارية وتوفير)</label></td><td><input id="zi-bank" data-add name="bank" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-deposits">الودائع والشهادات</label></td><td><input id="zi-deposits" data-add name="deposits" type="number" min="0" step="any" inputmode="decimal"></td></tr>
           </table>
         </div>
         <div class="zakat-group"><h3>الذهب والفضة (بالجرام)</h3>
           <table class="zakat-table">
-            <tr><td>ذهب عيار 24</td><td><input name="g24" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>ذهب عيار 21</td><td><input name="g21" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>ذهب عيار 18</td><td><input name="g18" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>قيمة الفضة (جنيه)</td><td><input data-add name="silver" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-g24">ذهب عيار 24</label></td><td><input id="zi-g24" name="g24" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-g21">ذهب عيار 21</label></td><td><input id="zi-g21" name="g21" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-g18">ذهب عيار 18</label></td><td><input id="zi-g18" name="g18" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-silver">قيمة الفضة (جنيه)</label></td><td><input id="zi-silver" data-add name="silver" type="number" min="0" step="any" inputmode="decimal"></td></tr>
           </table>
         </div>
         <div class="zakat-group"><h3>الاستثمارات والتجارة</h3>
           <table class="zakat-table">
-            <tr><td>قيمة الأسهم بسعر السوق اليوم</td><td><input data-add name="stocks" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>قيمة البضاعة المعروضة للبيع</td><td><input data-add name="stock_goods" type="number" min="0" step="any" inputmode="decimal"></td></tr>
-            <tr><td>ديون لك عند الآخرين (مرجو سدادها)</td><td><input data-add name="receivable" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-stocks">قيمة الأسهم بسعر السوق اليوم</label></td><td><input id="zi-stocks" data-add name="stocks" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-stock-goods">قيمة البضاعة المعروضة للبيع</label></td><td><input id="zi-stock-goods" data-add name="stock_goods" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-receivable">ديون لك عند الآخرين (مرجو سدادها)</label></td><td><input id="zi-receivable" data-add name="receivable" type="number" min="0" step="any" inputmode="decimal"></td></tr>
           </table>
         </div>
         <div class="zakat-group"><h3>يُخصم</h3>
           <table class="zakat-table">
-            <tr><td>ديون عليك مستحقة الآن</td><td><input name="debts" type="number" min="0" step="any" inputmode="decimal"></td></tr>
+            <tr><td><label for="zi-debts">ديون عليك مستحقة الآن</label></td><td><input id="zi-debts" name="debts" type="number" min="0" step="any" inputmode="decimal"></td></tr>
           </table>
         </div>
         <p class="hint">زكاة الزروع والأنعام وعروض التجارة المعقدة: كلمنا على 19340 ونساعدك في حسابها.</p>
@@ -82,6 +87,7 @@
 </main>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script>
 addEventListener("DOMContentLoaded", function () {
   var f = document.getElementById("zakat"), fmt = new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 2 });
@@ -114,7 +120,9 @@ addEventListener("DOMContentLoaded", function () {
     document.getElementById("z-nisab").textContent = p21 ? fmt.format(nisab) : "—";
     note.textContent = !p21 ? "اكتب سعر جرام الذهب عيار 21 لحساب الذهب والنصاب." :
       (net >= nisab ? "أموالك بلغت النصاب." : "أموالك لم تبلغ النصاب.");
-    document.getElementById("z-pay").href = window.MERSAL_SITE.onlinePayment ? "/donate.html?for=zakat" + (zakat >= 10 ? "&amount=" + Math.ceil(zakat) : "") + "#online" : "/donate.html";
+    // the card form takes 10 .. 1,000,000 EGP: a smaller zakat is rounded up to 10, a larger one capped
+    var amt = zakat > 0 ? Math.min(1000000, Math.max(10, Math.ceil(zakat))) : 0;
+    document.getElementById("z-pay").href = window.MERSAL_SITE.onlinePayment ? "/donate.html?for=zakat" + (amt ? "&amount=" + amt : "") + "#online" : "/donate.html";
     // slim bar (phones): same amount and link, shown once something is typed and the full card is off screen
     document.getElementById("z-bar-amt").textContent = fmt.format(zakat) + " جنيه";
     document.getElementById("z-bar-pay").href = document.getElementById("z-pay").href;

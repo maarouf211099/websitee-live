@@ -2,8 +2,11 @@
 // They live in public/js/layout.js between the /* mersal:site */ … /* /mersal:site */ markers (the SITE object literal),
 // so pages need no extra request; the API rewrites that block and mirrors it to public/data/site.json in one commit.
 // payMode (card payment) stays inside the same object but is only changed by the settings endpoint (adminSettings).
+// Revision (X-Mersal-Sha / X-Mersal-Base, lib/commit.js) = the site details without payMode, so flipping the card
+// switch does not block a details save, but another admin's details edit does (409).
 const { app } = require("@azure/functions");
 const { requireAdmin, readFile, commitFiles, json, fail } = require("../lib/admin");
+const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 
 const LAYOUT = "public/js/layout.js", COPY = "public/data/site.json";
 const MARK = /\/\* mersal:site \*\/([\s\S]*?)\/\* \/mersal:site \*\//;
@@ -58,23 +61,31 @@ function render(js, site) {
   return js.replace(MARK, () => "/* mersal:site */ " + toJs(site, "  ") + " /* /mersal:site */");
 }
 
+const siteRev = (site) => rev(JSON.stringify({ ...site, payMode: "" }));
+const withRev = (res, sha) => ({ ...res, headers: { ...(res.headers || {}), [SHA_HEADER]: sha } });
+
 app.http("adminSite", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/site",
   handler: async (req, ctx) => {
     try {
-      const p = requireAdmin(req);
-      const js = await readFile(LAYOUT);
-      const cur = parseSite(js);
-      if (req.method === "GET") return json(200, cur);
-      const b = await req.json().catch(() => ({}));
-      const next = normalize({ ...(b.site || b), payMode: cur.payMode }); // payMode is changed from the settings tab only
-      const bad = validate(next);
+      const p = await requireAdmin(req);
+      if (req.method === "GET") { const cur = parseSite(await readFile(LAYOUT)); return withRev(json(200, cur), siteRev(cur)); }
+      const b = (await req.json().catch(() => ({}))) || {};
+      const draft = normalize({ ...(b.site || b), payMode: "off" });
+      const bad = validate(draft);
       if (bad) return json(400, { message: bad });
-      const files = [{ path: LAYOUT, content: render(js, next) }, { path: COPY, content: JSON.stringify(next, null, 2) + "\n" }];
-      const sha = await commitFiles(files, b.message || "admin: site details", who(p));
-      return json(200, { ok: true, commit: sha, site: next });
+      const base = baseOf(req);
+      checkBase(base, base || ""); // 428 when the console sent no revision
+      let next = null;
+      const sha = await retry(commitFiles, async () => {
+        const js = await readFile(LAYOUT), cur = parseSite(js);
+        checkBase(base, siteRev(cur));
+        next = { ...draft, payMode: cur.payMode }; // payMode is changed from the settings tab only
+        return [{ path: LAYOUT, content: render(js, next) }, { path: COPY, content: JSON.stringify(next, null, 2) + "\n" }];
+      }, b.message || "admin: site details", who(p));
+      return withRev(json(200, { ok: true, commit: sha, site: next }), siteRev(next));
     } catch (e) { return fail(e, ctx); }
   },
 });
 
-module.exports = { parseSite, normalize, validate, render, toJs, SOCIAL };
+module.exports = { parseSite, normalize, validate, render, toJs, SOCIAL, siteRev };

@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "مؤسسة مرسال للأعمال الخيرية والتنموية",
   "short_name": "مرسال",
   "description": "تبرع لمرضى مرسال: مستشفى مرسال للأطفال، مركز الأورام، العلاج الشهري والكفالات.",
@@ -7,16 +8,20 @@
   "start_url": "/?utm_source=pwa",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#005959",
   "theme_color": "#005959",
+  "categories": ["medical", "health"],
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "تبرع الآن", "url": "/donate.html#online", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }] },
-    { "name": "حساب الزكاة", "url": "/zakat.html" },
-    { "name": "اتصل 19340", "url": "tel:19340" }
+    { "name": "تبرع الآن", "short_name": "تبرع", "url": "/donate.html?utm_source=pwa#online", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "حاسبة الزكاة", "short_name": "الزكاة", "url": "/zakat.html?utm_source=pwa", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "تواصل معنا - الخط الساخن 19340", "short_name": "تواصل", "url": "/contact.html?utm_source=pwa", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }

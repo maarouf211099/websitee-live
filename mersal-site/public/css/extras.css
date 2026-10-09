@@ -1,0 +1,141 @@
+/* Site extras (js/extras.js, loaded on every page by js/layout.js): announcement bar, floating WhatsApp button,
+   "بتتبرع من خلال" strip. Colours come from css/site.css; motion is transform / opacity only and stops for reduced motion. */
+:root { --extras-css: 1; } /* js/extras.js waits for this, so nothing is drawn unstyled */
+
+/* ---------- (a) announcement bar: in the page flow right under the sticky header (it scrolls away with the page, so the
+   phone header that slides away on scroll never has anything to drag along) ---------- */
+.ann-bar { --ann-bg: var(--gold); --ann-ink: var(--teal-ink); --ann-btn: var(--teal-ink); --ann-btn-ink: #fff;
+  position: relative; z-index: 1; background: var(--ann-bg); color: var(--ann-ink); font: 700 14.5px/1.5 "Cairo", "Titillium Web", Tahoma, sans-serif; overflow: hidden; }
+.ann-bar.t-teal { --ann-bg: var(--teal-soft); --ann-ink: var(--teal-ink); --ann-btn: var(--teal-text); --ann-btn-ink: #fff; box-shadow: inset 0 -1px 0 #cfe7e7; }
+.ann-bar.t-red { --ann-bg: #b42318; --ann-ink: #fff; --ann-btn: #fff; --ann-btn-ink: #b42318; }
+.ann-in { position: relative; display: flex; align-items: center; justify-content: center; gap: 0 12px; min-height: 44px; }
+.ann-bar.can-close .ann-in { padding-inline: 52px; }
+.ann-ico { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(0, 60, 60, .1); }
+.ann-bar.t-red .ann-ico { background: rgba(255, 255, 255, .16); }
+.ann-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ann-text { margin: 0; padding-block: 8px; min-width: 0; overflow-wrap: anywhere; }
+.ann-link { flex: none; display: inline-flex; align-items: center; min-height: 44px; color: var(--ann-ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.ann-link span { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: var(--ann-btn); color: var(--ann-btn-ink); font-size: 13.5px; font-weight: 800; white-space: nowrap; transition: transform .22s var(--spring, ease), filter .2s; }
+.ann-link i { font-style: normal; display: inline-block; transition: transform .25s var(--spring, ease); }
+.ann-link:hover { color: var(--ann-ink); }
+.ann-link:hover span { filter: brightness(1.12); }
+.ann-link:hover i { transform: translateX(-3px); }
+.ann-link:active span { transform: scale(.96); }
+.ann-link:focus-visible { outline: none; box-shadow: none; }
+.ann-link:focus-visible span { outline: 3px solid var(--teal-dark); outline-offset: 2px; }
+.ann-bar.t-red .ann-link:focus-visible span { outline-color: #fff; }
+.ann-x { position: absolute; inset-inline-end: 4px; top: 50%; translate: 0 -50%; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%;
+  background: none; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background .2s, transform .15s; }
+.ann-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.ann-x:hover { background: rgba(0, 60, 60, .1); }
+.ann-bar.t-red .ann-x:hover { background: rgba(255, 255, 255, .16); }
+.ann-x:active { transform: scale(.9); }
+.ann-x:focus-visible { outline: 3px solid currentColor; outline-offset: -3px; box-shadow: none; }
+/* arriving: the words fade in (the bar's room is already there when js/layout.js reserved it) */
+.ann-bar > .ann-in { animation: ann-fade .35s ease both; }
+.ann-bar.ann-new > .ann-in { animation-duration: .45s; }
+@keyframes ann-fade { from { opacity: 0; } }
+/* closing: folds away (the visitor asked for it, so this movement is expected) */
+.ann-bar.ann-out { min-height: 0 !important; height: 0 !important; opacity: 0; transition: height .3s cubic-bezier(.4, 0, .2, 1), opacity .2s ease; }
+@media (max-width: 760px) {
+  .ann-bar { font-size: 13.5px; line-height: 1.45; }
+  .ann-in { justify-content: flex-start; gap: 0 10px; }
+  .ann-bar.can-close .ann-in { padding-inline: 16px 48px; }
+  .ann-text { flex: 1 1 auto; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .ann-link span { padding: 5px 12px; font-size: 13px; }
+  .ann-x { inset-inline-end: 2px; }
+}
+@media (max-width: 420px) { .ann-ico { display: none; } }
+
+/* ---------- (b) floating WhatsApp button (only when the site has a WhatsApp number) ---------- */
+.wa-float { position: fixed; z-index: 86; inset-inline-end: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; text-decoration: none; background: linear-gradient(160deg, #2bc565, #168a45 70%);
+  box-shadow: 0 0 0 3px #fff, 0 14px 28px -10px rgba(10, 90, 45, .65); -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform .45s var(--spring, cubic-bezier(.22, 1, .36, 1)), scale .5s var(--bounce, cubic-bezier(.34, 1.45, .64, 1)), opacity .2s ease, visibility 0s linear 0s; }
+/* waiting for the first scroll (js adds .wa-on): shrunk away, no taps */
+.wa-float:not(.wa-on) { opacity: 0; visibility: hidden; scale: .5; pointer-events: none; transition: transform .45s var(--spring, cubic-bezier(.22, 1, .36, 1)), scale .25s ease, opacity .2s ease, visibility 0s linear .25s; }
+.wa-float svg { width: 30px; height: 30px; fill: currentColor; }
+.wa-float:hover { color: #fff; }
+.wa-float:active { scale: .92; transition-duration: .08s; }
+.wa-float:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; box-shadow: 0 0 0 3px #fff, 0 0 0 7px rgba(0, 89, 89, .85); }
+.wa-tip { position: absolute; inset-inline-end: calc(100% + 12px); top: 50%; translate: 0 -50%; padding: 6px 14px; border-radius: 999px; background: var(--teal-dark); color: #fff;
+  font: 700 13.5px/1.4 "Cairo", sans-serif; white-space: nowrap; box-shadow: 0 10px 24px -10px rgba(0, 40, 40, .6); pointer-events: none;
+  opacity: 0; transform: translateX(8px); transition: opacity .2s ease, transform .3s var(--spring, ease); }
+@media (hover: hover) and (min-width: 761px) {
+  .wa-float:hover .wa-tip, .wa-float:focus-visible .wa-tip { opacity: 1; transform: none; }
+}
+/* tablets and desktop: the corner is shared with the back-to-top button (same column, centred over it); once that one
+   shows, the WhatsApp button slides up above it */
+@media (min-width: 761px) {
+  .wa-float { inset-inline-end: 12px; bottom: 18px; }
+  .to-top.show ~ .wa-float { transform: translateY(-58px); }
+}
+/* phones: above the bottom bar, at its side (the raised donate circle is in the middle) */
+@media (max-width: 760px) {
+  .wa-float { width: 52px; height: 52px; inset-inline-end: 14px; }
+  .wa-float svg { width: 28px; height: 28px; }
+  body.has-mbar .wa-float { bottom: calc(86px + env(safe-area-inset-bottom)); }
+  /* zakat page: the slim result bar (#z-bar) rises above the bottom bar, so the button steps over it */
+  .wa-float.wa-up { transform: translateY(calc(-1 * var(--wa-lift, 80px))); }
+}
+/* out of the way while the phone menu is open or the app-install card is up */
+body.menu-open .wa-float, body:has(.pwa-card.in:not(.pwa-tucked)) .wa-float { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s ease, visibility 0s linear .2s; }
+
+/* ---------- (c) "بتتبرع من خلال": donation channels strip (#partners) ---------- */
+#partners:empty { display: none; }
+.pt-sec { padding: 52px 0 44px; background: var(--bg-2); overflow: hidden; }
+.pt-sec .section-title { margin-bottom: 24px; }
+.pt-viewport { position: relative; overflow: hidden; padding-block: 6px 10px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+.pt-rail { display: flex; width: max-content; }
+.pt-list { display: flex; gap: 14px; margin: 0; padding: 0; padding-inline-end: 14px; list-style: none; flex: none; }
+.pt-card { display: flex; align-items: center; justify-content: center; width: 168px; height: 76px; padding: 10px 14px; border-radius: 18px; background: #fff;
+  border: 1px solid var(--line); box-shadow: 0 8px 22px -16px rgba(0, 48, 48, .45); color: var(--teal-dark); text-decoration: none; text-align: center;
+  -webkit-tap-highlight-color: transparent; transition: transform .25s var(--spring, ease), border-color .2s, box-shadow .25s; }
+a.pt-card:hover { border-color: var(--teal); color: var(--teal-dark); box-shadow: 0 14px 28px -16px rgba(0, 48, 48, .5); transform: translateY(-2px); }
+a.pt-card:active { transform: scale(.96); transition-duration: .08s; }
+a.pt-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0 6px rgba(0, 89, 89, .85); }
+.pt-card picture { display: contents; }
+.pt-logo { display: block; width: auto; height: auto; max-width: 100%; max-height: 44px; object-fit: contain; }
+.pt-name { font: 800 15px/1.35 "Cairo", "Titillium Web", sans-serif; color: var(--teal-dark); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pt-card.is-text { background: linear-gradient(160deg, #fff, var(--teal-soft)); border-color: #cfe7e7; }
+/* moving row: the list and its hidden copy slide by one list width, then loop (RTL: towards the right) */
+.pt-run .pt-rail { animation: pt-loop var(--pt-dur, 60s) linear infinite; }
+@keyframes pt-loop { to { transform: translateX(50%); } }
+@media (hover: hover) { .pt-run:hover .pt-rail { animation-play-state: paused; } }
+.pt-run.pt-hold .pt-rail, .pt-run.pt-off .pt-rail, .pt-run.pt-stopped .pt-rail { animation-play-state: paused; }
+/* the row fits, the visitor prefers no motion, or a keyboard is moving through it: a still row that scrolls by hand */
+.pt-fit .pt-rail { margin-inline: auto; }
+.pt-static, .pt-viewport.pt-kbd { overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; overscroll-behavior-x: contain; }
+.pt-static::-webkit-scrollbar, .pt-viewport.pt-kbd::-webkit-scrollbar { display: none; }
+.pt-static .pt-rail, .pt-kbd .pt-rail { animation: none; padding-inline: 16px 2px; }
+.pt-static .pt-list > li, .pt-kbd .pt-list > li { scroll-snap-align: start; }
+.pt-foot { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 14px; }
+.pt-pause { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--teal-text);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background .2s, border-color .2s, transform .15s; }
+.pt-pause:hover { border-color: var(--teal); background: var(--teal-soft); }
+.pt-pause:active { transform: scale(.92); }
+.pt-pause svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.pt-pause .i-play { fill: currentColor; stroke-width: 1.5; transform: scaleX(-1); } /* RTL: the row moves right, so "play" points that way */
+.pt-pause[aria-pressed="true"] .i-pause, .pt-pause:not([aria-pressed="true"]) .i-play { display: none; }
+.pt-all { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 18px; border-radius: 12px; color: var(--teal-text); font-weight: 800; font-size: 14.5px; transition: background .2s, color .2s; }
+.pt-all:hover { background: var(--teal-soft); color: var(--teal-dark); }
+.pt-all span { display: inline-block; transition: transform .25s var(--spring, ease); }
+.pt-all:hover span { transform: translateX(-4px); }
+@media (max-width: 760px) {
+  .pt-sec { padding: 36px 0 28px; }
+  .pt-sec .section-title { margin-bottom: 16px; }
+  .pt-list { gap: 10px; padding-inline-end: 10px; }
+  .pt-card { width: 136px; height: 64px; padding: 8px 10px; border-radius: 16px; }
+  .pt-logo { max-height: 36px; }
+  .pt-name { font-size: 13.5px; }
+  .pt-viewport { -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+}
+@media (hover: none) { a.pt-card:hover { transform: none; box-shadow: 0 8px 22px -16px rgba(0, 48, 48, .45); border-color: var(--line); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ann-bar > .ann-in { animation: none; }
+  .ann-bar.ann-out, .ann-link span, .ann-link i, .ann-x, .wa-float, .wa-float:not(.wa-on), .wa-tip, .pt-card, .pt-all span, .pt-pause { transition: none; }
+  .pt-rail { animation: none !important; }
+}
+@media print { .ann-bar, .wa-float, #partners { display: none !important; } }

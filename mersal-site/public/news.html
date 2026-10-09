@@ -7,10 +7,8 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preload" as="image" type="image/webp" href="/img/old/3058766084-2443524919202383-73-43e50286-sm.webp" fetchpriority="high">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" type="image/webp" imagesrcset="/img/old/3058766084-2443524919202383-73-43e50286-sm.webp 600w, /img/old/3058766084-2443524919202383-73-43e50286.webp 1400w" imagesizes="100vw" fetchpriority="high">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/news.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
@@ -19,6 +17,11 @@
 <meta name="description" content="آخر أخبار مؤسسة مرسال، قصص نجاح مرضاها، وفعالياتها: المستشفى، مركز الأورام، القوافل والكفالات.">
 <meta property="og:title" content="أخبار وقصص مرسال">
 <meta property="og:description" content="آخر أخبار مؤسسة مرسال، قصص نجاح مرضاها، وفعالياتها.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/news.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/news.html">
 </head>
 <body class="news">
 <div id="site-header"></div>
@@ -50,6 +53,7 @@
 </main>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script defer src="/js/news.js"></script>
 </body>
 </html>

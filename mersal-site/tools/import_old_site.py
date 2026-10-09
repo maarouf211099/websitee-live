@@ -17,6 +17,7 @@ import json
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import urllib.parse
@@ -25,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
 CACHE = os.environ.get("IMPORT_CACHE", os.path.join(ROOT, ".import-cache"))
 SITE = "https://mersal-ngo.org"
-# Public address of the NEW site (og:image, sitemap). Change when the custom domain is live.
-SITE_URL = os.environ.get("SITE_URL", "https://jolly-moss-063f03a10.3.azurestaticapps.net").rstrip("/")
+# Public address of the NEW site (canonical, og:image, og:url, sitemap): the custom domain the site is served on.
+SITE_URL = os.environ.get("SITE_URL", "https://www.mersal-ngo.org").rstrip("/")
 API = SITE + "/MersalAPI/api"
 os.makedirs(CACHE, exist_ok=True)
 
@@ -112,6 +113,44 @@ def shrink(path, max_w):
                     "-quality", "82", path], capture_output=True)
 
 
+def img_size(path):
+    """(width, height) of a local PNG or JPEG, read from its header; None when unknown."""
+    try:
+        with open(path, "rb") as f:
+            b = f.read()
+    except OSError:
+        return None
+    if b[:8] == b"\x89PNG\r\n\x1a\n" and len(b) >= 24:
+        return struct.unpack(">II", b[16:24])
+    if b[:2] == b"\xff\xd8":
+        i = 2
+        while i + 9 < len(b):
+            if b[i] != 0xFF:
+                i += 1
+                continue
+            m = b[i + 1]
+            if m == 0xFF:
+                i += 1
+                continue
+            if m in (0xD8, 0x01) or 0xD0 <= m <= 0xD7:
+                i += 2
+                continue
+            seg = struct.unpack(">H", b[i + 2:i + 4])[0]
+            if 0xC0 <= m <= 0xCF and m not in (0xC4, 0xC8, 0xCC):
+                h, w = struct.unpack(">HH", b[i + 5:i + 9])
+                return w, h
+            i += 2 + seg
+    return None
+
+
+def page_photo_ok(src):
+    """A picture that can stand as a page's header photo: not an SVG icon, not a small logo or social icon."""
+    if not src or src.lower().endswith(".svg"):
+        return False
+    size = img_size(os.path.join(PUB, src.lstrip("/")))
+    return not size or min(size) >= 200
+
+
 # ---------------------------------------------------------------- html cleanup
 def page_link(url):
     if not url:
@@ -165,6 +204,70 @@ def clean_html(s):
     return s.strip()
 
 
+# ---------------------------------------------------------------- content markup pass
+_ATTR = lambda tag, name: re.search(r'\s' + name + r'\s*=\s*"([^"]*)"', tag, re.I)
+
+
+def _set_attr(tag, name, value):
+    if _ATTR(tag, name):
+        return re.sub(r'(\s' + name + r'\s*=\s*)"[^"]*"', lambda m: m.group(1) + '"' + value + '"', tag, count=1, flags=re.I)
+    return re.sub(r"^<(\w+)", lambda m: f'<{m.group(1)} {name}="{value}"', tag, count=1)
+
+
+def content_markup(body):
+    """Accessibility + image clean-up of imported content (safe to run again on its own output):
+    every <img> gets an alt (decorative "" when it had none or only a file name), content photos with a WebP sibling
+    become <picture> with their width/height (no layout shift), the first content photo is not lazy (it is often the
+    largest paint), icon-only links get a name (or leave the tab order when they are a decorative bullet), and frames
+    get a title."""
+    first = [True]
+
+    def img(tag, in_picture):
+        alt = _ATTR(tag, "alt")
+        if not alt or re.search(r"\.(jpe?g|png|gif|webp|svg)\s*$", alt.group(1), re.I):
+            tag = _set_attr(tag, "alt", "")
+        icon = re.search(r'class="[^"]*\bimg-(icon|social)\b', tag) or re.search(r"checklist|logo", tag, re.I)
+        if icon:
+            return tag
+        if first[0]:
+            first[0] = False
+            tag = re.sub(r'\sloading="lazy"', "", tag, count=1)
+        src = _ATTR(tag, "src")
+        m = src and re.match(r"^(/img/old/[^\"?#]+)\.(jpe?g|png)$", src.group(1), re.I)
+        if in_picture or not m:
+            return tag
+        webp = m.group(1) + ".webp"
+        if not os.path.exists(os.path.join(PUB, webp.lstrip("/"))):
+            return tag
+        size = img_size(os.path.join(PUB, src.group(1).lstrip("/")))
+        if size and not _ATTR(tag, "width") and not _ATTR(tag, "height"):
+            tag = re.sub(r"\s*/?>$", f' width="{size[0]}" height="{size[1]}">', tag)
+        return f'<picture><source type="image/webp" srcset="{webp}">{tag}</picture>'
+
+    def piece(m):
+        t = m.group(0)
+        if t[:8].lower() == "<picture":
+            return re.sub(r"<img\b[^>]*>", lambda k: img(k.group(0), True), t, flags=re.I)
+        return img(t, False)
+    body = re.sub(r"<picture\b.*?</picture>|<img\b[^>]*>", piece, body, flags=re.S | re.I)
+
+    def link(m):
+        tag, inner = m.group(1), m.group(2)
+        if _ATTR(tag, "aria-label") or _ATTR(tag, "aria-hidden"):
+            return m.group(0)
+        if any(a.group(1).strip() for a in re.finditer(r'\salt="([^"]*)"', inner)):
+            return m.group(0)
+        href = (_ATTR(tag, "href") or [None, ""])[1]
+        if re.search(r"checklist", inner):  # a list bullet that the old CMS wrapped in a (repeated, wrong) link
+            return _set_attr(_set_attr(tag, "aria-hidden", "true"), "tabindex", "-1") + inner + "</a>"
+        label = ("اتصل " + href[4:]) if href.startswith("tel:") else "فيسبوك" if "facebook.com" in href else \
+            "لينكدإن" if "linkedin.com" in href else "إنستجرام" if "instagram.com" in href else ""
+        return (_set_attr(tag, "aria-label", label) if label else tag) + inner + "</a>"
+    body = re.sub(r"(<a\b[^>]*>)((?:\s|&nbsp;)*(?:<picture\b.*?</picture>|<img\b[^>]*>)(?:\s|&nbsp;)*)</a>", link, body, flags=re.S | re.I)
+    body = re.sub(r"<iframe\b(?![^>]*\stitle=)", '<iframe title="خريطة الموقع على جوجل"', body, flags=re.I) if "google.com/maps" in body else body
+    return body
+
+
 # ---------------------------------------------------------------- page template
 def head(title, desc):
     return f"""<!doctype html>
@@ -176,12 +279,12 @@ def head(title, desc):
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/legacy.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
 <title>{html.escape(title)} | مؤسسة مرسال</title>
 <meta name="description" content="{html.escape(desc)}">
 <meta property="og:title" content="{html.escape(title)}">
@@ -225,7 +328,9 @@ def page_html(title, body, desc, cover=None, share_img=None, pid=None, crumbs=No
     (share_img); crumbs are pre-rendered when the menu is known (js/legacy.js builds them otherwise)."""
     cover_html = f'<img class="legacy-cover" src="{cover}" alt="" loading="lazy">' if cover and cover != share_img else ""
     og = f'<meta property="og:image" content="{SITE_URL}{share_img or "/img/hero.jpg"}">'
-    canon = f'<link rel="canonical" href="{SITE_URL}/p/{pid}.html">' if pid else ""
+    canon = (f'<link rel="canonical" href="{SITE_URL}/p/{pid}.html">' + chr(10) +
+             f'<meta property="og:url" content="{SITE_URL}/p/{pid}.html">') if pid else ""
+    body = content_markup(body)
     side = side_html(pid, title) if pid else ""
     head_html = head(title, desc).replace("</head>", og + chr(10) + canon + chr(10) + "</head>")
     return f"""{head_html}
@@ -255,10 +360,17 @@ def page_html(title, body, desc, cover=None, share_img=None, pid=None, crumbs=No
 </main>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script defer src="/js/legacy.js"></script>
 </body>
 </html>
 """
+
+
+def short_text(t, n):
+    """At most n characters, cut on a word boundary with an ellipsis."""
+    t = (t or "").strip()
+    return t if len(t) <= n else re.sub(r"\s+\S*$", "", t[:n]).rstrip(" ،,.:؛") + "…"
 
 
 def text_of(h, n=155):
@@ -293,7 +405,7 @@ def main():
         cover = local_image(d.get("ImagePath")) if d.get("ImagePath") else None
         desc = text_of(body)
         photos = [m for m in re.findall(r'<img[^>]+src="(/img/old/[^"]+)"', body)
-                  if not re.search(r"checklist|logo", m)]
+                  if not re.search(r"checklist|logo", m) and page_photo_ok(m)]
         if pid == 3:  # the old About page showed this picture beside the text
             body = ('<div class="row align-items-center"><div class="col-md-7">' + body +
                     '</div><div class="col-md-5"><img src="/img/about-mersal.jpg" alt="مؤسسة مرسال" loading="lazy"></div></div>')
@@ -338,7 +450,9 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
     with open(os.path.join(PUB, "data", "pages.json"), "w", encoding="utf-8") as f:
         json.dump({str(k): {"title": v["title"], "desc": v["desc"][:140], "photo": v["photo"] or v["cover"]}
                    for k, v in pages.items()}, f, ensure_ascii=False, indent=1)
-    urls = ["/", "/donate.html", "/zakat.html", "/afia.html", "/contact.html", "/albums.html"] + [f"/p/{k}.html" for k in sorted(pages)]
+    # pages that are only a picture of text (no description) stay out of the sitemap until their text is typed in
+    urls = (["/", "/donate.html", "/zakat.html", "/gift.html", "/afia.html", "/contact.html", "/albums.html", "/news.html", "/volunteer.html", "/help.html"]
+            + [f"/p/{k}.html" for k in sorted(pages) if pages[k]["desc"]] + ["/privacy.html", "/terms.html"])
     with open(os.path.join(PUB, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
         f.writelines(f"  <url><loc>{SITE_URL}{u}</loc></url>\n" for u in urls)
@@ -382,7 +496,7 @@ location.replace(m && known.indexOf(+m[1]) > -1 ? "/p/" + m[1] + ".html" : "/");
         if pid not in pages:
             continue
         img = pages[pid]["photo"] or local_image(p.get("ImagePath"), max_w=900) or pages[pid]["cover"]
-        projs.append({"title": pages[pid]["title"], "text": pages[pid]["desc"][:110],
+        projs.append({"title": pages[pid]["title"], "text": short_text(pages[pid]["desc"], 110),
                       "image": img or "/img/hero.jpg", "link": f"/p/{pid}.html"})
     content["projects"] = projs
 

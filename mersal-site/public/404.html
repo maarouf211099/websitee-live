@@ -8,9 +8,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
@@ -49,6 +47,7 @@
 </div></section></main>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script>
 addEventListener("DOMContentLoaded", function () {
   // show the address that was not found (Azure serves this page for every unknown URL)
@@ -70,7 +69,8 @@ addEventListener("DOMContentLoaded", function () {
     }, 60);
   });
   // a guess from the missing address (e.g. /Album/... -> albums) pre-fills the search box
-  var guess = decodeURIComponent(location.pathname).replace(/\.(html?|aspx?)$/i, "").split(/[\/\-_.]+/).filter(function (w) { return w && !/^(p|home|page|index|404)$/i.test(w) && !/^\d+$/.test(w); }).join(" ");
+  var path0; try { path0 = decodeURIComponent(location.pathname); } catch (x) { path0 = location.pathname; } // bad %-encoding
+  var guess = path0.replace(/\.(html?|aspx?)$/i, "").split(/[\/\-_.]+/).filter(function (w) { return w && !/^(p|home|page|index|404)$/i.test(w) && !/^\d+$/.test(w); }).join(" ");
   if (/[\u0600-\u06FF]/.test(guess) && !/404\.html$/.test(location.pathname)) document.getElementById("nf-q").value = guess.slice(0, 60);
 });
 </script>

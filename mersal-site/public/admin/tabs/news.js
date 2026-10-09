@@ -4,7 +4,8 @@
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
   var root, items = null, loaded = "";
   var TAGS = ["خبر", "قصة نجاح", "فعالية"];
-  function today() { return new Date().toISOString().slice(0, 10); }
+  // today in Egypt (a UTC date would still say yesterday between midnight and 2-3 am Cairo time)
+  function today() { try { return new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Cairo" }); } catch (e) { return new Date().toISOString().slice(0, 10); } }
   function uid() { return today() + "-" + Math.random().toString(36).slice(2, 7); }
   function field(label, html, full) { return '<div class="field' + (full ? " full" : "") + '"><label>' + label + "</label>" + html + "</div>"; }
   function tagSel(v) {

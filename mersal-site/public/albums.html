@@ -7,14 +7,19 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>ألبومات الصور | مؤسسة مرسال</title>
 <meta name="description" content="صور من فعاليات وحملات مؤسسة مرسال الخيرية.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/albums.html">
+<meta property="og:title" content="ألبومات الصور">
+<meta property="og:description" content="صور من فعاليات وحملات مؤسسة مرسال الخيرية.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/albums.html">
 </head>
 <body>
 <div id="site-header"></div>
@@ -29,17 +34,18 @@
 </main>
 <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="عرض الصور">
   <button type="button" class="lb-close" aria-label="إغلاق (Esc)">×</button>
-  <button type="button" class="lb-prev" aria-label="الصورة السابقة">&#8250;</button>
+  <button type="button" class="lb-prev" aria-label="الصورة السابقة">&#8249;</button>
   <span class="lb-count" aria-live="polite"></span>
   <figure>
     <div class="lb-stage"><img alt="" draggable="false"><span class="lb-spin" aria-hidden="true"></span></div>
     <figcaption></figcaption>
   </figure>
   <span class="lb-hint" aria-hidden="true">اسحب أو استخدم الأسهم ← → للتنقل · Esc للإغلاق</span>
-  <button type="button" class="lb-next" aria-label="الصورة التالية">&#8249;</button>
+  <button type="button" class="lb-next" aria-label="الصورة التالية">&#8250;</button>
 </div>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script>
 addEventListener("DOMContentLoaded", function () {
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
@@ -128,15 +134,18 @@ addEventListener("DOMContentLoaded", function () {
   });
 
   var albumsList = [];
+  // Arabic count after a number: 1 صورة، 2 صورتين، 3-10 صور، 11+ صورة
+  function photos(n) { return n === 2 ? "صورتين" : n + " " + (n >= 3 && n <= 10 ? "صور" : "صورة"); }
   fetch("/data/albums.json").then(function (r) { return r.json(); }).then(function (albums) {
     albumsList = albums;
     var box = document.getElementById("albums");
     box.innerHTML = albums.map(function (a, i) {
       var cover = (a.thumbs || a.photos)[0];
-      return '<button type="button" class="card album" data-i="' + i + '" aria-label="فتح ألبوم ' + esc(a.title) + ' (' + a.photos.length + ' صورة)">' +
+      var year = a.date && !/\b(19|20)\d{2}\b/.test(a.title || "") ? a.date.slice(0, 4) : ""; // a title that names its year keeps it alone
+      return '<button type="button" class="card album" data-i="' + i + '" aria-label="فتح ألبوم ' + esc(a.title) + ' (' + photos(a.photos.length) + ')">' +
         '<div class="thumb">' + window.mersalPic(cover, { alt: "", cls: "media", w: 600, h: 375, lazy: i > 1 }) +
-          '<span class="count"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-4 4 3 3-2 6 4"/></svg>' + a.photos.length + ' صورة</span></div>' +
-        '<div class="body"><h3>' + esc(a.title) + '</h3><p>' + (a.date ? esc(a.date.slice(0, 4)) : "مرسال") + "</p></div></button>";
+          '<span class="count"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-4 4 3 3-2 6 4"/></svg>' + photos(a.photos.length) + '</span></div>' +
+        '<div class="body"><h3 dir="auto">' + esc(a.title) + '</h3><p>' + (year ? esc(year) : "مرسال") + "</p></div></button>";
     }).join("");
     box.querySelectorAll(".album").forEach(function (b) { b.addEventListener("click", function () { open(albums[+b.dataset.i], 0); }); });
     if (window.mersalReveal) window.mersalReveal(box.children);

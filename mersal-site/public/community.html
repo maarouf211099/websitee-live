@@ -8,14 +8,21 @@
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/community.css">
+<link rel="stylesheet" href="/css/gift.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <title>مرسال كوميونيتي - هدايا المتبرعين | مؤسسة مرسال</title>
 <meta name="description" content="صفحة خاصة بمتبرعي مرسال: شهادة شكر باسمك، كارت للمشاركة، وهدايا من المؤسسة.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/community.html">
+<meta property="og:title" content="مرسال كوميونيتي - هدايا المتبرعين">
+<meta property="og:description" content="صفحة خاصة بمتبرعي مرسال: شهادة شكر باسمك، كارت للمشاركة، وهدايا من المؤسسة.">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/community.html">
 </head>
 <body class="community">
 <div id="site-header"></div>
@@ -61,6 +68,8 @@
       <div class="cm-cta">
         <a class="btn btn-gold btn-lg" href="/donate.html#online">تبرع تاني</a>
         <a class="btn btn-ghost-teal" href="/volunteer.html">تطوع معنا</a>
+        <button type="button" class="btn btn-ghost-teal" data-gift-reminder>ذكّرني كل شهر</button>
+        <a class="btn btn-ghost-teal" href="/gift.html">اهدي تبرع</a>
       </div>
     </div>
   </section>
@@ -72,13 +81,15 @@
       <canvas id="cm-canvas" width="1080" height="1350" aria-label="شهادة الشكر"></canvas>
       <div class="cm-modal-actions">
         <button type="button" class="btn btn-gold" id="cm-share">مشاركة</button>
-        <a class="btn btn-ghost-teal" id="cm-download" download="mersal-thank-you.png">تحميل الصورة</a>
+        <a class="btn btn-ghost-teal" id="cm-download" href="#" download="mersal-thank-you.png">تحميل الصورة</a>
       </div>
     </div>
   </div>
 </main>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script defer src="/js/community.js"></script>
+<script defer src="/js/gift.js"></script>
 </body>
 </html>

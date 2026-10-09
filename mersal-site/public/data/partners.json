@@ -1,0 +1,77 @@
+[
+  {
+    "name": "البنك الأهلي المصري",
+    "logo": "/img/banks/nbe.svg",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "إنستاباي",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "بنك مصر",
+    "logo": "/img/banks/banque-misr.svg",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "فوري",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "البنك التجاري الدولي CIB",
+    "logo": "/img/banks/cib.svg",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "فودافون كاش (ميجا خير)",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "بنك QNB الأهلي",
+    "logo": "/img/banks/qnb.png",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "اتصالات كاش e&",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "البنك العربي الأفريقي الدولي",
+    "logo": "/img/banks/aaib.png",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "WE Pay",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "بنك الإمارات دبي الوطني",
+    "logo": "/img/banks/enbd.jpg",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "أورانج كاش",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "مصرف أبوظبي الإسلامي",
+    "logo": "/img/banks/adib.png",
+    "link": "/donate.html#bank"
+  },
+  {
+    "name": "طلبات",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  },
+  {
+    "name": "وفّرها",
+    "logo": "",
+    "link": "/donate.html#wallets"
+  }
+]

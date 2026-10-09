@@ -7,14 +7,20 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/forms.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>تواصل معنا | مؤسسة مرسال</title>
 <meta name="description" content="تواصل مع مؤسسة مرسال: الخط الساخن 19340، الهاتف 01200002870، info@mersal-ngo.org">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/contact.html">
+<meta property="og:title" content="تواصل معنا">
+<meta property="og:description" content="تواصل مع مؤسسة مرسال: الخط الساخن 19340، الهاتف 01200002870، info@mersal-ngo.org">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/contact.html">
 </head>
 <body>
 <div id="site-header"></div>
@@ -27,7 +33,7 @@
     <div class="wrap grid grid-2">
       <div>
 <!-- mersal:content -->
-        <p>يسعدنا تواصلك معنا في أي وقت: اتصل بالخط الساخن أو ابعتلنا رسالة من الفورم.</p>
+        <p>اتصل بالخط الساخن أو ابعتلنا رسالة من الفورم، وفريق مرسال هيرد عليك.</p>
         <!-- data-site="…" values are filled from the site details in js/layout.js (edited from the console) -->
         <div class="bank"><div><b>الخط الساخن</b><a href="tel:19340" data-site="hotline">19340</a></div></div>
         <div class="bank"><div><b>الهاتف</b><a href="tel:01200002870" dir="ltr" data-site="phone">01200002870</a></div></div>
@@ -37,26 +43,54 @@
         <a href="https://maps.google.com/?q=8+Street+263+New+Maadi+Cairo" target="_blank" rel="noopener"><img src="/img/mersalmap.png" alt="خريطة موقع مؤسسة مرسال" style="border-radius:var(--radius);margin-top:8px" loading="lazy"></a>
 <!-- /mersal:content -->
       </div>
-      <form id="contact" class="card" style="padding:22px">
-        <h2 style="margin:0 0 12px;color:var(--teal-dark);font-size:22px">ابعتلنا رسالة</h2>
-        <div class="field"><label for="c-name">الاسم</label><input id="c-name" required maxlength="80" autocomplete="name"></div>
-        <div class="field"><label for="c-phone">رقم الموبايل</label><input id="c-phone" type="tel" dir="ltr" maxlength="20" autocomplete="tel"></div>
-        <div class="field"><label for="c-msg">الرسالة</label><textarea id="c-msg" rows="6" required maxlength="2000"></textarea></div>
-        <button class="btn btn-teal" type="submit">إرسال</button>
-        <p class="hint" style="margin-top:8px">سيتم فتح برنامج البريد على جهازك لإرسال الرسالة إلى info@mersal-ngo.org.</p>
-      </form>
+      <div class="contact-form">
+        <div id="c-alert" class="req-alert" hidden aria-live="polite"></div>
+        <form id="contact" class="stepper req-form contact-card" data-form="contact" data-alert="c-alert" data-success="c-success" novalidate>
+          <h2>ابعتلنا رسالة</h2>
+          <div class="field" data-field="name">
+            <label for="c-name">الاسم</label>
+            <input id="c-name" name="name" required maxlength="80" autocomplete="name">
+            <p class="f-err"></p>
+          </div>
+          <div class="field" data-field="phone">
+            <label for="c-phone">رقم الموبايل</label>
+            <input id="c-phone" name="phone" type="tel" inputmode="tel" dir="ltr" maxlength="20" autocomplete="tel" placeholder="01xxxxxxxxx">
+            <p class="f-err"></p>
+          </div>
+          <div class="field" data-field="email">
+            <label for="c-email">البريد الإلكتروني <small>(اختياري لو كتبت الموبايل)</small></label>
+            <input id="c-email" name="email" type="email" inputmode="email" dir="ltr" maxlength="120" autocomplete="email">
+            <p class="f-err"></p>
+          </div>
+          <div class="field" data-field="message">
+            <label for="c-msg">الرسالة</label>
+            <textarea id="c-msg" name="message" rows="6" required maxlength="2000"></textarea>
+            <small class="count" data-count="c-msg"></small>
+            <p class="f-err"></p>
+          </div>
+          <div class="hp" aria-hidden="true"><label for="c-website">الموقع الإلكتروني</label><input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+          <button class="btn btn-gold btn-block" type="submit">إرسال</button>
+          <p class="hint c-mail">تفضّل الإيميل؟ ابعتلنا على <a href="mailto:info@mersal-ngo.org" data-site="email">info@mersal-ngo.org</a></p>
+          <p class="hint">بنستخدم بياناتك عشان نرد عليك بس. <a href="/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>
+        </form>
+        <section id="c-success" class="stepper req-success contact-card" hidden aria-live="polite">
+          <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+          <h2 tabindex="-1">وصلتنا رسالتك، شكراً ليك 💚</h2>
+          <p>فريق مرسال هيقرا رسالتك ويرد عليك في أقرب وقت.</p>
+          <div class="ref-box"><div><small>رقم الرسالة - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+          <div class="actions">
+            <a class="btn btn-wa" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> واتساب</a>
+            <a class="btn btn-teal" href="tel:19340" data-site-href="hotline">اتصل بالخط الساخن</a>
+          </div>
+          <a class="again" data-again href="#contact">ابعت رسالة تانية</a>
+        </section>
+      </div>
     </div>
   </section>
 </main>
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
-<script>
-document.getElementById("contact").addEventListener("submit", function (e) {
-  e.preventDefault();
-  var n = document.getElementById("c-name").value, p = document.getElementById("c-phone").value, m = document.getElementById("c-msg").value;
-  location.href = "mailto:info@mersal-ngo.org?subject=" + encodeURIComponent("رسالة من الموقع - " + n) +
-    "&body=" + encodeURIComponent(m + "\n\n" + n + (p ? "\n" + p : ""));
-});
-</script>
+<script defer src="/js/pwa.js"></script>
+<script defer src="/js/forms.js"></script>
 </body>
 </html>

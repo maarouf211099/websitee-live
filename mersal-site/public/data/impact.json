@@ -8,10 +8,8 @@
   "max": 10000,
   "campaigns": true,
   "items": [
-    { "label": "جلسة كيماوي", "price": 1500, "unit": "جلسة", "icon": "drop", "text": "{n} {unit} كيماوي لمريض أورام", "link": "/donate.html?for=p31" },
-    { "label": "كشف وتحاليل", "price": 350, "unit": "كشف", "icon": "stethoscope", "text": "{n} {unit} وتحاليل لمريض غير قادر", "link": "/donate.html?for=p38" },
-    { "label": "كفالة أسرة شهر", "price": 750, "unit": "شهر", "icon": "home", "text": "كفالة أسرة مريض لمدة {n} {unit}", "link": "/donate.html?for=p42" },
+    { "label": "كشف وتحاليل", "price": 200, "unit": "سهم", "icon": "stethoscope", "text": "{n} {unit} في الكشف الطبي والفحوصات", "link": "/donate.html?for=p38" },
     { "label": "شنطة احتياجات أساسية", "price": 500, "unit": "كارت", "icon": "cart", "text": "{n} {unit} احتياجات أساسية لأسرة", "link": "" },
-    { "label": "يوم إقامة في دار الضيافة", "price": 200, "unit": "يوم", "icon": "bed", "text": "{n} {unit} إقامة في دار ضيافة مرسال", "link": "/donate.html?for=p32" }
+    { "label": "سهم استضافة مريض في دار الضيافة", "price": 200, "unit": "سهم", "icon": "bed", "text": "{n} {unit} استضافة في دار ضيافة مرسال", "link": "/donate.html?for=p32" }
   ]
 }

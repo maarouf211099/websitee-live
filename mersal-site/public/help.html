@@ -7,9 +7,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
 <link rel="apple-touch-icon" href="/img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/forms.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
@@ -18,6 +16,11 @@
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hosbitalbackground.jpeg">
 <title>طلب مساعدة | مؤسسة مرسال</title>
 <meta name="description" content="لو أنت أو حد من أسرتك محتاج علاج ومش قادر على تكلفته، قدّم طلب مساعدة لمؤسسة مرسال وفريقنا هيراجعه ويتواصل معاك.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:url" content="https://www.mersal-ngo.org/help.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.mersal-ngo.org/help.html">
 </head>
 <body>
 <div id="site-header"></div>
@@ -138,13 +141,13 @@
           <div class="req-submit"><button class="btn btn-gold btn-block" type="submit">إرسال طلب المساعدة</button></div>
           <div class="req-privacy">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7zm4 9.7V19h-2v-2.3a2 2 0 1 1 2 0z"/></svg>
-            <p><b>خصوصيتك:</b> بيانات المريض سرية، بتتخزن بشكل آمن وبيطّلع عليها فريق مرسال المختص فقط لدراسة الحالة والتواصل معاك. مش بننشرها ولا بنشاركها مع أي جهة تانية.</p>
+            <p><b>خصوصيتك:</b> بيانات المريض سرية، بتتخزن بشكل آمن وبيطّلع عليها فريق مرسال المختص فقط لدراسة الحالة والتواصل معاك. مش بننشرها ولا بنشاركها مع أي جهة تانية. <a href="/privacy.html" target="_blank" rel="noopener" style="text-decoration:underline">اقرأ سياسة الخصوصية</a></p>
           </div>
         </form>
 
         <section id="form-success" class="stepper req-success" hidden aria-live="polite">
           <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
-          <h2>وصلنا طلبك 💚</h2>
+          <h2 tabindex="-1">وصلنا طلبك 💚</h2>
           <p>فريق مرسال هيراجع الطلب ويتواصل معاك على الموبايل اللي كتبته لاستكمال البيانات.</p>
           <div class="ref-box"><div><small>رقم الطلب - احتفظ بيه</small><code id="ref"></code></div><button type="button" id="copy-ref"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
           <p>للمتابعة أو لو الحالة اتطورت، ابعتلنا رقم الطلب على واتساب أو كلمنا على الخط الساخن:</p>
@@ -187,6 +190,7 @@
 
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
+<script defer src="/js/pwa.js"></script>
 <script defer src="/js/forms.js"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@
 .cm-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 26px; }
 .cm-stat { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px 10px; text-align: center; }
 .cm-stat b { display: block; font: 700 26px/1.1 "Titillium Web", "Cairo", sans-serif; color: var(--teal); font-variant-numeric: tabular-nums; }
-.cm-stat span { font-size: 12.5px; color: var(--muted); }
+.cm-stat > span { font-size: 12.5px; color: var(--muted); }
 .cm-h { font-size: 22px; color: var(--teal-dark); margin: 8px 0 6px; }
 .cm-gifts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin: 12px 0 26px; }
 .cm-gift { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 14px; text-align: start; font: inherit; color: inherit; cursor: pointer; text-decoration: none; transition: transform .2s, box-shadow .2s, border-color .2s; }
@@ -30,7 +30,6 @@
 .cm-history { list-style: none; padding: 0; margin: 8px 0 26px; display: grid; gap: 8px; }
 .cm-history li { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
 .cm-history b { font-family: "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); font-size: 17px; }
-.cm-history .demo { font-size: 11px; color: #b45309; background: #fff4d1; padding: 2px 8px; border-radius: 999px; }
 .cm-cta { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
 .cm-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,24,24,.7); display: grid; place-items: center; padding: 16px; overflow: auto; }
 .cm-modal-in { background: #fff; border-radius: 22px; padding: 16px; width: min(100%, 420px); position: relative; }

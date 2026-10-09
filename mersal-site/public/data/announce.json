@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "text": "تبرعك بيوصل لمرضى مرسال، اعرف كل طرق التبرع",
+  "link": "/donate.html",
+  "linkText": "طرق التبرع",
+  "tone": "gold",
+  "until": "",
+  "dismissible": true
+}

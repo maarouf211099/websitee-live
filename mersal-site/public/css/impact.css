@@ -1,13 +1,13 @@
 /* "تبرعك بيعمل إيه" impact calculator (js/impact.js renders into #impact-calc). Motion is transform/opacity only. */
 #impact-calc { margin: 28px 0; }
-.ic { --ic-r: 24px; display: grid; grid-template-columns: minmax(0, 1fr); border-radius: var(--ic-r); overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 50px -24px rgba(0,48,48,.35); }
-.ic-head { position: relative; padding: 22px 20px 20px; color: #fff; background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad, radial-gradient(ellipse at 50% 45%, #008b8c 0%, #006e6f 55%, #005959 100%)); background-size: 240px 240px, cover; }
+.ic { --ic-r: 24px; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); border-radius: var(--ic-r); overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 50px -24px rgba(0,48,48,.35); }
+.ic-head { position: relative; padding: 22px 20px 20px; color: #fff; background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), radial-gradient(ellipse at 50% 45%, #006e6f 0%, #005f60 55%, #004d4d 100%); background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")), radial-gradient(ellipse at 50% 45%, #006e6f 0%, #005f60 55%, #004d4d 100%); background-size: 240px 240px, cover; } /* darker than --brand-grad: the small white and gold text keeps AA contrast on every pixel */
 .ic-head::after { content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 4px; background: var(--gold); }
 .ic-eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font-weight: 800; font-size: 13px; }
 .ic-eyebrow::before { content: ""; width: 22px; height: 3px; border-radius: 3px; background: var(--gold); }
 .ic-title { margin: 4px 0 2px; font-size: clamp(22px, 3vw, 28px); font-weight: 800; color: #fff; line-height: 1.3; }
-.ic-intro { margin: 0 0 14px; color: rgba(255,255,255,.85); font-size: 14.5px; }
-.ic-label { display: block; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.85); margin-bottom: 6px; }
+.ic-intro { margin: 0 0 14px; color: #fff; font-size: 14.5px; }
+.ic-label { display: block; font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px; }
 .ic-input { position: relative; }
 .ic-input input { width: 100%; box-sizing: border-box; font: 800 26px/1.2 "Titillium Web", "Cairo", sans-serif; color: var(--teal-ink, #003c3c); padding: 10px 74px 10px 16px; border: 0; border-radius: 16px; background: #fff; box-shadow: 0 10px 30px -14px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; direction: ltr; text-align: start; -moz-appearance: textfield; }
 .ic-input input::-webkit-outer-spin-button, .ic-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -85,8 +85,8 @@ a.ic-tile-in:hover .ic-arrow { transform: translateX(-3px); }
 }
 @media (max-width: 400px) {
   .ic-tiles { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .ic-tile-in { padding: 10px 10px 8px; gap: 2px 8px; grid-template-columns: 38px 1fr; }
-  .ic-ico { width: 38px; height: 38px; border-radius: 12px; }
+  .ic-tile-in { padding: 10px 10px 8px; gap: 2px 8px; grid-template-columns: minmax(0, 1fr); }
+  .ic-ico { grid-row: auto; width: 38px; height: 38px; border-radius: 12px; margin-bottom: 4px; }
   .ic-ico svg { width: 21px; height: 21px; }
   .ic-n { font-size: 26px; }
   .ic-t { font-size: 12.5px; }

@@ -7,11 +7,39 @@
 
   var toastT;
   function toast(msg, err) { var t = $("#toast"); t.textContent = msg; t.classList.toggle("err", !!err); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, err ? 6000 : 3500); }
+  // Every GET of a file returns its revision (X-Mersal-Sha); a PUT to the same path sends it back (X-Mersal-Base) so the
+  // server refuses (409) to overwrite a file someone else saved in between, and the PUT's answer carries the new revision.
+  var revs = {};
   function api(path, opt) {
     opt = opt || {};
-    return fetch("/api/console/" + path, { method: opt.method || "GET", headers: opt.body ? { "Content-Type": "application/json" } : {}, body: opt.body ? JSON.stringify(opt.body) : undefined })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) { var err = new Error(d.message || ("HTTP " + r.status)); err.status = r.status; err.data = d; throw err; } return d; }); });
+    var method = opt.method || "GET", headers = opt.body ? { "Content-Type": "application/json" } : {};
+    if (method === "PUT" && revs[path]) headers["X-Mersal-Base"] = revs[path];
+    return fetch("/api/console/" + path, { method: method, headers: headers, body: opt.body ? JSON.stringify(opt.body) : undefined })
+      .then(function (r) {
+        var rev = r.headers.get("X-Mersal-Sha"); if (rev && r.ok) revs[path] = rev;
+        return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) { var err = new Error(d.message || ("HTTP " + r.status)); err.status = r.status; err.data = d; throw err; } return d; });
+      });
   }
+  // CSV cell: quoted, and a text starting with = + - @ (or a tab / CR) gets a leading ' so Excel / Sheets show it as text
+  // instead of running it as a formula (names, notes and cities come from the public forms). Plain numbers stay numbers.
+  function csvCell(v) {
+    var s = String(v == null ? "" : v);
+    if (!/^-?\d+(\.\d+)?$/.test(s) && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  function downloadCsv(rows, name) {
+    var text = rows.map(function (l) { return l.map(csvCell).join(","); }).join("\r\n");
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([String.fromCharCode(65279) + text], { type: "text/csv;charset=utf-8" })); a.download = name; a.click();
+  }
+  // "2026-10-09T22:30:00Z" -> "2026-10-10 01:30" (Egypt time, like the date filters)
+  var cairoFmt = (function () { try { return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }); } catch (e) { return null; } })();
+  function cairoTime(iso) {
+    var d = new Date(iso || ""); if (!iso || isNaN(d)) return String(iso || "").replace("T", " ").slice(0, 16);
+    if (!cairoFmt) return String(iso).replace("T", " ").slice(0, 16);
+    var p = {}; cairoFmt.formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
+    return p.year + "-" + p.month + "-" + p.day + " " + p.hour + ":" + p.minute;
+  }
+  function cairoToday() { return cairoTime(new Date().toISOString()).slice(0, 10); }
   function busy(btn, on) { btn.disabled = on; btn.dataset.t = btn.dataset.t || btn.textContent; btn.textContent = on ? "جاري الحفظ…" : btn.dataset.t; }
   function published() { toast("تم الحفظ ✓ هيظهر على الموقع خلال دقيقة تقريباً"); }
 
@@ -47,12 +75,12 @@
       if (!me.github) { s.hidden = false; s.className = "status bad"; s.textContent = "الحفظ مش هيشتغل: GITHUB_TOKEN و GITHUB_REPO مش متظبطين في إعدادات Azure (شوف README)."; }
       $("#checks").innerHTML =
         '<li><span>الربط بـ GitHub (الحفظ والنشر)</span><b class="' + (me.github ? "ok" : "no") + '">' + (me.github ? "متصل" : "غير متصل") + "</b></li>" +
-        '<li><span>تخزين التبرعات (DONATIONS_STORAGE)</span><b class="' + (me.donations ? "ok" : "no") + '">' + (me.donations ? "مفعّل" : "غير مفعّل") + "</b></li>" +
+        '<li><span>تخزين التبرعات والطلبات (DONATIONS_STORAGE)</span><b class="' + (me.donations ? "ok" : "no") + '">' + (me.donations ? "مفعّل" : "غير مفعّل - الطلبات مش بتتحفظ") + "</b></li>" +
         '<li><span>بوابة بنك مصر (MPGS)</span><b class="' + (me.mpgs ? "ok" : "no") + '">' + (me.mpgs ? "متظبطة - " + esc(me.merchant) : "غير متظبطة") + "</b></li>" +
         '<li><span>كلمة سر اللوحة</span><b class="ok">' + ({ env: "من إعدادات Azure", saved: "متظبطة من اللوحة", aad: "حساب مايكروسوفت" }[me.password] || "—") + "</b></li>";
       $("#pw-user").textContent = me.user || "admin";
       if (me.password === "env" || me.password === "aad") { $("#pw-form").hidden = true; $("#pw-hint").textContent = me.password === "env" ? "كلمة السر متظبطة من إعدادات Azure (ADMIN_PASSWORD)؛ غيّرها من هناك." : "داخل بحساب مايكروسوفت."; }
-      if (!booted) { booted = true; loadHome(); loadPages(); loadAlbums(); loadSettings(); }
+      if (!booted) { booted = true; loadHome(); loadPages(); loadAlbums(); loadSettings(); keepAlive(); }
     }).catch(function (e) {
       if (e.status === 401) showLogin(true); else toast("تعذّر الاتصال: " + e.message, true);
     });
@@ -65,7 +93,21 @@
       .catch(function (x) { err.textContent = x.message; err.hidden = false; })
       .then(function () { busy(b, false); });
   });
+  // The session cookie lives 4 hours and GET /me renews it: while the console is open (and visible) it stays signed in,
+  // up to the server's 12-hour cap. A 401 here means the session ended (password changed, signed out everywhere).
+  function keepAlive() {
+    setInterval(function () {
+      if (document.visibilityState !== "visible" || $("#shell").hidden) return;
+      api("me").catch(function (e) { if (e.status === 401) { toast("الجلسة انتهت، ادخل تاني", true); showLogin(true); } });
+    }, 10 * 60e3);
+  }
   $("#logout").addEventListener("click", function (e) { e.preventDefault(); api("logout", { method: "POST" }).then(function () { location.reload(); }); });
+  var logoutAll = $("#logout-all");
+  if (logoutAll) logoutAll.addEventListener("click", function () {
+    if (!confirm("هيخرج كل الأجهزة اللي داخلة على اللوحة (وإنت كمان). متأكد؟")) return;
+    busy(logoutAll, true);
+    api("logout", { method: "POST", body: { everywhere: true } }).then(function () { location.reload(); }).catch(function (x) { toast(x.message, true); busy(logoutAll, false); });
+  });
   $("#pw-form").addEventListener("submit", function (e) {
     e.preventDefault();
     if ($("#pw-new").value !== $("#pw-new2").value) { toast("كلمة السر الجديدة مش متطابقة", true); return; }
@@ -140,7 +182,9 @@
   // ---------- home ----------
   var content = null;
   function loadHome() {
-    api("data/content").then(function (c) { content = c; renderSlides(); renderCampaigns(); renderProjects(); renderNumbers(); });
+    homeReady();
+    api("data/content").then(function (c) { content = c; renderSlides(); renderCampaigns(); renderProjects(); renderNumbers(); homeReady(); })
+      .catch(function (e) { toast("تعذّر تحميل الرئيسية: " + e.message, true); });
   }
   function renderSlides() {
     $("#slides").innerHTML = (content.slides || []).map(function (s, i) {
@@ -150,15 +194,18 @@
         '<div class="field"><label>العنوان (بيظهر على الموبايل)</label><input data-k="title" value="' + esc(s.title || "") + '"></div>' +
         '<div class="field"><label>سطر تحت العنوان</label><input data-k="text" value="' + esc(s.text || "") + '"></div>' +
         '<div class="field"><label>نص الزرار</label><input data-k="button" value="' + esc(s.button || "تبرع الآن") + '"></div>' +
-        '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" value="' + esc(s.link || "/donate.html") + '"></div>' +
-        '<div class="field"><label>مكان الصورة على الموبايل (مثال 40% 50%)</label><input data-k="focus" value="' + esc(s.focus || "50% 50%") + '"></div>' +
+        '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" dir="ltr" value="' + esc(s.link || "/donate.html") + '"></div>' +
+        '<div class="field"><label>مكان الصورة على الموبايل</label><input data-k="focus" dir="ltr" placeholder="مثال: 40% 50%" value="' + esc(s.focus || "50% 50%") + '"></div>' +
         '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div></div>' +
         '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="mimg" title="صورة أعلى جودة للموبايل (عرض 1800px أو أكتر، أفضل 4:5 طولي)">صورة الموبايل</button>' + (s.mobile ? '<button class="btn btn-ghost btn-sm" data-act="mdel">إلغاء صورة الموبايل</button>' : "") + '<button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
   function renderCampaigns() {
     $("#campaigns").innerHTML = (content.campaigns || []).map(function (c, i) {
-      var opts = Object.keys(pagesIndex).map(function (id) { return '<option value="/p/' + id + '.html"' + (c.link === "/p/" + id + ".html" ? " selected" : "") + ">" + esc(pagesIndex[id].title) + "</option>"; }).join("");
+      // like the projects: a link that is not in the pages list (pages.json not loaded yet, or failed) stays selected as is
+      var link = c.link || "/donate.html", known = link === "/donate.html";
+      var opts = Object.keys(pagesIndex).map(function (id) { var h = "/p/" + id + ".html"; if (h === link) known = true; return '<option value="' + h + '"' + (link === h ? " selected" : "") + ">" + esc(pagesIndex[id].title) + "</option>"; }).join("") +
+        (known ? "" : '<option value="' + esc(link) + '" selected>' + esc(link) + "</option>");
       return '<div class="item" data-i="' + i + '"><img class="thumb" src="' + esc(c.imageSm || c.image || "") + '" alt="">' +
         '<div class="fields">' +
         '<div class="field full"><label>اسم الحملة</label><input data-k="title" value="' + esc(c.title) + '"></div>' +
@@ -196,7 +243,7 @@
         '<div class="field"><label>الرقم</label><input data-k="value" type="number" value="' + esc(n.value) + '"></div>' +
         '<div class="field"><label>علامة قبل الرقم (+ مثلاً)</label><input data-k="prefix" value="' + esc(n.prefix || "") + '"></div>' +
         '<div class="field full"><label>الوصف</label><input data-k="label" value="' + esc(n.label) + '"></div>' +
-        '<div class="field full"><label>رابط (اختياري)</label><input data-k="link" value="' + esc(n.link || "") + '"></div></div>' +
+        '<div class="field full"><label>رابط (اختياري)</label><input data-k="link" dir="ltr" value="' + esc(n.link || "") + '"></div></div>' +
         '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
@@ -204,8 +251,10 @@
     var arr = content[key] || [];
     $$(listSel + " .item").forEach(function (it) {
       var o = arr[+it.dataset.i]; if (!o) return;
+      var oldLink = o.link || "/donate.html";
       $$("[data-k]", it).forEach(function (inp) { var v = inp.value; o[inp.dataset.k] = (numeric || []).indexOf(inp.dataset.k) > -1 ? Number(v) || 0 : v; });
-      if (key === "campaigns") o.purpose = /^\/p\/(\d+)\.html$/.test(o.link || "") ? "p" + RegExp.$1 : "general";
+      // the donation purpose follows the page only when the editor changed the page (an unchanged link keeps its purpose)
+      if (key === "campaigns" && ((o.link || "/donate.html") !== oldLink || !o.purpose)) { var m = /^\/p\/(\d+)\.html$/.exec(o.link || ""); o.purpose = m ? "p" + m[1] : "general"; }
     });
   }
   function listActions(listSel, key, render, imgOpts) {
@@ -244,23 +293,38 @@
   $("#add-campaign").onclick = function () { collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); (content.campaigns = content.campaigns || []).push({ title: "حملة جديدة", text: "", image: "", imageSm: "", unit: "سهم", unitPrice: 0, goal: 0, raised: 0, link: "/donate.html", purpose: "general" }); renderCampaigns(); };
   $("#add-project").onclick = function () { collect("#projects", "projects"); (content.projects = content.projects || []).push({ title: "مشروع جديد", text: "", image: "", imageSm: "", link: "/donate.html", button: "" }); renderProjects(); };
   $("#add-number").onclick = function () { collect("#numbers", "numbers", ["value"]); (content.numbers = content.numbers || []).push({ value: 0, prefix: "", label: "", link: "" }); renderNumbers(); };
+  // "حفظ ونشر" waits for the pages list (campaign / project links are picked from it); if it failed, a visible retry
+  // shows and saving is allowed again (links that are not in the list are kept as they are).
+  function homeReady() {
+    var b = $("#save-home"), box = $("#home-pages-status");
+    b.disabled = !content || pagesState === "loading";
+    b.title = pagesState === "loading" ? "استنى لحد ما قائمة الصفحات تحمّل" : "";
+    if (box) box.hidden = pagesState !== "error";
+  }
   $("#save-home").onclick = function () {
+    if (!content || pagesState === "loading") return;
     var b = this; collect("#slides", "slides"); collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); collect("#projects", "projects"); collect("#numbers", "numbers", ["value"]);
     content.slides = (content.slides || []).filter(function (s) { return s.banner; });
     content.projects = (content.projects || []).filter(function (p) { return p.title; });
     busy(b, true);
-    api("data/content", { method: "PUT", body: { data: content, message: "admin: home content" } }).then(published).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });
+    api("data/content", { method: "PUT", body: { data: content, message: "admin: home content" } }).then(published).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); homeReady(); });
   };
 
   // ---------- pages ----------
   // The fixed pages (public/<id>.html) are edited through the same endpoint as the imported /p/<id>.html ones
-  var STATIC_PAGES = { about: "عن مرسال", contact: "تواصل معنا", afia: "كارت عافية", zakat: "حاسبة الزكاة" };
-  var pagesIndex = {}, curPage = null, htmlMode = false;
+  // ("عن مرسال" is the imported page /p/3.html, listed with the content pages)
+  var STATIC_PAGES = { contact: "تواصل معنا", afia: "كارت عافية", zakat: "حاسبة الزكاة" };
+  var pagesIndex = {}, curPage = null, htmlMode = false, pagesState = "loading";
   function loadPages() {
+    pagesState = "loading"; homeReady();
     api("data/pages").then(function (pg) {
-      pagesIndex = pg; renderPageList(); if (content) { renderCampaigns(); renderProjects(); }
-    }).catch(function () { renderPageList(); });
+      // keep what the editor already typed in the campaign / project rows before they are drawn again
+      if (content) { collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); collect("#projects", "projects"); }
+      pagesIndex = pg || {}; pagesState = "ok"; renderPageList(); if (content) { renderCampaigns(); renderProjects(); }
+    }).catch(function () { pagesState = "error"; renderPageList(); })
+      .then(homeReady);
   }
+  if ($("#home-pages-retry")) $("#home-pages-retry").addEventListener("click", loadPages);
   function renderPageList() {
     var q = ($("#page-filter").value || "").trim();
     var li = function (id, title) { return '<li data-id="' + id + '"' + (curPage === id ? ' class="on"' : "") + ">" + esc(title) + "</li>"; };
@@ -346,17 +410,29 @@
       var total = rows.reduce(function (s, r) { return s + (Number(r.amount) || 0); }, 0);
       $("#d-total").textContent = rows.length ? rows.length + " تبرع · " + fmt.format(total) + " جنيه" : (d.enabled ? "مفيش تبرعات في الفترة دي" : "");
       $("#d-table tbody").innerHTML = rows.map(function (r) {
-        return "<tr><td>" + esc((r.paidAt || "").replace("T", " ").slice(0, 16)) + '</td><td class="num">' + fmt.format(r.amount) + " " + esc(r.currency) + "</td><td>" + esc(purposeName(r.purpose)) + "</td><td>" + esc(r.donorName) + '</td><td dir="ltr">' + esc(r.phone) + '</td><td dir="ltr">' + esc(r.email) + '</td><td dir="ltr">' + esc(r.orderId) + "</td></tr>";
+        return '<tr><td dir="ltr">' + esc(cairoTime(r.paidAt)) + '</td><td class="num">' + fmt.format(r.amount) + " " + esc(r.currency) + "</td><td>" + esc(purposeName(r.purpose)) + "</td><td>" + esc(r.donorName) + '</td><td dir="ltr">' + esc(r.phone) + '</td><td dir="ltr">' + esc(r.email) + '</td><td dir="ltr">' + esc(r.orderId) + "</td></tr>";
       }).join("");
     }).catch(function (e) { toast(e.message, true); });
   }
   function purposeName(p) { var m = /^p(\d+)$/.exec(p || ""); if (m && pagesIndex[m[1]]) return pagesIndex[m[1]].title; return { general: "تبرع عام", zakat: "زكاة", sadaqa: "صدقة" }[p] || p || ""; }
   $("#d-load").onclick = loadDonations;
   $("#csv").onclick = function () {
-    var head = ["التاريخ", "المبلغ", "العملة", "الجهة", "المتبرع", "الموبايل", "البريد", "رقم العملية", "رقم عملية البنك"];
-    var lines = [head].concat(rows.map(function (r) { return [r.paidAt, r.amount, r.currency, purposeName(r.purpose), r.donorName, r.phone, r.email, r.orderId, r.txnId]; }))
-      .map(function (l) { return l.map(function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }).join(","); }).join("\r\n");
-    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + lines], { type: "text/csv;charset=utf-8" })); a.download = "mersal-donations.csv"; a.click();
+    var head = ["التاريخ (القاهرة)", "المبلغ", "العملة", "الجهة", "المتبرع", "الموبايل", "البريد", "رقم العملية", "رقم عملية البنك"];
+    downloadCsv([head].concat(rows.map(function (r) { return [cairoTime(r.paidAt), r.amount, r.currency, purposeName(r.purpose), r.donorName, r.phone, r.email, r.orderId, r.txnId]; })), "mersal-donations.csv");
+  };
+  // card payments the donor's browser never confirmed (closed tab, lost network): ask the bank and record the paid ones
+  if ($("#d-reconcile")) $("#d-reconcile").onclick = function () {
+    var b = this; busy(b, true); b.textContent = "جاري المراجعة…";
+    api("donations/reconcile", { method: "POST", body: {} }).then(function (d) {
+      var parts = ["اتراجعت " + d.checked + " عملية معلقة"];
+      if (d.captured) parts.push("اتسجّل " + d.captured + " تبرع جديد");
+      if (d.pending) parts.push(d.pending + " لسه معلقة");
+      if (d.expired) parts.push(d.expired + " انتهت من غير دفع");
+      if (d.errors) parts.push(d.errors + " البنك مردّش عليها");
+      if (d.remaining) parts.push("فاضل " + d.remaining + " - دوس تاني");
+      toast(d.checked ? parts.join(" · ") : "مفيش عمليات معلقة أقدم من 15 دقيقة", !!d.errors);
+      if (d.captured) loadDonations();
+    }).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });
   };
 
   // ---------- settings ----------
@@ -368,6 +444,7 @@
   // ---------- shared helpers for the tab modules ----------
   window.MersalAdmin = {
     $: $, $$: $$, esc: esc, fmt: fmt, api: api, toast: toast, busy: busy, published: published, upload: upload, pick: pick,
+    csvCell: csvCell, downloadCsv: downloadCsv, cairoTime: cairoTime, cairoToday: cairoToday,
     content: function () { return content; }, pages: function () { return pagesIndex; }, staticPages: function () { return STATIC_PAGES; },
     register: function (tab, fn) { tabInits[tab] = fn; },
     openTab: function (tab) { var b = $('.tabs button[data-tab="' + tab + '"]'); if (b) b.click(); }

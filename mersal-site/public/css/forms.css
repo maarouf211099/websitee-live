@@ -1,5 +1,5 @@
-/* Public request forms: /volunteer.html (تطوع معنا), /help.html (طلب مساعدة) and, on /donate.html,
-   "سجّل تبرعك" (transfer) and "مندوب لحد البيت" (pickup). Loaded only by those pages, on top of site.css
+/* Public request forms: /volunteer.html (تطوع معنا), /help.html (طلب مساعدة), /contact.html (ابعتلنا رسالة) and,
+   on /donate.html, "سجّل تبرعك" (transfer) and "مندوب لحد البيت" (pickup). Loaded only by those pages, on top of site.css
    (.field, .btn, .card, .stepper, .check, .alert). The donate-page pieces are at the end of the file. */
 
 /* ---------- layout ---------- */
@@ -43,7 +43,7 @@
   border: 1.5px solid var(--line); background: #fff; font-weight: 700; color: var(--teal-dark); transition: background .15s, border-color .15s, color .15s;
 }
 .pills span::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); background: #fff; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 800; transition: background .15s, border-color .15s; }
-.pills input:checked + span { background: var(--teal); border-color: var(--teal); color: #fff; }
+.pills input:checked + span { background: var(--teal-text); border-color: var(--teal-text); color: #fff; }
 .pills input:checked + span::before { content: "✓"; background: var(--gold); border-color: var(--gold); color: var(--teal-ink); }
 .pills input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
 .pills-field.invalid .pills span { border-color: #d9534f; }
@@ -74,7 +74,7 @@
 .req-side .check-list { gap: 8px; }
 .req-side .check-list li { font-size: 14.5px; }
 .req-side .btn { margin-top: 10px; }
-.req-call { background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad); background-size: 240px 240px, cover; color: #fff; border: 0; }
+.req-call { background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad); background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")), var(--brand-grad); background-size: 240px 240px, cover; color: #fff; border: 0; }
 .req-call h3, .req-call p { color: #fff; }
 .req-call p { opacity: .88; }
 .req-call a.num { color: var(--gold); font: 800 30px/1.2 "Titillium Web", "Cairo", sans-serif; direction: ltr; display: inline-block; }
@@ -93,7 +93,7 @@
 .ref-box { display: inline-flex; align-items: center; gap: 14px; background: var(--teal-soft); border: 1px dashed var(--teal); border-radius: 14px; padding: 10px 16px; margin: 8px 0 12px; text-align: start; }
 .ref-box small { display: block; font-size: 12px; color: var(--muted); }
 .ref-box code { display: block; font: 800 22px/1.2 "Titillium Web", ui-monospace, Menlo, monospace; letter-spacing: .5px; color: var(--teal-dark); direction: ltr; }
-.ref-box button { font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--teal); background: #fff; color: var(--teal); cursor: pointer; min-height: 44px; white-space: nowrap; }
+.ref-box button { font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--teal); background: #fff; color: var(--teal-text); cursor: pointer; min-height: 44px; white-space: nowrap; }
 .req-success .actions { display: grid; gap: 10px; max-width: 440px; margin: 16px auto 0; }
 .req-success .actions .btn { padding-block: 13px; font-size: 16px; }
 .btn-wa { background: #25d366; color: #fff; }
@@ -227,3 +227,9 @@
   .seg label:active span { transform: none; }
 }
 @media print { .tr-cta-btn, .tr-box, #pk-form, #pk-alert { display: none !important; } }
+
+/* ---------- contact.html "ابعتلنا رسالة" (data-form="contact") ---------- */
+.contact-form { min-width: 0; }
+.contact-card.req-form > h2 { margin: 0 0 14px; color: var(--teal-dark); font-size: 22px; }
+.contact-card .c-mail { margin: 12px 0 0; }
+.contact-card .c-mail a { font-weight: 700; text-decoration: underline; }

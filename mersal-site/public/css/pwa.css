@@ -1,0 +1,74 @@
+/* Install card, connection notice and footer install link (js/pwa.js adds this file and the markup).
+   Plain fixed layers under the site's own overlays: the bottom bar (90), the phone menu sheet (95), the search
+   panel (200) and the lightbox (300) all sit above them, so nothing here ever hides site navigation. */
+
+/* ---------- install card ---------- */
+.pwa-card {
+  position: fixed; z-index: 80; bottom: 76px; inset-inline-end: 18px; width: min(390px, calc(100vw - 36px));
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start;
+  padding: 14px; padding-inline-end: 46px; border-radius: 20px; background: #fff; color: var(--ink);
+  border: 1px solid rgba(0, 89, 89, .1); box-shadow: 0 22px 48px -18px rgba(0, 40, 40, .45), 0 2px 8px rgba(0, 40, 40, .08);
+  font-family: "Cairo", "Titillium Web", Tahoma, sans-serif;
+  opacity: 0; visibility: hidden; transform: translateY(16px);
+  transition: opacity .22s ease, transform .45s var(--spring, cubic-bezier(.22, 1, .36, 1)), visibility 0s linear .45s;
+}
+.pwa-card.in { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+/* stepping aside: fade only, the box stays where it is (js measures it there) */
+.pwa-card.in.pwa-tucked { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .16s ease, visibility 0s linear .16s; }
+.pwa-card.out { opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity .2s ease, transform .3s ease, visibility 0s linear .3s; }
+
+.pwa-app { display: block; width: 48px; height: 48px; }
+.pwa-app img { width: 48px; height: 48px; border-radius: 13px; box-shadow: 0 4px 12px -4px rgba(0, 60, 60, .5); }
+.pwa-body { min-width: 0; }
+.pwa-body b { display: block; font-size: 16px; font-weight: 800; line-height: 1.4; color: var(--teal-dark); }
+.pwa-body p { margin: 2px 0 10px; font-size: 13.5px; line-height: 1.65; color: var(--muted); }
+.pwa-ico { display: inline-block; width: 19px; height: 19px; vertical-align: -4px; margin-inline: 1px; fill: none; stroke: var(--teal-text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pwa-ios .pwa-body p { color: var(--ink); font-weight: 600; }
+.pwa-ios .pwa-body em { font-style: normal; font-weight: 800; color: var(--teal-dark); }
+.pwa-btns { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.pwa-btns .btn { min-height: 44px; padding: 0 20px; font-size: 14.5px; }
+.pwa-later { min-height: 44px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--teal-text); font: 700 14px "Cairo", sans-serif; cursor: pointer; }
+.pwa-later:hover { background: var(--teal-soft); }
+.pwa-x { position: absolute; top: 4px; inset-inline-end: 4px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--muted);
+  display: grid; place-items: center; cursor: pointer; }
+.pwa-x:hover { background: var(--bg-2); color: var(--teal-dark); }
+.pwa-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.pwa-card button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.pwa-later:active, .pwa-x:active { transform: scale(.94); }
+
+/* phones: full width above the bottom bar and its raised donate button (bar 10 + 64 px, the button rises 24 px more) */
+@media (max-width: 760px) {
+  .pwa-card { inset-inline: 12px; width: auto; max-width: 520px; margin-inline: auto; bottom: calc(108px + env(safe-area-inset-bottom)); }
+  body:not(.has-mbar) .pwa-card { bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
+
+/* ---------- connection notice (never takes a tap) ---------- */
+.pwa-toast {
+  position: fixed; z-index: 81; left: 50%; bottom: 24px; width: max-content; max-width: min(520px, calc(100vw - 24px));
+  display: flex; align-items: center; gap: 10px; padding: 10px 18px 10px 16px; border-radius: 18px;
+  background: var(--teal-dark); color: #fff; font: 700 13.5px/1.55 "Cairo", "Titillium Web", Tahoma, sans-serif;
+  box-shadow: 0 16px 34px -14px rgba(0, 40, 40, .7); pointer-events: none;
+  opacity: 0; visibility: hidden; transform: translate(-50%, 14px);
+  transition: opacity .2s ease, transform .4s var(--spring, cubic-bezier(.22, 1, .36, 1)), visibility 0s linear .4s;
+}
+.pwa-toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+.pwa-toast svg { flex: none; width: 22px; height: 22px; fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.pwa-toast.pwa-on { background: var(--teal-text); }
+.pwa-toast.pwa-on svg { stroke: #fff; }
+@media (max-width: 760px) {
+  body.has-mbar .pwa-toast { bottom: calc(108px + env(safe-area-inset-bottom)); }
+}
+
+/* ---------- footer link ---------- */
+.pwa-foot-btn { display: inline-flex; align-items: center; gap: 6px; padding: 0; margin: 0; border: 0; background: none; color: #fff; font: inherit; line-height: inherit; text-align: start; cursor: pointer; }
+.pwa-foot-btn:hover { color: var(--gold); }
+.pwa-foot-btn svg { flex: none; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 760px), (pointer: coarse) { .pwa-foot-btn { min-height: 44px; padding: 9px 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pwa-card, .pwa-card.in, .pwa-card.out { transform: none; transition: opacity .01s linear, visibility 0s; }
+  .pwa-toast, .pwa-toast.show { transition: opacity .01s linear, visibility 0s; }
+  .pwa-toast { transform: translate(-50%, 0); }
+  .pwa-later:active, .pwa-x:active { transform: none; }
+}
+@media print { .pwa-card, .pwa-toast, #pwa-foot { display: none !important; } }

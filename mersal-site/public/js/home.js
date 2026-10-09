@@ -236,6 +236,9 @@
     var base = "/donate.html?for=" + encodeURIComponent(c.purpose || "general") + "&amount=";
     var badge = c.badge || ((UNIT_DEF[unit] || "ال" + unit) + " " + fmt.format(price) + " جنيه");
     var link = c.link || "/donate.html";
+    // progress as lit segments: each one fills in turn as --p counts up, colour follows the percentage (--hue)
+    var SEGS = 20, segs = "";
+    for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';
     return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (c.maxUnits || 50) + '" style="--p:0">' +
       // the image link is a duplicate of the title link (hidden from AT); the price badge and the state chip sit beside it so they are read
       '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, 380px" : "" }) + "</a>" +
@@ -243,7 +246,7 @@
       '<div class="body"><h3><a href="' + esc(link) + '">' + esc(c.title) + "</a></h3>" +
         (c.impact ? '<p class="camp-impact">' + esc(c.impact) + "</p>" : "") +
         (st === "fresh" ? '<p class="camp-first">كن أول من يساهم في الحملة</p>' : '<div class="camp-stat"><b class="camp-num">0</b><span>' + esc(unit) + ' اتوفرت</span><span class="camp-pct">0%</span></div>') +
-        (goal ? '<div class="bar" role="progressbar" aria-valuenow="' + Math.round(pct) + '" aria-valuemin="0" aria-valuemax="100" aria-label="' + Math.round(pct) + '% من الهدف"><i></i><em></em></div>' +
+        (goal ? '<div class="bar seg" style="--n:' + SEGS + '" role="progressbar" aria-valuenow="' + Math.round(pct) + '" aria-valuemin="0" aria-valuemax="100" aria-label="' + Math.round(pct) + '% من الهدف">' + segs + '<em></em></div>' +
           '<div class="camp-foot"><span>الهدف <b>' + fmt.format(goal) + "</b> " + esc(unit) + "</span>" + (st === "done" ? '<span class="ok">الحمد لله، اكتمل</span>' : '<span class="left">باقي <b>' + fmt.format(left) + "</b> " + esc(unit) + "</span>") + "</div>" : "") +
         (c.donors ? '<p class="camp-proof">شارك فيها <b>' + fmt.format(c.donors) + "</b> متبرع</p>" : "") +
         '<div class="camp-cta' + (price && st !== "done" ? "" : " single") + '">' +

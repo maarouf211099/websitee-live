@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/impact.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>طرق التبرع | مؤسسة مرسال</title>
@@ -125,10 +126,10 @@
           <p>يمكنك التبرع على حساب مؤسسة مرسال عن طريق تحويل بنكي من خلال البنوك التالية:</p>
           <!-- filled from /data/donate.json (banks) by js/donate.js; this markup is the no-JS fallback -->
           <div id="bank-accounts">
-          <div class="bank"><div><b>بنك CIB - بالجنيه</b><code>100034654454</code></div><button class="copy" data-copy="100034654454">نسخ</button></div>
-          <div class="bank"><div><b>بنك CIB - بالدولار</b><code>100034654357</code></div><button class="copy" data-copy="100034654357">نسخ</button></div>
-          <div class="bank"><div><b>بنك الإمارات دبي الوطني</b><code>1019409332701</code></div><button class="copy" data-copy="1019409332701">نسخ</button></div>
-          <div class="bank"><div><b>البنك العربي الأفريقي - بالجنيه أو الدولار</b><code>701840</code></div><button class="copy" data-copy="701840">نسخ</button></div>
+          <div class="bank"><div><b>بنك CIB - بالجنيه</b><code>100034654454</code></div><button class="copy" data-copy="100034654454"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+          <div class="bank"><div><b>بنك CIB - بالدولار</b><code>100034654357</code></div><button class="copy" data-copy="100034654357"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+          <div class="bank"><div><b>بنك الإمارات دبي الوطني</b><code>1019409332701</code></div><button class="copy" data-copy="1019409332701"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+          <div class="bank"><div><b>البنك العربي الأفريقي - بالجنيه أو الدولار</b><code>701840</code></div><button class="copy" data-copy="701840"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
           </div>
           <p class="hint">بعد التحويل، ابعتلنا صورة الإيصال على <a href="mailto:info@mersal-ngo.org" data-site="email">info@mersal-ngo.org</a> أو كلمنا على <a href="tel:19340" data-site="hotline">19340</a> لتأكيد التبرع.</p>
         </div>
@@ -167,10 +168,12 @@
       </aside>
     </div>
   </section>
+  <section class="alt" aria-label="تبرعك بيعمل إيه"><div class="wrap"><div id="impact-calc"></div></div></section>
 </main>
 
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
 <script defer src="/js/donate.js"></script>
+<script defer src="/js/impact.js"></script>
 </body>
 </html>

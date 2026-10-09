@@ -83,6 +83,8 @@
     }
   }
   function check(name) { var msg = RULES[name] ? RULES[name](valueOf(name)) : ""; setError(name, msg); return !msg; }
+  // a short shake (css .shake) on the fields that stop a submit; restarted each time
+  function shake(name) { var box = boxOf(name); if (!box) return; box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); }
   function clearAll() { NAMES.forEach(function (n) { var b = boxOf(n); if (b) { b.classList.remove("invalid", "valid"); delete b.dataset.touched; } setError(n, ""); }); }
 
   NAMES.forEach(function (name) {
@@ -137,7 +139,7 @@
     e.preventDefault();
     alertBox.hidden = true;
     var bad = NAMES.filter(function (n) { return !check(n); });
-    if (bad.length) { focusField(bad[0]); return; }
+    if (bad.length) { bad.forEach(shake); focusField(bad[0]); if (window.mersalTap) window.mersalTap(20); return; }
     var d = payload();
     // honeypot filled or submitted faster than any person could: show "success" and send nothing
     if (d.website || d.t < MIN_SECONDS) { showSuccess(fakeRef()); return; }
@@ -148,7 +150,7 @@
       .then(function (j) { showSuccess(j.ref); })
       .catch(function (err) {
         if (err && err.errors && Object.keys(err.errors).length) {
-          Object.keys(err.errors).forEach(function (k) { setError(k, err.errors[k]); });
+          Object.keys(err.errors).forEach(function (k) { setError(k, err.errors[k]); shake(k); });
           focusField(Object.keys(err.errors)[0]);
         } else {
           var msg = err && err.status ? err.message : "مفيش اتصال بالإنترنت أو الخدمة مش متاحة دلوقتي.";
@@ -168,8 +170,11 @@
     if (window.mersalTap) window.mersalTap(12);
   }
   $("#copy-ref").addEventListener("click", function () {
-    var b = this, ref = $("#ref").textContent;
-    var done = function () { b.textContent = "تم النسخ ✓"; setTimeout(function () { b.textContent = "نسخ"; }, 1500); };
+    var b = this, ref = $("#ref").textContent, label = b.querySelector("span") || b;
+    var done = function () {
+      b.classList.add("done"); label.textContent = "تم النسخ"; if (window.mersalTap) window.mersalTap(8);
+      clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove("done"); label.textContent = "نسخ"; }, 1600);
+    };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ref).then(done, function () {});
     else { var r = document.createRange(); r.selectNodeContents($("#ref")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand("copy"); done(); } catch (x) {} }
   });

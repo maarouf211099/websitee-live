@@ -1,11 +1,11 @@
 // Admin API (console login with a cookie session). Every change is one git commit to
 // the deploy branch, so the site republishes itself about a minute later.
 const { app } = require("@azure/functions");
-const { requireAdmin, readFile, commitFiles, fileExists, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL } = require("../lib/admin");
+const { requireAdmin, readFile, commitFiles, fileExists, json, fail, makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL, githubReady } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
 
-const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json" };
+const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json" };
 const who = (p) => ({ name: p.userDetails || "Mersal admin", email: /@/.test(p.userDetails || "") ? p.userDetails : "admin@mersal-ngo.org" });
 
 async function saveSettings(patch, message, p) {
@@ -27,10 +27,11 @@ app.http("adminStatus", {
       const names = Object.keys(process.env), settings = {};
       for (const k of EXPECTED) {
         if (String(process.env[k] || "").trim()) settings[k] = "ok";
+        else if (k === "GITHUB_REPO" || k === "GITHUB_BRANCH") settings[k] = "default";
         else if (k in process.env) settings[k] = "empty";
         else { const near = names.find((n) => n !== k && norm(n) === norm(k)); settings[k] = near ? `found as "${near}"` : "missing"; }
       }
-      return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO), settings });
+      return json(200, { user: adminUser(), setup: (await passwordSource()) === "setup", github: githubReady(), settings });
     } catch (e) { return fail(e, ctx); }
   },
 });
@@ -83,7 +84,7 @@ app.http("adminMe", {
   handler: async (req, ctx) => {
     try {
       const p = requireAdmin(req);
-      return json(200, { user: p.userDetails, roles: p.userRoles, via: p.via, github: !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO), donations: donations.enabled(),
+      return json(200, { user: p.userDetails, roles: p.userRoles, via: p.via, github: githubReady(), donations: donations.enabled(),
         password: p.via === "password" ? await passwordSource() : "aad",
         mpgs: !!(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD), merchant: process.env.MPGS_MERCHANT || null });
     } catch (e) { return fail(e, ctx); }
@@ -111,7 +112,16 @@ app.http("adminData", {
         }
         files[0].content = JSON.stringify(body.data, null, 2) + "\n";
         const idx = await readFile("public/index.html");
-        files.push({ path: "public/index.html", content: hero.apply(idx, body.data) });
+        // the tool-made 1.5x phone crop (-ms) next to each 2x one (-m): lighter file for dpr-2 phones
+        const msFor = {};
+        for (const sl of body.data.slides || []) {
+          if (sl && sl.mobile && /-m\.jpg$/i.test(sl.mobile) && !/\/uploads\//.test(sl.mobile)) {
+            const ms = sl.mobile.replace(/-m\.jpg$/i, "-ms.jpg");
+            if (await fileExists("public" + ms)) msFor[sl.mobile] = ms;
+          }
+        }
+        const mobileSet = (sl) => (msFor[sl.mobile] ? [{ src: msFor[sl.mobile], w: 1324 }, { src: sl.mobile, w: 1766 }] : null);
+        files.push({ path: "public/index.html", content: hero.apply(idx, body.data, { mobileSet }) });
       }
       const sha = await commitFiles(files, body.message || `admin: update ${req.params.name}`, who(p));
       return json(200, { ok: true, commit: sha });

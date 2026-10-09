@@ -158,7 +158,7 @@ function tableClient() {
   if (!cs || !TableClient) return null;
   return TableClient.fromConnectionString(cs, TABLE);
 }
-const githubReady = () => !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO);
+const githubReady = () => admin.githubReady();
 const enabled = () => ({ table: !!(process.env.DONATIONS_STORAGE && TableClient), github: githubReady(), webhook: !!process.env.FORMS_WEBHOOK_URL });
 const BOT = { name: "Mersal website", email: "forms@mersal-ngo.org" };
 

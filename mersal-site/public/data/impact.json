@@ -1,0 +1,17 @@
+{
+  "_note": "حاسبة أثر التبرع (js/impact.js). items = بنود ثابتة: label اسم البند، price سعر الوحدة بالجنيه، unit الوحدة (مفرد: جلسة/كشف/شهر/كارت/يوم)، icon أيقونة (drop/stethoscope/home/cart/bed/pill/heart/baby/syringe/star)، text قالب النص فيه {n} العدد و{unit} الوحدة بصيغتها الصحيحة. campaigns=true بيضيف حملات الرئيسية (content.json) تلقائياً.",
+  "title": "تبرعك بيعمل إيه؟",
+  "intro": "اختار مبلغ وشوف بيغطي إيه بالظبط في مرسال.",
+  "default": 500,
+  "presets": [100, 250, 500, 1000, 5000],
+  "min": 50,
+  "max": 10000,
+  "campaigns": true,
+  "items": [
+    { "label": "جلسة كيماوي", "price": 1500, "unit": "جلسة", "icon": "drop", "text": "{n} {unit} كيماوي لمريض أورام", "link": "/donate.html?for=p31" },
+    { "label": "كشف وتحاليل", "price": 350, "unit": "كشف", "icon": "stethoscope", "text": "{n} {unit} وتحاليل لمريض غير قادر", "link": "/donate.html?for=p38" },
+    { "label": "كفالة أسرة شهر", "price": 750, "unit": "شهر", "icon": "home", "text": "كفالة أسرة مريض لمدة {n} {unit}", "link": "/donate.html?for=p42" },
+    { "label": "شنطة احتياجات أساسية", "price": 500, "unit": "كارت", "icon": "cart", "text": "{n} {unit} احتياجات أساسية لأسرة", "link": "" },
+    { "label": "يوم إقامة في دار الضيافة", "price": 200, "unit": "يوم", "icon": "bed", "text": "{n} {unit} إقامة في دار ضيافة مرسال", "link": "/donate.html?for=p32" }
+  ]
+}

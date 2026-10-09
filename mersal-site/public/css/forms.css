@@ -117,3 +117,26 @@
   .req-intro { font-size: 15.5px; }
 }
 @media (prefers-reduced-motion: reduce) { .req-success .ok-ico { animation: none; } }
+
+/* ---------- v7 motion: a shake on the fields that stop a submit, a check that draws itself on the success screen ----------
+   (transform/opacity + stroke-dashoffset only; --ease/--spring/--bounce and the keyframes come from site.css) */
+@keyframes f-shake { 10%, 90% { transform: translateX(-1px); } 20%, 80% { transform: translateX(2px); } 30%, 50%, 70% { transform: translateX(-3px); } 40%, 60% { transform: translateX(3px); } }
+.field.shake, .pills-field.shake, .check-field.shake { animation: f-shake .4s var(--ease); }
+.f-err { animation: rise-sm .25s var(--ease) both; }
+.pills span { transition: transform .22s var(--spring), background .15s, border-color .15s, color .15s; }
+.pills label:active span { transform: scale(.96); transition-duration: .08s; }
+.pills input:checked + span { animation: pop-in .32s var(--bounce); }
+.req-form .check { transition: background .2s, border-color .2s; }
+.req-success > * { animation: rise-sm .5s var(--ease) both; }
+.req-success > :nth-child(2) { animation-delay: .35s; } .req-success > :nth-child(3) { animation-delay: .42s; } .req-success > :nth-child(4) { animation-delay: .5s; }
+.req-success > :nth-child(5) { animation-delay: .58s; } .req-success > :nth-child(6) { animation-delay: .66s; } .req-success > :nth-child(7) { animation-delay: .74s; }
+.req-success .ok-ico { animation: popin .5s var(--bounce) both; }
+.req-success .ok-ico path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw-check .5s .3s var(--ease) forwards; }
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+.ref-box button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: transform .22s var(--spring), background .2s, border-color .2s, color .2s; }
+.ref-box button:active { transform: scale(.95); transition-duration: .08s; }
+.ref-box button.done { background: #e6f6ee; border-color: #8fd3b2; color: #11683f; }
+@media (prefers-reduced-motion: reduce) {
+  .req-success .ok-ico, .req-success > *, .f-err, .pills input:checked + span, .field.shake, .pills-field.shake, .check-field.shake { animation: none !important; opacity: 1; transform: none; }
+  .req-success .ok-ico path { animation: none; stroke-dashoffset: 0; }
+}

@@ -90,7 +90,7 @@
     ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"], ["/help.html", "طلب مساعدة"],
     ["/p/30.html", "مستشفى مرسال"], ["/p/4.html", "المشاريع"], ["/p/46.html", "فروع مرسال"],
     ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/p/51.html", "الأسئلة الشائعة"],
-    ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"]
+    ["/news.html", "أخبار مرسال"], ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"]
   ].filter(function (n) { return n[0]; });
   var here = location.pathname.replace(/index\.html$/, "");
 
@@ -157,8 +157,26 @@
         (donated ? '<a class="m-gift' + (/community\.html$/.test(location.pathname) ? " on" : "") + '" href="/community.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-7-4-6 0M12 7c2-4 7-4 6 0"/></svg><span>هداياك</span></a>' : "") +
         '<button type="button" class="m-menu" aria-label="القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>القائمة</span></button>' +
       "</nav>");
-    if (donated) document.querySelector(".m-bar").classList.add("six");
+    var bar = document.querySelector(".m-bar");
+    if (donated) bar.classList.add("six");
     document.body.classList.add("has-mbar");
+    // Active-item pill: --i is the index of the lit item and the pill slides there (transform only). A tap moves it
+    // at once, and the cross-document view transition (css: m-ind) carries it into the next page.
+    bar.insertAdjacentHTML("afterbegin", '<i class="m-ind" aria-hidden="true"></i>');
+    var barItems = Array.prototype.slice.call(bar.querySelectorAll("a, button")), onIdx = -1;
+    barItems.forEach(function (el, i) { if (el.classList.contains("on")) onIdx = i; });
+    function setInd(i) {
+      if (i === "menu") i = barItems.indexOf(bar.querySelector(".m-menu"));
+      if (i == null) i = onIdx;
+      bar.classList.toggle("has-on", i >= 0);
+      if (i >= 0) bar.style.setProperty("--i", i);
+    }
+    setInd(onIdx);
+    window.mersalBarInd = setInd;
+    barItems.forEach(function (el, i) {
+      if (el.tagName !== "A" || /^tel:/.test(el.getAttribute("href") || "")) return;
+      el.addEventListener("click", function () { setInd(i); });
+    });
   }
 
   // Header: shadow once the page scrolls; on phones it slides away while scrolling down and comes back on scroll up
@@ -170,20 +188,26 @@
       if (y > 140 && y - lastY > 8) hdr.classList.add("hide");
       else if (lastY - y > 8 || y < 80) hdr.classList.remove("hide");
     } else hdr.classList.remove("hide");
+    document.body.classList.toggle("hdr-hide", hdr.classList.contains("hide")); // css: the donate summary strip follows the header
     lastY = y;
   }, { passive: true });
 
-  // Fade-up on scroll for sections, cards and banners (skipped for reduced motion)
+  // Fade-up on scroll for sections, cards and banners (skipped for reduced motion; without JS nothing is ever hidden).
+  // Items are watched from 48px below the viewport, so they are already moving when they come into view, and the
+  // ones that arrive in the same frame follow each other 70 ms apart (--d). Each item is revealed once.
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var io = (!reduce && "IntersectionObserver" in window) ? new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-  }, { threshold: .12, rootMargin: "0px 0px -40px 0px" }) : null;
+    var k = 0;
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.style.setProperty("--d", Math.min(k++, 6) * 0.07 + "s");
+      e.target.classList.add("in"); io.unobserve(e.target);
+    });
+  }, { threshold: 0, rootMargin: "0px 0px 48px 0px" }) : null;
   window.mersalReveal = function (els) {
     if (!io) return;
     Array.prototype.forEach.call(els, function (el) {
       if (el.classList.contains("reveal")) return;
-      var sibs = el.parentNode ? Array.prototype.indexOf.call(el.parentNode.children, el) : 0;
-      el.style.setProperty("--d", Math.min(sibs, 5) * 0.08 + "s");
       el.classList.add("reveal"); io.observe(el);
     });
   };
@@ -240,8 +264,8 @@
       var kids = (it.children || []).filter(function (k) { return k && k.title && k.href; });
       if (!kids.length) return it.href ? row(it) : "";
       var open = kids.some(function (k) { return k.href === here; }) || it.href === here;
-      return '<details class="m-group"' + (open ? " open" : "") + "><summary>" + esc(it.title) + ic.chev + "</summary><div class=\"m-sub\">" +
-        (it.href ? row({ href: it.href, title: "كل " + it.title }) : "") + kids.map(row).join("") + "</div></details>";
+      return '<details class="m-group' + (open ? " is-open" : "") + '"' + (open ? " open" : "") + "><summary>" + esc(it.title) + ic.chev + "</summary><div class=\"m-sub-wrap\"><div class=\"m-sub\">" +
+        (it.href ? row({ href: it.href, title: "كل " + it.title }) : "") + kids.map(row).join("") + "</div></div></details>";
     }).join("");
     var wa = SITE.whatsapp ? String(SITE.whatsapp).replace(/\D/g, "") : "";
     var html = '<div class="m-sheet" id="m-sheet" hidden><div class="m-sheet-in">' +
@@ -263,8 +287,24 @@
     "</div></div>";
     document.body.insertAdjacentHTML("beforeend", html);
     var sheet = document.getElementById("m-sheet");
-    sheet.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
-    document.getElementById("m-search").addEventListener("click", function () { setMenu(false); var b = document.querySelector(".search-btn"); if (b) b.click(); });
+    // a tapped link closes the sheet at once, so the page transition starts from a clean page
+    sheet.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false, true); });
+    document.getElementById("m-search").addEventListener("click", function () { setMenu(false, true); var b = document.querySelector(".search-btn"); if (b) b.click(); });
+    // groups: <details> opens at once (so the rows exist), then .is-open grows the height (css grid-rows); closing runs the other way
+    sheet.querySelectorAll(".m-group > summary").forEach(function (sm) {
+      sm.addEventListener("click", function (e) {
+        e.preventDefault();
+        var d = sm.parentNode;
+        if (d.classList.contains("is-open")) {
+          d.classList.remove("is-open");
+          setTimeout(function () { if (!d.classList.contains("is-open")) d.open = false; }, 360);
+        } else {
+          d.open = true;
+          requestAnimationFrame(function () { requestAnimationFrame(function () { d.classList.add("is-open"); }); });
+        }
+        if (window.mersalTap) window.mersalTap(6);
+      });
+    });
   }
 
   // Skip link + back-to-top
@@ -285,6 +325,7 @@
     { t: "حاسبة الزكاة", u: "/zakat.html", d: "احسب زكاة مالك وذهبك وتجارتك" },
     { t: "كارت عافية", u: "/afia.html", d: "كارت خصومات عائلي على الخدمات الطبية حتى 70%" },
     { t: "تواصل معنا", u: "/contact.html", d: "الخط الساخن 19340، العنوان، البريد" },
+    { t: "أخبار وقصص مرسال", u: "/news.html", d: "آخر أخبار مرسال، قصص نجاح المرضى، فعاليات المستشفى ومركز الأورام والقوافل" },
     { t: "ألبومات الصور", u: "/albums.html", d: "صور فعاليات وحملات مرسال: التبرع بالدم، فوانيس الفرحة، بازار عيد الأم" },
     { t: "تطوع معنا", u: "/volunteer.html", d: "سجل كمتطوع مع مرسال" },
     { t: "طلب مساعدة", u: "/help.html", d: "قدّم طلب مساعدة طبية أو اجتماعية لمرسال" }
@@ -313,6 +354,7 @@
       : '<li class="none">مفيش نتايج. جرّب كلمة تانية أو كلمنا على 19340.</li>';
   }
   sInput.addEventListener("input", runSearch);
+  sList.addEventListener("click", function (e) { if (e.target.closest("a")) closeSearch(); });
   document.querySelector(".search-btn").addEventListener("click", openSearch);
   panel.querySelector(".search-close").addEventListener("click", closeSearch);
   panel.addEventListener("click", function (e) { if (e.target === panel) closeSearch(); });
@@ -324,18 +366,26 @@
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
   // On phones the menu is the #m-sheet (built once menu.json arrives); before that, and on tablets, it is the nav list
   function menuOpen() { var sheet = document.getElementById("m-sheet"); return sheet ? !sheet.hidden : nav.classList.contains("open"); }
-  function setMenu(open) {
+  var sheetTimer = null;
+  function setMenu(open, instant) {
     var sheet = document.getElementById("m-sheet");
-    if (sheet) { sheet.hidden = !open; if (open) sheet.scrollTop = 0; nav.classList.remove("open"); }
+    if (sheet) {
+      clearTimeout(sheetTimer); sheet.classList.remove("closing");
+      if (open) { sheet.hidden = false; sheet.scrollTop = 0; }
+      else if (instant || sheet.hidden || reduce) sheet.hidden = true;
+      else { sheet.classList.add("closing"); sheetTimer = setTimeout(function () { sheet.hidden = true; sheet.classList.remove("closing"); }, 200); }
+      nav.classList.remove("open");
+    }
     else nav.classList.toggle("open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.setAttribute("aria-label", open ? "إغلاق القائمة" : "القائمة");
     document.body.classList.toggle("menu-open", open);
     var mm = document.querySelector(".m-bar .m-menu"); if (mm) mm.setAttribute("aria-expanded", open ? "true" : "false");
+    if (window.mersalBarInd) window.mersalBarInd(open ? "menu" : null);
   }
   toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!menuOpen()); });
   var mMenu = document.querySelector(".m-bar .m-menu");
-  if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); var open = !menuOpen(); setMenu(open); if (open && !document.getElementById("m-sheet")) scrollTo({ top: 0, behavior: "smooth" }); });
+  if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); document.body.classList.remove("hdr-hide"); var open = !menuOpen(); setMenu(open); if (open && !document.getElementById("m-sheet")) scrollTo({ top: 0, behavior: "smooth" }); });
   nav.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
   addEventListener("keydown", function (e) { if (e.key === "Escape" && menuOpen()) { setMenu(false); toggle.focus(); } });
   // Mobile menu footer: donate + hotline (added once the menu is built)

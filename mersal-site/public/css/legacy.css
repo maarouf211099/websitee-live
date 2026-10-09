@@ -248,3 +248,23 @@
   .legacy .accordion-collapse, .legacy .accordion-button::after, .legacy img, .legacy .gal-track, .legacy .gal-dots button, .related .card .more::after { transition: none; }
   .legacy .gal-track, .related .grid { scroll-behavior: auto; }
 }
+
+/* ---------- v7 motion: a smoother FAQ accordion, the share bar comes in button by button, mouse users drag the picture strips ---------- */
+.legacy .accordion-collapse { transition: grid-template-rows .38s var(--ease), visibility 0s .38s; }
+.legacy .accordion-collapse.show { transition: grid-template-rows .38s var(--ease); }
+.legacy .accordion-body { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .28s var(--ease); }
+.legacy .accordion-collapse.show .accordion-body { opacity: 1; transform: none; transition: opacity .3s .08s, transform .42s .08s var(--spring); }
+.legacy .accordion-button { transition: background .2s, transform .22s var(--spring); }
+.legacy .accordion-button:active { transform: scale(.985); transition-duration: .08s; }
+.legacy .accordion-button::after { transition: transform .42s var(--spring), background-color .2s; }
+.share-bar.reveal > * { opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .55s var(--spring); }
+.share-bar.reveal.in > * { opacity: 1; transform: none; }
+.share-bar.reveal.in > :nth-child(2) { transition-delay: .05s; } .share-bar.reveal.in > :nth-child(3) { transition-delay: .1s; } .share-bar.reveal.in > :nth-child(4) { transition-delay: .15s; }
+.share-bar.reveal.in > :nth-child(5) { transition-delay: .2s; } .share-bar.reveal.in > :nth-child(6) { transition-delay: .25s; }
+@media (hover: hover) and (pointer: fine) { .legacy .gal-track { cursor: grab; } .legacy .gal-track.grab { cursor: grabbing; } .legacy .gal-track img { -webkit-user-drag: none; user-select: none; } }
+.legacy .gal-track.dragging { scroll-snap-type: none; scroll-behavior: auto; }
+.legacy .gal-track.dragging a, .legacy .gal-track.dragging img { pointer-events: none; }
+.legacy .gal-arrow { transition: transform .22s var(--spring), background .2s; }
+.legacy .gal-arrow:active { transform: scale(.9); transition-duration: .08s; }
+@media print { .legacy .accordion-body { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .legacy .accordion-body, .share-bar.reveal > * { opacity: 1; transform: none; transition: none; } .legacy .accordion-button::after { transition: none; } }

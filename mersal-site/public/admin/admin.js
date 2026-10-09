@@ -30,8 +30,8 @@
       var box = $("#l-settings");
       if (box && st.settings && !st.github) {
         var rows = ["GITHUB_TOKEN", "GITHUB_REPO", "GITHUB_BRANCH"].map(function (k) {
-          var v = st.settings[k] || "missing", ok = v === "ok";
-          return "<li" + (ok ? ' class="ok"' : "") + "><code>" + k + "</code> " + (ok ? "موجود ✓" : v === "empty" ? "موجود بس فاضي" : v === "missing" ? "مش موجود" : "اتكتب غلط: " + esc(v.replace(/^found as /, ""))) + "</li>";
+          var v = st.settings[k] || "missing", ok = v === "ok" || v === "default";
+          return "<li" + (ok ? ' class="ok"' : "") + "><code>" + k + "</code> " + (v === "ok" ? "موجود ✓" : v === "default" ? "مش لازم (القيمة الافتراضية شغالة) ✓" : v === "empty" ? "موجود بس فاضي" : v === "missing" ? "مش موجود" : "اتكتب غلط: " + esc(v.replace(/^found as /, ""))) + "</li>";
         });
         box.innerHTML = "<p>اللي الـAPI شايفه من إعدادات Azure دلوقتي:</p><ul>" + rows.join("") + "</ul><p>المكان: Static Web App ← Settings ← Environment variables ← Production ← Add ← Save، واستنى دقيقة وحدّث الصفحة.</p>";
         box.hidden = false;
@@ -91,16 +91,20 @@
   });
 
   // ---------- image upload (resized in the browser) ----------
-  // cropLeft (0-1): keep only that fraction of the width, from the left - the photo half of a banner for the phone hero
+  // cropLeft (0-1): keep only that fraction of the width, from the left - the photo half of a banner for the phone hero.
+  // That crop is the one picture allowed to grow (a 1920 banner's photo half is 883px; the phone card shows it at
+  // ~2.6-3x device pixels, so it is written at 1800px: the canvas's "high" smoothing beats the browser's live upscale).
   function resize(file, max, quality, cropLeft) {
     return new Promise(function (res, rej) {
       var img = new Image(), url = URL.createObjectURL(file);
       img.onload = function () {
         if (cropLeft && img.width / img.height < 2.2) cropLeft = 0;   // not a wide banner: keep the whole picture for the phone card
         var sw = cropLeft ? Math.round(img.width * cropLeft) : img.width, sh = img.height;
-        var k = Math.min(1, max / Math.max(sw, sh)), w = Math.round(sw * k), h = Math.round(sh * k);
-        var c = document.createElement("canvas"); c.width = w; c.height = h;
-        c.getContext("2d").drawImage(img, 0, 0, sw, sh, 0, 0, w, h);
+        var k = max / Math.max(sw, sh); if (!cropLeft) k = Math.min(1, k);
+        var w = Math.round(sw * k), h = Math.round(sh * k);
+        var c = document.createElement("canvas"), ctx = c.getContext("2d"); c.width = w; c.height = h;
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, sw, sh, 0, 0, w, h);
         URL.revokeObjectURL(url);
         res(c.toDataURL("image/jpeg", quality || .82).split(",")[1]);
       };
@@ -114,9 +118,9 @@
     });
   }
   // returns [{url, urlSm}] after committing the images
-  function upload(files, maxBig, maxSm, mobileCrop) {
+  function upload(files, maxBig, maxSm, mobileCrop, qualityBig) {
     return Promise.all(files.map(function (f) {
-      return Promise.all([resize(f, maxBig || 1600), maxSm ? resize(f, maxSm, .78) : null, mobileCrop ? resize(f, 900, .82, mobileCrop) : null]).then(function (r) {
+      return Promise.all([resize(f, maxBig || 1600, qualityBig), maxSm ? resize(f, maxSm, .78) : null, mobileCrop ? resize(f, 1800, .85, mobileCrop) : null]).then(function (r) {
         var stem = f.name.replace(/\.[^.]+$/, "");
         var out = [{ name: stem + ".jpg", data: r[0] }];
         if (r[1]) out.push({ name: stem + "-sm.jpg", data: r[1] });
@@ -149,7 +153,7 @@
         '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" value="' + esc(s.link || "/donate.html") + '"></div>' +
         '<div class="field"><label>مكان الصورة على الموبايل (مثال 40% 50%)</label><input data-k="focus" value="' + esc(s.focus || "50% 50%") + '"></div>' +
         '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div></div>' +
-        '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="mimg" title="صورة أعلى جودة للموبايل (عرض 900px أو أكتر، أفضل 4:3)">صورة الموبايل</button>' + (s.mobile ? '<button class="btn btn-ghost btn-sm" data-act="mdel">إلغاء صورة الموبايل</button>' : "") + '<button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
+        '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="mimg" title="صورة أعلى جودة للموبايل (عرض 1800px أو أكتر، أفضل 4:5 طولي)">صورة الموبايل</button>' + (s.mobile ? '<button class="btn btn-ghost btn-sm" data-act="mdel">إلغاء صورة الموبايل</button>' : "") + '<button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
   function renderCampaigns() {
@@ -214,10 +218,11 @@
       else if (b.dataset.act === "down" && i < arr.length - 1) { arr.splice(i + 1, 0, arr.splice(i, 1)[0]); render(); }
       else if (b.dataset.act === "mdel") { arr[i].mobile = ""; render(); }
       else if (b.dataset.act === "mimg") {
-        // a dedicated phone photo (the hero card on phones is nearly square): uploaded as-is, 1000px wide
+        // a dedicated phone photo (the hero card on phones is a tall 4:5 story card): 1800px wide so it is
+        // 2x on a 3x phone (the card is ~1100 device px wide); never upscaled, so upload a big original
         pick(false).then(function (files) {
           if (!files.length) return; busy(b, true);
-          return upload(files, 1000).then(function (r) { arr[i].mobile = r[0].url; render(); toast("اترفعت صورة الموبايل، اضغط حفظ ونشر"); });
+          return upload(files, 1800, 0, 0, .85).then(function (r) { arr[i].mobile = r[0].url; render(); toast("اترفعت صورة الموبايل، اضغط حفظ ونشر"); });
         }).catch(function (err) { toast(err.message, true); busy(b, false); });
       }
       else if (b.dataset.act === "img") {

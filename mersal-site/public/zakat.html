@@ -85,12 +85,26 @@
 addEventListener("DOMContentLoaded", function () {
   var f = document.getElementById("zakat"), fmt = new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 2 });
   function v(n) { var x = parseFloat(f.elements[n].value); return isFinite(x) && x > 0 ? x : 0; }
+  // the total counts up to its new value (450 ms) and bumps once it lands (css .bump); plain text under reduced motion
+  var totalEl = document.getElementById("z-total"), shown = 0, raf = null, reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function showTotal(z) {
+    cancelAnimationFrame(raf);
+    if (reduce || Math.abs(z - shown) < 1) { shown = z; totalEl.textContent = fmt.format(z) + " جنيه"; return; }
+    var from = shown, t0 = performance.now(), D = 450;
+    raf = requestAnimationFrame(function tick(now) {
+      var p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3);
+      shown = from + (z - from) * e;
+      totalEl.textContent = fmt.format(p < 1 ? Math.round(shown) : z) + " جنيه";
+      if (p < 1) { raf = requestAnimationFrame(tick); return; }
+      shown = z; totalEl.classList.remove("bump"); void totalEl.offsetWidth; totalEl.classList.add("bump");
+    });
+  }
   function calc() {
     var p21 = v("gold21price"), gold = (v("g24") * 24 / 21 + v("g21") + v("g18") * 18 / 21) * p21;
     var assets = gold;
     f.querySelectorAll("[data-add]").forEach(function (i) { assets += v(i.name); });
     var debts = v("debts"), net = Math.max(0, assets - debts), zakat = Math.round(net * 0.025 * 100) / 100;
-    document.getElementById("z-total").textContent = fmt.format(zakat) + " جنيه";
+    showTotal(zakat);
     document.getElementById("z-assets").textContent = fmt.format(assets);
     document.getElementById("z-gold").textContent = fmt.format(gold);
     document.getElementById("z-debts").textContent = fmt.format(debts);

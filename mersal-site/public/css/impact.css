@@ -1,0 +1,103 @@
+/* "تبرعك بيعمل إيه" impact calculator (js/impact.js renders into #impact-calc). Motion is transform/opacity only. */
+#impact-calc { margin: 28px 0; }
+.ic { --ic-r: 24px; display: grid; grid-template-columns: minmax(0, 1fr); border-radius: var(--ic-r); overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 50px -24px rgba(0,48,48,.35); }
+.ic-head { position: relative; padding: 22px 20px 20px; color: #fff; background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad, radial-gradient(ellipse at 50% 45%, #008b8c 0%, #006e6f 55%, #005959 100%)); background-size: 240px 240px, cover; }
+.ic-head::after { content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 4px; background: var(--gold); }
+.ic-eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font-weight: 800; font-size: 13px; }
+.ic-eyebrow::before { content: ""; width: 22px; height: 3px; border-radius: 3px; background: var(--gold); }
+.ic-title { margin: 4px 0 2px; font-size: clamp(22px, 3vw, 28px); font-weight: 800; color: #fff; line-height: 1.3; }
+.ic-intro { margin: 0 0 14px; color: rgba(255,255,255,.85); font-size: 14.5px; }
+.ic-label { display: block; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.85); margin-bottom: 6px; }
+.ic-input { position: relative; }
+.ic-input input { width: 100%; box-sizing: border-box; font: 800 26px/1.2 "Titillium Web", "Cairo", sans-serif; color: var(--teal-ink, #003c3c); padding: 10px 74px 10px 16px; border: 0; border-radius: 16px; background: #fff; box-shadow: 0 10px 30px -14px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; direction: ltr; text-align: start; -moz-appearance: textfield; }
+.ic-input input::-webkit-outer-spin-button, .ic-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ic-input input:focus { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ic-input span { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 800; font-size: 15px; pointer-events: none; }
+.ic-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 8px; margin: 12px 0 6px; }
+.ic-chips button { min-width: 0; min-height: 44px; padding: 0 4px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 800 14.5px "Titillium Web", "Cairo", sans-serif; letter-spacing: -.2px; cursor: pointer; transition: background .2s, border-color .2s, color .2s, transform .15s var(--spring, cubic-bezier(.22,1,.36,1)); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.ic-chips button:hover { background: rgba(255,255,255,.2); }
+.ic-chips button:active { transform: scale(.94); }
+.ic-chips button.on { background: var(--gold); border-color: var(--gold); color: var(--teal-ink, #003c3c); }
+.ic-chips button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+/* range: the native input stays for a11y, drawn as a gold thumb on a pale track, 44px tall hit area */
+.ic-range { width: 100%; height: 44px; margin: 4px 0 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; direction: rtl; }
+.ic-range:focus { outline: none; }
+.ic-range::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: rgba(255,255,255,.28); }
+.ic-range::-moz-range-track { height: 6px; border-radius: 6px; background: rgba(255,255,255,.28); }
+.ic-range::-moz-range-progress { height: 6px; border-radius: 6px; background: var(--gold); }
+.ic-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: var(--gold); border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .15s; }
+.ic-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.ic-range:active::-webkit-slider-thumb { transform: scale(1.15); }
+.ic-range:focus-visible::-webkit-slider-thumb { outline: 3px solid var(--gold); outline-offset: 3px; }
+.ic-range:focus-visible::-moz-range-thumb { outline: 3px solid var(--gold); outline-offset: 3px; }
+.ic-range-ends { display: flex; justify-content: space-between; font: 700 12px "Titillium Web", "Cairo", sans-serif; color: rgba(255,255,255,.7); margin-top: -4px; }
+/* desktop only: the hotline card fills the bottom of the side panel */
+.ic-help { display: none; margin-top: auto; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); font-size: 13px; line-height: 1.7; color: rgba(255,255,255,.88); }
+.ic-help b { display: block; color: var(--gold); font-size: 15px; }
+.ic-help a { color: #fff; font-weight: 800; }
+
+.ic-body { padding: 18px 16px 18px; background: linear-gradient(180deg, #fff, var(--bg-2, #f6f9f9)); }
+.ic-sum { margin: 0 0 12px; font-weight: 700; color: var(--teal-dark); font-size: 16px; }
+.ic-sum b { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 22px; color: var(--teal); font-variant-numeric: tabular-nums; }
+.ic-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px; }
+.ic-tile-in { position: relative; display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto auto; gap: 2px 10px; align-items: start; height: 100%; box-sizing: border-box; padding: 12px 12px 10px; border-radius: 18px; background: #fff; border: 1px solid var(--line); color: inherit; text-decoration: none; overflow: hidden; transition: transform .25s var(--spring, cubic-bezier(.22,1,.36,1)), box-shadow .25s, border-color .2s; }
+a.ic-tile-in:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -16px rgba(0,48,48,.45); border-color: #cfe7e7; color: inherit; }
+a.ic-tile-in:active { transform: scale(.97); }
+a.ic-tile-in:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ic-ico { grid-row: 1 / 3; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--teal-soft); color: var(--teal); }
+.ic-ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.ic-main { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; min-width: 0; }
+.ic-n { font: 700 30px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
+.ic-n.bump { animation: ic-pop .4s var(--spring, cubic-bezier(.22,1,.36,1)); }
+@keyframes ic-pop { 40% { transform: scale(1.14); } }
+.ic-pct { display: none; font: 700 15px/1 "Titillium Web", "Cairo", sans-serif; color: #b45309; background: #fff4d1; padding: 4px 8px; border-radius: 999px; }
+.ic-t { flex-basis: 100%; font-size: 13.5px; line-height: 1.5; color: var(--ink); font-weight: 700; margin-top: 2px; }
+.ic-bar { grid-column: 1 / -1; display: none; height: 6px; border-radius: 6px; background: var(--teal-soft); overflow: hidden; margin-top: 6px; }
+.ic-bar i { display: block; height: 100%; width: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--gold), var(--gold-dark, #e9ad0c)); transform-origin: right center; transform: scaleX(var(--p, 0)); transition: transform .6s var(--spring, cubic-bezier(.22,1,.36,1)); }
+.ic-price { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.ic-arrow { color: var(--teal); font-weight: 800; transition: transform .2s; }
+a.ic-tile-in:hover .ic-arrow { transform: translateX(-3px); }
+/* partial tiles: the amount is less than one unit, so the number gives way to a percentage and a bar */
+.ic-tile.is-part .ic-tile-in { background: #fbfdfd; }
+.ic-tile.is-part .ic-n { display: none; }
+.ic-tile.is-part .ic-pct { display: inline-block; }
+.ic-tile.is-part .ic-bar { display: block; }
+.ic-tile.is-part .ic-ico { background: #fff4d1; color: #b45309; }
+.ic-tile.is-part .ic-t { font-weight: 600; color: var(--muted); }
+.ic-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 16px; }
+.ic-cta { min-height: 48px; padding: 10px 28px; border-radius: 14px; font-size: 16px; }
+.ic-note { font-size: 12.5px; color: var(--muted); }
+/* entrance: the tiles rise in one after the other the first time the calculator scrolls into view */
+@media (prefers-reduced-motion: no-preference) {
+  .ic-tile { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .6s var(--spring, cubic-bezier(.22,1,.36,1)); transition-delay: var(--d, 0ms); }
+  .ic-in .ic-tile { opacity: 1; transform: none; }
+}
+@media (min-width: 900px) {
+  .ic { grid-template-columns: 340px minmax(0, 1fr); }
+  .ic-head { padding: 26px 24px; display: flex; flex-direction: column; }
+  .ic-help { display: block; margin-top: 22px; }
+  .ic-head > .ic-help { margin-top: auto; padding-top: 12px; }
+  .ic-head { gap: 0; }
+  .ic-head .ic-range-ends { margin-bottom: 16px; }
+  .ic-head::after { inset-inline: auto 0; inset-block: 0; width: 4px; height: auto; }
+  .ic-body { padding: 22px 22px 22px; }
+  .ic-tiles { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+}
+@media (max-width: 400px) {
+  .ic-tiles { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ic-tile-in { padding: 10px 10px 8px; gap: 2px 8px; grid-template-columns: 38px 1fr; }
+  .ic-ico { width: 38px; height: 38px; border-radius: 12px; }
+  .ic-ico svg { width: 21px; height: 21px; }
+  .ic-n { font-size: 26px; }
+  .ic-t { font-size: 12.5px; }
+  .ic-cta { width: 100%; }
+}
+@media (hover: none) {
+  a.ic-tile-in:hover { transform: none; box-shadow: none; }
+  .ic-chips button:hover { background: rgba(255,255,255,.1); }
+  .ic-chips button.on:hover { background: var(--gold); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ic-n.bump { animation: none; }
+  .ic-bar i, .ic-tile-in, .ic-chips button, .ic-arrow { transition: none; }
+}

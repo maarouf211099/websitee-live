@@ -724,18 +724,25 @@ h1, h2, h3, .big-title { text-wrap: balance; }
 .card picture { display: block; }
 img.media { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; display: block; background: var(--teal-soft); }
 
-/* Cross-document view transitions: header, bottom bar and FAB stay put, the page content cross-fades upward */
+/* Cross-document page transitions (View Transitions API, Chromium 126+; other browsers get a plain navigation):
+   the old page slips up and fades, the new one rises in (~220 ms). The header, the phone bottom bar and its
+   active-item pill are named so they stay put; the pill's group animation slides it from the old item to the
+   new one. Off under prefers-reduced-motion (the media query also drops @view-transition). */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
-  .site-header { view-transition-name: site-header; }
+  .site-header { view-transition-name: header; }
   .m-bar { view-transition-name: m-bar; }
+  .m-bar.has-on .m-ind { view-transition-name: m-ind; }
   .fab-donate { view-transition-name: fab; }
-  ::view-transition-old(root) { animation: .22s ease-in both vt-out; }
-  ::view-transition-new(root) { animation: .42s cubic-bezier(.2,.7,.2,1) both vt-in; }
-  ::view-transition-old(site-header), ::view-transition-new(site-header),
-  ::view-transition-old(m-bar), ::view-transition-new(m-bar) { animation: none; mix-blend-mode: normal; }
-  @keyframes vt-out { to { opacity: 0; translate: 0 -10px; } }
-  @keyframes vt-in { from { opacity: 0; translate: 0 22px; } }
+  ::view-transition-old(root) { animation: .14s ease-in both vt-out; }
+  ::view-transition-new(root) { animation: .22s .02s cubic-bezier(.2, .7, .2, 1) both vt-in; }
+  ::view-transition-old(header), ::view-transition-new(header),
+  ::view-transition-old(m-bar), ::view-transition-new(m-bar),
+  ::view-transition-old(fab), ::view-transition-new(fab) { animation: none; mix-blend-mode: normal; }
+  ::view-transition-group(m-ind) { animation-duration: .32s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+  ::view-transition-old(m-ind), ::view-transition-new(m-ind) { animation: none; mix-blend-mode: normal; }
+  @keyframes vt-out { to { opacity: 0; transform: translateY(-8px); } }
+  @keyframes vt-in { from { opacity: 0; transform: translateY(14px); } }
 }
 
 /* Inner page hero v3 */
@@ -1114,18 +1121,6 @@ form#contact .btn { min-width: 160px; }
   .only-online { display: none !important; }
 }
 
-/* --- reduced motion: every animation and transition this stylesheet owns stops --- */
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
-  .reveal, .reveal.zoom, .page-head .crumbs, .page-head .chip, .page-head h1, .page-head p, .page-head .ph-bg, .quick-bar .hero-card { opacity: 1; transform: none; translate: none; scale: none; animation: none; }
-  .fab-donate, .m-bar .m-donate, .m-bar .m-donate i, .slogan-art img, .num b.done, .site-header::after, .search-box, .nav.open { animation: none !important; }
-  .gw-spin, .lightbox .lb-spin { animation: spin 1.5s linear infinite !important; animation-duration: 1.5s !important; animation-iteration-count: infinite !important; } /* the loading rings keep turning: they signal "still working" */
-  .section-title.reveal:not(.in) h2::after { width: 56px; }
-  .car-track, .gal-track, .related .grid, .tabs { scroll-behavior: auto; }
-  .site-header.hide { translate: none; }
-}
-
 /* ===== v6: phone menu sheet + donor item in the bottom bar ===== */
 .m-sheet { position: fixed; inset: 60px 0 0; z-index: 95; background: #f4f8f8; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .m-sheet[hidden] { display: none; }
@@ -1169,4 +1164,185 @@ body.menu-open .m-bar { z-index: 96; }
   .m-bar .m-gift::after { content: ""; position: absolute; top: 10px; inset-inline-end: 14px; width: 7px; height: 7px; border-radius: 50%; background: #e53e3e; border: 2px solid #fff; }
   .m-bar .m-gift.on::after { display: none; }
 }
-@media (prefers-reduced-motion: reduce) { .m-sheet-in { animation: none; } }
+
+/* =====================================================================================================
+   v7 motion: the site moves like an app. Every rule here animates transform / opacity / clip-path only
+   (plus stroke-dashoffset on 16px icons), runs once, needs no JS to be readable, and is switched off by
+   the reduced-motion block at the very end of this file.
+   ===================================================================================================== */
+:root { --ease: cubic-bezier(.2, .7, .2, 1); --spring: cubic-bezier(.22, 1, .36, 1); --bounce: cubic-bezier(.34, 1.45, .64, 1); --soft-bounce: cubic-bezier(.3, 1.3, .5, 1); }
+@keyframes pop-in { 0% { transform: scale(.94); } 60% { transform: scale(1.05); } 100% { transform: none; } }
+@keyframes rise-sm { from { opacity: 0; transform: translateY(10px); } } /* no explicit end frame: a filled animation then keeps following the element's own transform (hover, press, sticky offset) */
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes ring { 0% { transform: scale(.86); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+
+/* --- buttons, chips, cards: a tactile press everywhere, a lift only where there is a pointer --- */
+.btn { transition: transform .22s var(--spring), background .2s, color .2s, box-shadow .2s; }
+.btn:active { transform: scale(.96); filter: none; transition-duration: .08s; }
+@media (hover: hover) {
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: scale(.96); }
+}
+@media (hover: none) { .btn { transition: transform .22s var(--spring), background .12s, color .12s; } }
+.amounts button, .tabs button, .freq span, .side-amounts a, .copy, .link-btn, .search-btn, .menu-toggle, .nf-links a, .contact-cards a, .way2, .num, .m-quick a, .m-row, .m-group summary, .m-search-row, .m-gift-row, .m-contact a, .social a, .m-social a { transition: transform .22s var(--spring), background .2s, border-color .2s, color .2s, box-shadow .2s; }
+.amounts button:active, .tabs button:active, .nf-links a:active, .contact-cards a:active, .way2:active, .num:active { transform: scale(.95); transition-duration: .08s; }
+.freq label:active span, .side-amounts a:active, .copy:active, .m-row:active, .m-group summary:active, .m-quick a:active, .m-search-row:active, .m-gift-row:active, .m-contact a:active, .social a:active, .m-social a:active { transform: scale(.96); transition-duration: .08s; }
+.amounts button.on, .freq input:checked + span { animation: pop-in .32s var(--bounce); }
+@media (max-width: 760px) { .tabs button[aria-selected="true"] { animation: pop-in .32s var(--bounce); } }
+.card, a.card { transition: transform .3s var(--spring), box-shadow .3s var(--ease); }
+.card:active, a.card:active { transition-duration: .1s; }
+@media (hover: hover) { .chips li { transition: transform .2s var(--spring); } .chips li:hover { transform: translateY(-2px); } }
+.tab-panel:not([hidden]) { animation: rise-sm .32s var(--ease) both; }
+.alert { animation: rise-sm .35s var(--ease) both; }
+
+/* --- header: slides away with transform (no layout), comes back with a small spring; the logo scales instead of resizing --- */
+.site-header { transition: box-shadow .25s, background .25s, transform .5s var(--soft-bounce); }
+.site-header.hide { translate: none; transform: translate3d(0, -100%, 0); transition-duration: .28s; transition-timing-function: cubic-bezier(.4, 0, .7, 1); box-shadow: none; }
+.brand { transition: transform .3s var(--ease); }
+@media (max-width: 760px) {
+  .site-header .wrap, .site-header.scrolled .wrap { min-height: 60px; transition: none; }
+  .site-header.scrolled .brand img { height: 36px; }
+  .site-header.scrolled .brand { transform: scale(.88); }
+}
+.to-top { transform: translateY(8px) scale(.6); transition: opacity .25s, transform .5s var(--bounce); }
+.to-top.show { transform: none; }
+.to-top:active { transform: scale(.9); transition-duration: .08s; }
+/* the floating donate button really floats (.btn-gold's "position: relative" for the shine used to win over the
+   fixed position), scales in once the page is scrolled, and pulses with a ring (transform + opacity) instead of an animated shadow */
+@media (min-width: 761px) {
+  .fab-donate { position: fixed; animation: none; overflow: visible; transform: translateY(16px) scale(.8); transition: opacity .3s, transform .5s var(--bounce); }
+  .fab-donate.show { transform: none; }
+  .fab-donate.show:hover { transform: translateY(-1px); }
+  .fab-donate.show:active { transform: scale(.96); transition-duration: .08s; }
+  .fab-donate::after { display: none; }
+  .fab-donate::before { content: ""; position: absolute; inset: -3px; border-radius: 999px; border: 2px solid rgba(254,200,48,.7); animation: ring 2.4s ease-out infinite; pointer-events: none; }
+  .fab-donate:not(.show)::before { animation-play-state: paused; }
+}
+
+/* --- phone bottom bar: a soft pill + gold dot slides under the active item (transform only), icons tap in, the donor badge pings --- */
+@media (max-width: 760px) {
+  .m-bar { --n: 5; --pad: 4px; }
+  .m-bar.six { --n: 6; --pad: 2px; }
+  .m-bar a, .m-bar button { position: relative; z-index: 1; transition: color .2s, transform .25s var(--spring); }
+  .m-bar a:active, .m-bar button:active { transform: scale(.88); transition-duration: .08s; }
+  .m-bar .m-ind { position: absolute; top: 6px; inset-inline-start: var(--pad); z-index: 0; width: calc((100% - var(--pad) * 2) / var(--n)); height: 52px; border-radius: 16px; background: rgba(0,144,145,.09); pointer-events: none; transform: translateX(calc(var(--i, 0) * -100%)); transition: transform .42s var(--spring), opacity .2s; }
+  .m-bar .m-ind::after { content: ""; position: absolute; bottom: 5px; inset-inline-start: calc(50% - 2.5px); width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .m-bar:not(.has-on) .m-ind { opacity: 0; }
+  .m-bar .on span::after { display: none; }
+  .m-bar .on svg { animation: m-tap .5s var(--bounce); }
+  @keyframes m-tap { from { transform: scale(.72) translateY(3px); } to { transform: translateY(-1px); } }
+  .m-bar .m-donate i { animation: none; transition: transform .25s var(--spring); }
+  .m-bar .m-donate i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(254,200,48,.8); animation: ring 2.4s ease-out infinite; }
+  .m-bar .m-gift::after { top: 9px; inset-inline-end: 13px; width: 9px; height: 9px; }
+  .m-bar .m-gift::before { content: ""; position: absolute; top: 7px; inset-inline-end: 11px; width: 13px; height: 13px; border-radius: 50%; background: rgba(229,62,62,.5); animation: badge-ping 2s var(--ease) infinite; }
+  .m-bar .m-gift.on::before { display: none; }
+  @keyframes badge-ping { 0% { transform: scale(.5); opacity: 1; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+}
+
+/* --- phone menu sheet: fades + rises, rows follow one after the other, closes with the same move (js adds .closing) --- */
+.m-sheet { animation: fade-in .2s ease-out both; }
+.m-sheet-in { animation: sheet-up .34s var(--ease) both; }
+.m-sheet-in > * { animation: rise-sm .45s var(--ease) both; }
+.m-sheet-in > :nth-child(2) { animation-delay: .04s; }
+.m-sheet-in > :nth-child(3) { animation-delay: .08s; }
+.m-sheet-in > :nth-child(4) { animation-delay: .12s; }
+.m-sheet-in > :nth-child(5) { animation-delay: .16s; }
+.m-sheet-in > :nth-child(6) { animation-delay: .2s; }
+.m-sheet-in > :nth-child(7) { animation-delay: .24s; }
+.m-sheet.closing { animation: sheet-out .18s ease-in both; pointer-events: none; }
+.m-sheet.closing .m-sheet-in, .m-sheet.closing .m-sheet-in > * { animation: none; }
+@keyframes sheet-up { from { transform: translateY(18px); } }
+@keyframes sheet-out { to { opacity: 0; transform: translateY(10px); } }
+/* groups open with the grid-rows trick (js toggles .is-open; the <details> open flag follows once the height has settled) */
+.m-group .m-sub-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .32s var(--ease); }
+.m-group.is-open .m-sub-wrap { grid-template-rows: 1fr; }
+.m-sub-wrap > .m-sub { min-height: 0; overflow: hidden; }
+.m-sub .m-row { opacity: 0; transform: translateY(-5px); transition: opacity .22s, transform .32s var(--ease); }
+.m-group.is-open .m-sub .m-row { opacity: 1; transform: none; transition-delay: .05s; }
+.m-group[open] summary { border-radius: 14px; color: var(--ink); border-color: var(--line); }
+.m-group.is-open summary { border-radius: 14px 14px 0 0; color: var(--teal); border-color: #cfe7e7; }
+.m-row .chev, .m-group .chev { transition: transform .3s var(--spring); }
+.m-group[open] > summary .chev { transform: scaleX(-1); }
+.m-group.is-open > summary .chev { transform: rotate(90deg); }
+
+/* --- scroll reveal: shorter, springier, staggered per batch by js (--d) --- */
+.reveal { transform: translateY(22px); transition: opacity .5s var(--ease), transform .7s var(--spring); transition-delay: var(--d, 0s); }
+.reveal.in { transform: none; }
+.reveal.zoom { transform: scale(.95) translateY(10px); }
+.reveal.zoom.in { transform: none; }
+
+/* --- donate: steps slide in (RTL: forward comes from the left), the progress line fills, chips pop, the amount stays in view --- */
+.stepper[data-dir] .step:not([hidden]) { animation: step-in .36s var(--ease) both; }
+.stepper[data-dir="back"] .step:not([hidden]) { animation-name: step-back; }
+.gateway:not([hidden]) { animation: step-in .36s var(--ease) both; }
+@keyframes step-in { from { opacity: 0; transform: translateX(-22px); } }
+@keyframes step-back { from { opacity: 0; transform: translateX(22px); } }
+.steps li.on + li::before, .steps li.done + li::before { background: var(--line); }
+.steps li + li::after { content: ""; position: absolute; top: 15px; inset-inline-end: calc(50% + 18px); width: calc(100% - 36px); height: 2px; background: var(--teal); transform: scaleX(0); transform-origin: 100% 50%; transition: transform .45s var(--ease); }
+.steps li.done + li::after { transform: scaleX(1); }
+.steps li.on span { animation: step-dot .45s var(--bounce); }
+@keyframes step-dot { 0% { transform: scale(.8); } 60% { transform: scale(1.22); } 100% { transform: scale(1.1); } }
+.steps li.done span::after { display: inline-block; animation: pop-in .3s var(--bounce); }
+.s-sum { display: flex; align-items: center; gap: 10px; background: var(--teal-soft); border: 1px solid #cfe7e7; border-radius: 12px; padding: 7px 12px; margin: -6px 0 14px; font-size: 13.5px; color: var(--teal-dark); animation: rise-sm .3s var(--ease) both; }
+.s-sum b { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 17px; white-space: nowrap; }
+.s-sum .s-for { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.s-sum .link-btn { text-decoration: none; font-size: 13.5px; min-height: 36px; padding: 0 6px; }
+.summary { animation: rise-sm .4s .08s var(--ease) both; }
+@media (max-width: 760px) {
+  .steps li + li::after { top: 14px; }
+  .s-sum { position: sticky; top: 64px; z-index: 5; box-shadow: 0 8px 18px -10px rgba(0,48,48,.35); transition: transform .3s var(--ease); }
+  body.hdr-hide .s-sum { transform: translateY(-56px); }
+}
+
+/* --- copy buttons: the copy icon morphs into a check that draws itself (js adds .done for 1.6 s) --- */
+.copy { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.ci { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; overflow: visible; }
+.ci .ci-a, .ci .ci-b { transform-box: fill-box; transform-origin: center; transition: transform .3s var(--bounce), opacity .18s; }
+.ci .ci-b { opacity: 0; transform: scale(.4); stroke-dasharray: 22; stroke-dashoffset: 22; transition: transform .3s var(--bounce), opacity .15s, stroke-dashoffset .35s .08s var(--ease); }
+.done > .ci .ci-a { opacity: 0; transform: scale(.4); }
+.done > .ci .ci-b { opacity: 1; transform: none; stroke-dashoffset: 0; }
+.copy.done { background: #e6f6ee; border-color: #8fd3b2; color: #11683f; }
+
+/* --- zakat: the total counts up and bumps when it changes (js adds .bump) --- */
+.zakat-result .big { display: inline-block; transform-origin: 100% 50%; }
+.zakat-result .big.bump { animation: pop-in .5s var(--bounce); }
+
+/* --- albums lightbox: zooms in on open, shrinks away on close (js adds .closing) --- */
+.lightbox { animation: fade-in .22s ease-out both; }
+.lightbox figure { animation: lb-zoom .36s var(--ease) both; }
+.lightbox.closing { animation: fade-out .18s ease-in both; pointer-events: none; }
+.lightbox.closing figure { animation: lb-zoom-out .18s ease-in both; }
+.lightbox button, .lightbox .lb-count { z-index: 2; } /* the figure fills the dialog and would otherwise sit on top of its buttons */
+@keyframes lb-zoom { from { opacity: 0; transform: scale(.86); } }
+@keyframes lb-zoom-out { to { opacity: 0; transform: scale(.92); } }
+
+/* --- search panel + 404 links --- */
+.search-box { animation: lb-zoom .28s var(--ease) both; }
+.nf-links a { animation: rise-sm .5s var(--ease) both; }
+.nf-links a:nth-child(2) { animation-delay: .05s; } .nf-links a:nth-child(3) { animation-delay: .1s; } .nf-links a:nth-child(4) { animation-delay: .15s; }
+.nf-links a:nth-child(5) { animation-delay: .2s; } .nf-links a:nth-child(6) { animation-delay: .25s; } .nf-links a:nth-child(7) { animation-delay: .3s; } .nf-links a:nth-child(8) { animation-delay: .35s; }
+.nf .nf-code { animation: pop-in .6s .1s var(--bounce) both; }
+
+/* --- reduced motion: every animation and transition this stylesheet owns stops --- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+  .reveal, .reveal.zoom, .page-head .crumbs, .page-head .chip, .page-head h1, .page-head p, .page-head .ph-bg, .quick-bar .hero-card { opacity: 1; transform: none; translate: none; scale: none; animation: none; }
+  .fab-donate, .m-bar .m-donate, .m-bar .m-donate i, .slogan-art img, .num b.done, .site-header::after, .search-box, .nav.open { animation: none !important; }
+  .gw-spin, .lightbox .lb-spin { animation: spin 1.5s linear infinite !important; animation-duration: 1.5s !important; animation-iteration-count: infinite !important; } /* the loading rings keep turning: they signal "still working" */
+  .section-title.reveal:not(.in) h2::after { width: 56px; }
+  .car-track, .gal-track, .related .grid, .tabs { scroll-behavior: auto; }
+  .site-header.hide { translate: none; }
+  /* v7 motion: every state that starts hidden, scaled or moved is shown in place */
+  .m-sheet, .m-sheet-in, .m-sheet-in > *, .lightbox, .lightbox figure, .search-box, .nf-links a, .nf .nf-code, .s-sum, .summary, .gateway, .stepper[data-dir] .step, .steps li.on span, .steps li.done span::after, .amounts button.on, .tabs button[aria-selected="true"], .freq input:checked + span, .tab-panel, .alert, .m-bar .on svg, .zakat-result .big.bump { animation: none !important; opacity: 1; transform: none; }
+  .m-bar .m-donate i::after, .m-bar .m-gift::before, .fab-donate::before { display: none; }
+  .m-sheet.closing, .lightbox.closing { opacity: 0; }
+  .m-group .m-sub-wrap { grid-template-rows: 1fr; }
+  .m-sub .m-row { opacity: 1; transform: none; }
+  .steps li.done + li::after { transform: scaleX(1); }
+  .ci .ci-b, .done > .ci .ci-b, .m-bar .m-ind, .to-top, .s-sum { transition: none; }
+  .site-header.hide { transform: none; }
+  .to-top { transform: translateY(8px) scale(.6); } .to-top.show { transform: none; }
+  .fab-donate { transition: none; } .fab-donate.show { transform: none; }
+}

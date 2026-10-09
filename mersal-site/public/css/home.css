@@ -202,19 +202,20 @@
   .home .slider { padding: 12px 0 38px; }
   .sl-track { gap: 10px; padding-inline: 16px; scroll-padding-inline: 16px; }
   .sl-track::after { content: ""; flex: 0 0 18px; } /* 18px + 10px gap = the 28px peek: lets the last card reach its start snap */
-  .sl-card { flex-basis: calc(100% - 28px); aspect-ratio: 4 / 5.4; max-height: min(58svh, 470px); border-radius: 24px; isolation: isolate; box-shadow: 0 24px 50px -24px rgba(0,0,0,.55); transition: scale .18s var(--spring); background-color: var(--teal-dark); }
-  .sl-card:active { scale: .985; }
-  /* photo on top, copy on a teal panel below. The photo keeps a near-native shape (the banners' photo half is
-     only 883px wide) so it is scaled ~1.3x on a 3x phone instead of ~2.5x: stretching it over the whole
-     portrait card is what made it look blurry. */
-  .sl-link { display: flex; flex-direction: column; }
-  .sl-card picture { position: relative; flex: 1 1 auto; min-height: 0; }
-  .sl-card img { position: absolute; inset: 0; }
-  .sl-card picture::after { content: ""; position: absolute; inset: auto 0 -1px; height: 56px; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(0,56,56,0), rgba(0,56,56,.55) 55%, var(--teal-dark)); }
-  .sl-copy { position: relative; z-index: 2; flex: 0 0 auto; gap: 7px; padding: 2px 18px 18px; transition: opacity .3s; will-change: transform; }
-  .sl-card:not(.on) .sl-copy { opacity: 0; }
-  .sl-title { font-size: clamp(22px, 6.2vw, 28px); text-shadow: none; max-width: 15ch; }
-  .sl-kicker { background: rgba(254,200,48,.14); }
+  /* story card: the photo is the card. --ph = share of the card the photo covers before it fades into the
+     teal under the copy (the copy overlaps that fade, so the picture reads as the whole card). The crops are
+     1766x1140 (2x) / 1324x855 (1.5x), so at ~80% of a 4:5.4 card a 3x phone shows them at ~1:1 device pixels. */
+  .sl-card { --ph: .8; flex-basis: calc(100% - 28px); aspect-ratio: 4 / 5.4; max-height: min(60vh, 500px); max-height: min(60svh, 500px); border-radius: 24px; isolation: isolate; box-shadow: 0 24px 50px -24px rgba(0,0,0,.55); background-color: var(--teal-dark); transition: scale .45s var(--spring), opacity .4s; }
+  /* the snapped card in focus; the neighbours peeking in at the edges sit a little back */
+  .sl-card:not(.on) { scale: .95; opacity: .78; }
+  .sl-card:active { scale: .985; transition-duration: .15s; }
+  .sl-link { display: block; height: 100%; }
+  .sl-card picture { position: absolute; inset: 0 0 auto; height: calc(var(--ph) * 100%); }
+  .sl-card img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* scrim only where the copy sits: clear over the faces, teal by the bottom edge of the photo */
+  .sl-card picture::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(0,89,89,0) 40%, rgba(0,80,80,.42) 62%, rgba(0,80,80,.82) 80%, var(--teal-dark) 93%); }
+  .sl-copy { position: absolute; inset-inline: 0; bottom: 0; z-index: 2; gap: 7px; padding: 0 18px 18px; will-change: transform; }
+  .sl-title { font-size: clamp(22px, 6.2vw, 28px); max-width: 14ch; }
   .sl-btn { height: 44px; }
   .sl-nav { margin-top: 7px; gap: 2px; }
   .sl-dots { gap: 0; }
@@ -225,6 +226,8 @@
   .hero-wave { height: 26px; }
   .home .quick-bar { margin-top: -26px !important; }
 }
+/* short phones (iPhone SE size): a lower cap keeps the quick-donate card above the fold */
+@media (max-width: 760px) and (max-height: 620px) { .sl-card { max-height: 50vh; max-height: 50svh; } }
 @media (min-width: 761px) {
   .home .slider { padding: 18px 0 54px; }
   .sl-track { max-width: 1400px; margin: 0 auto; border-radius: 0 0 36px 36px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.45); outline: 1px solid rgba(254,200,48,.35); outline-offset: 8px; }
@@ -238,19 +241,31 @@
 @media (min-width: 761px) and (max-width: 1460px) { .sl-track { margin-inline: 24px; } }
 /* arrows stay inside the viewport until the 1400px track + 22px really fits (>= 1476px) */
 @media (min-width: 1300px) { .sl-prev { right: max(16px, calc(50% - 722px)); } .sl-next { left: max(16px, calc(50% - 722px)); } }
-@media (hover: hover) and (min-width: 761px) { .sl-card img { transition: scale .6s ease; } .sl-card:hover img { scale: 1.015; } }
+@media (hover: hover) and (min-width: 761px) { .sl-card img { transition: scale .6s ease, translate .5s ease; } .sl-card:hover img { scale: 1.035; } }
+/* button micro-interactions: arrow nudges the way it points, the pill presses in (transform only) */
+.sl-btn { transition: scale .2s var(--spring), box-shadow .25s; }
+.sl-btn svg { transition: translate .35s var(--spring); }
+.sl-link:hover .sl-btn svg, .sl-link:focus-visible .sl-btn svg { translate: -4px 0; }
+.sl-link:active .sl-btn { scale: .96; }
+.sl-pause, .sl-dots button::before { transition: scale .2s var(--spring), background .3s; }
+.sl-pause:active { scale: .88; }
+.sl-dots button:active::before { scale: .75; }
 @media (prefers-reduced-motion: no-preference) {
-  .sl-card.on .sl-copy > * { animation: rise .7s var(--spring) both; }
-  .sl-card.on .sl-copy > :nth-child(2) { animation-delay: .06s; }
-  .sl-card.on .sl-copy > :nth-child(3) { animation-delay: .12s; }
-  .sl-card.on .sl-copy > :nth-child(4) { animation-delay: .18s; }
+  .sl-card.on .sl-copy > * { animation: slRise .75s var(--spring) both; }
+  .sl-card.on .sl-copy > :nth-child(2) { animation-delay: .07s; }
+  .sl-card.on .sl-copy > :nth-child(3) { animation-delay: .14s; }
+  .sl-card.on .sl-copy > :nth-child(4) { animation-delay: .21s; }
+  .sl-card.on .sl-btn svg { animation: slArrow 1.2s var(--spring) .6s 1; }
   @supports (animation-timeline: scroll()) { .home .sl-track { animation: heroDrift linear both; animation-timeline: scroll(root); animation-range: 0 700px; } }
 }
 @keyframes heroDrift { to { transform: translateY(60px); } }
+@keyframes slRise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes slArrow { 35% { translate: -5px 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .sl-card img, .sl-copy > *, .sl-track, .sl-dots button::after, .sl-hint, .sl-hint svg { animation: none !important; }
-  .sl-card, .sl-dots button, .sl-copy { transition: none; }
+  .sl-card img, .sl-copy > *, .sl-track, .sl-dots button::after, .sl-hint, .sl-hint svg, .sl-btn svg { animation: none !important; }
+  .sl-card, .sl-dots button, .sl-dots button::before, .sl-copy, .sl-btn, .sl-btn svg, .sl-pause, .sl-card img { transition: none; }
   .sl-copy { transform: none !important; }
+  .sl-card img { translate: none !important; }
 }
 
 /* ================= campaigns v4: "cause cards" ================= */
@@ -323,10 +338,17 @@
 }
 /* snapped card in focus, the neighbours a little smaller (class set by home.js trackDots; a CSS
    view(inline) timeline computes progress mirrored in RTL scrollers in Chromium 141, so no timeline here) */
-@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
-  .home .camp { transition: scale .35s, opacity .35s, transform .25s ease, box-shadow .25s ease; }
-  .home .car-track:has(.is-snapped) > .camp:not(.is-snapped) { scale: .94; opacity: .8; }
+@media (prefers-reduced-motion: no-preference) {
+  /* reveal: each card rises in when it enters the viewport (home.js adds .in, 120ms apart); `translate` is used
+     so the hover lift (transform) and the focus effect (scale) compose with it instead of fighting */
+  .home .camp { transition: opacity .55s ease, translate .75s var(--spring), scale .35s var(--spring), transform .25s ease, box-shadow .25s ease; }
+  .home .camp:not(.in) { opacity: 0; translate: 0 26px; }
 }
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  .home .car-track:has(.is-snapped) > .camp.in:not(.is-snapped) { scale: .94; opacity: .8; }
+}
+.home .quick-donate .amounts button { transition: scale .15s var(--spring), background .2s, color .2s, border-color .2s, box-shadow .2s; }
+.home .quick-donate .amounts button:active, .camp-share:active { scale: .94; }
 @media (prefers-reduced-motion: reduce) { .camp.filled .bar i::after, .camp.filled .bar em, .camp.filled .camp-num, .camp.filled .camp-pct, .camp-hot::before, .eyebrow.live::before { animation: none; } }
 
 /* ================= polish v4 ================= */

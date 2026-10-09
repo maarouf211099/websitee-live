@@ -1,7 +1,19 @@
 // Mersal community: donor gifts. Unlocked on the device that donated (see recordDonation in donate.js).
 (function () {
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  // Odometer like the home page numbers: each digit rolls to its value (transform only), the units digit first
+  function odometer(el, value) {
+    var str = fmt.format(Math.round(value)), total = str.replace(/\D/g, "").length, k = 0;
+    el.setAttribute("role", "img"); el.setAttribute("aria-label", str); el.classList.add("odo");
+    if (reduce) { el.textContent = str; return; }
+    el.innerHTML = str.split("").map(function (ch) {
+      if (!/\d/.test(ch)) return '<span class="od-sep">' + esc(ch) + "</span>";
+      return '<span class="od" style="--d:' + ch + ';--i:' + (total - 1 - k++) + '"><span class="od-roll"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>';
+    }).join("");
+    requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("od-go"); }); });
+  }
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || "null") || fallback; } catch (e) { return fallback; } }
   var donor = read("mersalDonor", {}), history = read("mersalDonations", []);
   var gate = document.getElementById("cm-gate"), main = document.getElementById("cm-main");
@@ -21,9 +33,11 @@
   if (total >= 5000) badges.push("داعم ذهبي");
   document.getElementById("cm-badges").innerHTML = badges.map(function (b) { return '<span class="cm-badge"><i></i>' + esc(b) + "</span>"; }).join("");
   document.getElementById("cm-stats").innerHTML =
-    '<div class="cm-stat"><b>' + fmt.format(history.length) + "</b><span>تبرع</span></div>" +
-    '<div class="cm-stat"><b>' + fmt.format(total) + "</b><span>جنيه ساهمت بيهم</span></div>" +
-    '<div class="cm-stat"><b>' + fmt.format(Math.max(1, Math.round(total / 100))) + "</b><span>سهم علاج تقريباً</span></div>";
+    '<div class="cm-stat"><b>0</b><span>تبرع</span></div>' +
+    '<div class="cm-stat"><b>0</b><span>جنيه ساهمت بيهم</span></div>' +
+    '<div class="cm-stat"><b>0</b><span>سهم علاج تقريباً</span></div>';
+  var statVals = [history.length, total, Math.max(1, Math.round(total / 100))];
+  document.querySelectorAll("#cm-stats b").forEach(function (b, i) { odometer(b, statVals[i]); });
   document.getElementById("cm-history").innerHTML = history.slice().reverse().map(function (d) {
     return "<li><span>" + esc(new Date(d.date).toLocaleDateString("ar-EG")) + (d.purposeTitle ? " · " + esc(d.purposeTitle) : "") + (d.demo ? ' <span class="demo">تجريبي</span>' : "") + "</span><b>" + fmt.format(d.amount) + " ج</b></li>";
   }).join("");
@@ -88,13 +102,21 @@
   }
   function openCertificate(shareCard) {
     document.getElementById("cm-modal-title").textContent = shareCard ? "كارت ابعت فرحة" : "شهادة شكر";
-    modal.hidden = false; document.body.style.overflow = "hidden";
+    modal.classList.remove("closing"); modal.hidden = false; document.body.style.overflow = "hidden";
     (document.fonts && document.fonts.load ? document.fonts.load("800 40px Cairo") : Promise.resolve()).then(function () { draw(shareCard); setTimeout(function () { draw(shareCard); }, 400); });
     var dl = document.getElementById("cm-download");
     setTimeout(function () { try { dl.href = canvas.toDataURL("image/png"); } catch (e) {} }, 600);
   }
-  document.getElementById("cm-close").addEventListener("click", function () { modal.hidden = true; document.body.style.overflow = ""; });
-  modal.addEventListener("click", function (e) { if (e.target === modal) { modal.hidden = true; document.body.style.overflow = ""; } });
+  function closeModal() {
+    if (modal.hidden || modal.classList.contains("closing")) return;
+    document.body.style.overflow = "";
+    if (reduce) { modal.hidden = true; return; }
+    modal.classList.add("closing"); // css: shrinks away, then hidden
+    setTimeout(function () { modal.hidden = true; modal.classList.remove("closing"); }, 190);
+  }
+  document.getElementById("cm-close").addEventListener("click", closeModal);
+  modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(); });
+  addEventListener("keydown", function (e) { if (e.key === "Escape") closeModal(); });
   document.getElementById("cm-share").addEventListener("click", function () {
     canvas.toBlob(function (blob) {
       var file = new File([blob], "mersal-thank-you.png", { type: "image/png" });

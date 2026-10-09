@@ -109,7 +109,7 @@ function requireAdmin(req) {
 const ALLOWED = [
   /^public\/index\.html$/,
   /^public\/(about|contact|afia|zakat|donate|albums|volunteer|help)\.html$/,
-  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community)\.json$/,
+  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community|news|impact)\.json$/,
   /^api\/data\/requests\/[A-Za-z0-9_-]+\.json$/, /^api\/data\/requests\/index\.json$/,
   /^public\/p\/\d{1,4}\.html$/, /^public\/js\/layout\.js$/,
   /^public\/img\/uploads\/[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif)$/,
@@ -119,8 +119,13 @@ function checkPath(p) {
   return `${SITE_ROOT}/${p}`;
 }
 
+// This site's own repository and branch: only the token is secret, so Azure needs GITHUB_TOKEN alone
+const DEFAULT_REPO = "maarouf211099/websitee-live";
+const githubRepo = () => String(process.env.GITHUB_REPO || "").trim() || DEFAULT_REPO;
+const githubReady = () => !!String(process.env.GITHUB_TOKEN || "").trim();
+
 function gh() {
-  const token = process.env.GITHUB_TOKEN, repo = process.env.GITHUB_REPO, branch = process.env.GITHUB_BRANCH || "main";
+  const token = process.env.GITHUB_TOKEN, repo = githubRepo(), branch = process.env.GITHUB_BRANCH || "main";
   if (!token || !repo) { const e = new Error("GITHUB_TOKEN / GITHUB_REPO مش متظبطين في إعدادات Azure"); e.status = 500; throw e; }
   const api = async (path, init = {}) => {
     const r = await fetch(`https://api.github.com${path}`, {
@@ -173,4 +178,4 @@ const json = (status, body) => ({ status, headers: { "Cache-Control": "no-store"
 const fail = (e, ctx) => { if (ctx && (e.status || 500) >= 500) ctx.error(e); return json(e.status || 500, { message: e.message }); };
 
 module.exports = { principal, requireAdmin, readFile, commitFiles, checkPath, fileExists, json, fail, SITE_ROOT,
-  makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL };
+  makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL, githubReady };

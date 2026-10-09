@@ -9,16 +9,29 @@ const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": 
 // tools/optimize_images.py guarantees a .webp sibling for every jpg/png under /img/ except /img/uploads/
 const webp = (u) => (/^\/img\/(?!uploads\/)[^?#]+\.(jpe?g|png)$/i.test(u || "") ? u.replace(/\.(jpe?g|png)$/i, ".webp") : null);
 const SIZES = "(max-width: 1400px) 100vw, 1400px";
+// Phone crops are landscape (the banner's photo half, 883x570) shown with object-fit:cover in a portrait card, so the
+// browser scales them by HEIGHT: the photo is 80% of a 4:5.4 card that is 100vw-28px wide, which draws the crop
+// ~140vw wide. Saying so in sizes is what makes a dpr-2 phone pick the 1.5x crop and a 3x phone the 2x one.
+const M_SIZES = "(max-width: 760px) 140vw";
+
+// Phone candidates for a slide: [{src, w}] from opts.mobileSet (tools/render-home.js: the -ms/-m pair written by
+// tools/optimize_images.py with their real widths) or the single slide.mobile / opts.mobileFor(banner) file.
+function mobileSet(s, opts) {
+  if (opts.mobileSet) { const set = opts.mobileSet(s); if (set && set.length) return set; }
+  const m = s.mobile || (opts.mobileFor ? opts.mobileFor(s.banner) : null);
+  return m ? [{ src: m }] : [];
+}
+const srcsetOf = (set, fn) => set.map((c) => esc(fn(c.src)) + (c.w ? ` ${c.w}w` : "")).join(", ");
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
 
 function picture(s, i, opts) {
-  const full = s.banner, sm = s.bannerSm, mobile = s.mobile || (opts.mobileFor ? opts.mobileFor(full) : null);
+  const full = s.banner, sm = s.bannerSm, mset = mobileSet(s, opts);
   const pre = i >= 2 ? "data-" : ""; // cards 3+ wake up after window load (see home.js)
   let h = "<picture>";
-  if (mobile) {
-    const mw = webp(mobile);
-    if (mw) h += `<source media="(max-width: 760px)" type="image/webp" ${pre}srcset="${esc(mw)}">`;
-    h += `<source media="(max-width: 760px)" ${pre}srcset="${esc(mobile)}">`;
+  if (mset.length) {
+    const sz = mset.length > 1 ? ` sizes="${M_SIZES}"` : "";
+    if (mset.every((c) => webp(c.src))) h += `<source media="(max-width: 760px)" type="image/webp" ${pre}srcset="${srcsetOf(mset, webp)}"${sz}>`;
+    h += `<source media="(max-width: 760px)" ${pre}srcset="${srcsetOf(mset, (u) => u)}"${sz}>`;
   }
   const set = sm ? `${esc(sm)} 1200w, ${esc(full)} 1920w` : esc(full);
   const setW = sm ? (webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1920w` : null) : webp(full);
@@ -59,11 +72,13 @@ function dots(n) {
 function preload(s, opts) {
   if (!s || !s.banner) return "";
   opts = opts || {};
-  const mobile = s.mobile || (opts.mobileFor ? opts.mobileFor(s.banner) : null);
+  const mset = mobileSet(s, opts), mobile = mset.length > 0;
   const out = [];
   if (mobile) {
-    const mw = webp(mobile);
-    out.push(`<link rel="preload" as="image" media="(max-width: 760px)"${mw ? ` type="image/webp" href="${esc(mw)}"` : ` href="${esc(mobile)}"`} fetchpriority="high">`);
+    // same candidates and sizes as the <source> above, so the browser reuses the preloaded file
+    const allW = mset.every((c) => webp(c.src)), fn = allW ? webp : (u) => u, type = allW ? ' type="image/webp"' : "";
+    if (mset.length > 1) out.push(`<link rel="preload" as="image" media="(max-width: 760px)"${type} imagesrcset="${srcsetOf(mset, fn)}" imagesizes="${M_SIZES}" fetchpriority="high">`);
+    else out.push(`<link rel="preload" as="image" media="(max-width: 760px)"${type} href="${esc(fn(mset[0].src))}" fetchpriority="high">`);
   }
   const sm = s.bannerSm, full = s.banner;
   const setW = sm && webp(sm) && webp(full) ? `${webp(sm)} 1200w, ${webp(full)} 1920w` : webp(full) || null;

@@ -35,6 +35,8 @@
       <button role="tab" data-tab="requests">الطلبات</button>
       <button role="tab" data-tab="site">بيانات الموقع</button>
       <button role="tab" data-tab="community">الكوميونيتي</button>
+      <button role="tab" data-tab="news">الأخبار</button>
+      <button role="tab" data-tab="impact">أثر التبرع</button>
       <button role="tab" data-tab="settings">الإعدادات</button>
     </nav>
     <div class="side-foot">
@@ -127,6 +129,16 @@
       <div id="community-root"></div>
     </section>
 
+    <section class="panel" id="tab-news" hidden>
+      <header class="panel-head"><h1>أخبار وقصص مرسال</h1><button class="btn btn-gold" id="save-news">حفظ ونشر</button></header>
+      <div id="news-root"></div>
+    </section>
+
+    <section class="panel" id="tab-impact" hidden>
+      <header class="panel-head"><h1>أثر التبرع</h1><button class="btn btn-gold" id="save-impact">حفظ ونشر</button></header>
+      <div id="impact-root"></div>
+    </section>
+
     <section class="panel" id="tab-settings" hidden>
       <header class="panel-head"><h1>الإعدادات</h1></header>
       <h2>الدفع بالبطاقة</h2>
@@ -155,5 +167,7 @@
 <script src="/admin/tabs/site.js"></script>
 <script src="/admin/tabs/requests.js"></script>
 <script src="/admin/tabs/community.js"></script>
+<script src="/admin/tabs/news.js"></script>
+<script src="/admin/tabs/impact.js"></script>
 </body>
 </html>

@@ -52,16 +52,20 @@
   if (!hash) hash = "online";
   if (document.getElementById(hash) && document.getElementById(hash).getAttribute("role") === "tabpanel") openTab(hash);
 
-  // Copy buttons (bank rows are rendered later from donate.json, so listen on the document)
+  // Copy buttons (bank rows are rendered later from donate.json, so listen on the document): the copy icon morphs
+  // into a check (css .done) for 1.6 s
+  var CI = '<svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg>';
   document.addEventListener("click", function (e) {
     var b = e.target.closest(".copy"); if (!b) return;
     navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(function () {
-      b.textContent = "تم النسخ ✓"; setTimeout(function () { b.textContent = "نسخ"; }, 1500);
+      var t = b.querySelector("span") || b;
+      b.classList.add("done"); t.textContent = "تم النسخ"; if (window.mersalTap) window.mersalTap(8);
+      clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove("done"); t.textContent = "نسخ"; }, 1600);
     });
   });
   // Bank accounts, wallets and the account abroad come from /data/donate.json (edited from the console, "بيانات الموقع");
   // the markup already in donate.html is the fallback while it loads or if it fails.
-  function row(label, value) { return '<div class="bank"><div><b>' + esc(label) + "</b><code>" + esc(value) + '</code></div><button class="copy" data-copy="' + esc(value) + '">نسخ</button></div>'; }
+  function row(label, value) { return '<div class="bank"><div><b>' + esc(label) + "</b><code>" + esc(value) + '</code></div><button class="copy" data-copy="' + esc(value) + '">' + CI + "<span>نسخ</span></button></div>"; }
   fetch("/data/donate.json").then(function (r) { return r.json(); }).then(function (d) {
     var banks = (d.banks || []).filter(function (b) { return b && b.name && b.number; });
     if (banks.length) {
@@ -143,9 +147,25 @@
   }
 
   var stepEls = form.querySelectorAll(".step"), dots = form.querySelectorAll(".steps li"), cur = 1;
+  // Strip above steps 2-3 (sticky on phones): the amount and the purpose stay in view, "تعديل" jumps back to step 1
+  var sumBar = (function () {
+    var el = document.createElement("div"); el.className = "s-sum"; el.hidden = true;
+    el.innerHTML = '<b></b><span class="s-for"></span><button type="button" class="link-btn">تعديل</button>';
+    form.querySelector(".steps").insertAdjacentElement("afterend", el);
+    el.querySelector("button").addEventListener("click", function () { go(1); });
+    return function (n) {
+      el.hidden = n < 2;
+      if (n < 2) return;
+      el.querySelector("b").textContent = fmt.format(Number(amount.value) || 0) + " جنيه" + (freq() === "monthly" ? " شهرياً" : "");
+      el.querySelector(".s-for").textContent = purposeText();
+    };
+  })();
   function go(n) {
+    // css: the new step slides in from the side it comes from (data-dir)
+    form.dataset.dir = n > cur ? "fwd" : n < cur ? "back" : (form.dataset.dir || "fwd");
     cur = n;
     stepEls.forEach(function (s) { s.hidden = Number(s.dataset.step) !== n; });
+    sumBar(n);
     dots.forEach(function (d) { var k = Number(d.dataset.step); d.classList.toggle("on", k === n); d.classList.toggle("done", k < n); });
     if (n === 3) fillSummary();
     var first = form.querySelector('.step[data-step="' + n + '"] input, .step[data-step="' + n + '"] select');
@@ -185,7 +205,7 @@
     e.preventDefault();
     if (cur !== 3) { if (valid(cur)) go(cur + 1); return; }
     btn.disabled = true;
-    stepEls.forEach(function (s) { s.hidden = true; });
+    stepEls.forEach(function (s) { s.hidden = true; }); sumBar(1);
     gw.hidden = false; gw.classList.remove("stopped");
     document.getElementById("gw-title").textContent = "جاري التحويل لبوابة بنك مصر…";
     document.getElementById("gw-body").innerHTML = "";

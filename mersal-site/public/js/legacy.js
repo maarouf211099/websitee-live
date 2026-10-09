@@ -79,6 +79,38 @@
         if (e.key === "ArrowRight") { e.preventDefault(); goTo(cur - 1); }
       });
       track.setAttribute("tabindex", "0");
+      // mouse users drag the strip; it keeps rolling after the release, then settles on the nearest picture
+      if (matchMedia("(hover: hover) and (pointer: fine)").matches) (function () {
+        var x0 = null, sl0 = 0, vx = 0, lastX = 0, lastT = 0, raf = null, moved = false, snapT = null;
+        track.addEventListener("pointerdown", function (e) {
+          if (e.pointerType !== "mouse" || e.button !== 0) return;
+          cancelAnimationFrame(raf); clearTimeout(snapT);
+          x0 = lastX = e.clientX; sl0 = track.scrollLeft; lastT = performance.now(); vx = 0; moved = false;
+          track.classList.add("grab"); try { track.setPointerCapture(e.pointerId); } catch (x) {}
+        });
+        track.addEventListener("pointermove", function (e) {
+          if (x0 === null) return;
+          var dx = e.clientX - x0;
+          if (!moved && Math.abs(dx) < 4) return;
+          moved = true; track.classList.add("dragging");
+          track.scrollLeft = sl0 - dx;
+          var t = performance.now(); vx = (e.clientX - lastX) / Math.max(1, t - lastT); lastX = e.clientX; lastT = t;
+        });
+        function settle() { sync(); goTo(cur); snapT = setTimeout(function () { track.classList.remove("dragging"); }, 450); }
+        function up() {
+          if (x0 === null) return;
+          x0 = null; track.classList.remove("grab");
+          if (!moved) { track.classList.remove("dragging"); return; }
+          var v = vx * 16; // px per frame, decays 8% a frame
+          (function roll() {
+            if (Math.abs(v) < .6 || reduce) { settle(); return; }
+            track.scrollLeft -= v; v *= .92; raf = requestAnimationFrame(roll);
+          })();
+        }
+        track.addEventListener("pointerup", up); track.addEventListener("pointercancel", up);
+        track.addEventListener("dragstart", function (e) { e.preventDefault(); }); // a picture would otherwise start a native drag-and-drop
+        track.addEventListener("click", function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+      })();
     }
     return g;
   }
@@ -178,6 +210,7 @@
     });
     var nat = share.querySelector(".sh-native");
     if (nat) nat.addEventListener("click", function () { navigator.share({ title: title + " - مؤسسة مرسال", url: location.href }).catch(function () {}); });
+    if (window.mersalReveal) window.mersalReveal([share]); // its buttons follow one another (css .share-bar.reveal > *)
   }
 
   // ---------- 5. breadcrumbs (if the page did not ship them) + related pages from the menu ----------

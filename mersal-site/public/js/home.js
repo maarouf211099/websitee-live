@@ -177,6 +177,22 @@
         }
       } catch (e) {}
     }
+    if (!phone && !reduceMotion && window.matchMedia && matchMedia("(hover: hover)").matches) {
+      // desktop: the photo drifts a few px against the pointer (translate only, one rAF per move; CSS adds the
+      // slight zoom on hover so no edge shows). Reset when the pointer leaves the track.
+      var pe = null, pq = false;
+      track.addEventListener("pointermove", function (e) {
+        pe = e; if (pq) return; pq = true;
+        requestAnimationFrame(function () {
+          pq = false;
+          var c = pe.target && pe.target.closest ? pe.target.closest(".sl-card") : null, im = c && c.querySelector("img");
+          if (!im) return;
+          var r = c.getBoundingClientRect(), x = (pe.clientX - r.left) / r.width - .5, y = (pe.clientY - r.top) / r.height - .5;
+          im.style.translate = (x * -12).toFixed(1) + "px " + (y * -8).toFixed(1) + "px";
+        });
+      }, { passive: true });
+      track.addEventListener("pointerleave", function () { track.querySelectorAll("img").forEach(function (im) { im.style.translate = ""; }); });
+    }
     play();
   }
 
@@ -293,12 +309,19 @@
         });
       }, delay);
     }
-    var cards = track.querySelectorAll(".camp");
+    var cards = track.querySelectorAll(".camp"), revealed = false;
+    // the cards rise in (CSS .camp:not(.in)) 120ms apart the first time the section shows: all of them at once,
+    // so the ones waiting off to the side of the phone carousel (which the counters' observer never sees
+    // until they are swiped in) are already in place when they peek in
+    function revealAll() {
+      if (revealed) return; revealed = true;
+      cards.forEach(function (c, i) { if (reduceMotion) c.classList.add("in"); else setTimeout(function () { c.classList.add("in"); }, i * 120); });
+    }
     if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (en) { var i = 0; en.forEach(function (e) { if (e.isIntersecting) { animate(e.target, i++ * 120); io.unobserve(e.target); } }); }, { threshold: .35 });
+      var io = new IntersectionObserver(function (en) { var i = 0; en.forEach(function (e) { if (e.isIntersecting) { revealAll(); animate(e.target, i++ * 120); io.unobserve(e.target); } }); }, { threshold: .35 });
       cards.forEach(function (c) { io.observe(c); });
-    } else cards.forEach(function (c) { animate(c, 0); });
-    // (no mersalReveal here: the counters are the cards' entrance, and a reveal animation would hold
+    } else { revealAll(); cards.forEach(function (c) { animate(c, 0); }); }
+    // (no mersalReveal here: .in + the counters are the cards' entrance; mersalReveal's animation would hold
     // the opacity that the snapped-card focus effect needs)
   }
   // quantity stepper -> live CTA amount (delegated once; survives re-renders)

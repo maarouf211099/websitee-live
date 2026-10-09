@@ -6,6 +6,7 @@
 //            "paymob" -> { redirect }: the donor goes to Paymob's Unified Checkout and comes back to ?gw=paymob&…
 //            "mpgs"   -> { sessionId }: Banque Misr Hosted Checkout v100, back to ?hcoReturn=1
 //            not saved yet -> whatever the server answers (Banque Misr until a gateway is saved)
+//            { unavailable } (the gateway's settings are not in Azure yet) -> the demo's "other ways" panel
 (function () {
   var KEY = "mersalPayment", DONOR_KEY = "mersalDonor";
   // PSA-22: explicit smooth scrolls follow the visitor's reduced-motion setting (like forms.js and impact.js)
@@ -333,7 +334,7 @@
     startLivePayment(run);
   });
 
-  // Demo: the flow ends here, before any card data or charge
+  // Demo (or live while the gateway is not set up yet): the flow ends here, before any card data or charge
   function stopAtGateway() {
     gw.classList.add("stopped");
     document.getElementById("gw-title").textContent = "بوابة الدفع الإلكتروني قيد التفعيل";
@@ -385,7 +386,9 @@
   }
   function startLivePayment(run) {
     var stale = function () { return run !== payRun || gw.hidden; }; // the amount or purpose changed meanwhile
-    var failed = function (err) { if (run === payRun) window.mersalPayError(err); };
+    // { unavailable: true }: card payment cannot start at all yet (gateway settings not in Azure): the same "other ways"
+    // panel as demo, nothing was charged
+    var failed = function (err) { if (run !== payRun) return; if (err && err.unavailable && !gw.hidden) stopAtGateway(); else window.mersalPayError(err); };
     if (PROVIDER === "mpgs") {
       return loadMpgs(function () { requestCheckout().then(function (d) { if (!stale()) openMpgs(d); }).catch(failed); });
     }

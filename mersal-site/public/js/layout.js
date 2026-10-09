@@ -9,7 +9,8 @@
   // payProvider (also from the console settings, "بوابة الدفع"; saved whenever payMode is set to "live"; absent = Banque
   // Misr): "paymob" (Paymob Unified Checkout) | "mpgs" (Banque Misr Hosted Checkout).
   var SITE = /* mersal:site */ {
-    payMode: "demo",
+    payMode: "live",
+    payProvider: "paymob",
     hotline: "19340",
     phone: "01200002870",
     whatsapp: "",

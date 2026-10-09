@@ -11,8 +11,8 @@ const MODE_RE = /payMode:\s*"(off|demo|live)"/, PROVIDER_RE = /payProvider:\s*"(
 const env = (k) => String(process.env[k] || "").trim();
 const MPGS_REQUIRED = ["MPGS_MERCHANT", "MPGS_API_PASSWORD"];
 
-// Names (never values) of the application settings a gateway still needs
-const missingFor = (p) => (p === "paymob" ? paymob.missing() : p === "mpgs" ? MPGS_REQUIRED.filter((k) => !env(k)) : ["?"]);
+// Names (never values) of the application settings a gateway still needs (Paymob: + why its keys cannot take real money)
+const missingFor = (p) => (p === "paymob" ? paymob.missing().concat(paymob.keyProblem() || []) : p === "mpgs" ? MPGS_REQUIRED.filter((k) => !env(k)) : ["?"]);
 const ready = (p) => missingFor(p).length === 0;
 // No saved choice: Banque Misr (MPGS), the gateway the site used before a gateway could be chosen. Never derived from
 // which settings exist, so adding or removing PAYMOB_* settings never moves live payments; Paymob takes over only once it
@@ -34,6 +34,18 @@ function write(js, mode, provider) {
   // first save of a provider: its own line right after payMode, same indentation
   return out.replace(/^([ \t]*)payMode:\s*"(off|demo|live)"(\s*,)?/m, (m, ind, v, comma) => `${ind}payMode: "${v}",\n${ind}payProvider: "${provider}"${comma ? "," : ""}`);
 }
+// The switch as the live site serves it (/js/layout.js), for when GitHub cannot be read (no GITHUB_TOKEN yet, or a
+// GitHub hiccup): no token needed, and a console change shows here once its deploy is out (about a minute). The site is
+// PUBLIC_BASE_URL (the custom domain once there is one) or this Static Web App's own default hostname, never the
+// request's Host header (the switch is cached for everyone).
+const DEFAULT_SITE = "https://jolly-moss-063f03a10.3.azurestaticapps.net";
+const siteBase = () => { const v = env("PUBLIC_BASE_URL").replace(/\/+$/, ""); return /^https:\/\/[A-Za-z0-9.-]+(:\d+)?$/.test(v) ? v : DEFAULT_SITE; };
+async function readDeployed() {
+  const r = await fetch(`${siteBase()}/js/layout.js?pay=${Date.now()}`, { cache: "no-store", signal: AbortSignal.timeout(5000) });
+  const t = r.ok ? await r.text() : "";
+  if (!/mersal:site/.test(t)) throw new Error(`deployed layout.js: HTTP ${r.status}`);
+  return read(t);
+}
 const label = (p) => (p === "paymob" ? "Paymob" : p === "mpgs" ? "بنك مصر (MPGS)" : String(p));
 
-module.exports = { MODES, PROVIDERS, MODE_RE, PROVIDER_RE, read, write, missingFor, ready, defaultProvider, effective, label };
+module.exports = { MODES, PROVIDERS, MODE_RE, PROVIDER_RE, read, write, readDeployed, siteBase, missingFor, ready, defaultProvider, effective, label };

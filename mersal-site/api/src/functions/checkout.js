@@ -5,7 +5,11 @@
 //   Banque Misr: creates a Hosted Checkout session with the same INITIATE_CHECKOUT body that is live today (hco-v100c)
 //                -> { orderId, sessionId, successIndicator }
 // Server-side gate: sessions are created only while card payment is "live": the PAY_MODE application setting when it
-// is set, else payMode in js/layout.js (the console's "الدفع بالبطاقة" switch, read through GitHub, cached 60 s).
+// is set, else payMode in js/layout.js (the console's "الدفع بالبطاقة" switch, cached 60 s): read through GitHub, or
+// from the live site itself when there is no GITHUB_TOKEN or GitHub fails (lib/pay.js readDeployed).
+// GET /api/checkout/status -> { mode, provider, ready, missing? }: can a card donation start right now (setting NAMES
+// only, never values), to check a go-live from outside. The donor never needs it: an unavailable gateway answers
+// { unavailable: true } and the donate page shows the other ways to give.
 // Limits (lib/limits.js): CHECKOUT_RATE_LIMIT (10) sessions per visitor IP per hour, CHECKOUT_GLOBAL_LIMIT (300) per hour
 // from everyone, so the merchant account cannot be used for card testing.
 // Each session is saved as a pending order (lib/donations.js, when DONATIONS_STORAGE is set) so a payment whose donor
@@ -13,7 +17,7 @@
 // is saved BEFORE the donor is sent to pay (its amount and purpose are what the callback is checked against).
 const { app } = require("@azure/functions");
 const { cfg, mpgs, newOrderId } = require("../lib/mpgs");
-const { readFile } = require("../lib/admin");
+const { readFile, githubReady } = require("../lib/admin");
 const limits = require("../lib/limits");
 const donations = require("../lib/donations");
 const paymob = require("../lib/paymob");
@@ -29,6 +33,8 @@ const MAX = Number(process.env.MAX_AMOUNT || 1000000);
 const bad = (message) => ({ status: 400, jsonBody: { message } });
 const clean = (s, n) => String(s || "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
 const OTHER_WAYS = "تقدر تتبرع بالتحويل البنكي أو المحافظ من صفحة طرق التبرع، أو كلمنا على 19340.";
+// card payment cannot start at all right now (switch off / unknown, gateway settings missing): the page offers the rest
+const unavailable = (status, message) => ({ status, jsonBody: { message, unavailable: true } });
 
 // -> { mode: "off" | "demo" | "live", provider: "paymob" | "mpgs" }
 let payCache = null;
@@ -39,14 +45,21 @@ async function paySettings() {
   if (fixedMode && fixedMode !== "live") return settled(fixedMode, null); // the gateway does not matter
   if (payCache && Date.now() - payCache.at < 60e3) return settled(fixedMode || payCache.mode, payCache.provider);
   try {
-    const s = pay.read(await readFile("public/js/layout.js"));
+    const s = await readSwitch();
     payCache = { mode: s.mode, provider: s.provider, at: Date.now() };
     return settled(fixedMode || s.mode, s.provider);
   } catch (e) {
     if (payCache) return settled(fixedMode || payCache.mode, payCache.provider); // GitHub hiccup: keep the last known switch
-    if (fixedMode) return settled(fixedMode, null); // PAY_MODE=live without GitHub: the default gateway (Banque Misr)
+    if (fixedMode) return settled(fixedMode, null); // PAY_MODE=live and neither source answers: the default gateway (Banque Misr)
     throw e;
   }
+}
+// GitHub first (a console change counts at once), the deployed file when GitHub is not set up or does not answer
+async function readSwitch() {
+  if (githubReady()) {
+    try { return pay.read(await within(5000, readFile("public/js/layout.js"))); } catch { /* the deployed file below */ }
+  }
+  return pay.readDeployed();
 }
 // Never wait long on GitHub for a label
 const within = (ms, p) => Promise.race([p, new Promise((_, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); if (t.unref) t.unref(); })]);
@@ -70,9 +83,14 @@ app.http("checkout", {
     let ps;
     try { ps = await paySettings(); } catch (e) {
       ctx.error("checkout: payMode unknown", e.message);
-      return { status: 503, jsonBody: { message: "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS } };
+      return unavailable(503, "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS);
     }
-    if (ps.mode !== "live") return { status: 403, jsonBody: { message: "الدفع بالبطاقة مش مفعّل دلوقتي. " + OTHER_WAYS } };
+    if (ps.mode !== "live") return unavailable(403, "الدفع بالبطاقة مش مفعّل دلوقتي. " + OTHER_WAYS);
+    // the chosen gateway cannot start a payment (settings missing, Paymob test keys): before the limits, nothing to count
+    if (!pay.ready(ps.provider)) {
+      ctx.error(ps.provider === "paymob" ? "checkout: Paymob not ready:" : "checkout: Banque Misr settings missing:", pay.missingFor(ps.provider).join(", "));
+      return unavailable(503, "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS);
+    }
 
     let b;
     try { b = await req.json(); } catch { return bad("بيانات غير صحيحة"); }
@@ -105,7 +123,7 @@ app.http("checkout", {
     if (ps.provider === "paymob") return paymobCheckout({ orderId, amount, purpose, name, email, phone, origin }, ctx);
     if (!pay.ready("mpgs")) {
       ctx.error("checkout: Banque Misr settings missing:", pay.missingFor("mpgs").join(", "));
-      return { status: 503, jsonBody: { message: "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS } };
+      return unavailable(503, "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS);
     }
 
     const c = cfg();
@@ -154,12 +172,23 @@ app.http("checkout", {
   },
 });
 
+app.http("checkoutStatus", {
+  methods: ["GET"], authLevel: "anonymous", route: "checkout/status",
+  handler: async (req, ctx) => {
+    const out = (body) => ({ status: 200, headers: { "Cache-Control": "no-store" }, jsonBody: body });
+    let ps;
+    try { ps = await paySettings(); } catch (e) { ctx.warn("checkout status: payMode unknown", e.message); return out({ mode: null, ready: false }); }
+    const missing = ps.mode === "live" ? pay.missingFor(ps.provider) : [];
+    return out({ mode: ps.mode, provider: ps.provider, ready: ps.mode === "live" && !missing.length, ...(missing.length ? { missing } : {}) });
+  },
+});
+
 // Paymob: pending order first (when the orders table exists: no payment is started that the callback could not match),
 // then the intention; the donor is sent to Paymob's Unified Checkout with the returned URL (public key + client secret).
 async function paymobCheckout({ orderId, amount, purpose, name, email, phone, origin }, ctx) {
-  if (!paymob.configured()) {
-    ctx.error("checkout: Paymob settings missing:", paymob.missing().join(", "));
-    return { status: 503, jsonBody: { message: "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS } };
+  if (!paymob.ready()) {
+    ctx.error("checkout: Paymob not ready:", pay.missingFor("paymob").join(", "));
+    return unavailable(503, "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS);
   }
   if (donations.enabled()) {
     try { await donations.addPending({ orderId, amount, purpose, createdAt: new Date().toISOString(), provider: "paymob" }); }

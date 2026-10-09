@@ -134,8 +134,9 @@ app.http("adminMe", {
       const res = json(200, { user: p.userDetails, roles: p.userRoles, via: p.via, github: githubReady(), donations: donations.enabled(),
         password: p.via === "password" ? await passwordSource() : "aad",
         mpgs: !!(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD), merchant: process.env.MPGS_MERCHANT || null,
-        // Paymob: configured or the NAMES of the missing settings (never values), and test/live from the key prefix
-        paymob: paymob.configured(), paymobMissing: paymob.missing(), paymobMode: paymob.mode(),
+        // Paymob: ready to take real donations, or the NAMES of the missing settings + why the keys cannot (never values),
+        // and test/live from the key prefix
+        paymob: paymob.ready(), paymobMissing: pay.missingFor("paymob"), paymobMode: paymob.mode(),
         payModeEnv: String(process.env.PAY_MODE || "").trim().toLowerCase() || null });
       return p.renew ? { ...res, cookies: [await sessionFor(req, p.userDetails, p.auth)] } : res;
     } catch (e) { return fail(e, ctx); }

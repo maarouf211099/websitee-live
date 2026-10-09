@@ -40,6 +40,22 @@ function mode() {
   const k = env("PAYMOB_SECRET_KEY").toLowerCase();
   return /sk_?test/.test(k) ? "test" : /sk_?live/.test(k) ? "live" : null;
 }
+// the same from the Public Key (egy_pk_test_… / egy_pk_live_…)
+function publicMode() {
+  const k = env("PAYMOB_PUBLIC_KEY").toLowerCase();
+  return /pk_?test/.test(k) ? "test" : /pk_?live/.test(k) ? "live" : null;
+}
+// Why these keys cannot take real donations (Arabic, never a value), or null. The site takes real money only: test keys
+// would send donors to a checkout that refuses their real cards, so they start no payment unless PAYMOB_ALLOW_TEST=1.
+// A Public Key from the other mode than the Secret Key makes every Unified Checkout page fail.
+function keyProblem() {
+  const sk = mode(), pk = publicMode();
+  if (sk && pk && sk !== pk) return "PAYMOB_PUBLIC_KEY و PAYMOB_SECRET_KEY من وضعين مختلفين (واحد test وواحد live)";
+  if ((sk === "test" || pk === "test") && env("PAYMOB_ALLOW_TEST") !== "1") return "مفاتيح live بدل المفاتيح التجريبية (test) اللي متحطوطة";
+  return null;
+}
+// configured with keys that can start a payment now
+const ready = () => configured() && !keyProblem();
 
 const err = (status, message) => Object.assign(new Error(message), { status });
 // Text safe for logs and error messages: configured secrets, bearer tokens and client secrets removed, 300 chars
@@ -244,7 +260,7 @@ function isoTime(s) {
 }
 
 module.exports = {
-  cfg, missing, configured, mode, integrationIds, redact, toPiasters, billingData, checkoutUrl, intentionBody, createIntention,
+  cfg, missing, configured, mode, publicMode, keyProblem, ready, integrationIds, redact, toPiasters, billingData, checkoutUrl, intentionBody, createIntention,
   POST_FIELDS, GET_FIELDS, postString, getString, sign, verifyCallback, verifyRedirect,
   authToken, retrieveTransaction, inquire, classify, donorOf, isoTime, REQUIRED, LOOKUP_TIMEOUT, CREATE_TIMEOUT, RETRY_WITHIN,
   _reset: () => { tokenCache = null; },

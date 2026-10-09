@@ -26,6 +26,16 @@
       $("#l-pass-label").textContent = st.setup ? "اختار كلمة سر (8 حروف على الأقل)" : "كلمة السر";
       $("#l-pass").autocomplete = st.setup ? "new-password" : "current-password";
       $("#login-hint").textContent = st.setup ? "أول دخول: اكتب كود التفعيل واختار كلمة السر اللي هتدخل بيها بعد كده." : (st.github ? "ادخل باسم المستخدم وكلمة السر" : "تنبيه: GITHUB_TOKEN مش متظبط في Azure، اللوحة مش هتقدر تحفظ.");
+      // Azure settings the API can see (names only): shows a typo or a setting saved in the wrong place
+      var box = $("#l-settings");
+      if (box && st.settings && !st.github) {
+        var rows = ["GITHUB_TOKEN", "GITHUB_REPO", "GITHUB_BRANCH"].map(function (k) {
+          var v = st.settings[k] || "missing", ok = v === "ok";
+          return "<li" + (ok ? ' class="ok"' : "") + "><code>" + k + "</code> " + (ok ? "موجود ✓" : v === "empty" ? "موجود بس فاضي" : v === "missing" ? "مش موجود" : "اتكتب غلط: " + esc(v.replace(/^found as /, ""))) + "</li>";
+        });
+        box.innerHTML = "<p>اللي الـAPI شايفه من إعدادات Azure دلوقتي:</p><ul>" + rows.join("") + "</ul><p>المكان: Static Web App ← Settings ← Environment variables ← Production ← Add ← Save، واستنى دقيقة وحدّث الصفحة.</p>";
+        box.hidden = false;
+      } else if (box) box.hidden = true;
     }).catch(function () {});
     setTimeout(function () { ($("#l-pass").value ? $("#l-pass") : $("#l-user")).focus(); }, 50);
   }

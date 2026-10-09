@@ -933,7 +933,7 @@ img.media { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover;
   .bank > div { flex: 1 1 60%; min-width: 0; }
   .bank code { font-size: 15.5px; }
 }
-@media (max-width: 400px) { .tabs button { flex-basis: calc(50% - 4px); } }
+@media (max-width: 560px) { .tabs button { flex-basis: calc(50% - 4px); } }
 @media (min-width: 761px) and (max-width: 960px) {
   .layout-side .side-ads { grid-template-columns: 1fr 1fr; gap: 14px; max-width: 640px; margin: 10px auto 0; }
   .tabs { gap: 4px; }
@@ -992,19 +992,25 @@ form#contact .btn { min-width: 160px; }
   .zakat-table td:first-child { font-size: 14.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
   .zakat-table input { min-height: 48px; font-size: 18px; }
   .zakat-group { margin-bottom: 18px; }
-  .zakat-result {
-    order: -1; position: sticky; top: 58px; z-index: 20; padding: 12px 14px 12px; border-radius: 16px;
-    display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 12px; row-gap: 6px;
-  }
-  .zakat-result > div:first-child { font-size: 12.5px; }
-  .zakat-result .big { font-size: 26px; line-height: 1.2; grid-row: 2; }
-  .zakat-result dl { grid-column: 1 / -1; grid-row: 3; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 6px 0 0; padding-top: 8px; font-size: 12.5px; }
-  .zakat-result dl dt::after { content: ":"; }
-  .zakat-result dl dd { display: inline; margin-inline-start: 4px; font-size: 13px; }
-  .zakat-result dl dt { display: inline; }
-  .zakat-result #z-note { grid-column: 1 / -1; grid-row: 4; font-size: 12px; margin: 0; }
-  .zakat-result .btn-gold { grid-column: 2; grid-row: 1 / 3; width: auto !important; margin: 0 !important; padding: 10px 16px; font-size: 14px; min-height: 44px; }
+  /* phones: the full result card sits in the page after the form (nothing covers the field being typed);
+     the slim .z-bar above the bottom navigation carries the amount while the card is off screen */
+  .zakat-result { position: static; order: 0; padding: 18px 16px 16px; border-radius: 20px; }
+  .zakat-result > div:first-child { font-size: 13.5px; }
+  .zakat-result .big { font-size: 34px; line-height: 1.25; margin-top: 2px; }
+  .zakat-result dl { grid-template-columns: 1fr auto; gap: 8px 12px; margin: 12px 0 10px; font-size: 14px; }
+  .zakat-result dl dd { font-size: 15px; }
+  .zakat-result #z-note { font-size: 13px; margin: 0 0 4px; }
+  .zakat-result .btn-gold { width: 100% !important; margin-top: 10px !important; min-height: 50px; font-size: 16px; }
+  .z-bar { position: fixed; inset-inline: 12px; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 85; display: flex; align-items: center; gap: 10px;
+    padding: 8px 8px 8px 8px; padding-inline-start: 16px; border-radius: 18px; background: var(--teal-dark); color: #fff;
+    box-shadow: 0 16px 34px -14px rgba(0,40,40,.7); opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .2s ease, transform .32s var(--spring, ease); }
+  .z-bar.show { opacity: 1; transform: none; pointer-events: auto; }
+  .z-bar small { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.75); line-height: 1.2; }
+  .z-bar b { display: block; font: 700 21px/1.2 "Titillium Web", "Cairo", sans-serif; color: var(--gold); }
+  .z-bar > span { flex: 1; min-width: 0; }
+  .z-bar .btn { min-height: 44px; padding: 0 16px; font-size: 14.5px; margin: 0; white-space: nowrap; }
 }
+@media (min-width: 761px) { .z-bar { display: none; } }
 
 /* --- 404 page --- */
 .nf { text-align: center; padding: 20px 0 10px; }
@@ -1346,3 +1352,14 @@ body.menu-open .m-bar { z-index: 96; }
   .to-top { transform: translateY(8px) scale(.6); } .to-top.show { transform: none; }
   .fab-donate { transition: none; } .fab-donate.show { transform: none; }
 }
+
+/* donate side: the hotline card is HTML now (the old 282px image was blurry on phones) */
+.side-ads > a.hot-card, .hot-card { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-height: 100%; aspect-ratio: 282 / 239; padding: 18px 18px 16px; border-radius: 18px; overflow: hidden;
+  color: #fff; text-decoration: none; text-align: start; background: radial-gradient(120% 90% at 85% 0%, rgba(254,200,48,.22), transparent 55%), linear-gradient(160deg, #0a8f8f, #005959 70%); box-shadow: 0 16px 32px -18px rgba(0,60,60,.7); isolation: isolate; }
+.side-ads > a.hot-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: url(../img/pattern-white.png) 0 0 / 180px; opacity: .08; }
+.hot-card svg { position: absolute; top: 14px; inset-inline-end: 14px; width: 30px; height: 30px; fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.hot-card .hc-t { font-weight: 700; font-size: 14.5px; line-height: 1.45; max-width: 75%; }
+.hot-card b { font: 700 clamp(34px, 9vw, 46px)/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; color: #fff; direction: ltr; text-align: center; }
+.hot-card .hc-s { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.85); text-align: center; }
+.hot-card:hover { color: #fff; }
+@media (max-width: 760px) { .side-ads > a.hot-card { aspect-ratio: 1 / 1; padding: 14px 14px 12px; } }

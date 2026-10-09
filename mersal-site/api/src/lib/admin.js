@@ -6,24 +6,29 @@
 //   SITE_ROOT      folder of the site inside the repo (default mersal-site)
 //   ADMIN_USER     console username (default "admin")
 //   ADMIN_PASSWORD optional: fixes the password from Azure. Otherwise the password chosen on first login is kept
-//                  as a scrypt hash in public/data/settings.json (first login needs the one-time code in api/setup.json)
-//   ADMIN_SECRET   optional: cookie signing key (defaults to a key derived from GITHUB_TOKEN)
+//                  in public/data/settings.json as a scrypt hash peppered with a secret (useless without it)
+//   ADMIN_SETUP_CODE optional: code for the first login. Default: the last 8 characters of GITHUB_TOKEN, so only
+//                  whoever configured Azure can claim the console (the repository is public: no secret lives in it)
+//   ADMIN_SECRET   optional: cookie signing key and password pepper (defaults to keys derived from GITHUB_TOKEN)
 
 const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
 
 const SITE_ROOT = (process.env.SITE_ROOT || "mersal-site").replace(/^\/+|\/+$/g, "");
 const DEFAULT_USER = "admin", COOKIE = "mersal_admin", TTL = 12 * 3600;
 
-// ---- session cookie: base64url(payload) + "." + HMAC ----
+// ---- secrets: only Azure application settings, never a file in the (public) repository ----
+const env = (k) => String(process.env[k] || "").trim();
+// First-login code: ADMIN_SETUP_CODE, else the last 8 characters of GITHUB_TOKEN ("" = setup not possible yet)
 function setupCode() {
-  try { return JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "setup.json"), "utf8")).code || ""; } catch { return ""; }
+  if (env("ADMIN_SETUP_CODE")) return env("ADMIN_SETUP_CODE");
+  const t = env("GITHUB_TOKEN");
+  return t.length >= 16 ? t.slice(-8) : "";
 }
+const setupHint = () => (env("ADMIN_SETUP_CODE") ? "env-code" : setupCode() ? "token-tail" : "unavailable");
+// ---- session cookie: base64url(payload) + "." + HMAC ----
 function signingKey() {
-  // ADMIN_SECRET, else the GitHub token, else the private setup code (api/setup.json is never served)
-  const seed = process.env.ADMIN_SECRET || process.env.GITHUB_TOKEN || setupCode();
-  if (!seed) { const e = new Error("ADMIN_SECRET أو GITHUB_TOKEN لازم يتظبط في إعدادات Azure قبل الدخول"); e.status = 500; throw e; }
+  const seed = env("ADMIN_SECRET") || env("GITHUB_TOKEN") || env("ADMIN_PASSWORD");
+  if (!seed) { const e = new Error("GITHUB_TOKEN لازم يتظبط في إعدادات Azure قبل الدخول"); e.status = 503; throw e; }
   return crypto.createHash("sha256").update("mersal-admin-session:" + seed).digest();
 }
 // Does a public image exist on the deploy branch? (read-only, images only)
@@ -54,29 +59,48 @@ const sessionCookie = (req, token, maxAge) => ({ name: COOKIE, value: token, pat
 // ---- passwords (never stored in clear) ----
 const digest = (t) => crypto.createHash("sha256").update(String(t)).digest();
 const safeEq = (a, b) => crypto.timingSafeEqual(digest(a), digest(b));
-function hashPassword(pass) { const salt = crypto.randomBytes(16); return "scrypt$" + salt.toString("base64url") + "$" + crypto.scryptSync(pass, salt, 32).toString("base64url"); }
+// The stored hash is public (settings.json is in the public repo and served), so it is peppered:
+// "scrypt2$<kid>$<salt>$<HMAC(pepper, scrypt(pass, salt))>". Without the pepper (from ADMIN_SECRET or GITHUB_TOKEN)
+// it cannot be brute-forced offline. <kid> names the pepper: a new token makes the old hash stale -> first login again.
+function pepper() {
+  const seed = env("ADMIN_SECRET") || env("GITHUB_TOKEN");
+  return seed ? crypto.createHash("sha256").update("mersal-admin-pepper:" + seed).digest() : null;
+}
+const kidOf = (pep) => crypto.createHash("sha256").update(pep).update("kid").digest("base64url").slice(0, 10);
+function hashPassword(pass) {
+  const pep = pepper();
+  if (!pep) { const e = new Error("GITHUB_TOKEN لازم يتظبط في إعدادات Azure قبل حفظ كلمة السر"); e.status = 503; throw e; }
+  const salt = crypto.randomBytes(16), k = crypto.scryptSync(pass, salt, 32);
+  return "scrypt2$" + kidOf(pep) + "$" + salt.toString("base64url") + "$" + crypto.createHmac("sha256", pep).update(k).digest("base64url");
+}
+// "ok" | "stale" (other pepper or the old unpeppered format) | "none"
+function hashState(hash) {
+  if (!hash) return "none";
+  const [alg, kid] = String(hash).split("$"), pep = pepper();
+  return alg === "scrypt2" && pep && kid === kidOf(pep) ? "ok" : "stale";
+}
 function checkHash(pass, hash) {
-  const [alg, salt, key] = String(hash || "").split("$");
-  if (alg !== "scrypt" || !salt || !key) return false;
-  const k = crypto.scryptSync(pass, Buffer.from(salt, "base64url"), 32), kk = Buffer.from(key, "base64url");
+  if (hashState(hash) !== "ok") return false;
+  const [, , salt, key] = String(hash).split("$"), pep = pepper();
+  const k = crypto.createHmac("sha256", pep).update(crypto.scryptSync(pass, Buffer.from(salt, "base64url"), 32)).digest(), kk = Buffer.from(key, "base64url");
   return k.length === kk.length && crypto.timingSafeEqual(k, kk);
 }
 async function savedHash() {
   try { return JSON.parse(await readFile("public/data/settings.json")).adminPasswordHash || null; } catch { return null; }
 }
-// "env" = fixed in Azure, "saved" = chosen from the console, "setup" = nothing yet (first login creates it)
+// "env" = fixed in Azure, "saved" = chosen from the console, "setup" = nothing usable yet (first login creates it)
 async function passwordSource() {
-  if (process.env.ADMIN_PASSWORD) return "env";
-  return (await savedHash()) ? "saved" : "setup";
+  if (env("ADMIN_PASSWORD")) return "env";
+  return hashState(await savedHash()) === "ok" ? "saved" : "setup";
 }
 const adminUser = () => process.env.ADMIN_USER || DEFAULT_USER;
 async function verifyPassword(user, pass) {
   if (!user || !pass || !safeEq(user, adminUser())) return false;
-  if (process.env.ADMIN_PASSWORD) return safeEq(pass, process.env.ADMIN_PASSWORD);
+  if (env("ADMIN_PASSWORD")) return safeEq(pass, env("ADMIN_PASSWORD"));
   const hash = await savedHash();
   return hash ? checkHash(pass, hash) : false;
 }
-// One-time code for the first login (api/setup.json, deployed with the function app)
+// Code for the first login (see setupCode)
 function setupCodeOk(code) {
   const c = setupCode();
   return !!c && safeEq(String(code || ""), c);
@@ -89,13 +113,10 @@ function throttle(req) { const a = attempts.get(clientIp(req)); if (a && a.until
 function loginFailed(req) { const ip = clientIp(req), a = attempts.get(ip) || { n: 0, until: 0 }; a.n++; if (a.n >= 5) { a.until = Date.now() + 10 * 60e3; a.n = 0; } attempts.set(ip, a); }
 function loginOk(req) { attempts.delete(clientIp(req)); }
 
+// Only the console's own signed cookie counts (no client-supplied identity headers)
 function principal(req) {
   const t = readToken(cookies(req)[COOKIE]);
-  if (t) return { userDetails: t.u, userRoles: ["admin"], via: "password" };
-  // Static Web Apps built-in auth still works for anyone invited with the "admin" role
-  const h = req.headers.get("x-ms-client-principal");
-  if (!h) return null;
-  try { const p = JSON.parse(Buffer.from(h, "base64").toString("utf8")); return p && (p.userRoles || []).includes("admin") ? { ...p, via: "aad" } : null; } catch { return null; }
+  return t ? { userDetails: t.u, userRoles: ["admin"], via: "password" } : null;
 }
 
 // Returns the principal or throws a 401 error
@@ -178,4 +199,4 @@ const json = (status, body) => ({ status, headers: { "Cache-Control": "no-store"
 const fail = (e, ctx) => { if (ctx && (e.status || 500) >= 500) ctx.error(e); return json(e.status || 500, { message: e.message }); };
 
 module.exports = { principal, requireAdmin, readFile, commitFiles, checkPath, fileExists, json, fail, SITE_ROOT,
-  makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL, githubReady };
+  makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL, githubReady, setupHint, hashState };

@@ -29,17 +29,20 @@ function picture(s, i, opts) {
 }
 
 function card(s, i, n, opts) {
-  const title = s.title || s.alt || "مؤسسة مرسال";
+  const title = s.title || s.alt || "مؤسسة مرسال", button = s.button || "تبرع الآن";
   const copy =
     '<span class="sl-copy">' +
     (s.kicker ? `<span class="sl-kicker">${esc(s.kicker)}</span>` : "") +
-    (i === 0 ? `<h2 class="sl-title">${esc(title)}</h2>` : `<h2 class="sl-title">${esc(title)}</h2>`) +
+    `<h2 class="sl-title">${esc(title)}</h2>` +
     (s.text ? `<span class="sl-pill">${esc(s.text)}</span>` : "") +
-    `<span class="sl-btn">${esc(s.button || "تبرع الآن")} ${ARROW}</span>` +
+    `<span class="sl-btn">${esc(button)} ${ARROW}</span>` +
     "</span>";
   const style = s.banner ? ` style="--focus:${esc(s.focus || "50% 50%")}"` : ` style="--bg:url('${esc(s.image || "/img/hero.jpg")}')"`;
-  return `<a class="sl-card${i === 0 ? " on" : ""}${s.banner ? "" : " txt"}" href="${esc(s.link || "/donate.html")}"${style} aria-roledescription="slide" aria-label="${esc(title)} (${i + 1} من ${n})">` +
-    (s.banner ? picture(s, i, opts) : "") + copy + "</a>";
+  // ARIA carousel pattern: the slide is a group (role + roledescription live here, so the link keeps
+  // its link role); the link's name is "button: title" instead of every word of the card plus the alt.
+  return `<div class="sl-card${i === 0 ? " on" : ""}${s.banner ? "" : " txt"}"${style} role="group" aria-roledescription="slide" aria-label="${i + 1} من ${n}">` +
+    `<a class="sl-link" href="${esc(s.link || "/donate.html")}" aria-label="${esc(button)}: ${esc(title)}">` +
+    (s.banner ? picture(s, i, opts) : "") + copy + "</a></div>";
 }
 
 function html(slides, opts) {

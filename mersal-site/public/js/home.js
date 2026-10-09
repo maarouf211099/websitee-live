@@ -4,6 +4,7 @@
   if (/[?&]hcoReturn=1/.test(location.search)) { location.replace("/donate.html" + location.search); return; }
 
   var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var phone = window.matchMedia && matchMedia("(max-width: 760px)").matches;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
 
@@ -30,16 +31,21 @@
 
   // ---------- numbers + ticker (from content.json "numbers") ----------
   var fmtN = new Intl.NumberFormat("en-US");
-  // Odometer: "16,601" -> each digit rolls to its value (transform only, so it stays smooth on phones)
+  // Odometer: "16,601" -> each digit rolls to its value (transform only, so it stays smooth on phones).
+  // --i counts from the units digit, so the roll starts on the right and carries leftwards like a real
+  // odometer (CSS adds the delay, spring overshoot and the short blur). Returns the ms until it settles.
+  var ODO_MS = 1100, ODO_STEP = 80;
   function odometer(el, value, prefix) {
-    var str = fmtN.format(Math.round(value)), digits = 0;
-    el.setAttribute("aria-label", (prefix || "") + str); el.classList.add("odo");
-    if (reduceMotion) { el.textContent = (prefix || "") + str; return; }
+    var str = fmtN.format(Math.round(value)), total = str.replace(/\D/g, "").length, k = 0;
+    // role="img" + aria-label: the rolling digits are presentational and the number is read once, as a whole
+    el.setAttribute("role", "img"); el.setAttribute("aria-label", (prefix || "") + str); el.classList.add("odo");
+    if (reduceMotion) { el.textContent = (prefix || "") + str; return 0; }
     el.innerHTML = (prefix ? '<span class="od-sep">' + esc(prefix) + "</span>" : "") + str.split("").map(function (ch) {
       if (!/\d/.test(ch)) return '<span class="od-sep">' + ch + "</span>";
-      return '<span class="od" aria-hidden="true"><span class="od-roll" style="--d:' + ch + ';--i:' + (digits++) + '"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>';
+      return '<span class="od' + (ch === "0" ? " od-z" : "") + '" style="--d:' + ch + ';--i:' + (total - 1 - k++) + '"><span class="od-roll"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span>';
     }).join("");
     requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("od-go"); }); });
+    return ODO_MS + Math.max(0, total - 1) * ODO_STEP;
   }
   function numbers(list) {
     var tk = document.getElementById("ticker"), grid = document.querySelector(".numbers-grid");
@@ -62,49 +68,115 @@
   function heroRev(slides) { var str = JSON.stringify(slides || []), h = 5381; for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
   function slider(slides) {
     var root = document.getElementById("slider"), track = document.getElementById("slides"), dots = document.getElementById("sl-dots");
+    var nav = document.getElementById("sl-nav") || dots, pauseBtn = document.getElementById("sl-pause");
     if (!root || !track) return;
     var cards = Array.prototype.slice.call(track.children), n = cards.length, dotEls = dots.querySelectorAll("button");
     if (!n) { root.hidden = true; return; }
     if (slides && track.dataset.rev && track.dataset.rev !== heroRev(slides)) console.warn("hero markup is older than content.json - run: node tools/render-home.js");
-    // cards 3+ carry data-src so they do not compete with the first paint
+    // cards 3+ carry data-src so they do not compete with the first paint; woken on the first navigation,
+    // after 2s, or shortly after load - whichever comes first (autoplay reaches card 3 at 13s)
+    var woke = false;
     function wake() {
+      if (woke) return; woke = true;
       track.querySelectorAll("source[data-srcset]").forEach(function (so) { so.srcset = so.dataset.srcset; so.removeAttribute("data-srcset"); });
       track.querySelectorAll("img[data-src]").forEach(function (im) { if (im.dataset.srcset) im.srcset = im.dataset.srcset; im.src = im.dataset.src; im.removeAttribute("data-src"); im.removeAttribute("data-srcset"); });
     }
+    setTimeout(wake, 2000);
     if (document.readyState === "complete") setTimeout(wake, 300); else addEventListener("load", function () { setTimeout(wake, 300); });
-    if (n < 2) { root.querySelectorAll(".sl-arrow").forEach(function (a) { a.hidden = true; }); dots.hidden = true; return; }
-    var cur = 0, timer = null, hold = false, seen = true, rtl = getComputedStyle(track).direction === "rtl", DUR = 6500;
+    if (n < 2) { root.querySelectorAll(".sl-arrow").forEach(function (a) { a.hidden = true; }); nav.hidden = true; return; }
+    var cur = 0, timer = null, hold = false, seen = true, userPaused = false, rtl = getComputedStyle(track).direction === "rtl", DUR = 6500;
+    var jumping = -1, jumpEnd = null, resume = null;
     function setActive(i) {
       if (i === cur) return;
       cards[cur].classList.remove("on"); dotEls[cur].setAttribute("aria-selected", "false");
       cur = i; cards[i].classList.add("on"); dotEls[i].setAttribute("aria-selected", "true");
-      dotEls[i].style.animation = "none"; void dotEls[i].offsetWidth; dotEls[i].style.animation = "";
     }
+    // restart the active dot's fill so it runs in step with the autoplay timer
+    function refill() { var d = dotEls[cur]; d.classList.add("reset"); void d.offsetWidth; d.classList.remove("reset"); }
+    function startEdge(t) { var pad = parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0; return rtl ? t.right - pad : t.left + pad; }
+    function nearest() {
+      var edge = startEdge(track.getBoundingClientRect()), best = 0, bd = Infinity;
+      cards.forEach(function (c, i) { var r = c.getBoundingClientRect(), d = Math.abs((rtl ? r.right : r.left) - edge); if (d < bd) { bd = d; best = i; } });
+      return best;
+    }
+    function landed() { clearTimeout(jumpEnd); jumping = -1; setActive(nearest()); }
     function goTo(i, smooth) {
+      wake();
       i = (i + n) % n;
-      var t = track.getBoundingClientRect(), r = cards[i].getBoundingClientRect(), pad = parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0;
-      var dx = rtl ? r.right - (t.right - pad) : r.left - (t.left + pad);
-      track.scrollBy({ left: dx, behavior: smooth && !reduceMotion ? "smooth" : "auto" });
+      var edge = startEdge(track.getBoundingClientRect()), r = cards[i].getBoundingClientRect();
+      var dx = (rtl ? r.right : r.left) - edge;
+      setActive(i); // dots and copy respond at once; cards passed on the way are ignored until the jump lands
+      if (Math.abs(dx) < 1) return;
+      jumping = i; clearTimeout(jumpEnd); jumpEnd = setTimeout(landed, 1200);
+      // scrollTo with an absolute target: scroll-snap-stop:always truncates scrollBy() to the next card,
+      // which broke every multi-card jump (dots, prev from the first card, the autoplay wrap 4 -> 1)
+      track.scrollTo({ left: track.scrollLeft + dx, behavior: smooth && !reduceMotion ? "smooth" : "auto" });
     }
+    track.addEventListener("scrollend", function () { if (jumping >= 0) landed(); });
     if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.intersectionRatio >= .6) setActive(cards.indexOf(e.target)); }); }, { root: track, threshold: .6 });
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.intersectionRatio >= .6) { var k = cards.indexOf(e.target); if (jumping < 0 || k === jumping) setActive(k); } });
+      }, { root: track, threshold: .6 });
       cards.forEach(function (c) { io.observe(c); });
       new IntersectionObserver(function (e) { seen = e[0].isIntersecting; seen ? play() : stop(); }, { threshold: .3 }).observe(root);
     }
-    function play() { stop(); if (reduceMotion || !seen || document.hidden || document.body.classList.contains("menu-open")) return; root.classList.remove("paused"); timer = setInterval(function () { if (!hold) goTo(cur + 1, true); }, DUR); }
+    function play() {
+      stop();
+      if (userPaused || reduceMotion || !seen || document.hidden || document.body.classList.contains("menu-open")) return;
+      root.classList.remove("paused"); refill();
+      timer = setInterval(function () { if (!hold) goTo(cur + 1, true); }, DUR);
+    }
     function stop() { if (timer) clearInterval(timer); timer = null; root.classList.add("paused"); }
-    var resume;
-    function touched() { hold = true; stop(); clearTimeout(resume); resume = setTimeout(function () { hold = false; play(); }, 8000); }
+    function touched() { wake(); hold = true; jumping = -1; clearTimeout(jumpEnd); stop(); clearTimeout(resume); resume = setTimeout(function () { hold = false; play(); }, 8000); }
     track.addEventListener("pointerdown", touched, { passive: true });
     track.addEventListener("wheel", touched, { passive: true });
     document.addEventListener("visibilitychange", function () { document.hidden ? stop() : play(); });
     new MutationObserver(function () { document.body.classList.contains("menu-open") ? stop() : play(); }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-    dotEls.forEach(function (d, i) { d.addEventListener("click", function () { goTo(i, true); touched(); }); });
-    root.querySelector(".sl-next").addEventListener("click", function () { goTo(cur + 1, true); touched(); });
-    root.querySelector(".sl-prev").addEventListener("click", function () { goTo(cur - 1, true); touched(); });
+    dotEls.forEach(function (d, i) { d.addEventListener("click", function () { touched(); goTo(i, true); }); });
+    root.querySelector(".sl-next").addEventListener("click", function () { touched(); goTo(cur + 1, true); });
+    root.querySelector(".sl-prev").addEventListener("click", function () { touched(); goTo(cur - 1, true); });
     root.addEventListener("mouseenter", stop); root.addEventListener("mouseleave", play);
     root.addEventListener("focusin", stop); root.addEventListener("focusout", play);
+    // keyboard: tabbing to a card's link scrolls that card into its snap position
+    track.addEventListener("focusin", function (e) { var c = e.target.closest(".sl-card"); if (c) goTo(cards.indexOf(c), false); });
     root.addEventListener("keydown", function (e) { if (e.key === "ArrowLeft") goTo(cur + 1, true); if (e.key === "ArrowRight") goTo(cur - 1, true); });
+    // visible pause/play (WCAG 2.2.2); under reduced motion nothing moves, so there is nothing to pause
+    if (pauseBtn) {
+      if (reduceMotion) pauseBtn.hidden = true;
+      pauseBtn.addEventListener("click", function () {
+        userPaused = !userPaused; root.classList.toggle("user-paused", userPaused);
+        pauseBtn.setAttribute("aria-label", userPaused ? "تشغيل التحريك التلقائي" : "إيقاف التحريك التلقائي");
+        userPaused ? stop() : play();
+      });
+    }
+    if (phone && !reduceMotion) {
+      // copy drifts a little slower than the photo while swiping (one rAF per scroll frame; a CSS
+      // view(inline) timeline is mirrored in RTL scrollers in Chromium 141, so it is done here)
+      var copies = cards.map(function (c) { return c.querySelector(".sl-copy"); }), queued = false;
+      var parallax = function () {
+        queued = false;
+        var t = track.getBoundingClientRect(), mid = t.left + t.width / 2;
+        cards.forEach(function (c, i) {
+          var r = c.getBoundingClientRect(); if (!copies[i] || r.right < t.left || r.left > t.right) return;
+          copies[i].style.transform = "translateX(" + ((r.left + r.width / 2 - mid) / r.width * -22).toFixed(1) + "px)";
+        });
+      };
+      track.addEventListener("scroll", function () { if (!queued) { queued = true; requestAnimationFrame(parallax); } }, { passive: true });
+      // "swipe" hint on the first card, once per session, gone after 3s or on the first touch
+      try {
+        if (!sessionStorage.getItem("mersal-swipe-hint")) {
+          sessionStorage.setItem("mersal-swipe-hint", "1");
+          var hint = document.createElement("span");
+          hint.className = "sl-hint"; hint.setAttribute("aria-hidden", "true");
+          hint.innerHTML = 'اسحب <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
+          cards[0].appendChild(hint);
+          var gone = false;
+          var hideHint = function () { if (gone) return; gone = true; hint.classList.add("off"); setTimeout(function () { hint.remove(); }, 450); };
+          setTimeout(hideHint, 3000);
+          track.addEventListener("pointerdown", hideHint, { once: true, passive: true });
+        }
+      } catch (e) {}
+    }
     play();
   }
 
@@ -127,14 +199,20 @@
   }
 
   // Donation campaigns with goals (imported from the old home page)
-  // dots under a horizontal card track (phones)
+  // dots under a horizontal card track (phones); the snapped card also gets .is-snapped (CSS focus effect)
   function trackDots(track, box) {
     if (!box || !("IntersectionObserver" in window)) return;
     var cards = Array.prototype.slice.call(track.children);
     box.innerHTML = cards.map(function (_, i) { return "<i" + (i ? "" : ' class="on"') + "></i>"; }).join("");
     var dots = box.children;
     var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.intersectionRatio >= .6) { var i = cards.indexOf(e.target); Array.prototype.forEach.call(dots, function (d, k) { d.classList.toggle("on", k === i); }); } });
+      es.forEach(function (e) {
+        if (e.intersectionRatio >= .6) {
+          var i = cards.indexOf(e.target);
+          Array.prototype.forEach.call(dots, function (d, k) { d.classList.toggle("on", k === i); });
+          cards.forEach(function (c, k) { c.classList.toggle("is-snapped", k === i); });
+        }
+      });
     }, { root: track, threshold: .6 });
     cards.forEach(function (c) { io.observe(c); });
   }
@@ -159,8 +237,9 @@
     var badge = c.badge || ((UNIT_DEF[unit] || "ال" + unit) + " " + fmt.format(price) + " جنيه");
     var link = c.link || "/donate.html";
     return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (c.maxUnits || 50) + '" style="--p:0">' +
-      '<a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, 380px" : "" }) +
-        (price ? '<span class="camp-badge">' + esc(badge) + "</span>" : "") + (hot ? '<span class="camp-hot">' + hot + "</span>" : "") + "</a>" +
+      // the image link is a duplicate of the title link (hidden from AT); the price badge and the state chip sit beside it so they are read
+      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, 380px" : "" }) + "</a>" +
+        (price ? '<span class="camp-badge">' + esc(badge) + "</span>" : "") + (hot ? '<span class="camp-hot">' + hot + "</span>" : "") + "</div>" +
       '<div class="body"><h3><a href="' + esc(link) + '">' + esc(c.title) + "</a></h3>" +
         (c.impact ? '<p class="camp-impact">' + esc(c.impact) + "</p>" : "") +
         (st === "fresh" ? '<p class="camp-first">كن أول من يساهم في الحملة</p>' : '<div class="camp-stat"><b class="camp-num">0</b><span>' + esc(unit) + ' اتوفرت</span><span class="camp-pct">0%</span></div>') +
@@ -185,13 +264,14 @@
     if (count) count.textContent = open + (open === 1 ? " حملة" : open === 2 ? " حملتين" : open <= 10 ? " حملات" : " حملة");
     if (!track.dataset.wired) { carouselArrows(track); track.dataset.wired = "1"; }
     trackDots(track, document.getElementById("camp-dots"));
-    // one clock drives the number, the percentage, the bar and its thumb
+    // one clock drives the number, the percentage, the bar and its thumb: the bar and the % pill take
+    // exactly as long as the odometer (units digit first, leftmost digit last), so all three settle together
     function animate(card, delay) {
-      var pct = +card.dataset.pct, raised = +card.dataset.raised, num = card.querySelector(".camp-num"), pc = card.querySelector(".camp-pct"), D = 1600, t0 = null;
+      var pct = +card.dataset.pct, raised = +card.dataset.raised, num = card.querySelector(".camp-num"), pc = card.querySelector(".camp-pct"), t0 = null;
       function paint(e) { card.style.setProperty("--p", (pct * e).toFixed(2)); if (pc) pc.textContent = Math.round(pct * e) + "%"; }
-      if (num) odometer(num, raised);
-      if (reduceMotion || !pct) { paint(1); card.classList.add("filled"); return; }
+      if (reduceMotion || !pct) { if (num) odometer(num, raised); paint(1); card.classList.add("filled"); return; }
       setTimeout(function () {
+        var D = (num ? odometer(num, raised) : 0) || 1500;
         requestAnimationFrame(function step(t) {
           t0 = t0 || t; var k = Math.min(1, (t - t0) / D); paint(1 - Math.pow(1 - k, 4));
           if (k < 1) requestAnimationFrame(step); else card.classList.add("filled");
@@ -203,7 +283,8 @@
       var io = new IntersectionObserver(function (en) { var i = 0; en.forEach(function (e) { if (e.isIntersecting) { animate(e.target, i++ * 120); io.unobserve(e.target); } }); }, { threshold: .35 });
       cards.forEach(function (c) { io.observe(c); });
     } else cards.forEach(function (c) { animate(c, 0); });
-    if (window.mersalReveal) window.mersalReveal(cards);
+    // (no mersalReveal here: the counters are the cards' entrance, and a reveal animation would hold
+    // the opacity that the snapped-card focus effect needs)
   }
   // quantity stepper -> live CTA amount (delegated once; survives re-renders)
   document.addEventListener("click", function (e) {
@@ -227,8 +308,8 @@
     var nums = document.querySelectorAll("[data-count]:not([data-done])");
     nums.forEach(function (n) { n.setAttribute("data-done", "1"); });
     function run(el) {
-      odometer(el, Number(el.dataset.count), el.dataset.prefix || "");
-      setTimeout(function () { el.classList.add("done"); }, reduceMotion ? 0 : 1700);
+      var ms = odometer(el, Number(el.dataset.count), el.dataset.prefix || "");
+      setTimeout(function () { el.classList.add("done"); }, ms ? ms + 100 : 0);
     }
     if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
     var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } }); }, { threshold: .6 });

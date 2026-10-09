@@ -17,10 +17,19 @@ const SITE_ROOT = (process.env.SITE_ROOT || "mersal-site").replace(/^\/+|\/+$/g,
 const DEFAULT_USER = "admin", COOKIE = "mersal_admin", TTL = 12 * 3600;
 
 // ---- session cookie: base64url(payload) + "." + HMAC ----
+function setupCode() {
+  try { return JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "setup.json"), "utf8")).code || ""; } catch { return ""; }
+}
 function signingKey() {
-  const seed = process.env.ADMIN_SECRET || process.env.GITHUB_TOKEN;
-  if (!seed) { const e = new Error("GITHUB_TOKEN (أو ADMIN_SECRET) لازم يتظبط في إعدادات Azure قبل الدخول"); e.status = 500; throw e; }
+  // ADMIN_SECRET, else the GitHub token, else the private setup code (api/setup.json is never served)
+  const seed = process.env.ADMIN_SECRET || process.env.GITHUB_TOKEN || setupCode();
+  if (!seed) { const e = new Error("ADMIN_SECRET أو GITHUB_TOKEN لازم يتظبط في إعدادات Azure قبل الدخول"); e.status = 500; throw e; }
   return crypto.createHash("sha256").update("mersal-admin-session:" + seed).digest();
+}
+// Does a public image exist on the deploy branch? (read-only, images only)
+async function fileExists(relPath) {
+  if (!/^public\/img\/[A-Za-z0-9._\/-]+$/.test(relPath)) return false;
+  try { const { api, repo, branch } = gh(); await api(`/repos/${repo}/contents/${encodeURI(`${SITE_ROOT}/${relPath}`)}?ref=${encodeURIComponent(branch)}`); return true; } catch { return false; }
 }
 const sign = (payload) => crypto.createHmac("sha256", signingKey()).update(payload).digest("base64url");
 function makeToken(user) {
@@ -69,7 +78,8 @@ async function verifyPassword(user, pass) {
 }
 // One-time code for the first login (api/setup.json, deployed with the function app)
 function setupCodeOk(code) {
-  try { const c = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "setup.json"), "utf8")).code; return !!c && safeEq(String(code || ""), c); } catch { return false; }
+  const c = setupCode();
+  return !!c && safeEq(String(code || ""), c);
 }
 
 // ---- brute-force throttle per client (per function instance): 5 wrong tries -> 10 minutes ----
@@ -98,7 +108,9 @@ function requireAdmin(req) {
 // Paths the admin may read/write, relative to the site root
 const ALLOWED = [
   /^public\/index\.html$/,
-  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings)\.json$/,
+  /^public\/(about|contact|afia|zakat|donate|albums|volunteer|help)\.html$/,
+  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate)\.json$/,
+  /^api\/data\/requests\/[A-Za-z0-9_-]+\.json$/, /^api\/data\/requests\/index\.json$/,
   /^public\/p\/\d{1,4}\.html$/, /^public\/js\/layout\.js$/,
   /^public\/img\/uploads\/[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif)$/,
 ];
@@ -160,5 +172,5 @@ async function commitFiles(files, message, author) {
 const json = (status, body) => ({ status, headers: { "Cache-Control": "no-store" }, jsonBody: body });
 const fail = (e, ctx) => { if (ctx && (e.status || 500) >= 500) ctx.error(e); return json(e.status || 500, { message: e.message }); };
 
-module.exports = { principal, requireAdmin, readFile, commitFiles, checkPath, json, fail, SITE_ROOT,
+module.exports = { principal, requireAdmin, readFile, commitFiles, checkPath, fileExists, json, fail, SITE_ROOT,
   makeToken, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, TTL };

@@ -370,3 +370,24 @@
 .camp-share svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .camp-share:hover, .camp-share:active { color: var(--teal); background: var(--teal-soft); }
 .odo span { font-size: inherit; color: inherit; font-weight: inherit; font-family: inherit; margin: 0; }
+
+/* ===== progress v5: segmented bar, colour follows the amount collected ===== */
+/* colour of the bar follows the amount: coral (0%) -> gold (45%) -> teal (100%), green when complete */
+.home .camp { --t1: clamp(0, calc(var(--p) / 45), 1); --t2: clamp(0, calc((var(--p) - 45) / 55), 1);
+  --bar-c: var(--gold);
+  --bar-c: color-mix(in oklch, color-mix(in oklch, #ff6a3d, #fec830 calc(var(--t1) * 100%)), #009091 calc(var(--t2) * 100%)); }
+.home .camp.is-done { --bar-c: #16a34a; }
+.home .camp .bar.seg { display: flex; gap: 3px; height: 12px; background: none; border-radius: 0; margin: 6px 0 2px; }
+.home .camp .bar.seg i { position: relative; flex: 1; inset: auto; border-radius: 4px; background: #e6f0f0; overflow: hidden; transform: none; will-change: auto;
+  --f: clamp(0, calc((var(--p) - var(--k) * (100 / var(--n))) * var(--n) / 100), 1); }
+.home .camp .bar.seg i::before { content: ""; position: absolute; inset: 0; background: var(--bar-c); transform: scaleX(var(--f)); transform-origin: 100% 50%; }
+.home .camp .bar.seg i::after { content: none; }
+.home .camp .bar.seg em { position: absolute; top: 50%; inset-inline-start: calc(var(--p) * 1%); width: 10px; height: 20px; margin-inline-start: -5px; border-radius: 6px; border: 0; background: var(--bar-c); box-shadow: 0 0 0 3px #fff, 0 0 14px 2px color-mix(in oklab, var(--bar-c) 55%, transparent); transform: translateY(-50%); }
+.home .camp.is-fresh .bar.seg em { display: none; }
+.home .camp.filled .bar.seg em { animation: tipBounce .9s var(--spring) 1; box-shadow: 0 0 0 3px #fff, 0 0 16px 3px color-mix(in oklab, var(--bar-c) 60%, transparent); }
+@keyframes tipBounce { 0% { transform: translateY(-50%) scale(.6); } 60% { transform: translateY(-50%) scale(1.35); } 100% { transform: translateY(-50%) scale(1); } }
+.home .camp .camp-stat .camp-pct { background: color-mix(in oklab, var(--bar-c) 16%, #fff); color: color-mix(in oklab, var(--bar-c) 72%, #000); }
+.home .camp.filled .bar.seg i::before { animation: segPop .35s var(--spring) 1; animation-delay: calc(var(--k) * 18ms); }
+@keyframes segPop { 50% { transform: scaleX(var(--f)) scaleY(1.35); } }
+.home .camp .camp-foot .left b { color: color-mix(in oklab, var(--bar-c) 72%, #000); }
+@media (prefers-reduced-motion: reduce) { .home .camp.filled .bar.seg em, .home .camp.filled .bar.seg i::before { animation: none; } }

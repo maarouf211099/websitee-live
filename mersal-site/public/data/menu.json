@@ -98,6 +98,14 @@
     "href": null,
     "children": [
       {
+        "title": "اتصل بنا",
+        "href": "/contact.html"
+      },
+      {
+        "title": "ألبومات الصور",
+        "href": "/albums.html"
+      },
+      {
         "title": "فروع مرسال",
         "href": "/p/46.html"
       }
@@ -108,12 +116,20 @@
     "href": null,
     "children": [
       {
-        "title": "تطوع مع مرسال",
-        "href": "/p/47.html"
+        "title": "تبرع الآن",
+        "href": "/donate.html"
       },
       {
-        "title": "طرق التبرع لمرسال",
-        "href": "/p/48.html"
+        "title": "حساب الزكاة",
+        "href": "/zakat.html"
+      },
+      {
+        "title": "تطوع معنا",
+        "href": "/volunteer.html"
+      },
+      {
+        "title": "طلب مساعدة",
+        "href": "/help.html"
       }
     ]
   },

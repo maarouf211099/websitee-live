@@ -1,0 +1,119 @@
+/* Public request forms: /volunteer.html (تطوع معنا) and /help.html (طلب مساعدة).
+   Loaded only by those two pages, on top of site.css (.field, .btn, .card, .stepper, .check, .alert). */
+
+/* ---------- layout ---------- */
+.req-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+.req-layout > * { min-width: 0; }
+.req-intro { margin: 0 0 18px; font-size: 16.5px; color: var(--muted); }
+.req-intro b { color: var(--teal-dark); }
+
+/* ---------- form card ---------- */
+.req-form { scroll-margin-top: 90px; }
+.req-form fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.req-form fieldset + fieldset { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+.req-form legend { font-size: 18px; font-weight: 800; color: var(--teal-dark); padding: 0; margin: 0 0 2px; }
+.req-form .sec-hint { margin: 0 0 14px; }
+.req-form .field { margin-bottom: 14px; }
+.req-form .field label { font-size: 15px; }
+.req-form .field label small { font-weight: 400; color: var(--muted); }
+.req-form .field input, .req-form .field select, .req-form .field textarea { min-height: 48px; font-size: 16px; }
+.req-form .field textarea { min-height: 124px; resize: vertical; line-height: 1.6; }
+.req-form .field select {
+  appearance: none; -webkit-appearance: none; padding-inline-end: 40px; cursor: pointer;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23005959' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat left 14px center / 16px;
+}
+.req-form .field input[dir="ltr"] { text-align: start; }
+.req-form .field .count { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.req-form .field .count.over { color: #a12a1d; font-weight: 700; }
+
+/* inline validation */
+.f-err { display: none; margin: 4px 0 0; font-size: 13.5px; font-weight: 700; color: #a12a1d; }
+.f-err::before { content: "!"; display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #a12a1d; color: #fff; font-size: 11px; margin-inline-end: 6px; vertical-align: 1px; }
+.invalid > .f-err { display: block; }
+.field.invalid input, .field.invalid select, .field.invalid textarea { border-color: #d9534f; box-shadow: 0 0 0 3px #fdecea; }
+.field.valid input, .field.valid select, .field.valid textarea { border-color: var(--teal); }
+
+/* checkbox pills (how to help) */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 4px; }
+.pills label { position: relative; cursor: pointer; }
+.pills input { position: absolute; opacity: 0; pointer-events: none; }
+.pills span {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 8px 16px 8px 18px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: #fff; font-weight: 700; color: var(--teal-dark); transition: background .15s, border-color .15s, color .15s;
+}
+.pills span::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); background: #fff; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 800; transition: background .15s, border-color .15s; }
+.pills input:checked + span { background: var(--teal); border-color: var(--teal); color: #fff; }
+.pills input:checked + span::before { content: "✓"; background: var(--gold); border-color: var(--gold); color: var(--teal-ink); }
+.pills input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
+.pills-field.invalid .pills span { border-color: #d9534f; }
+@media (hover: hover) { .pills input:not(:checked) + span:hover { border-color: var(--teal); } }
+
+/* consent */
+.req-form .check { align-items: flex-start; gap: 12px; font-size: 15px; line-height: 1.6; margin: 6px 0 4px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--bg-2); }
+.req-form .check input { width: 22px; height: 22px; flex: none; margin: 3px 0 0; }
+.req-form .check-field.invalid .check { border-color: #d9534f; background: #fdecea; }
+
+/* bot trap: real people never see or fill this */
+.hp { position: absolute; inset-inline-start: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+
+/* submit + privacy */
+.req-submit { margin-top: 20px; }
+.req-submit .btn-block { padding-block: 15px; font-size: 18px; }
+.req-privacy { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--bg-2); color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+.req-privacy svg { width: 20px; height: 20px; flex: none; fill: var(--teal); margin-top: 3px; }
+.req-privacy p { margin: 0; }
+.req-alert { margin: 0 0 16px; }
+.req-alert a { font-weight: 800; text-decoration: underline; color: inherit; }
+
+/* ---------- side column ---------- */
+.req-side { display: grid; gap: 16px; }
+.req-side .card { padding: 20px; }
+.req-side h3 { margin: 0 0 10px; color: var(--teal-dark); font-size: 18px; }
+.req-side p { margin: 0 0 8px; color: var(--muted); font-size: 14.5px; }
+.req-side .check-list { gap: 8px; }
+.req-side .check-list li { font-size: 14.5px; }
+.req-side .btn { margin-top: 10px; }
+.req-call { background-color: var(--teal-dark); background-image: url(../img/pattern-white.png), var(--brand-grad); background-size: 240px 240px, cover; color: #fff; border: 0; }
+.req-call h3, .req-call p { color: #fff; }
+.req-call p { opacity: .88; }
+.req-call a.num { color: var(--gold); font: 800 30px/1.2 "Titillium Web", "Cairo", sans-serif; direction: ltr; display: inline-block; }
+.req-call .btn-ghost { margin-top: 12px; }
+.how-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: hs; }
+.how-steps li { position: relative; padding-inline-start: 42px; counter-increment: hs; font-size: 14.5px; color: var(--muted); line-height: 1.6; }
+.how-steps li::before { content: counter(hs); position: absolute; inset-inline-start: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--gold); color: var(--teal-ink); font-weight: 800; display: grid; place-items: center; }
+.how-steps b { display: block; color: var(--teal-dark); }
+
+/* ---------- success screen ---------- */
+.req-success { text-align: center; padding: 14px 4px 6px; }
+.req-success .ok-ico { width: 88px; height: 88px; border-radius: 50%; background: #e6f6ee; color: #11683f; display: grid; place-items: center; margin: 0 auto 14px; animation: popin .5s cubic-bezier(.2, .7, .2, 1) both; }
+.req-success .ok-ico svg { width: 46px; height: 46px; }
+.req-success h2 { margin: 0 0 6px; color: var(--teal-dark); font-size: 26px; }
+.req-success p { margin: 0 0 10px; color: var(--muted); }
+.ref-box { display: inline-flex; align-items: center; gap: 14px; background: var(--teal-soft); border: 1px dashed var(--teal); border-radius: 14px; padding: 10px 16px; margin: 8px 0 12px; text-align: start; }
+.ref-box small { display: block; font-size: 12px; color: var(--muted); }
+.ref-box code { display: block; font: 800 22px/1.2 "Titillium Web", ui-monospace, Menlo, monospace; letter-spacing: .5px; color: var(--teal-dark); direction: ltr; }
+.ref-box button { font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--teal); background: #fff; color: var(--teal); cursor: pointer; min-height: 40px; white-space: nowrap; }
+.req-success .actions { display: grid; gap: 10px; max-width: 440px; margin: 16px auto 0; }
+.req-success .actions .btn { padding-block: 13px; font-size: 16px; }
+.btn-wa { background: #25d366; color: #fff; }
+.btn-wa:hover { background: #1ebe5b; color: #fff; }
+.btn-wa svg { width: 20px; height: 20px; fill: currentColor; }
+.req-success .again { display: inline-block; margin-top: 16px; font-weight: 700; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 960px) {
+  .req-layout { grid-template-columns: minmax(0, 1fr); }
+  .req-side { grid-template-columns: 1fr 1fr; }
+  .req-side .req-call { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .req-side { grid-template-columns: 1fr; }
+  .req-form { padding: 16px 14px; border-radius: 16px; }
+  .req-form legend { font-size: 17px; }
+  .req-form fieldset + fieldset { margin-top: 18px; padding-top: 18px; }
+  .pills span { padding: 8px 14px 8px 16px; }
+  .ref-box { width: 100%; justify-content: space-between; }
+  .req-success .actions { max-width: none; }
+  .req-intro { font-size: 15.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .req-success .ok-ico { animation: none; } }

@@ -202,13 +202,20 @@
   .home .slider { padding: 12px 0 38px; }
   .sl-track { gap: 10px; padding-inline: 16px; scroll-padding-inline: 16px; }
   .sl-track::after { content: ""; flex: 0 0 18px; } /* 18px + 10px gap = the 28px peek: lets the last card reach its start snap */
-  .sl-card { flex-basis: calc(100% - 28px); aspect-ratio: 4 / 5; max-height: min(56svh, 460px); border-radius: 24px; isolation: isolate; box-shadow: 0 24px 50px -24px rgba(0,0,0,.55); transition: scale .18s var(--spring); }
+  .sl-card { flex-basis: calc(100% - 28px); aspect-ratio: 4 / 5.4; max-height: min(58svh, 470px); border-radius: 24px; isolation: isolate; box-shadow: 0 24px 50px -24px rgba(0,0,0,.55); transition: scale .18s var(--spring); background-color: var(--teal-dark); }
   .sl-card:active { scale: .985; }
-  .sl-card picture, .sl-card img { position: absolute; inset: 0; }
-  /* scrim starts where the copy starts (~50%) so the kicker and title read on any photo */
-  .sl-card::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(0,40,40,.18) 0, rgba(0,40,40,0) 20%, rgba(0,40,40,.15) 38%, rgba(0,48,48,.72) 58%, rgba(0,56,56,.92) 100%); }
-  .sl-copy { position: absolute; inset-inline: 0; bottom: 0; z-index: 2; padding: 0 18px 18px; transition: opacity .3s; will-change: transform; }
+  /* photo on top, copy on a teal panel below. The photo keeps a near-native shape (the banners' photo half is
+     only 883px wide) so it is scaled ~1.3x on a 3x phone instead of ~2.5x: stretching it over the whole
+     portrait card is what made it look blurry. */
+  .sl-link { display: flex; flex-direction: column; }
+  .sl-card picture { position: relative; flex: 1 1 auto; min-height: 0; }
+  .sl-card img { position: absolute; inset: 0; }
+  .sl-card picture::after { content: ""; position: absolute; inset: auto 0 -1px; height: 56px; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(0,56,56,0), rgba(0,56,56,.55) 55%, var(--teal-dark)); }
+  .sl-copy { position: relative; z-index: 2; flex: 0 0 auto; gap: 7px; padding: 2px 18px 18px; transition: opacity .3s; will-change: transform; }
   .sl-card:not(.on) .sl-copy { opacity: 0; }
+  .sl-title { font-size: clamp(22px, 6.2vw, 28px); text-shadow: none; max-width: 15ch; }
+  .sl-kicker { background: rgba(254,200,48,.14); }
+  .sl-btn { height: 44px; }
   .sl-nav { margin-top: 7px; gap: 2px; }
   .sl-dots { gap: 0; }
   .sl-dots button { width: 24px; }
@@ -233,14 +240,12 @@
 @media (min-width: 1300px) { .sl-prev { right: max(16px, calc(50% - 722px)); } .sl-next { left: max(16px, calc(50% - 722px)); } }
 @media (hover: hover) and (min-width: 761px) { .sl-card img { transition: scale .6s ease; } .sl-card:hover img { scale: 1.015; } }
 @media (prefers-reduced-motion: no-preference) {
-  @media (max-width: 760px) { .sl-card.on img { animation: kb 7s ease-out both; } }
   .sl-card.on .sl-copy > * { animation: rise .7s var(--spring) both; }
   .sl-card.on .sl-copy > :nth-child(2) { animation-delay: .06s; }
   .sl-card.on .sl-copy > :nth-child(3) { animation-delay: .12s; }
   .sl-card.on .sl-copy > :nth-child(4) { animation-delay: .18s; }
   @supports (animation-timeline: scroll()) { .home .sl-track { animation: heroDrift linear both; animation-timeline: scroll(root); animation-range: 0 700px; } }
 }
-@keyframes kb { from { scale: 1.06; } to { scale: 1; } }
 @keyframes heroDrift { to { transform: translateY(60px); } }
 @media (prefers-reduced-motion: reduce) {
   .sl-card img, .sl-copy > *, .sl-track, .sl-dots button::after, .sl-hint, .sl-hint svg { animation: none !important; }
@@ -391,3 +396,7 @@
 @keyframes segPop { 50% { transform: scaleX(var(--f)) scaleY(1.35); } }
 .home .camp .camp-foot .left b { color: color-mix(in oklab, var(--bar-c) 72%, #000); }
 @media (prefers-reduced-motion: reduce) { .home .camp.filled .bar.seg em, .home .camp.filled .bar.seg i::before { animation: none; } }
+
+/* card pictures that are not photos (logos, square posters) are shown whole, never cropped */
+.card .media-box { overflow: hidden; background: var(--teal-soft); }
+.card img.media.fit { object-fit: contain; padding: 14px; background: linear-gradient(135deg, #e4f3f3, #f4f8f8); }

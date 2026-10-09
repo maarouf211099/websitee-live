@@ -190,15 +190,27 @@
         bar = '<div class="progress" aria-label="' + pct + '%"><i style="width:' + pct + '%"></i></div>' +
           '<div class="meta-row"><span>تم جمع ' + fmt.format(c.raised || 0) + ' جنيه</span><span>الهدف ' + fmt.format(c.goal) + "</span></div>";
       }
-      return '<article class="card"><div style="overflow:hidden">' + window.mersalPic(c.imageSm || c.image, { alt: c.title, cls: "media", w: 600, h: 375 }) + "</div>" +
+      return '<article class="card"><div class="media-box">' + window.mersalPic(c.imageSm || c.image, { alt: c.title, cls: "media", w: 600, h: 375 }) + "</div>" +
         '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(c.text) + "</p>" + bar +
         '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + (c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
     }).join("");
     carouselArrows(track);
+    fitMedia(track);
     if (window.mersalReveal) window.mersalReveal(track.children);
   }
 
   // Donation campaigns with goals (imported from the old home page)
+  // Card pictures: photos fill the 16:10 box; logos, square and portrait pictures (or SVGs) are shown whole on a soft background
+  function fitMedia(root) {
+    root.querySelectorAll("img.media").forEach(function (im) {
+      function judge() {
+        if (!im.naturalWidth) return;
+        var r = im.naturalWidth / im.naturalHeight, svg = /\.svg(\?|$)/i.test(im.currentSrc || im.src);
+        if (svg || r < 1.25 || r > 2.2) im.classList.add("fit");
+      }
+      if (im.complete) judge(); else im.addEventListener("load", judge, { once: true });
+    });
+  }
   // dots under a horizontal card track (phones); the snapped card also gets .is-snapped (CSS focus effect)
   function trackDots(track, box) {
     if (!box || !("IntersectionObserver" in window)) return;

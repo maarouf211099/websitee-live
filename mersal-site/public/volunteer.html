@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#005959">
+<link rel="apple-touch-icon" href="/img/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/forms.css">
+<meta property="og:site_name" content="مؤسسة مرسال">
+<meta property="og:title" content="تطوع معنا | مؤسسة مرسال">
+<meta property="og:description" content="انضم لمتطوعي مرسال: في المستشفى، القوافل، التصميم والسوشيال ميديا أو جمع التبرعات. سجّل بياناتك وهنتواصل معاك.">
+<meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
+<title>تطوع معنا | مؤسسة مرسال</title>
+<meta name="description" content="انضم لمتطوعي مرسال: في المستشفى، القوافل، التصميم والسوشيال ميديا أو جمع التبرعات. سجّل بياناتك وهنتواصل معاك.">
+</head>
+<body>
+<div id="site-header"></div>
+
+<div class="page-head has-photo"><picture><source type="image/webp" srcset="/img/hero.webp"><img class="ph-bg" src="/img/hero.jpg" alt="" fetchpriority="high" width="1600" height="429"></picture><div class="wrap">
+  <span class="chip">ساعد مرسال</span>
+  <h1>تطوع معنا</h1>
+  <p>وقتك ومهاراتك ممكن يغيّروا حياة مريض. سجّل بياناتك وفريق المتطوعين هيتواصل معاك.</p>
+</div></div>
+
+<main>
+  <section>
+    <div class="wrap req-layout">
+      <div>
+        <p class="req-intro"><b>دقيقتين وبس.</b> اكتب بياناتك واختار إزاي تحب تساعد، وهنتواصل معاك على الموبايل اللي هتكتبه لتحديد أقرب تدريب أو نشاط يناسبك.</p>
+        <div id="form-alert" class="req-alert" hidden aria-live="polite"></div>
+
+        <form id="req-form" class="stepper req-form" data-form="volunteer" novalidate>
+          <fieldset>
+            <legend>بياناتك</legend>
+            <p class="hint sec-hint">كل الخانات مطلوبة إلا اللي مكتوب جنبها (اختياري).</p>
+            <div class="field" data-field="name">
+              <label for="f-name">الاسم بالكامل</label>
+              <input id="f-name" name="name" autocomplete="name" maxlength="80" required>
+              <p class="f-err"></p>
+            </div>
+            <div class="row-2">
+              <div class="field" data-field="phone">
+                <label for="f-phone">رقم الموبايل</label>
+                <input id="f-phone" name="phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" maxlength="20" placeholder="01xxxxxxxxx" required>
+                <p class="f-err"></p>
+              </div>
+              <div class="field" data-field="age">
+                <label for="f-age">السن</label>
+                <input id="f-age" name="age" type="number" inputmode="numeric" min="16" max="80" dir="ltr" required>
+                <p class="f-err"></p>
+              </div>
+            </div>
+            <div class="field" data-field="email">
+              <label for="f-email">البريد الإلكتروني <small>(اختياري)</small></label>
+              <input id="f-email" name="email" type="email" inputmode="email" dir="ltr" autocomplete="email" maxlength="120">
+              <p class="f-err"></p>
+            </div>
+            <div class="field" data-field="city">
+              <label for="f-city">المدينة / المنطقة</label>
+              <input id="f-city" name="city" autocomplete="address-level2" maxlength="80" placeholder="مثال: المعادي - القاهرة" required>
+              <p class="f-err"></p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>إزاي تحب تساعد؟</legend>
+            <p class="hint sec-hint">اختار كل اللي يناسبك.</p>
+            <div class="field pills-field" data-field="how">
+              <div class="pills" role="group" aria-label="طرق المساعدة">
+                <label><input type="checkbox" name="how" value="hospital"><span>في المستشفى</span></label>
+                <label><input type="checkbox" name="how" value="convoys"><span>القوافل الطبية</span></label>
+                <label><input type="checkbox" name="how" value="design"><span>تصميم / سوشيال ميديا</span></label>
+                <label><input type="checkbox" name="how" value="fundraising"><span>جمع تبرعات</span></label>
+                <label><input type="checkbox" name="how" value="other"><span>أخرى</span></label>
+              </div>
+              <p class="f-err"></p>
+            </div>
+            <div class="field" data-field="howOther" hidden>
+              <label for="f-howother">اكتب إزاي تحب تساعد</label>
+              <input id="f-howother" name="howOther" maxlength="120">
+              <p class="f-err"></p>
+            </div>
+            <div class="field" data-field="availability">
+              <label for="f-avail">الوقت المناسب ليك</label>
+              <select id="f-avail" name="availability" required>
+                <option value="">اختار…</option>
+                <option value="weekdays">أيام الأسبوع</option>
+                <option value="weekends">نهاية الأسبوع</option>
+                <option value="flexible">مرن / حسب الحاجة</option>
+                <option value="online">أونلاين فقط</option>
+              </select>
+              <p class="f-err"></p>
+            </div>
+            <div class="field" data-field="message">
+              <label for="f-msg">كلمنا عن نفسك <small>(اختياري: دراستك، خبراتك، ليه حابب تتطوع)</small></label>
+              <textarea id="f-msg" name="message" rows="4" maxlength="1000"></textarea>
+              <small class="count" data-count="f-msg"></small>
+              <p class="f-err"></p>
+            </div>
+          </fieldset>
+
+          <div class="hp" aria-hidden="true"><label for="f-website">الموقع الإلكتروني</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+
+          <div class="req-submit"><button class="btn btn-gold btn-block" type="submit">إرسال طلب التطوع</button></div>
+          <div class="req-privacy">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7zm4 9.7V19h-2v-2.3a2 2 0 1 1 2 0z"/></svg>
+            <p><b>خصوصيتك:</b> بياناتك بتتخزن بشكل آمن وبيستخدمها فريق مرسال فقط للتواصل معاك بخصوص التطوع، ومش بنشاركها مع أي جهة تانية.</p>
+          </div>
+        </form>
+
+        <section id="form-success" class="stepper req-success" hidden aria-live="polite">
+          <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+          <h2>وصلنا طلبك، شكراً ليك 💚</h2>
+          <p>فريق المتطوعين هيراجع طلبك ويتواصل معاك على الموبايل اللي كتبته.</p>
+          <div class="ref-box"><div><small>رقم الطلب - احتفظ بيه</small><code id="ref"></code></div><button type="button" id="copy-ref">نسخ</button></div>
+          <p>عندك استفسار؟ ابعتلنا رقم الطلب على واتساب أو كلمنا على الخط الساخن:</p>
+          <div class="actions">
+            <a class="btn btn-wa" id="wa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> واتساب</a>
+            <a class="btn btn-teal" href="tel:19340">اتصل بالخط الساخن 19340</a>
+          </div>
+          <a class="again" id="again" href="#req-form">تقديم طلب تاني</a>
+        </section>
+      </div>
+
+      <aside class="req-side">
+        <div class="card">
+          <h3>ليه تتطوع مع مرسال؟</h3>
+          <ul class="check-list">
+            <li>بتتدرب جوه المؤسسة قبل ما تبدأ، وفريق بيسندك طول الوقت.</li>
+            <li>مجالات مختلفة تختار منها: المستشفى، القوافل، التصميم والسوشيال ميديا، جمع التبرعات.</li>
+            <li>وقت مرن يناسب دراستك أو شغلك.</li>
+            <li>أثر حقيقي بتشوفه بعينك مع المرضى وأسرهم.</li>
+          </ul>
+          <a class="btn btn-ghost-teal" href="/p/47.html">اعرف أكتر عن متطوعي مرسال</a>
+        </div>
+        <div class="card req-call">
+          <h3>تحب تتكلم مع حد الأول؟</h3>
+          <p>الخط الساخن بيستقبل استفساراتك عن التطوع.</p>
+          <a class="num" href="tel:19340">19340</a>
+          <a class="btn btn-ghost" href="/contact.html">كل طرق التواصل</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script defer src="/js/layout.js"></script>
+<script defer src="/js/forms.js"></script>
+</body>
+</html>

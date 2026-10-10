@@ -17,6 +17,9 @@
 /* phones: a slimmer gold button keeps the trust line on one line at 360px; its min-width holds "تبرع بـ 1,000 ج", so
    picking an amount never re-flows the title beside it */
 @media (max-width: 760px) { .home .quick-donate .qd-go { padding: 8px 12px; min-width: 8.3em; } }
+/* desktop: the same idea at the 12px 30px padding («تبرع بـ 1,000 ج» measures 160.3px), so the four chips never shift under
+   the pointer when 1,000 is picked */
+@media (min-width: 761px) { .home .quick-donate .qd-go { min-width: 162px; } }
 /* the amount on the gold button pops once when a chip changes it (home.js adds .bump) */
 .home .qd-go.bump b { animation: pop .3s var(--spring); }
 @media (prefers-reduced-motion: reduce) { .home .qd-go.bump b { animation: none; } }
@@ -55,6 +58,9 @@
 @media (min-width: 761px) {
   .ts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
   .ts-ic { width: 36px; height: 36px; }
+  /* the three links are wide here: bigger logos keep the MegaKheir wordmark and the InstaPay mark readable (44px still holds) */
+  .ts-ways img { height: 28px; max-width: 84px; }
+  .ts-ways img.ts-ip { height: 40px; max-width: 40px; margin-block: -6px; }
 }
 
 /* ---------- section titles, split layout ---------- */
@@ -262,10 +268,11 @@
 }
 /* short phones (iPhone SE size): a lower cap keeps the quick-donate card above the fold */
 @media (max-width: 760px) and (max-height: 620px) { .sl-card { max-height: 50vh; max-height: 50svh; } }
-/* 621-780px tall phones (360x740): the hero card gives up just enough height that the quick-donate card, its impact line
+/* 706-780px tall phones (360x740): the hero card gives up just enough height that the quick-donate card, its impact line
    included, clears the bottom bar and its raised donate circle on the first screen (353px = the rest of that first screen:
-   header, slider padding and dots, the card and the bar). Never below the 50% the shortest phones get. */
-@media (max-width: 760px) and (min-height: 621px) and (max-height: 780px) { .sl-card { max-height: max(50vh, calc(100vh - 353px)); max-height: max(50svh, calc(100svh - 353px)); } }
+   header, slider padding and dots, the card and the bar). Below 706px tall, 50% would be the larger value, so the cap would
+   only shrink the photo without clearing the bar: those phones (390x664, 375x667, 360x640) keep min(60svh, 500px). */
+@media (max-width: 760px) and (min-height: 706px) and (max-height: 780px) { .sl-card { max-height: max(50vh, calc(100vh - 353px)); max-height: max(50svh, calc(100svh - 353px)); } }
 @media (min-width: 761px) {
   .home .slider { padding: 18px 0 54px; }
   .sl-track { max-width: 1400px; margin: 0 auto; border-radius: var(--r-xl); box-shadow: 0 30px 60px -20px rgba(0,0,0,.45); }

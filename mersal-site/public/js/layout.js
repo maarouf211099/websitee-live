@@ -475,7 +475,7 @@
   menuCta();
   new MutationObserver(menuCta).observe(nav, { childList: true });
 
-  // Extras: js/extras.js + css/extras.css (announcement bar under the header, WhatsApp button, "بتتبرع من خلال" strip).
+  // Extras: js/extras.js + css/extras.css (announcement bar under the header, WhatsApp button, "اتبرع من بنكك أو محفظتك" strip).
   // A page that showed the bar last time gets its room back before the first paint (extras.js keeps its height), so nothing jumps.
   (function () {
     var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "/css/extras.css"; document.head.appendChild(css);

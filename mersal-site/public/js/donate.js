@@ -56,7 +56,7 @@
   // 01xxxxxxxxx from an Egyptian mobile typed any usual way (+20 / 0020 / Arabic digits), else null (the API's rule)
   function egyptMobile(p) {
     var d = asciiDigits(p).replace(/[^\d+]/g, "").replace(/^\+/, "").replace(/^00/, "");
-    if (/^20\d{10}$/.test(d)) d = "0" + d.slice(2); else if (/^1[0125]\d{8}$/.test(d)) d = "0" + d;
+    if (/^200?1[0125]\d{8}$/.test(d)) d = "0" + d.replace(/^200?/, ""); else if (/^1[0125]\d{8}$/.test(d)) d = "0" + d;
     return /^01[0125]\d{8}$/.test(d) ? d : null;
   }
 
@@ -263,6 +263,7 @@
   // place): go back to step 1, so the review, the pay button and the sticky strip never show an older amount than
   // the one that is sent to the bank.
   function changedLater() {
+    if (sheet) return; // the app's Paymob sheet is open (the page behind is inert): its order stands
     if (gw && !gw.hidden) { payRun++; gw.hidden = true; btn.disabled = false; } // a pending redirect to the bank is dropped
     if (cur > 1) go(1);
   }
@@ -427,94 +428,125 @@
 
   // ---------- Paymob through the Mersal app (payProvider "app") ----------
   // Its checkout opens in a sheet inside this page (Paymob then returns to the app's own page, not to this site), and the
-  // app's record is asked every 4 s (/api/verify?gw=app) until it says paid or failed. Closing the sheet asks once more
-  // with cancelled=1, so a payment that went through at the last second still shows as paid.
-  var APP_DONE = /^(FAILED|REFUNDED|CANCELLED|CANCELED|EXPIRED|DECLINED|VOIDED)$/, APP_POLL = 4000, APP_MAX = 30 * 60e3;
-  var sheet = null, pollT = null;
+  // app's record is asked every 4 s (/api/verify?gw=app) until it says paid or failed (every 30 s after half an hour, up
+  // to 3 hours). Closing the sheet (✕, Escape, or the phone's Back) asks once more with cancelled=1, so a payment that
+  // went through at the last second still shows as paid. While it is open the page behind is inert (focus stays in the
+  // dialog); focus comes back to the pay button or the result.
+  var APP_DONE = /^(FAILED|REFUNDED|CANCELLED|CANCELED|EXPIRED|DECLINED|VOIDED)$/, APP_POLL = 4000, APP_SLOW = 30000, APP_SLOW_AFTER = 30 * 60e3, APP_MAX = 3 * 3600e3;
+  var sheet = null, pollT = null, inerted = [], backPending = false, afterBack = [];
+  if (!result.hasAttribute("aria-live")) { result.setAttribute("role", "status"); result.setAttribute("aria-live", "polite"); }
   function askApp(orderId, cancelled) {
     return fetch("/api/verify?gw=app&orderId=" + encodeURIComponent(orderId) + (cancelled ? "&cancelled=1" : ""), { cache: "no-store" })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (o) { if (!r.ok) throw o; return o; }); });
   }
-  function stopPoll() { if (pollT) { clearInterval(pollT); pollT = null; } }
+  // the saved order is dropped only when it is still this one (another tab or a newer payment may own it now)
+  function forget(orderId) {
+    try { var c = JSON.parse(localStorage.getItem(KEY) || "null"); if (c && c.orderId === orderId) localStorage.removeItem(KEY); } catch (x) {}
+  }
+  function stopPoll() { if (pollT) { clearTimeout(pollT); pollT = null; } }
   function closeSheet() {
     stopPoll();
     if (sheet) { sheet.remove(); sheet = null; }
+    inerted.forEach(function (el) { el.inert = false; el.removeAttribute("aria-hidden"); }); inerted = [];
     document.documentElement.classList.remove("pm-open");
+    try { if (history.state && history.state.overlay === "paymob") { backPending = true; history.back(); } } catch (x) {} // its Back entry
+  }
+  // the phone's Back closes the sheet like ✕ (one history entry, as the menu and search do in layout.js)
+  addEventListener("popstate", function () {
+    if (backPending) { backPending = false; var q = afterBack; afterBack = []; setTimeout(function () { q.forEach(function (f) { f(); }); }, 0); return; }
+    if (sheet && !(history.state && history.state.overlay === "paymob")) sheet.dispatchEvent(new Event("pm-back"));
+  });
+  // focus after the sheet's own history step is done (the browser drops focus while it goes back)
+  function focusLater(el) {
+    if (!el) return;
+    var done = false, run = function () { if (done) return; done = true; try { el.focus({ preventScroll: true }); } catch (x) {} };
+    if (backPending) { afterBack.push(run); setTimeout(run, 700); } else run();
   }
   function openEmbedded(d, run) {
+    var rec = { orderId: d.orderId, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim() };
     remember(d, "app");
-    closeSheet();
+    if (sheet) closeSheet();
     sheet = document.createElement("div");
     sheet.className = "pm-sheet";
     sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true"); sheet.setAttribute("aria-label", "الدفع الآمن عبر Paymob");
-    sheet.innerHTML = '<div class="pm-box"><div class="pm-head"><span class="pm-title">🔒 Paymob · <b dir="ltr">' + fmt.format(Number(amount.value) || 0) + "</b> جنيه</span>" +
+    sheet.innerHTML = '<div class="pm-box"><div class="pm-head"><span class="pm-title">🔒 Paymob · <b dir="ltr">' + fmt.format(rec.amount) + "</b> جنيه</span>" +
       '<button type="button" class="pm-close" aria-label="إقفل صفحة الدفع">✕</button></div>' +
       '<p class="pm-note" role="status">بعد ما تدفع هنأكد تبرعك هنا تلقائياً، متقفلش الصفحة.</p>' +
       '<iframe class="pm-frame" title="صفحة الدفع Paymob" allow="payment *"></iframe></div>';
     sheet.querySelector("iframe").src = d.checkoutUrl;
+    Array.prototype.forEach.call(document.body.children, function (el) {
+      if (!el.inert && el.tagName !== "SCRIPT") { el.inert = true; el.setAttribute("aria-hidden", "true"); inerted.push(el); }
+    });
     document.body.appendChild(sheet);
     document.documentElement.classList.add("pm-open");
-    var x = sheet.querySelector(".pm-close");
-    x.addEventListener("click", function () { userClosed(d.orderId, run); });
-    sheet.addEventListener("keydown", function (e) { if (e.key === "Escape") userClosed(d.orderId, run); });
+    try { if (history.state && history.state.overlay) history.replaceState({ overlay: "paymob" }, ""); else history.pushState({ overlay: "paymob" }, ""); } catch (x) {}
+    var x = sheet.querySelector(".pm-close"), close = function () { userClosed(rec, run); };
+    x.addEventListener("click", close);
+    sheet.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    sheet.addEventListener("pm-back", close);
     x.focus();
     document.getElementById("gw-title").textContent = "مستنيين تأكيد الدفع…";
-    var started = Date.now(), busy = false;
-    pollT = setInterval(function () {
-      if (run !== payRun || !sheet) return stopPoll();
-      if (Date.now() - started > APP_MAX) return stopPoll(); // the close button still asks once more
-      if (busy) return;
-      busy = true;
-      askApp(d.orderId).then(function (o) { if (run === payRun && sheet) appSettled(o, false); })
-        .catch(function () { /* keep asking */ }).then(function () { busy = false; });
-    }, APP_POLL);
+    var started = Date.now(), note = sheet.querySelector(".pm-note");
+    (function poll() {
+      var age = Date.now() - started;
+      if (age > APP_MAX) { note.textContent = "لو دفعت ومفيش تأكيد لسه، دوس ✕ وهنتأكد من تبرعك."; return; }
+      if (age > APP_SLOW_AFTER) note.textContent = "لسه مستنيين تأكيد الدفع. لو خلصت الدفع وطوّل التأكيد، دوس ✕ وهنتأكد.";
+      pollT = setTimeout(function () {
+        if (run !== payRun || !sheet) return;
+        askApp(rec.orderId).then(function (o) { if (run === payRun && sheet) appSettled(o, false, rec); })
+          .catch(function () { /* keep asking */ }).then(function () { if (run === payRun && sheet) poll(); });
+      }, age > APP_SLOW_AFTER ? APP_SLOW : APP_POLL);
+    })();
   }
   // paid -> thanks screen; failed -> back to step 3 with nothing charged; still open -> keep waiting (or, after a close,
   // say so: the app records a late payment by itself)
-  function appSettled(o, closed) {
-    var saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (x) {}
-    if (o.paid) { closeSheet(); gw.hidden = true; paidScreen(o, saved); return; }
+  function appSettled(o, closed, rec) {
+    if (o.paid) { closeSheet(); gw.hidden = true; paidScreen(o, rec); return; }
     if (APP_DONE.test(o.status || "")) {
-      closeSheet(); try { localStorage.removeItem(KEY); } catch (x) {}
+      closeSheet(); forget(rec.orderId);
       gw.hidden = true; btn.disabled = false; go(3);
       show("err", "لم تكتمل عملية الدفع ومفيش أي مبلغ اتخصم. تقدر تحاول تاني أو تكلمنا على 19340.");
+      focusLater(btn);
       return;
     }
     if (closed) {
       gw.hidden = true; btn.disabled = false; go(3);
       show("info", "اتقفلت صفحة الدفع ومفيش تبرع اتأكد لسه. لو كنت دفعت فعلاً هيتسجل تبرعك تلقائياً، ولو عندك سؤال كلمنا على 19340" +
-        ' برقم العملية: <code dir="ltr">' + esc(o.orderId || saved.orderId || "") + "</code>.");
+        ' برقم العملية: <code dir="ltr">' + esc(rec.orderId) + "</code>.");
+      focusLater(btn);
     }
   }
-  function userClosed(orderId, run) {
+  function userClosed(rec, run) {
     if (!sheet) return;
     closeSheet();
     document.getElementById("gw-title").textContent = "جاري التأكد من عملية الدفع…";
-    askApp(orderId, true).then(function (o) { if (run === payRun) appSettled(o, true); })
-      .catch(function () { if (run === payRun) appSettled({ orderId: orderId, status: "UNKNOWN" }, true); });
+    askApp(rec.orderId, true).then(function (o) { if (run === payRun) appSettled(o, true, rec); })
+      .catch(function () { if (run === payRun) appSettled({ orderId: rec.orderId, status: "UNKNOWN" }, true, rec); });
   }
 
   // The thanks screen for a payment the gateway confirmed (Banque Misr / Paymob return, or the app's record)
   function paidScreen(o, saved) {
     var amt = Number(o.amount) || Number(saved.amount) || 0;
-    try { localStorage.removeItem(KEY); } catch (x) {}
+    forget(o.orderId);
     form.hidden = true;
     recordDonation({ orderId: o.orderId, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
     show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(amt) + " جنيه</b> بنجاح.<br>" +
       'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
       '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
     if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
+    var al = result.querySelector(".alert"); if (al) { al.setAttribute("tabindex", "-1"); focusLater(al); }
   }
 
   // Back on the page (a reload, or the tab was closed) while an app checkout was open: its record is asked once.
-  // Older than a day = left alone and forgotten.
+  // Older than a day = left alone and forgotten. A payment started meanwhile wins (nothing is shown over it).
   if (!RETURNING) (function resumeApp() {
     var pend = null; try { pend = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (x) {}
     if (!pend || pend.gw !== "app" || !pend.orderId) return;
-    if (!(Date.now() - Number(pend.at) < 864e5)) { try { localStorage.removeItem(KEY); } catch (x) {} return; }
+    if (!(Date.now() - Number(pend.at) < 864e5)) { forget(pend.orderId); return; }
     askApp(pend.orderId).then(function (o) {
+      if (payRun) return;
       if (o.paid) { openTab("online"); paidScreen(o, pend); }
-      else if (APP_DONE.test(o.status || "")) { try { localStorage.removeItem(KEY); } catch (x) {} }
+      else if (APP_DONE.test(o.status || "")) forget(pend.orderId);
     }).catch(function () {});
   })();
 

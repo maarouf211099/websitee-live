@@ -45,11 +45,11 @@ const campaignFor = (purpose) => (Object.prototype.hasOwnProperty.call(CAMPAIGNS
 
 // Arabic-Indic / Persian digits -> 0-9
 const asciiDigits = (s) => String(s == null ? "" : s).replace(/[٠-٩]/g, (c) => String(c.charCodeAt(0) - 0x660)).replace(/[۰-۹]/g, (c) => String(c.charCodeAt(0) - 0x6f0));
-// An Egyptian mobile number as 01xxxxxxxxx (+20 / 0020 / 20 prefixes accepted), or null. The app's function takes only these.
+// An Egyptian mobile number as 01xxxxxxxxx (+20 / 0020 / 20 prefixes accepted, with or without the trunk 0), or null. The app's function takes only these.
 function egyptMobile(p) {
   let d = asciiDigits(p).replace(/[^\d+]/g, "");
   d = d.replace(/^\+/, "").replace(/^00/, "");
-  if (/^20\d{10}$/.test(d)) d = "0" + d.slice(2);
+  if (/^200?1[0125]\d{8}$/.test(d)) d = "0" + d.replace(/^200?/, ""); // +20 1…, and +20 01… with the trunk 0 kept
   else if (/^1[0125]\d{8}$/.test(d)) d = "0" + d;
   return /^01[0125]\d{8}$/.test(d) ? d : null;
 }

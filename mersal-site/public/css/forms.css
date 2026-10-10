@@ -238,7 +238,9 @@
 .bk-official { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin: 0 0 16px; border-radius: var(--r-md); background: var(--teal-soft); border-inline-start: 4px solid var(--gold); }
 .bk-official b { display: block; color: var(--teal-ink); font-size: 16px; }
 .bk-official p { margin: 2px 0 0; color: var(--teal-ink); font-size: 14px; line-height: 1.7; }
-.bk-official a { font: 800 15px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding-block: 10px; margin-block: -10px; }
+/* the hotline: 24px line + 10px padding = a 44px tall tap target (2px more each side: 44px wide); the negative margin
+   keeps the line spacing */
+.bk-official a { font: 800 15px/24px "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 10px 2px; margin: -10px -2px; }
 .bk-off-ic { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--teal-text); display: grid; place-items: center; }
 .bk-off-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @media print { .bk-official { background: none; border: 1px solid #000; } }
@@ -246,6 +248,8 @@
 /* ---------- donate.html: the receipt after a confirmed card payment ("تأكيد التبرع", js/donate.js paidScreen) ----------
    The .alert stays its wrapper (gift.js adds the card offer + "ذكّرني كل شهر" under the receipt, inside it). */
 #pay-result .alert.ok:has(.rcpt) { background: none; padding: 0; }
+/* the receipt holds the dua: it appears still (religious text is never animated; site.css slides every .alert in) */
+#pay-result .alert:has(.rcpt) { animation: none; }
 .rcpt { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px 18px 18px; box-shadow: var(--sh-2); color: var(--ink); font-weight: 400; }
 /* a perforated top edge, like a paper slip */
 .rcpt::before { content: ""; position: absolute; inset-inline: 14px; top: -5px; height: 10px; background: radial-gradient(circle, var(--bg) 4px, transparent 4.5px) 0 0 / 14px 10px repeat-x; }
@@ -265,7 +269,7 @@
 .rcpt .copy { flex: none; min-height: 44px; min-width: 104px; padding: 6px 12px; border-radius: 10px; font-weight: 700; }
 .rcpt .copy:not(.done) { background: #fff; color: var(--teal-dark); }
 .rcpt-next { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
-.rcpt-next a { font: 800 16px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+.rcpt-next a { font: 800 16px/24px "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding-block: 10px; margin-block: -10px; }
 .rcpt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .rcpt-actions .btn { min-height: 44px; padding-inline: 20px; }
 #pay-result .rcpt + .gf-after { margin-top: 12px; }
@@ -281,11 +285,16 @@
   .rcpt-actions { flex-direction: column; }
   .rcpt-actions .btn { width: 100%; }
 }
+/* small phones: a standard order number (32 characters) stays on one line, so it is read out whole on 19340. No nowrap:
+   the app's longer references (up to 160 characters) still wrap instead of pushing the page sideways */
+@media (max-width: 400px) { .rcpt-rows dd.rcpt-ref code { font-size: 15px; letter-spacing: 0; } }
+@media (max-width: 359px) { .rcpt-rows dd.rcpt-ref code { font-size: 14px; } }
+.rcpt-hint { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--teal-soft); color: var(--teal-ink); font-size: 14px; font-weight: 700; line-height: 1.6; text-wrap: balance; }
 /* "احفظ التأكيد": only the receipt is printed (these out-rank site.css's "#pay-result { display: none !important }") */
 @media print {
   html.rcpt-print body > :not(main), html.rcpt-print .page-head, html.rcpt-print main > section.alt, html.rcpt-print .tabs,
   html.rcpt-print .tab-panel:not(#online), html.rcpt-print .side-ads, html.rcpt-print #pay-form, html.rcpt-print .rcpt-actions,
-  html.rcpt-print .gf-after { display: none !important; }
+  html.rcpt-print .rcpt-hint, html.rcpt-print .gf-after { display: none !important; }
   html.rcpt-print #online, html.rcpt-print #pay-result { display: block !important; }
   html.rcpt-print #online { border-top: 0; padding-top: 0; }
   html.rcpt-print #pay-result .alert { border: 0; animation: none; outline: 0; box-shadow: none; }

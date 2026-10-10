@@ -104,8 +104,21 @@
   // The donation receipt ("تأكيد التبرع", paidScreen): "احفظ التأكيد" prints only the receipt (css: html.rcpt-print in
   // forms.css), "ابعت الفرحة لصحابك" shares the page (never the amount): the phone's share sheet, else WhatsApp.
   var JOY = "اتبرعت لمرضى مرسال النهارده، وانت كمان تقدر تبعت فرحة #ابعت_فرحة";
+  // In-app browsers (Facebook, Instagram, Messenger, TikTok, any Android WebView) ignore window.print(): there the
+  // button asks for a screenshot instead of doing nothing
+  var NO_PRINT = typeof window.print !== "function" || /; wv\)|FBAN|FBAV|FB_IAB|Instagram|musical_ly|BytedanceWebview|Snapchat/.test(navigator.userAgent);
   document.addEventListener("click", function (e) {
-    if (e.target.closest("[data-print-rcpt]")) {
+    var pr = e.target.closest("[data-print-rcpt]");
+    if (pr) {
+      if (NO_PRINT) {
+        var box = pr.closest(".rcpt"), hint = box && box.querySelector(".rcpt-hint");
+        if (box && !hint) {
+          hint = document.createElement("p"); hint.className = "rcpt-hint"; hint.setAttribute("role", "status");
+          box.appendChild(hint);
+          setTimeout(function () { hint.textContent = "خد سكرين شوت للتأكيد ده واحتفظ برقم العملية"; }, 50);
+        }
+        return;
+      }
       document.documentElement.classList.add("rcpt-print");
       window.print();
       return;

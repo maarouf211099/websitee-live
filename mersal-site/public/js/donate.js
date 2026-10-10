@@ -511,6 +511,8 @@
     s.setAttribute("data-error", "mersalPayError");
     s.setAttribute("data-cancel", "mersalPayCancel");
     s.onload = done;
+    // the bank's page script could not load (network, blocker): say so instead of spinning forever
+    s.onerror = function () { s.remove(); window.mersalPayError({ message: "تعذّر فتح صفحة الدفع الآمنة لبنك مصر. اتأكد من الإنترنت وحاول تاني، أو اتبرع بطريقة تانية من التبويبات اللي فوق." }); };
     document.head.appendChild(s);
   }
   function openMpgs(d) {

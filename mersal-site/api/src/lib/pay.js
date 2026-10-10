@@ -14,8 +14,11 @@ const env = (k) => String(process.env[k] || "").trim();
 const MPGS_REQUIRED = ["MPGS_MERCHANT", "MPGS_API_PASSWORD"];
 
 // Names (never values) of the application settings a gateway still needs (Paymob: + why its keys cannot take real money)
-const missingFor = (p) => (p === "app" ? mersalapp.missing() : p === "paymob" ? paymob.missing().concat(paymob.keyProblem() || [])
-  : p === "mpgs" ? MPGS_REQUIRED.filter((k) => !env(k)) : ["?"]);
+// a missing name that exists under another spelling ("MPGS_Merchant", "MPGS-API-PASSWORD", a trailing space…) says so
+const norm = (n) => String(n).replace(/[\s_-]+/g, "").toLowerCase();
+const nearMiss = (k) => { const n = Object.keys(process.env).find((x) => x !== k && norm(x) === norm(k)); return n ? `${k} (موجود باسم "${n}")` : k; };
+const missingFor = (p) => (p === "app" ? mersalapp.missing() : p === "paymob" ? paymob.missing().map(nearMiss).concat(paymob.keyProblem() || [])
+  : p === "mpgs" ? MPGS_REQUIRED.filter((k) => !env(k)).map(nearMiss) : ["?"]);
 const ready = (p) => missingFor(p).length === 0;
 // No saved choice: Banque Misr (MPGS), the gateway the site used before a gateway could be chosen. Never derived from
 // which settings exist, so adding or removing PAYMOB_* settings never moves live payments; Paymob takes over only once it

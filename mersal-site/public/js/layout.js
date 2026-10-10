@@ -11,7 +11,7 @@
   // this site's own keys) | "mpgs" (Banque Misr Hosted Checkout).
   var SITE = /* mersal:site */ {
     payMode: "live",
-    payProvider: "app",
+    payProvider: "mpgs",
     hotline: "19340",
     phone: "01200002870",
     whatsapp: "",

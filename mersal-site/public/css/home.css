@@ -181,6 +181,15 @@
 .home .hospital-feature .hf-cta .btn { margin: 0; min-height: 46px; }
 .hf-more { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font-weight: 700; font-size: 15px; color: var(--teal-text); }
 .hf-more:hover { text-decoration: underline; }
+/* phones and tablets (the text column is too narrow for three tiles up to 1023px): each share is one 56px row,
+   what it buys at the start, the amount at the end */
+@media (max-width: 1023px) {
+  .hf-shares { grid-template-columns: 1fr; gap: 8px; }
+  .hf-shares a { flex-direction: row; justify-content: flex-start; align-items: center; gap: 8px; min-height: 56px; padding: 8px 14px; border-radius: 14px; }
+  .hf-shares span { order: -2; font-size: 14.5px; }
+  .hf-shares .waqf em { order: -1; align-self: center; margin: 0; }
+  .hf-shares b { margin-inline-start: auto; font-size: 20px; white-space: nowrap; }
+}
 
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
@@ -205,12 +214,6 @@
   .sb-copy .slogan-art img { width: min(200px, 70%); margin-inline: auto; }
   .sb-copy p { margin-inline: auto; }
   .slogan-band .hot-card { width: 100%; }
-  /* each share is one 56px row: what it buys at the start, the amount at the end */
-  .hf-shares { grid-template-columns: 1fr; gap: 8px; }
-  .hf-shares a { flex-direction: row; justify-content: flex-start; align-items: center; gap: 8px; min-height: 56px; padding: 8px 14px; border-radius: 14px; }
-  .hf-shares span { order: -2; font-size: 14.5px; }
-  .hf-shares .waqf em { order: -1; align-self: center; margin: 0; }
-  .hf-shares b { margin-inline-start: auto; font-size: 20px; white-space: nowrap; }
   .hf-cta .btn { flex: 1 1 100%; }
 }
 

@@ -1645,7 +1645,8 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .niyya-chips button[aria-checked="true"] { background: var(--teal-text); color: #fff; border-color: var(--teal-text); }
 .niyya-chips button[data-p="zakat"][aria-checked="true"] { background: var(--gold); color: var(--teal-ink); border-color: var(--gold); }
 .niyya-note { min-height: 1.6em; margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--teal-dark); }
-.niyya-note a { font-weight: 700; color: var(--teal-text); text-decoration: underline; display: inline-block; padding-block: 10px; margin-block: -10px; }
+/* 12px above and below a 21.6px line = a 45.6px tap target; the matching negative margin keeps the note's line height */
+.niyya-note a { font-weight: 700; color: var(--teal-text); text-decoration: underline; display: inline-block; padding-block: 12px; margin-block: -12px; }
 @media (prefers-reduced-motion: no-preference) { .niyya-chips button { transition: background .2s, color .2s, border-color .2s; } }
 /* phones: four chips never fit one row, so they sit two by two at equal widths (a lone chip on a second row looked stray) */
 @media (max-width: 560px) { .niyya-chips { display: grid; grid-template-columns: 1fr 1fr; } }

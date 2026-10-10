@@ -1652,3 +1652,38 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 @media (max-width: 560px) { .niyya-chips { display: grid; grid-template-columns: 1fr 1fr; } }
 /* the success screens' prayer line keeps the .dua ink (forms.css greys every paragraph in them) */
 .req-success .dua { color: var(--teal-ink); margin: 2px 0 12px; }
+
+/* ===== v8 zakat uses + ways to give without a card (zakat.html, project pages) ===== */
+/* zakat result card: the other ways out, each opening its donate tab with zakat preselected (?for=zakat) */
+.z-ways { margin: 10px 0 0; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.88); text-wrap: balance; } /* two even lines, never one link left alone */
+.z-ways a { color: #fff; text-decoration: underline; text-underline-offset: 3px; display: inline-block; min-height: 44px; line-height: 44px; font-weight: 700; }
+.z-ways a:hover { color: var(--gold); }
+.z-ways a:focus-visible { outline: 3px solid var(--gold); outline-offset: 0; border-radius: 4px; }
+/* «زكاتك بتروح فين في مرسال؟»: the page's one verse, then the zakat uses listed in the FAQ (p/51), without its figures */
+.zk-uses { background: var(--sand); padding: 48px 0; }
+.zk-uses h2 { margin: 0 0 6px; text-align: center; font-size: clamp(22px, 4.6vw, 28px); color: var(--teal-ink); }
+.zk-uses .zk-lead { margin: 0 auto; max-width: 60ch; text-align: center; color: var(--muted); font-size: 15px; text-wrap: balance; }
+.zk-cards { list-style: none; margin: 16px auto; padding: 0; max-width: 880px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.zk-cards li { background: #fff; border-radius: 14px; padding: 14px 16px; border-inline-start: 4px solid var(--gold); box-shadow: var(--sh-1); }
+.zk-cards b { display: block; color: var(--teal-ink); font-size: 16px; margin-bottom: 2px; }
+.zk-cards span { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.zk-src { margin: 0; text-align: center; font-size: 14px; color: var(--muted); text-wrap: balance; }
+/* 44px tall links on a 24px line: the padding gives the target, the negative margin keeps the line */
+.zk-src a { display: inline-block; padding-block: 10px; margin-block: -10px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) { .zk-cards { grid-template-columns: 1fr; } .zk-uses { padding: 40px 0; } }
+/* project pages (js/layout.js): the side card's project code also goes on the transfer / wallet / pickup routes */
+.side-ways { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.side-ways p { width: 100%; margin: 0; font: 700 13.5px/1.5 "Cairo", sans-serif; color: var(--teal-dark); }
+.side-ways a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13.5px; font-weight: 700; color: var(--teal-ink); text-decoration: none; }
+.side-ways a:hover { border-color: var(--teal); background: var(--teal-soft); }
+.side-ways a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.side-ways small { width: 100%; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+/* donate step 1: the impact line wraps into two even lines (no emoji left alone on the second one) */
+.impact { text-wrap: balance; }
+/* news.html before anything is published (js/news.js): the "coming soon" line leads to the official pages and the albums */
+.nw-empty.nw-soon { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 560px; margin: 0 auto; padding: 32px 0 8px; font-size: 16px; line-height: 1.8; color: var(--ink); text-wrap: balance; }
+.nw-empty.nw-soon[hidden] { display: none; }
+.nw-soon .nw-soc { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.nw-soon .nw-soc .btn { min-height: 44px; padding: 8px 18px; } /* the three fit one row at 360px */
+.nw-soon .nw-alb { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+@media print { .zk-uses .zk-src, .z-ways { display: none; } }

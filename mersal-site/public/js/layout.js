@@ -187,6 +187,20 @@
   if (!/donate\.html$/.test(location.pathname)) {
     var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname), pid = pm ? (pm[1] === "4" || pm[1] === "5" ? "31" : pm[1]) : ""; // p4/p5 = oncology centre (p31)
     var dHref = "/donate.html" + (pid ? "?for=p" + pid : "") + "#online";
+    // Project pages: the side card's own project code (for=p<id> on its gold button) also goes on the ways to give
+    // without a card, so a transfer, a wallet payment or a home pickup can still be earmarked for this project
+    // (forms.js prefill() selects ?for= in the transfer / pickup form). The generated pages stay untouched.
+    var sideBtn = document.querySelector(".page-side .side-card.donate a.btn-gold"), sideFor = "";
+    try { sideFor = sideBtn ? new URL(sideBtn.href, location.href).searchParams.get("for") || "" : ""; } catch (e) {}
+    if (/^p\d+$/.test(sideFor) && !sideBtn.parentNode.querySelector(".side-ways")) {
+      var wHref = "/donate.html?for=" + sideFor;
+      sideBtn.parentNode.insertAdjacentHTML("beforeend",
+        '<div class="side-ways"><p>مش معاك كارت؟ تبرع لنفس المشروع بـ</p>' +
+          '<a href="' + wHref + '#wallets">إنستاباي أو فوري</a>' +
+          '<a href="' + wHref + '#bank">تحويل بنكي</a>' +
+          '<a href="' + wHref + '#home">مندوب لحد البيت</a>' +
+          "<small>بعد ما تحوّل سجّل تبرعك في الصفحة عشان يتخصص للمشروع ده.</small></div>");
+    }
     // the floating donate button (phones; desktop has the sticky header button) stays off the request/contact forms
     if (!/(help|volunteer|contact)\.html$/.test(location.pathname)) document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>');
     document.body.insertAdjacentHTML("beforeend",

@@ -44,10 +44,20 @@
     var q = new URLSearchParams(location.search), tag = q.get("tag") || "", shown = 0, cur = [];
     var tags = []; items.forEach(function (it) { if (tags.indexOf(it.tag) < 0) tags.push(it.tag); });
     if (tag && tags.indexOf(tag) < 0) tag = "";
-    // nothing published yet: no filter bar, a "coming soon" line instead of an empty grid
+    // nothing published yet: no filter bar, a "coming soon" line instead of an empty grid, then the official pages
+    // (only the https:// ones set in the site details) and the photo albums, so the page still leads somewhere
     if (!items.length) {
       var bar = filters.closest(".nw-bar"); if (bar) bar.hidden = true;
-      empty.textContent = "قريباً أخبار مرسال هنا.";
+      var soc = (window.MERSAL_SITE && window.MERSAL_SITE.social) || {};
+      var links = [["facebook", "فيسبوك"], ["instagram", "إنستجرام"], ["youtube", "يوتيوب"]].filter(function (s) {
+        return /^https:\/\/\S+$/.test(String(soc[s[0]] || "").trim());
+      }).map(function (s) {
+        return '<a class="btn btn-ghost-teal" href="' + esc(String(soc[s[0]]).trim()) + '" target="_blank" rel="noopener">' + esc(s[1]) + "</a>";
+      });
+      empty.classList.add("nw-soon");
+      empty.innerHTML = "<span>" + esc("أخبار مرسال هتنزل هنا قريباً. لحد ما تنزل، تابع آخر أخبارنا على صفحاتنا الرسمية:") + "</span>" +
+        (links.length ? '<span class="nw-soc">' + links.join("") + "</span>" : "") +
+        '<a class="nw-alb" href="/albums.html">' + esc("صور من فعالياتنا ←") + "</a>";
     }
     filters.innerHTML = [["", "الكل"]].concat(tags.map(function (t) { return [t, t]; })).map(function (t) {
       var n = t[0] ? items.filter(function (it) { return it.tag === t[0]; }).length : items.length;

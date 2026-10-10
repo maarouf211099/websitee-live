@@ -257,10 +257,13 @@
   syncChips();
 
   // Purpose list: general/zakat/sadaqa + every project and service imported from the old site
+  var CAMPAIGNS = []; // the home campaigns (content.json), for the #impact line
   Promise.all([
     fetch("/content.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
     fetch("/data/menu.json").then(function (r) { return r.json(); }).catch(function () { return []; })
   ]).then(function (res) {
+    CAMPAIGNS = ((res[0] || {}).campaigns) || [];
+    if (!Array.isArray(CAMPAIGNS)) CAMPAIGNS = [];
     // one option per cause: pages that are aliases of another code (LEGACY, e.g. p4/p5 -> p31) are skipped, and a
     // second page with a title that is already listed becomes an alias of the first one (so ?for= still finds it)
     var groups = {}, seen = {}, titles = {}, alias = {};
@@ -375,13 +378,20 @@
     sync();
   })();
 
-  // What a donation can do (figures from the old site's pages)
+  // What a donation can do (figures from the old site's pages). Between the hospital / monthly-treatment lines and the
+  // generic ones: the same "{n} {unit} في {campaign}" line as the home dock (window.mersalUnit from js/impact.js), over
+  // every open home campaign for a general gift, or over the chosen project's own campaign. Zakat and sadaqa keep the
+  // generic lines, so no campaign is presented as zakat-eligible.
+  function unitLine(a, list) { return window.mersalUnit && list.length ? window.mersalUnit.line(a, list) : ""; }
   function updateImpact() {
-    var a = Number(amount.value) || 0, msg = "";
+    var a = Number(amount.value) || 0, msg = "", l = "", camp = null;
     if (purpose.value === "p30" && a >= 25000) msg = "تبرعك يساوي متر وقف خيري في مستشفى مرسال للأطفال 🏥";
     else if (purpose.value === "p30" && a >= 1000) msg = "تبرعك يساوي " + fmt.format(Math.floor(a / 1000)) + " سهم عام في مستشفى مرسال 🏥";
     else if (purpose.value === "p30" && a >= 500) msg = "تبرعك يساوي سهم أجهزة طبية في مستشفى مرسال 🏥";
     else if (purpose.value === "p37" && a >= 100) msg = "سهم التبرع للعلاج الشهري 100 جنيه، تبرعك = " + fmt.format(Math.floor(a / 100)) + " سهم 💊";
+    else if (purpose.value === "general" && (l = unitLine(a, CAMPAIGNS))) msg = "تبرعك يساوي " + l + " 💚";
+    else if (purpose.value !== "zakat" && purpose.value !== "sadaqa" &&
+      (camp = CAMPAIGNS.filter(function (c) { return c && c.purpose === purpose.value; })[0]) && (l = unitLine(a, [camp]))) msg = "تبرعك يساوي " + l;
     else if (a >= 5000) msg = "تبرعك ممكن يغطي العلاج الشهري لمريض كامل 💚";
     else if (a >= 500) msg = "تبرعك بيساهم في كشف وتحاليل لمريض غير قادر 🩺";
     else if (a >= 10) msg = "كل جنيه بيفرق مع مريض محتاج 💚";

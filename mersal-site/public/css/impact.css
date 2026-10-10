@@ -104,3 +104,23 @@ a.ic-tile-in:hover .ic-arrow { transform: translateX(-3px); }
   .ic-n.bump { animation: none; }
   .ic-bar i, .ic-tile-in, .ic-chips button, .ic-arrow { transition: none; }
 }
+
+/* donate.html: the calculator is a second amount picker on the page, so it waits behind a summary until asked for
+   (the home calculator stays open). impact.js still renders into #impact-calc and fills the stepper in place. */
+.ic-more > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; padding: 8px 18px; box-sizing: border-box; border-radius: 16px; background: #fff; border: 1px solid var(--line); font-weight: 800; font-size: 16px; line-height: 1.5; color: var(--teal-dark); cursor: pointer; list-style: none; text-wrap: balance; -webkit-tap-highlight-color: transparent; }
+.ic-more > summary::-webkit-details-marker { display: none; }
+/* the chevron is a drawn glyph, so its borders are physical (right + bottom turned 45deg = pointing down in LTR and RTL);
+   logical borders would turn it into a "<" on this RTL page */
+.ic-more > summary::after { content: ""; flex: none; width: 10px; height: 10px; margin-top: -5px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s; }
+.ic-more[open] > summary::after { transform: rotate(-135deg); margin-top: 5px; }
+.ic-more[open] > summary { margin-bottom: 14px; }
+.ic-more > summary:hover { border-color: #cfe7e7; }
+.ic-more > summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0 6px rgba(0,89,89,.85); }
+.ic-more #impact-calc { margin: 0; }
+/* closed: the calculator is taken out of layout, not only hidden by the details element. Chromium hides closed content
+   with content-visibility: hidden, and impact.js's IntersectionObserver watching #impact-calc in there froze the details
+   element's style, so it never opened (verified in Chromium 141); without a box the observer simply waits for the open */
+.ic-more:not([open]) > #impact-calc { display: none; }
+/* nothing to show (impact.json and the campaigns empty): no summary that opens onto nothing */
+.ic-more:has(#impact-calc:empty) { display: none; }
+@media (prefers-reduced-motion: reduce) { .ic-more > summary::after { transition: none; } }

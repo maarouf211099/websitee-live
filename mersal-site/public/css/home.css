@@ -34,7 +34,8 @@
 /* v8: one section-header system: eyebrow + start-aligned h2 + lead, no centred underline */
 .home .section-title { text-align: start; }
 .home .section-title h2::after { display: none; }
-.home .section-title p { margin-inline: 0; max-width: 56ch; }
+.home .section-title p { margin-inline: 0; max-width: 56ch; text-wrap: pretty; }
+.home .ways-sec .section-title p { max-width: 62ch; }
 
 /* ---------- about ---------- */
 .home .about-intro { position: relative; overflow: hidden; background: #fff; }
@@ -74,6 +75,8 @@
 .home #projects { background: var(--bg-2); }
 .home .car-track .card { border-radius: 22px; border: 0; }
 .home .ways-sec { background: #fff; }
+/* news strip (js/news.js, shown once data/news.json has items) sits between campaigns (white) and partners (bg-2): sand keeps them apart */
+.home .nw-home { background: var(--sand); }
 .home .way2 { border-radius: 20px; border: 0; }
 
 /* ---------- slogan band ---------- */
@@ -92,6 +95,9 @@
   .ticker-track b { font-size: 16px; }
   .home .section-title.split { flex-direction: column; align-items: flex-start; gap: 6px; }
   .home .section-title.split p { font-size: 14px; }
+  /* news.css centres its split header for a row layout; stacked here it would be the only centred header on the page */
+  .home .nw-home .section-title.split { align-items: flex-start; }
+  .home .nw-home .nw-all { margin-inline-start: -10px; }
   .home .section-title h2 { font-size: 26px; }
   .home .big-title { font-size: 25px; }
   .home .numbers { padding: 40px 0; }
@@ -272,7 +278,8 @@
 .home .camp { --p: 0; border-radius: 22px; border: 0; box-shadow: 0 14px 40px -20px rgba(0,48,48,.35); }
 .home .camp-media { position: relative; }
 .home .camp-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(0,32,32,.5)); pointer-events: none; }
-.home .camp-badge { position: absolute; z-index: 1; inset-inline-start: 12px; bottom: 12px; background: var(--gold); color: var(--teal-ink); font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 999px; box-shadow: 0 6px 16px -6px rgba(0,0,0,.5); pointer-events: none; }
+/* the price pill is a label, not a button: gold text on a dark glass chip like .sl-kicker (gold stays for money actions) */
+.home .camp-badge { position: absolute; z-index: 1; inset-inline-start: 12px; bottom: 12px; background: rgba(0,32,32,.8); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); color: var(--gold); font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 999px; box-shadow: none; pointer-events: none; }
 .camp-hot { position: absolute; z-index: 1; inset-inline-end: 12px; bottom: 12px; background: rgba(255,255,255,.92); color: #b45309; font-weight: 800; font-size: 12px; line-height: 1; padding: 7px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; pointer-events: none; }
 .camp-hot::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #f97316; animation: none; }
 .is-urgent .camp-hot::before { animation: live 2s infinite; }

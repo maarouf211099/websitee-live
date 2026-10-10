@@ -17,16 +17,19 @@
 .ic-chips button { min-width: 0; min-height: 44px; padding: 0 4px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 800 14.5px "Titillium Web", "Cairo", sans-serif; letter-spacing: -.2px; cursor: pointer; transition: background .2s, border-color .2s, color .2s, transform .15s var(--spring, cubic-bezier(.22,1,.36,1)); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .ic-chips button:hover { background: rgba(255,255,255,.2); }
 .ic-chips button:active { transform: scale(.94); }
-.ic-chips button.on { background: var(--gold); border-color: var(--gold); color: var(--teal-ink, #003c3c); }
+/* one selected-amount look (as .amounts in site.css): white chip on the dark head with the gold check disc */
+.ic-chips button { position: relative; }
+.ic-chips button.on { background: #fff; border-color: #fff; color: var(--teal-ink, #003c3c); }
+.ic-chips button.on::after { content: ""; position: absolute; top: -6px; inset-inline-end: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003c3c' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center / 12px no-repeat; box-shadow: 0 0 0 2px var(--teal-dark); }
 .ic-chips button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
-/* range: the native input stays for a11y, drawn as a gold thumb on a pale track, 44px tall hit area */
+/* range: the native input stays for a11y, drawn as a white thumb with a gold ring on a pale track, 44px tall hit area */
 .ic-range { width: 100%; height: 44px; margin: 4px 0 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; direction: rtl; }
 .ic-range:focus { outline: none; }
 .ic-range::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: rgba(255,255,255,.28); }
 .ic-range::-moz-range-track { height: 6px; border-radius: 6px; background: rgba(255,255,255,.28); }
-.ic-range::-moz-range-progress { height: 6px; border-radius: 6px; background: var(--gold); }
-.ic-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: var(--gold); border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .15s; }
-.ic-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.ic-range::-moz-range-progress { height: 6px; border-radius: 6px; background: #fff; }
+.ic-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: #fff; border: 4px solid var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .15s; }
+.ic-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 4px solid var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
 .ic-range:active::-webkit-slider-thumb { transform: scale(1.15); }
 .ic-range:focus-visible::-webkit-slider-thumb { outline: 3px solid var(--gold); outline-offset: 3px; }
 .ic-range:focus-visible::-moz-range-thumb { outline: 3px solid var(--gold); outline-offset: 3px; }
@@ -53,7 +56,7 @@ a.ic-tile-in:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px
 .ic-pct { display: none; font: 700 15px/1 "Titillium Web", "Cairo", sans-serif; color: #b45309; background: #fff4d1; padding: 4px 8px; border-radius: 999px; }
 .ic-t { flex-basis: 100%; font-size: 13.5px; line-height: 1.5; color: var(--ink); font-weight: 700; margin-top: 2px; }
 .ic-bar { grid-column: 1 / -1; display: none; height: 6px; border-radius: 6px; background: var(--teal-soft); overflow: hidden; margin-top: 6px; }
-.ic-bar i { display: block; height: 100%; width: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--gold), var(--gold-dark, #e9ad0c)); transform-origin: right center; transform: scaleX(var(--p, 0)); transition: transform .6s var(--spring, cubic-bezier(.22,1,.36,1)); }
+.ic-bar i { display: block; height: 100%; width: 100%; border-radius: 6px; background: var(--teal-text); transform-origin: right center; transform: scaleX(var(--p, 0)); transition: transform .6s var(--spring, cubic-bezier(.22,1,.36,1)); }
 .ic-price { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
 .ic-arrow { color: var(--teal); font-weight: 800; transition: transform .2s; }
 a.ic-tile-in:hover .ic-arrow { transform: translateX(-3px); }
@@ -95,7 +98,7 @@ a.ic-tile-in:hover .ic-arrow { transform: translateX(-3px); }
 @media (hover: none) {
   a.ic-tile-in:hover { transform: none; box-shadow: none; }
   .ic-chips button:hover { background: rgba(255,255,255,.1); }
-  .ic-chips button.on:hover { background: var(--gold); }
+  .ic-chips button.on:hover { background: #fff; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ic-n.bump { animation: none; }

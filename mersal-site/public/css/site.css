@@ -1527,6 +1527,9 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .amounts button.on { background: var(--teal-text); border-color: var(--teal-text); color: #fff; box-shadow: 0 10px 20px -12px rgba(0,96,96,.8); }
 .amounts button.on::after { content: ""; position: absolute; top: -6px; inset-inline-end: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003c3c' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center / 12px no-repeat; box-shadow: 0 0 0 2px #fff; }
 @media (hover: hover) { .amounts button.on:hover { color: #fff; } }
+/* the selected chip keeps the site focus halo: its own drop shadow would otherwise replace the 6px teal ring that gives
+   the gold outline its contrast on white (gold alone on white is 1.55:1) */
+.amounts button.on:focus-visible { box-shadow: 0 0 0 6px rgba(0,89,89,.85), 0 10px 20px -12px rgba(0,96,96,.8); }
 /* carousel arrows are navigation, not giving: white with a teal chevron (white on gold was 1.55:1) */
 .car-arrow { background: #fff; color: var(--teal-dark); border: 1px solid var(--line); width: 48px; height: 48px; }
 .car-arrow:hover { background: var(--teal-soft); color: var(--teal-dark); }

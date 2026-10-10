@@ -18,12 +18,30 @@
 
   // ---------- quick donate (only when card payment is on) ----------
   var form = document.getElementById("quick-donate"), input = document.getElementById("qa");
+  var qdLine = document.getElementById("qd-impact"), qdAmt = document.getElementById("qd-amt"), qdGo = form.querySelector(".qd-go");
+  // "بـ 500 جنيه: جرعة في علاج مرضى الأورام": what the chosen amount covers in an open campaign (window.mersalUnit comes
+  // from js/impact.js, which runs after this file; every deferred script has run before DOMContentLoaded)
+  var liveCamps = null; // content.json campaigns once fetched (later()), else the inlined #home-data ones
+  function qdImpact(v) {
+    if (!qdLine) return;
+    var list = liveCamps || (data || {}).campaigns, line = window.mersalUnit && window.mersalUnit.line(v, list);
+    var t = line ? "بـ " + fmt.format(v) + " جنيه: " + line : "كل جنيه بيفرق مع مريض محتاج";
+    if (qdLine.textContent !== t) qdLine.textContent = t; // unchanged text is not rewritten, so the live region stays quiet on load
+  }
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () {
       form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.remove("on"); });
       b.classList.add("on"); input.value = b.dataset.v; if (window.mersalTap) window.mersalTap(8);
+      var v = +b.dataset.v;
+      if (qdAmt) qdAmt.textContent = fmt.format(v);
+      if (qdGo) { qdGo.classList.remove("bump"); void qdGo.offsetWidth; qdGo.classList.add("bump"); }
+      qdImpact(v);
     });
   });
+  // (as a deferred script this runs while readyState is already "interactive" but before DOMContentLoaded; later() repeats it
+  // with the fetched content.json in any case)
+  if (document.readyState === "complete") qdImpact(+input.value);
+  else document.addEventListener("DOMContentLoaded", function () { qdImpact(+input.value); });
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     location.href = "/donate.html?amount=" + encodeURIComponent(input.value) + "#online";
@@ -366,11 +384,23 @@
   if (data) boot(data);
   function later() {
     fetch("/content.json").then(function (r) { return r.json(); }).then(function (fresh) {
+      if (Array.isArray(fresh.campaigns)) { liveCamps = fresh.campaigns; qdImpact(+input.value); }
       if (!data) { boot(fresh); campaigns(fresh.projects); return; }
       campaigns(fresh.projects);
       if (JSON.stringify(fresh.campaigns) !== JSON.stringify(data.campaigns)) donationCampaigns(fresh.campaigns);
       if (JSON.stringify(fresh.numbers) !== JSON.stringify(data.numbers)) { numbers(fresh.numbers); countUp(); }
       if (heroRev(fresh.slides) !== heroRev(data.slides)) console.warn("hero is older than content.json - run: node tools/render-home.js");
+    }).catch(function () {});
+    // trust strip: "حسابات رسمية في 7 بنوك" counts the distinct banks that have an account number in data/donate.json
+    fetch("/data/donate.json").then(function (r) { return r.json(); }).then(function (dj) {
+      var names = Object.create(null), k = 0;
+      ((dj && dj.banks) || []).forEach(function (b) {
+        var n = String((b && b.name) || "").trim();
+        if (n && String((b && b.number) || "").trim() && !names[n]) { names[n] = 1; k++; }
+      });
+      if (k < 3) return;
+      document.querySelectorAll("[data-bank-count]").forEach(function (el) { el.textContent = k; });
+      document.querySelectorAll("[data-bank-word]").forEach(function (el) { el.textContent = k <= 10 ? "بنوك" : "بنك"; });
     }).catch(function () {});
   }
   if (data) { if (document.readyState === "complete") setTimeout(later, 800); else addEventListener("load", function () { setTimeout(later, 800); }); } else later();

@@ -62,15 +62,16 @@
   <section class="quick-bar">
     <div class="wrap">
       <form class="hero-card only-online quick-donate" id="quick-donate" action="/donate.html" method="get">
-        <div class="qd-text"><b>ساهم مع مرسال</b><span>اختار مبلغ وكمّل في صفحة التبرع</span></div>
+        <div class="qd-text"><b>ساهم مع مرسال</b><span class="qd-trust"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>دفع آمن ومشفّر · فيزا · ميزة</span></div>
         <div class="amounts" role="group" aria-label="المبلغ">
           <button type="button" data-v="100">100</button>
           <button type="button" data-v="250">250</button>
           <button type="button" data-v="500" class="on">500</button>
           <button type="button" data-v="1000">1,000</button>
         </div>
+        <p class="qd-impact" id="qd-impact" aria-live="polite">بـ 500 جنيه: جرعة في علاج مرضى الأورام</p>
         <input type="hidden" id="qa" name="amount" value="500">
-        <button class="btn btn-gold qd-go" type="submit">تبرع الآن</button>
+        <button class="btn btn-gold qd-go" type="submit">تبرع بـ <b id="qd-amt">500</b> ج</button>
       </form>
       <div class="hero-card quick-offline only-offline">
         <div class="qo-item"><span>الخط الساخن - مندوب لحد البيت</span><a href="tel:19340" data-site-href="hotline"><b data-site="hotline">19340</b></a></div>
@@ -80,16 +81,22 @@
     </div>
   </section>
 
-  <div class="ticker" aria-label="مرسال في سطور">
-    <div class="ticker-track" id="ticker">
-      <span><b dir="ltr">+5,000</b> مريض شهرياً في العلاج الشهري</span>
-      <span><b>68</b> مستشفى دعمتها قوافل مرسال</span>
-      <span><b>+15</b> تخصص طبي في عيادات مرسال</span>
-      <span><b>+1,400</b> مريض في دار ضيافة مرسال</span>
-      <span><b>19340</b> الخط الساخن - مندوب لحد البيت</span>
-      <span class="hash"><b>#</b>ابعت_فرحة</span>
+  <section class="trust-strip" aria-labelledby="ts-title">
+    <div class="wrap">
+      <h2 id="ts-title" class="sr-only">ليه تطمن لمرسال</h2>
+      <ul class="ts-grid" role="list">
+        <li><a class="ts-tile" href="/p/46.html"><span class="ts-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><span><b>فروع من القاهرة لسوهاج</b><small>اتبرع في أقرب فرع</small></span></a></li>
+        <li><a class="ts-tile" href="/donate.html#bank"><span class="ts-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg></span><span><b>حسابات رسمية في <span data-bank-count>7</span> <span data-bank-word>بنوك</span></b><small>الأهلي · مصر · CIB</small></span></a></li>
+        <li><a class="ts-tile" href="/donate.html#online"><span class="ts-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span><b>رقم متابعة لتبرعك</b><small>بالكارت أو بتسجيل تحويلك</small></span></a></li>
+        <li><a class="ts-tile" href="tel:19340" data-site-href="hotline"><span class="ts-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><span><b>اسألنا قبل ما تتبرع</b><small>الخط الساخن <bdi data-site="hotline">19340</bdi></small></span></a></li>
+      </ul>
+      <div class="ts-ways" role="group" aria-label="طرق تانية للتبرع">
+        <a href="/donate.html#wallets"><picture><source type="image/webp" srcset="/img/old/3536unnamed-1c52e3b3.webp"><img class="ts-ip" src="/img/old/3536unnamed-1c52e3b3.png" alt="" width="20" height="20" loading="lazy" decoding="async"></picture><span>إنستاباي</span></a>
+        <a href="/donate.html#wallets"><picture><source type="image/webp" srcset="/img/old/98894335english-logo-copy-f5f96cd8.webp"><img src="/img/old/98894335english-logo-copy-f5f96cd8.png" alt="" width="63" height="20" loading="lazy" decoding="async"></picture><span>فوري <b dir="ltr">9200</b></span></a>
+        <a href="/donate.html#wallets"><picture><source type="image/webp" srcset="/img/old/4542logo-pic-9eed272a.webp"><img src="/img/old/4542logo-pic-9eed272a.jpg" alt="" width="54" height="20" loading="lazy" decoding="async"></picture><span>فودافون كاش</span></a>
+      </div>
     </div>
-  </div>
+  </section>
 
   <section class="campaigns-sec" id="campaigns-sec">
     <div class="wrap">
@@ -104,8 +111,6 @@
   </section>
 
   <div id="news-home"></div>
-
-  <section id="partners"></section>
 
   <section class="about-intro">
     <div class="wrap grid grid-2" style="align-items:center">
@@ -205,6 +210,8 @@
       </div>
     </div>
   </section>
+
+  <section id="partners"></section>
 
   <section class="slogan-band alt">
     <div class="wrap">

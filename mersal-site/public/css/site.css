@@ -543,6 +543,19 @@ html.pm-open, html.pm-open body { overflow: hidden; }
   .quick-donate .amounts button { padding: 8px 0; font-size: 14.5px; }
   .quick-donate .qd-go { grid-column: 2; grid-row: 1; padding: 8px 18px; font-size: 14px; width: auto; }
 }
+/* dock: a trust line under the title, the amount on the gold button, and one line saying what that amount does
+   (js/home.js writes it; the static default matches today's data, so nothing shifts) */
+.quick-donate .qd-text .qd-trust { display: inline-flex; align-items: center; gap: 5px; color: var(--teal-text); font-weight: 700; }
+.quick-donate .qd-trust svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.quick-donate .qd-impact { margin: 0; font: 700 13.5px/1.5 "Cairo", sans-serif; color: var(--teal-text); min-height: 1.5em; text-align: center; text-wrap: balance; }
+.quick-donate { flex-wrap: wrap; row-gap: 4px; }
+.quick-donate .qd-impact { flex-basis: 100%; order: 5; }
+.quick-donate .qd-go { gap: 5px; }
+.qd-go b { font-family: "Titillium Web", "Cairo", sans-serif; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .quick-donate .qd-impact { grid-column: 1 / -1; grid-row: 3; margin-top: -4px; }
+  .quick-donate .qd-text .qd-trust { font-size: 12.5px; }
+}
 
 /* ===== donation campaigns (old home "التبرعات") ===== */
 .campaigns-sec { padding-top: 40px; }

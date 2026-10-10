@@ -406,9 +406,9 @@ def main():
         desc = text_of(body)
         photos = [m for m in re.findall(r'<img[^>]+src="(/img/old/[^"]+)"', body)
                   if not re.search(r"checklist|logo", m) and page_photo_ok(m)]
-        if pid == 3:  # the old About page showed this picture beside the text
+        if pid == 3:  # a picture beside the About text: Mersal volunteers in vests (not the old stock photo of a child)
             body = ('<div class="row align-items-center"><div class="col-md-7">' + body +
-                    '</div><div class="col-md-5"><img src="/img/about-mersal.jpg" alt="مؤسسة مرسال" loading="lazy"></div></div>')
+                    '</div><div class="col-md-5"><picture><source type="image/webp" srcset="/img/old/43img-7521-9c813483-sm.webp 600w, /img/old/43img-7521-9c813483.webp 1600w" sizes="(max-width: 760px) 92vw, 460px"><img src="/img/old/43img-7521-9c813483-sm.jpg" srcset="/img/old/43img-7521-9c813483-sm.jpg 600w, /img/old/43img-7521-9c813483.jpg 1600w" sizes="(max-width: 760px) 92vw, 460px" alt="متطوعين مرسال بسترات المؤسسة" width="1600" height="1067" loading="lazy"></picture></div></div>')
         with open(os.path.join(PUB, "p", f"{pid}.html"), "w", encoding="utf-8") as f:
             f.write(page_html(title, body, desc, cover, cover or (photos[0] if photos else None), pid))
         pages[pid] = {"title": title, "desc": desc, "cover": cover, "photo": photos[0] if photos else None}

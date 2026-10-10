@@ -55,11 +55,19 @@ function egyptMobile(p) {
 }
 // The app's order references: "mersal-…" (what the other website accepts), printable, at most 160 characters
 const validOrderId = (id) => typeof id === "string" && id.length <= 160 && /^mersal-[^\s\u0000-\u001f\u007f]{1,153}$/.test(id);
-// Paymob's own pages only, never another address inside the donate page
+// Paymob's own pages only (paymob.com, and the older paymobsolutions.com), or a page of the app's own project, never
+// another address inside the donate page
+const PAYMOB_HOSTS = ["paymob.com", "paymobsolutions.com"];
 function checkoutUrlOk(u) {
-  try { const x = new URL(String(u)); return x.protocol === "https:" && (x.hostname === "paymob.com" || x.hostname.endsWith(".paymob.com")); }
-  catch { return false; }
+  try {
+    const x = new URL(String(u)), h = x.hostname.toLowerCase();
+    if (x.protocol !== "https:") return false;
+    return PAYMOB_HOSTS.some((d) => h === d || h.endsWith("." + d)) || h === new URL(cfg().url).hostname.toLowerCase();
+  } catch { return false; }
 }
+// a short, safe diagnostic code for the donor's error message (shown so a screenshot tells what failed; no values)
+const codeOf = (t) => String(t == null ? "" : t).toLowerCase().replace(/[^a-z0-9_.:-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40);
+const hostOf = (u) => { try { return new URL(String(u)).hostname; } catch { return "none"; } };
 
 async function call(method, path, { body, headers = {}, timeout }) {
   const c = cfg();
@@ -93,11 +101,15 @@ async function createDonation({ amount, purpose, name, email, phone, idempotency
     },
     timeout: CREATE_TIMEOUT,
   });
+  const fail = (message, code) => Object.assign(err(502, message), { code });
   if (r.status === 400) throw err(400, redact(r.data.error || "rejected"));
-  if (r.status < 200 || r.status >= 300) throw err(502, `payments-donations ${r.status}: ${redact(r.data.error || r.data.raw || "")}`);
+  if (r.status === 0) throw fail(`payments-donations 0: ${r.data.error}`, r.data.error);
+  if (r.status < 200 || r.status >= 300) {
+    throw fail(`payments-donations ${r.status}: ${redact(r.data.error || r.data.message || r.data.raw || "")}`, "upstream_" + r.status + (r.data.error ? ":" + codeOf(r.data.error) : ""));
+  }
   const orderId = r.data.orderId, url = r.data.iframeUrl;
-  if (!validOrderId(orderId)) throw err(502, "payments-donations: no order reference");
-  if (!checkoutUrlOk(url)) throw err(502, "payments-donations: checkout URL is not a Paymob page");
+  if (!validOrderId(orderId)) throw fail("payments-donations: no order reference (got " + codeOf(typeof orderId) + ")", "no_order:" + codeOf(typeof orderId));
+  if (!checkoutUrlOk(url)) throw fail("payments-donations: checkout URL is not a Paymob page (" + codeOf(hostOf(url)) + ")", "bad_url:" + codeOf(hostOf(url)));
   return { orderId, checkoutUrl: String(url) };
 }
 

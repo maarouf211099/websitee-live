@@ -208,7 +208,8 @@ async function appCheckout({ amount, purpose, name, email, phone }, ctx) {
       return bad("بيانات التبرع مش مقبولة، راجع المبلغ ورقم الموبايل وحاول تاني.");
     }
     ctx.error("app checkout failed", mersalapp.redact(e.message));
-    return { status: 502, jsonBody: { message: "تعذّر الاتصال ببوابة الدفع. حاول مرة أخرى بعد قليل." } };
+    // the short code (e.g. upstream_500, bad_url:host, timeout) goes in the message so a screenshot says what failed
+    return { status: 502, jsonBody: { message: "تعذّر الاتصال ببوابة الدفع. حاول مرة أخرى بعد قليل." + (e.code ? " (كود: " + e.code + ")" : ""), ...(e.code ? { code: e.code } : {}) } };
   }
   ctx.log("checkout created", r.orderId, amount, purpose, "app");
   return { status: 200, headers: { "Cache-Control": "no-store" }, jsonBody: { orderId: r.orderId, provider: "app", checkoutUrl: r.checkoutUrl } };

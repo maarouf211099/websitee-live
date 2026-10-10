@@ -208,6 +208,8 @@ async function appCheckout({ amount, purpose, name, email, phone }, ctx) {
       return bad("بيانات التبرع مش مقبولة، راجع المبلغ ورقم الموبايل وحاول تاني.");
     }
     ctx.error("app checkout failed", mersalapp.redact(e.message));
+    // the app refused the website itself (401/403): card payment is unavailable for a while, the page offers the rest
+    if (e.unavailable) return { status: 503, jsonBody: { message: "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS, unavailable: true, code: e.code } };
     // the short code (e.g. upstream_500, bad_url:host, timeout) goes in the message so a screenshot says what failed
     return { status: 502, jsonBody: { message: "تعذّر الاتصال ببوابة الدفع. حاول مرة أخرى بعد قليل." + (e.code ? " (كود: " + e.code + ")" : ""), ...(e.code ? { code: e.code } : {}) } };
   }

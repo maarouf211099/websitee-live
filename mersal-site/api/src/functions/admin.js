@@ -137,7 +137,7 @@ app.http("adminMe", {
         // Paymob: ready to take real donations, or the NAMES of the missing settings + why the keys cannot (never values),
         // and test/live from the key prefix
         paymob: paymob.ready(), paymobMissing: pay.missingFor("paymob"), paymobMode: paymob.mode(),
-        app: pay.ready("app"), // Paymob through the Mersal app's backend: ready unless MERSAL_SUPABASE_URL is set wrong
+        app: pay.ready("app"), appMissing: pay.missingFor("app"), // Paymob through the Mersal app's backend (+ why not, when not)
         payModeEnv: String(process.env.PAY_MODE || "").trim().toLowerCase() || null });
       return p.renew ? { ...res, cookies: [await sessionFor(req, p.userDetails, p.auth)] } : res;
     } catch (e) { return fail(e, ctx); }

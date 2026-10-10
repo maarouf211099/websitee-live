@@ -190,9 +190,14 @@
     // Project pages: the side card's own project code (for=p<id> on its gold button) also goes on the ways to give
     // without a card, so a transfer, a wallet payment or a home pickup can still be earmarked for this project
     // (forms.js prefill() selects ?for= in the transfer / pickup form). The generated pages stay untouched.
+    // Every generated page's side card carries for=p<id>, so pages that are not causes are left out here, or a transfer
+    // would be recorded against the FAQ or the branches page (donate.js does not list them either): about, doctors,
+    // clinic hours, volunteers (p26, p47), the Afya discount card (p29, a paid service), branches, ways to give, FAQ.
+    // p4/p5 (the oncology centre) stay in: forms.js and donate.js map them to p31.
+    var NOT_CAUSE = /^p(3|6|7|26|29|46|47|48|51)$/;
     var sideBtn = document.querySelector(".page-side .side-card.donate a.btn-gold"), sideFor = "";
     try { sideFor = sideBtn ? new URL(sideBtn.href, location.href).searchParams.get("for") || "" : ""; } catch (e) {}
-    if (/^p\d+$/.test(sideFor) && !sideBtn.parentNode.querySelector(".side-ways")) {
+    if (/^p\d+$/.test(sideFor) && !NOT_CAUSE.test(sideFor) && !sideBtn.parentNode.querySelector(".side-ways")) {
       var wHref = "/donate.html?for=" + sideFor;
       sideBtn.parentNode.insertAdjacentHTML("beforeend",
         '<div class="side-ways"><p>مش معاك كارت؟ تبرع لنفس المشروع بـ</p>' +

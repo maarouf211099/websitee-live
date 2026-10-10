@@ -1655,7 +1655,16 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 
 /* ===== v8 zakat uses + ways to give without a card (zakat.html, project pages) ===== */
 /* zakat result card: the other ways out, each opening its donate tab with zakat preselected (?for=zakat) */
-.z-ways { margin: 10px 0 0; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.88); text-wrap: balance; } /* two even lines, never one link left alone */
+/* The links wrap as flex items, each «·» sits in the 20px gap before a link, and a dot that would open a line falls
+   outside the clipped box (the row starts 20px past it), so no line ever starts or ends on a dangling separator.
+   The 4px / 3px padding keeps the links' focus ring inside the clip. */
+.z-ways { margin: 7px -4px -3px; padding: 3px 4px; overflow: hidden; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.88); }
+.zw-row { display: flex; flex-wrap: wrap; align-items: center; margin-inline-start: -20px; }
+.zw-row > * { position: relative; margin-inline-start: 20px; }
+/* narrower than one line (375px): «أو أخرجها بـ تحويل بنكي» takes the first line and the other two share the second */
+.z-ways { container: zw / inline-size; }
+@container zw (max-width: 400px) { .zw-row > span { flex-basis: calc(100% - 20px); } }
+.zw-row > a::before { content: "\00B7"; content: "\00B7" / ""; position: absolute; inset-inline-start: -20px; top: 0; width: 20px; text-align: center; color: rgba(255,255,255,.88); font-weight: 700; pointer-events: none; }
 .z-ways a { color: #fff; text-decoration: underline; text-underline-offset: 3px; display: inline-block; min-height: 44px; line-height: 44px; font-weight: 700; }
 .z-ways a:hover { color: var(--gold); }
 .z-ways a:focus-visible { outline: 3px solid var(--gold); outline-offset: 0; border-radius: 4px; }
@@ -1668,6 +1677,9 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .zk-cards b { display: block; color: var(--teal-ink); font-size: 16px; margin-bottom: 2px; }
 .zk-cards span { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; }
 .zk-src { margin: 0; text-align: center; font-size: 14px; color: var(--muted); text-wrap: balance; }
+/* each phrase stays whole; below 480px the line (401px) no longer fits, so the two phrases stack and the dot goes */
+.zk-src > span { display: inline-block; }
+@media (max-width: 480px) { .zk-src > span { display: block; } .zk-src > .zk-sep { display: none; } }
 /* 44px tall links on a 24px line: the padding gives the target, the negative margin keeps the line */
 .zk-src a { display: inline-block; padding-block: 10px; margin-block: -10px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 640px) { .zk-cards { grid-template-columns: 1fr; } .zk-uses { padding: 40px 0; } }

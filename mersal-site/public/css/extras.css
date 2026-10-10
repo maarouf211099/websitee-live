@@ -1,5 +1,5 @@
 /* Site extras (js/extras.js, loaded on every page by js/layout.js): announcement bar, floating WhatsApp button,
-   "بتتبرع من خلال" strip. Colours come from css/site.css; motion is transform / opacity only and stops for reduced motion. */
+   "اتبرع من بنكك أو محفظتك" strip. Colours come from css/site.css; motion is transform / opacity only and stops for reduced motion. */
 :root { --extras-css: 1; } /* js/extras.js waits for this, so nothing is drawn unstyled */
 
 /* ---------- (a) announcement bar: in the page flow right under the sticky header (it scrolls away with the page, so the
@@ -81,7 +81,7 @@
 /* out of the way while the phone menu is open or the app-install card is up */
 body.menu-open .wa-float, body:has(.pwa-card.in:not(.pwa-tucked)) .wa-float { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s ease, visibility 0s linear .2s; }
 
-/* ---------- (c) "بتتبرع من خلال": donation channels strip (#partners) ---------- */
+/* ---------- (c) "اتبرع من بنكك أو محفظتك": donation channels strip (#partners) ---------- */
 #partners:empty { display: none; }
 .pt-sec { padding: 52px 0 44px; background: var(--bg-2); overflow: hidden; }
 .pt-sec .section-title { margin-bottom: 24px; }

@@ -1,5 +1,5 @@
 // Admin tab "شريط الإعلان والشركاء": the announcement bar under the header of every page (data/announce.json) and the
-// "بتتبرع من خلال" strip on the home page (data/partners.json) -> PUT /api/console/data/announce and /api/console/data/partners.
+// "اتبرع من بنكك أو محفظتك" strip on the home page (data/partners.json) -> PUT /api/console/data/announce and /api/console/data/partners.
 // The site side is js/extras.js. The WhatsApp button needs no setting here: it shows once "بيانات الموقع" has a WhatsApp number.
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
@@ -30,8 +30,8 @@
         "<label " + CHECK + '><input type="checkbox" data-a="dismissible" ' + BOX + (ann.dismissible !== false ? " checked" : "") + "> <span>الزائر يقدر يقفله بعلامة ×</span></label>" +
       "</div>" +
       '<p class="hint" style="margin:12px 0 6px">معاينة (زي ما هيظهر على الموقع):</p><div id="ann-preview"></div>' +
-      '<h2>بتتبرع من خلال</h2>' +
-      '<p class="hint">شريط بيتحرك لوحده في الصفحة الرئيسية (بعد الأخبار) فيه البنوك والمحافظ والتطبيقات اللي الناس تتبرع لمرسال من خلالها. دي طرق تبرع مش رعاة، فمتضيفش جهة هنا غير لو التبرع من خلالها شغال فعلاً. اللوجو اختياري: من غيره الاسم بيظهر مكتوب. الترتيب هنا هو ترتيب الشريط.</p>' +
+      '<h2>اتبرع من بنكك أو محفظتك (حسابات مرسال الرسمية)</h2>' +
+      '<p class="hint">شريط بيتحرك لوحده في الصفحة الرئيسية (تحت «طرق التبرع») فيه البنوك والمحافظ والتطبيقات اللي الناس تتبرع لمرسال من خلالها. دي طرق تبرع مش رعاة، فمتضيفش جهة هنا غير لو التبرع من خلالها شغال فعلاً. اللوجو اختياري: من غيره الاسم بيظهر مكتوب. الترتيب هنا هو ترتيب الشريط.</p>' +
       '<div class="list" id="partners-list"></div><button type="button" class="btn btn-ghost" id="add-partner">+ إضافة جهة</button>';
     renderList();
     preview();

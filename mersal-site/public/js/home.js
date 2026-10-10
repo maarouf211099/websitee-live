@@ -52,7 +52,7 @@
     if (list && list.length) {
       if (grid) grid.innerHTML = list.map(function (n) {
         var tag = n.link ? "a" : "div";
-        return "<" + tag + ' class="num"' + (n.link ? ' href="' + esc(n.link) + '"' : "") + '><b data-count="' + Number(n.value || 0) + '" data-prefix="' + esc(n.prefix || "") + '">0</b><span>' + esc(n.label) + "</span></" + tag + ">";
+        return "<" + tag + ' class="num"' + (n.link ? ' href="' + esc(n.link) + '"' : "") + '><b data-count="' + Number(n.value || 0) + '" data-prefix="' + esc(n.prefix || "") + '">' + esc(n.prefix || "") + fmtN.format(Number(n.value || 0)) + '</b><span>' + esc(n.label) + "</span></" + tag + ">";
       }).join("");
       if (tk) tk.innerHTML = list.map(function (n) { return "<span><b>" + esc(n.prefix || "") + fmtN.format(Number(n.value || 0)) + "</b> " + esc(n.label) + "</span>"; }).join("") +
         '<span><b>19340</b> الخط الساخن - مندوب لحد البيت</span><span class="hash"><b>#</b>ابعت_فرحة</span>';

@@ -55,11 +55,8 @@
 .home .hospital-feature { background: #fff; }
 .home .hf-pic { position: relative; }
 .home .hf-pic img { border-radius: 32px; }
-.home .chip { position: absolute; z-index: 2; background: #fff; border-radius: 16px; padding: 10px 16px; box-shadow: 0 16px 40px -14px rgba(0,48,48,.45); display: flex; flex-direction: column; line-height: 1.2; animation: float 6s ease-in-out infinite; }
-.home .chip b { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 26px; color: var(--teal); }
-.home .chip span { font-size: 12.5px; color: var(--muted); }
-.home .chip-a { inset-inline-start: -14px; top: 22px; }
-.home .chip-b { inset-inline-end: -14px; bottom: 26px; animation-delay: 1.5s; }
+.home .hf-status { position: absolute; z-index: 2; top: 14px; inset-inline-start: 14px; display: inline-flex; align-items: center; gap: 7px; background: #fff; color: var(--teal-ink); font-weight: 800; font-size: 13px; line-height: 1; padding: 8px 12px; border-radius: 999px; box-shadow: 0 8px 20px -10px rgba(0,48,48,.45); }
+.home .hf-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
 .home .facts div { border-radius: 16px; }
 
 /* ---------- services & projects ---------- */
@@ -95,10 +92,6 @@
   .home .numbers::before, .home .numbers::after { display: none; }
   .home .num { border-radius: 16px; }
   .home .num b { font-size: 32px; }
-  .home .chip { padding: 8px 12px; border-radius: 12px; }
-  .home .chip b { font-size: 20px; }
-  .home .chip-a { inset-inline-start: 8px; top: 12px; }
-  .home .chip-b { inset-inline-end: 8px; bottom: 12px; }
   .home .hf-pic img { border-radius: 20px; }
   .home .about-pic img { border-radius: 20px; }
   .home .slogan-band { padding: 40px 0; }
@@ -117,7 +110,6 @@
 @keyframes sdaZoom { from { opacity: 0; transform: scale(.92) translateY(16px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
-  .home .chip { animation: none; }
 }
 .hf-pic img, .about-pic img { height: auto; }
 
@@ -128,19 +120,15 @@
 .home .about-pic figcaption b { font-size: 18px; }
 .home .about-pic figcaption span { font-size: 13px; color: rgba(255,255,255,.85); }
 .home .about-pic .cap-eyebrow { color: var(--gold); font-weight: 800; font-size: 13px; }
-.home .about-chip { position: absolute; top: 16px; inset-inline-start: 16px; background: #fff; border-radius: 14px; padding: 8px 14px; display: flex; flex-direction: column; line-height: 1.2; color: var(--teal-dark); box-shadow: 0 12px 30px -12px rgba(0,48,48,.5); animation: float 6s ease-in-out infinite; }
-.home .about-chip b { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 22px; color: var(--teal); }
-.home .about-chip span { font-size: 12px; color: var(--muted); }
+/* volunteers photo: keep the "Mersal 19340" vest print above the caption gradient */
+.home .about-pic img { object-position: 50% 45%; }
 @media (max-width: 760px) {
   .home .about-intro .grid { display: flex; flex-direction: column-reverse; gap: 18px; }
   .home .about-pic { width: 100%; }
   .home .about-pic img { aspect-ratio: 16 / 10; border-radius: 20px; }
   .home .about-pic figcaption { border-radius: 0 0 20px 20px; padding: 40px 14px 14px; }
   .home .about-pic figcaption b { font-size: 16px; }
-  .home .about-chip { top: 12px; inset-inline-start: 12px; padding: 6px 12px; }
-  .home .about-chip b { font-size: 18px; }
 }
-@media (prefers-reduced-motion: reduce) { .home .about-chip { animation: none; } } /* after the rule above, which would otherwise win */
 
 /* ================= hero v4: story cards, pre-rendered in index.html, hydrated by home.js ================= */
 :root { --spring: cubic-bezier(.22, 1, .36, 1); --odo-spring: cubic-bezier(.22, 1.18, .36, 1); }
@@ -354,7 +342,7 @@
 /* ================= polish v4 ================= */
 .ticker-track .dup { display: contents; }
 .ticker.off .ticker-track, .ticker:active .ticker-track { animation-play-state: paused; }
-.num b, .facts b, .chip b { font-variant-numeric: tabular-nums; }
+.num b, .facts b { font-variant-numeric: tabular-nums; direction: ltr; } /* the static "+5,000" reads like the odometer (.odo is ltr) */
 @media (hover: none) {
   .btn, button, .card a, .way2, .svc, .num { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .btn:active, .way2:active, .svc:active, .num:active { transform: scale(.96); }

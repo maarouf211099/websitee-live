@@ -92,7 +92,7 @@
                 <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx" required>
               </div>
               <div class="field">
-                <label for="email">البريد الإلكتروني <small>(لإرسال الإيصال)</small></label>
+                <label for="email">البريد الإلكتروني <small>(لتأكيد التبرع)</small></label>
                 <input id="email" name="email" type="email" autocomplete="email" maxlength="120" dir="ltr" inputmode="email" required>
               </div>
               <label class="check"><input type="checkbox" id="anon"> تبرع بدون ذكر اسمي</label>
@@ -128,18 +128,18 @@
               <dl class="summary" id="summary"></dl>
               <div class="pay-methods">
                 <span class="pm">VISA</span><span class="pm">Mastercard</span><span class="pm">Meeza</span>
-                <span class="secure">🔒 دفع آمن عبر بنك مصر</span>
+                <span class="secure">دفع آمن ومشفّر</span>
               </div>
               <div class="step-nav">
                 <button class="btn btn-ghost-teal" type="button" data-prev>تعديل</button>
                 <button class="btn btn-gold" id="pay-btn" type="submit">ادفع <b id="pay-amount"></b></button>
               </div>
-              <p class="hint">بالضغط على "ادفع" هيتم تحويلك لصفحة بنك مصر الآمنة لإدخال بيانات البطاقة. مرسال لا تحتفظ ببيانات بطاقتك. <a href="/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a> · <a href="/terms.html" target="_blank" rel="noopener">شروط الاستخدام</a></p>
+              <p class="hint">بالضغط على "ادفع" هتفتح صفحة الدفع الآمنة لإدخال بيانات الدفع. مرسال لا تحتفظ ببيانات بطاقتك. <a href="/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a> · <a href="/terms.html" target="_blank" rel="noopener">شروط الاستخدام</a></p>
             </fieldset>
 
             <div class="gateway" id="gateway" hidden>
               <div class="gw-spin" aria-hidden="true"></div>
-              <h3 id="gw-title">جاري التحويل لبوابة بنك مصر…</h3>
+              <h3 id="gw-title">جاري التحويل لصفحة الدفع الآمنة…</h3>
               <div id="gw-body"></div>
             </div>
           </form>

@@ -1513,3 +1513,7 @@ body.menu-open .m-bar { z-index: 96; }
 }
 /* contact details: phone / e-mail links get a 44px tap height without changing the layout */
 main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"], .c-mail a { display: inline-block; padding-block: 10px; margin-block: -10px; }
+
+/* honesty: an illustrative (stock) photo says so */
+[data-illus] { position: relative; }
+[data-illus]::after { content: "صورة تعبيرية"; position: absolute; z-index: 2; inset-block-end: 10px; inset-inline-end: 10px; font: 700 11.5px/1 "Cairo", sans-serif; color: #fff; background: rgba(0,32,32,.68); padding: 6px 10px; border-radius: 999px; pointer-events: none; }

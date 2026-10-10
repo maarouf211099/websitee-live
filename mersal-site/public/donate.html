@@ -60,8 +60,15 @@
 
             <fieldset class="step" data-step="1">
               <legend class="sr-only">المبلغ وجهة التبرع</legend>
+              <div class="niyya-chips" id="niyya-chips" role="radiogroup" aria-label="نيتك">
+                <button type="button" role="radio" data-p="general" aria-checked="true" tabindex="0">تبرع عام</button>
+                <button type="button" role="radio" data-p="zakat" aria-checked="false" tabindex="-1">زكاة</button>
+                <button type="button" role="radio" data-p="sadaqa" aria-checked="false" tabindex="-1">صدقة</button>
+                <button type="button" role="radio" data-p="p30" aria-checked="false" tabindex="-1" hidden>صدقة جارية</button>
+              </div>
+              <p class="niyya-note" id="niyya-note" aria-live="polite">تبرعك بيروح للمكان اللي محتاجه أكتر.</p>
               <div class="field">
-                <label for="purpose">تبرع لـ</label>
+                <label for="purpose">أو اختار مشروع معيّن</label>
                 <select id="purpose" name="purpose">
                   <optgroup label="عام">
                     <option value="general">تبرع عام - حيث الحاجة أكبر</option>
@@ -101,7 +108,7 @@
                 <input id="email" name="email" type="email" autocomplete="email" maxlength="120" dir="ltr" inputmode="email" required>
               </div>
               <label class="check"><input type="checkbox" id="anon"> تبرع بدون ذكر اسمي</label>
-              <label class="check"><input type="checkbox" id="gift-on"> اهدي التبرع ده</label>
+              <label class="check"><input type="checkbox" id="gift-on"> اهدي التبرع ده، أو اجعله صدقة على روح حد غالي</label>
               <div class="gf-step-gift" id="gift-fields" hidden>
                 <div class="field">
                   <label for="gift-occasion">المناسبة</label>
@@ -343,6 +350,7 @@
               <section id="tr-success" class="stepper req-success" hidden aria-live="polite">
                 <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
                 <h2 tabindex="-1">سجّلنا تبرعك، شكراً ليك 💚</h2>
+                <p class="dua">ربنا يتقبّل منك</p>
                 <p class="req-recap" data-recap hidden></p>
                 <p>هنراجع التحويل ونأكده ونخصصه للغرض اللي اخترته.</p>
                 <div class="ref-box"><div><small>رقم الطلب - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
@@ -527,6 +535,7 @@
           <section id="pk-success" class="stepper req-success" hidden aria-live="polite">
             <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
             <h2 tabindex="-1">وصلنا طلبك 💚</h2>
+            <p class="dua">ربنا يتقبّل منك</p>
             <p class="req-recap" data-recap hidden></p>
             <p>مندوب مرسال هيكلمك على الموبايل اللي كتبته يأكد الميعاد قبل ما ييجي.</p>
             <p>يمكنك متابعة طلبك بالكود ده:</p>

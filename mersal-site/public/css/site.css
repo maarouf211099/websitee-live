@@ -290,6 +290,7 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 .site-footer { background: var(--teal-dark); }
 .site-footer .copyright { background: #004646; margin-top: 32px; border: 0; }
 .site-footer .two-col { columns: 2; column-gap: 20px; }
+.site-footer .two-col li { break-inside: avoid; text-wrap: balance; } /* a two-line label (اهدي تبرع أو صدقة على روح) breaks evenly, never across the columns */
 
 @media (max-width: 1100px) {
   .menu-toggle { display: block; }
@@ -1493,7 +1494,7 @@ body.menu-open .m-bar { z-index: 96; }
 /* donate side: the hotline card is HTML now (the old 282px image was blurry on phones) */
 .side-ads > a.hot-card, .hot-card { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-height: 100%; aspect-ratio: 282 / 239; padding: 18px 18px 16px; border-radius: 18px; overflow: hidden;
   color: #fff; text-decoration: none; text-align: start; background: radial-gradient(120% 90% at 85% 0%, rgba(254,200,48,.22), transparent 55%), linear-gradient(160deg, #0a8f8f, #005959 70%); box-shadow: 0 16px 32px -18px rgba(0,60,60,.7); isolation: isolate; }
-.side-ads > a.hot-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: url(../img/pattern-white.png) 0 0 / 180px; background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")); opacity: .08; }
+.hot-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: url(../img/pattern-white.png) 0 0 / 180px; background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")); opacity: .08; }
 .hot-card svg { position: absolute; top: 14px; inset-inline-end: 14px; width: 30px; height: 30px; fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .hot-card .hc-t { font-weight: 700; font-size: 14.5px; line-height: 1.45; max-width: 75%; }
 .hot-card b { font: 700 clamp(34px, 9vw, 46px)/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; color: #fff; direction: ltr; text-align: center; }
@@ -1618,3 +1619,35 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
   .ph-trust li { background: none; border-color: #999; color: #000; }
   .pw-act { display: none !important; }
 }
+
+/* ===== v8 giving intentions: one verse per page, the closing band's hotline card, the donate intention chips ===== */
+/* .ayah: the page's single Quran verse (home closing band; zakat.html reuses it). Still text: never animated, never in a
+   carousel or a share image. teal-ink on sand 12.8:1, the gold-ink ornaments and citation 5.14:1 */
+.ayah { margin: 0 auto 24px; max-width: 34ch; text-align: center; font: 700 clamp(20px, 5.2vw, 28px)/2 "Cairo", sans-serif; color: var(--teal-ink); }
+.ayah p { margin: 0; color: inherit; max-width: none; font: inherit; text-wrap: balance; }
+/* the ornate brackets ﴿ ﴾ stay in the text (copy / paste keeps them), but Cairo draws them as plain parentheses that face
+   away from the verse in RTL: the glyph is made invisible and a gold SVG bracket is drawn in its place, the first one
+   opening towards the verse on the start side, the last one on the end side */
+.ayah .orn { display: inline-block; width: .42em; height: 1.18em; vertical-align: -.26em; margin-inline: .14em; overflow: hidden; color: transparent; background: var(--gold-ink);
+  --orn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 28'%3E%3Cpath fill='%23000' d='M1.6 1C8.6 6 8.6 22 1.6 27C4.4 21 4.4 7 1.6 1zM8.6 12L9.9 14L8.6 16L7.3 14z'/%3E%3C/svg%3E");
+  -webkit-mask: var(--orn) center / contain no-repeat; mask: var(--orn) center / contain no-repeat; }
+.ayah .orn:last-child { --orn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 28'%3E%3Cpath fill='%23000' d='M8.4 1C1.4 6 1.4 22 8.4 27C5.6 21 5.6 7 8.4 1zM1.4 12L2.7 14L1.4 16L0.1 14z'/%3E%3C/svg%3E"); }
+@media (forced-colors: active) { .ayah .orn { background: CanvasText; } }
+.ayah cite { display: block; margin-top: 4px; font: 600 13px "Cairo", sans-serif; font-style: normal; color: var(--gold-ink); }
+.slogan-band .hot-card { aspect-ratio: auto; min-height: 0; }
+/* the card's own shadow would drop the teal halo that gives the gold focus ring its contrast (on sand or white) */
+.side-ads > a.hot-card:focus-visible, .hot-card:focus-visible { box-shadow: 0 0 0 6px rgba(0,89,89,.85), 0 16px 32px -18px rgba(0,60,60,.7); }
+/* donate step 1: «نيتك» chips pick the same #purpose option a donor could pick by hand (js/donate.js, display only) */
+.niyya-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.niyya-chips button { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font: 700 14.5px "Cairo", sans-serif; color: var(--teal-dark); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.niyya-chips button[hidden] { display: none; }
+.niyya-chips button:hover { border-color: var(--teal); }
+.niyya-chips button[aria-checked="true"] { background: var(--teal-text); color: #fff; border-color: var(--teal-text); }
+.niyya-chips button[data-p="zakat"][aria-checked="true"] { background: var(--gold); color: var(--teal-ink); border-color: var(--gold); }
+.niyya-note { min-height: 1.6em; margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--teal-dark); }
+.niyya-note a { font-weight: 700; color: var(--teal-text); text-decoration: underline; display: inline-block; padding-block: 10px; margin-block: -10px; }
+@media (prefers-reduced-motion: no-preference) { .niyya-chips button { transition: background .2s, color .2s, border-color .2s; } }
+/* phones: four chips never fit one row, so they sit two by two at equal widths (a lone chip on a second row looked stray) */
+@media (max-width: 560px) { .niyya-chips { display: grid; grid-template-columns: 1fr 1fr; } }
+/* the success screens' prayer line keeps the .dua ink (forms.css greys every paragraph in them) */
+.req-success .dua { color: var(--teal-ink); margin: 2px 0 12px; }

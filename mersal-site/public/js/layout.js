@@ -114,7 +114,7 @@
   var FOOT = [
     ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"], ["/help.html", "طلب مساعدة"],
     ["/p/30.html", "مستشفى مرسال"], ["/#projects", "المشاريع"], ["/p/46.html", "فروع مرسال"],
-    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/gift.html", "اهدي تبرع"], ["/p/51.html", "الأسئلة الشائعة"],
+    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/gift.html", "اهدي تبرع أو صدقة على روح"], ["/p/51.html", "الأسئلة الشائعة"],
     ["/news.html", "أخبار مرسال"], ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"],
     ["/privacy.html", "سياسة الخصوصية"], ["/terms.html", "شروط الاستخدام"]
   ].filter(function (n) { return n[0]; });
@@ -167,8 +167,11 @@
     var k = el.getAttribute("data-site"), v = String(SITE[k] || "").trim(), box = el.closest("[data-site-box]");
     if (box) box.hidden = !v;
     if (!v) return;
+    var old = el.textContent.trim(), named = el.closest("a[aria-label]");
     el.textContent = v;
     if (el.tagName === "A") el.href = siteHref(k, v, el);
+    // a card link named by aria-label (the hotline cards) says the same number it shows
+    if (named && old && old !== v) named.setAttribute("aria-label", named.getAttribute("aria-label").split(old).join(v));
   });
   // data-site-href="hotline|phone|whatsapp|email": only the link target comes from SITE (for links that hold more markup)
   document.querySelectorAll("a[data-site-href]").forEach(function (el) {

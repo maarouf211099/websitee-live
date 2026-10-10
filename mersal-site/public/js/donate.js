@@ -311,6 +311,70 @@
   amount.addEventListener("input", function () { syncChips(); updateImpact(); changedLater(); });
   purpose.addEventListener("change", function () { updateImpact(); changedLater(); });
 
+  // ---------- intention chips «نيتك» (display only) ----------
+  // A chip picks the same #purpose option a donor could pick by hand and fires the same "change", so updateImpact() and
+  // changedLater() run exactly as for a manual pick; nothing else is sent. The chips follow the select: a project
+  // picked in it clears them, ?for= (zakat.html's link) lights the matching one once the options are in.
+  (function niyyaChips() {
+    var box = document.getElementById("niyya-chips"), note = document.getElementById("niyya-note");
+    if (!box) return;
+    var chips = Array.prototype.slice.call(box.querySelectorAll("[data-p]"));
+    var NOTE = {
+      general: "تبرعك بيروح للمكان اللي محتاجه أكتر.",
+      zakat: "هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها في مرسال: علاج وكفالات المرضى الفقراء، ديونهم الطبية، وابن السبيل.",
+      sadaqa: "هيتسجّل تبرعك «صدقة». ربنا يتقبّل منك.",
+      p30: "صدقة جارية في بناء مستشفى مرسال للأطفال، ربنا يجعلها في ميزان حسناتك."
+    };
+    var shownKey = note && note.textContent.trim() === NOTE.general ? "general" : null; // donate.html ships the general line
+    function visible() { return chips.filter(function (c) { return !c.hidden; }); }
+    function sync() {
+      var v = purpose.value, on = null;
+      chips.forEach(function (c) {
+        c.hidden = !purpose.querySelector('option[value="' + c.dataset.p + '"]'); // p30 waits for the project options
+        var hit = !c.hidden && c.dataset.p === v;
+        c.setAttribute("aria-checked", hit ? "true" : "false");
+        if (hit) on = c;
+      });
+      var tab = on || visible()[0]; // roving tabindex: the checked chip, or the first one when a project is picked
+      chips.forEach(function (c) { c.tabIndex = c === tab ? 0 : -1; });
+      var key = Object.prototype.hasOwnProperty.call(NOTE, v) ? v : "";
+      if (!note || key === shownKey) return; // the live region speaks only when the line really changes
+      shownKey = key;
+      note.textContent = key ? NOTE[key] : "";
+      if (key === "zakat") {
+        var a = document.createElement("a"); a.href = "/zakat.html#zakat-uses"; a.textContent = "التفاصيل ←";
+        note.appendChild(document.createTextNode(" ")); note.appendChild(a);
+      }
+    }
+    function pick(c) {
+      purpose.value = c.dataset.p;
+      purpose.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    box.addEventListener("click", function (e) {
+      var c = e.target.closest("[data-p]");
+      if (!c || c.hidden) return;
+      pick(c);
+      if (window.mersalTap) window.mersalTap(8);
+    });
+    // radiogroup keys: the arrows move to the next / previous chip and pick it (Left is "next" in RTL), Home / End jump
+    box.addEventListener("keydown", function (e) {
+      var vis = visible(), i = vis.indexOf(document.activeElement);
+      if (i < 0) return;
+      var rtl = getComputedStyle(box).direction === "rtl", n = vis.length, j = -1;
+      if (e.key === "ArrowDown" || e.key === (rtl ? "ArrowLeft" : "ArrowRight")) j = (i + 1) % n;
+      else if (e.key === "ArrowUp" || e.key === (rtl ? "ArrowRight" : "ArrowLeft")) j = (i - 1 + n) % n;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = n - 1;
+      if (j < 0) return;
+      e.preventDefault();
+      vis[j].focus();
+      pick(vis[j]);
+    });
+    purpose.addEventListener("change", sync);
+    if (window.MutationObserver) new MutationObserver(sync).observe(purpose, { childList: true, subtree: true });
+    sync();
+  })();
+
   // What a donation can do (figures from the old site's pages)
   function updateImpact() {
     var a = Number(amount.value) || 0, msg = "";

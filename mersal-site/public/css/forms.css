@@ -233,3 +233,73 @@
 .contact-card.req-form > h2 { margin: 0 0 14px; color: var(--teal-dark); font-size: 22px; }
 .contact-card .c-mail { margin: 12px 0 0; }
 .contact-card .c-mail a { font-weight: 700; text-decoration: underline; }
+
+/* ---------- donate.html: "حسابات مرسال الرسمية" (bank tab) ---------- */
+.bk-official { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin: 0 0 16px; border-radius: var(--r-md); background: var(--teal-soft); border-inline-start: 4px solid var(--gold); }
+.bk-official b { display: block; color: var(--teal-ink); font-size: 16px; }
+.bk-official p { margin: 2px 0 0; color: var(--teal-ink); font-size: 14px; line-height: 1.7; }
+/* the hotline: 24px line + 10px padding = a 44px tall tap target (2px more each side: 44px wide); the negative margin
+   keeps the line spacing */
+.bk-official a { font: 800 15px/24px "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 10px 2px; margin: -10px -2px; }
+.bk-off-ic { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--teal-text); display: grid; place-items: center; }
+.bk-off-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media print { .bk-official { background: none; border: 1px solid #000; } }
+
+/* ---------- donate.html: the receipt after a confirmed card payment ("تأكيد التبرع", js/donate.js paidScreen) ----------
+   The .alert stays its wrapper (gift.js adds the card offer + "ذكّرني كل شهر" under the receipt, inside it). */
+#pay-result .alert.ok:has(.rcpt) { background: none; padding: 0; }
+/* the receipt holds the dua: it appears still (religious text is never animated; site.css slides every .alert in) */
+#pay-result .alert:has(.rcpt) { animation: none; }
+.rcpt { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px 18px 18px; box-shadow: var(--sh-2); color: var(--ink); font-weight: 400; }
+/* a perforated top edge, like a paper slip */
+.rcpt::before { content: ""; position: absolute; inset-inline: 14px; top: -5px; height: 10px; background: radial-gradient(circle, var(--bg) 4px, transparent 4.5px) 0 0 / 14px 10px repeat-x; }
+.rcpt-head { text-align: center; }
+.rcpt-ic { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #e6f6ee; color: #11683f; }
+.rcpt-ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.rcpt-head h2 { margin: 8px 0 4px; color: var(--teal-ink); font-size: 22px; line-height: 1.4; }
+.rcpt-head h2:focus { outline: none; }
+.rcpt-head .dua { display: inline-block; margin: 6px 0 0; font-size: 15px; line-height: 1.6; text-wrap: balance; }
+.rcpt-rows { display: grid; grid-template-columns: auto 1fr; gap: 0; margin: 14px 0; }
+.rcpt-rows dt, .rcpt-rows dd { padding: 10px 0; border-bottom: 1px dashed var(--line); margin: 0; }
+.rcpt-rows dt { color: var(--muted); padding-inline-end: 14px; }
+.rcpt-rows dd { text-align: end; font-weight: 700; color: var(--teal-ink); min-width: 0; overflow-wrap: anywhere; }
+.rcpt-rows dd b { font: 700 19px/1.4 "Titillium Web", "Cairo", sans-serif; }
+.rcpt-rows code { font: 700 18px "Titillium Web", monospace; letter-spacing: .5px; overflow-wrap: anywhere; }
+.rcpt-rows dd.rcpt-ref { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.rcpt .copy { flex: none; min-height: 44px; min-width: 104px; padding: 6px 12px; border-radius: 10px; font-weight: 700; }
+.rcpt .copy:not(.done) { background: #fff; color: var(--teal-dark); }
+.rcpt-next { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+.rcpt-next a { font: 800 16px/24px "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding-block: 10px; margin-block: -10px; }
+.rcpt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.rcpt-actions .btn { min-height: 44px; padding-inline: 20px; }
+#pay-result .rcpt + .gf-after { margin-top: 12px; }
+@media (max-width: 560px) {
+  .rcpt { padding: 20px 14px 14px; }
+  .rcpt-head h2 { font-size: 20px; }
+  /* the order number gets the whole width: its label above, the number and the copy button under it */
+  .rcpt-rows dt.rcpt-ref { grid-column: 1 / -1; border-bottom: 0; padding-bottom: 0; }
+  .rcpt-rows dd.rcpt-ref { grid-column: 1 / -1; flex-wrap: wrap; justify-content: space-between; gap: 6px 10px; padding-top: 4px; }
+  /* a long number (MERSAL-WEB-20261009151625-A1B2C3) takes its own line, right-aligned under its label; a short one
+     shares the line with the copy button */
+  .rcpt-rows dd.rcpt-ref code { flex: 1 1 auto; min-width: 0; text-align: right; font-size: 17px; }
+  .rcpt-actions { flex-direction: column; }
+  .rcpt-actions .btn { width: 100%; }
+}
+/* small phones: a standard order number (32 characters) stays on one line, so it is read out whole on 19340. No nowrap:
+   the app's longer references (up to 160 characters) still wrap instead of pushing the page sideways */
+@media (max-width: 400px) { .rcpt-rows dd.rcpt-ref code { font-size: 15px; letter-spacing: 0; } }
+@media (max-width: 359px) { .rcpt-rows dd.rcpt-ref code { font-size: 14px; } }
+.rcpt-hint { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--teal-soft); color: var(--teal-ink); font-size: 14px; font-weight: 700; line-height: 1.6; text-wrap: balance; }
+/* "احفظ التأكيد": only the receipt is printed (these out-rank site.css's "#pay-result { display: none !important }") */
+@media print {
+  html.rcpt-print body > :not(main), html.rcpt-print .page-head, html.rcpt-print main > section.alt, html.rcpt-print .tabs,
+  html.rcpt-print .tab-panel:not(#online), html.rcpt-print .side-ads, html.rcpt-print #pay-form, html.rcpt-print .rcpt-actions,
+  html.rcpt-print .rcpt-hint, html.rcpt-print .gf-after { display: none !important; }
+  html.rcpt-print #online, html.rcpt-print #pay-result { display: block !important; }
+  html.rcpt-print #online { border-top: 0; padding-top: 0; }
+  html.rcpt-print #pay-result .alert { border: 0; animation: none; outline: 0; box-shadow: none; }
+  html.rcpt-print .rcpt-head::before { content: "مؤسسة مرسال · تأكيد التبرع"; display: block; margin-bottom: 8px; font-weight: 800; font-size: 12pt; color: #000; }
+  html.rcpt-print .rcpt { box-shadow: none; border: 1.5px solid #000; break-inside: avoid; }
+  html.rcpt-print .rcpt-rows dt, html.rcpt-print .rcpt-rows dd { border-color: #999; }
+  html.rcpt-print .rcpt-head h2, html.rcpt-print .rcpt-rows dd, html.rcpt-print .rcpt-next a { color: #000; }
+}

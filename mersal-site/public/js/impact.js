@@ -3,12 +3,52 @@
 // /data/impact.json (editable from the console tab "أثر التبرع") plus the home campaigns in /content.json (unit +
 // unitPrice). The CTA goes to /donate.html?amount=N#online; on the donate page itself it fills the stepper in place.
 (function () {
+  // Shared with the home quick-donate (js/home.js reads window.mersalUnit), so these sit above the calculator's guard:
+  // function declarations are hoisted but var FORMS / var fmt are not.
+  var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
+  // Arabic count forms: singular -> [dual, plural (3-10)]. A unit written as "مفرد|مثنى|جمع" overrides the table.
+  var FORMS = {
+    "جلسة": ["جلستين", "جلسات"], "كشف": ["كشفين", "كشوفات"], "شهر": ["شهرين", "شهور"], "كارت": ["كارتين", "كروت"], "يوم": ["يومين", "أيام"],
+    "سهم": ["سهمين", "أسهم"], "جرعة": ["جرعتين", "جرعات"], "كفالة": ["كفالتين", "كفالات"], "وجبة": ["وجبتين", "وجبات"], "شنطة": ["شنطتين", "شنط"],
+    "جهاز": ["جهازين", "أجهزة"], "عملية": ["عمليتين", "عمليات"], "أسرة": ["أسرتين", "أسر"], "مريض": ["مريضين", "مرضى"], "طفل": ["طفلين", "أطفال"],
+    "ليلة": ["ليلتين", "ليالي"], "علبة": ["علبتين", "علب"], "حضانة": ["حضانتين", "حضانات"], "متر": ["مترين", "أمتار"], "ساعة": ["ساعتين", "ساعات"]
+  };
+  function unitForm(unit, n) {
+    var parts = String(unit || "").split("|").map(function (s) { return s.trim(); }), one = parts[0] || "", f = parts.length > 1 ? parts.slice(1) : FORMS[one];
+    if (n === 1 || !f) return one;
+    if (n === 2) return f[0] || one;
+    if (n >= 3 && n <= 10) return f[1] || f[0] || one;
+    return one;
+  }
+  // "{n} {unit} ..." -> for 1 and 2 the unit form already carries the count, so {n} disappears there
+  function phrase(tpl, n, unit) {
+    var u = unitForm(unit, n), out = String(tpl || "{n} {unit}");
+    out = out.replace(/\{n\}\s*/g, n >= 3 ? fmt.format(n) + " " : "").replace(/\{unit\}/g, u);
+    return out.replace(/\s+/g, " ").trim();
+  }
+
+  // One line for an amount: "{n} {unit} في {campaign}" from the home campaigns (content.json). Open campaigns whose unit
+  // fits in the amount; one the amount divides exactly wins, then the highest unit price (the first in list order on a tie).
+  // A finished campaign (status done, or raised >= goal) is never offered. "" when nothing fits.
+  function impactLine(a, list) {
+    a = Number(a);
+    if (!(a > 0) || !Array.isArray(list)) return "";
+    var ok = list.filter(function (c) {
+      var p = Number(c && c.unitPrice);
+      return c && c.title && p > 0 && p <= a && c.status !== "done" && !(c.goal && (Number(c.raised) || 0) >= c.goal);
+    });
+    var exact = ok.filter(function (c) { return a % Number(c.unitPrice) === 0; }), best = null;
+    (exact.length ? exact : ok).forEach(function (c) { if (!best || Number(c.unitPrice) > Number(best.unitPrice)) best = c; });
+    if (!best) return "";
+    return phrase("{n} {unit} في " + best.title, Math.floor(a / Number(best.unitPrice)), best.unit || "سهم");
+  }
+  window.mersalUnit = { form: unitForm, phrase: phrase, line: impactLine };
+
   var root = document.getElementById("impact-calc");
   if (!root || root.dataset.ready) return;
   root.dataset.ready = "1";
 
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   function num(v, d) { v = Number(v); return isFinite(v) && v > 0 ? v : d; }
 
@@ -37,20 +77,6 @@
   };
   function icon(k) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[k] || ICONS.heart) + "</svg>"; }
 
-  // Arabic count forms: singular -> [dual, plural (3-10)]. A unit written as "مفرد|مثنى|جمع" overrides the table.
-  var FORMS = {
-    "جلسة": ["جلستين", "جلسات"], "كشف": ["كشفين", "كشوفات"], "شهر": ["شهرين", "شهور"], "كارت": ["كارتين", "كروت"], "يوم": ["يومين", "أيام"],
-    "سهم": ["سهمين", "أسهم"], "جرعة": ["جرعتين", "جرعات"], "كفالة": ["كفالتين", "كفالات"], "وجبة": ["وجبتين", "وجبات"], "شنطة": ["شنطتين", "شنط"],
-    "جهاز": ["جهازين", "أجهزة"], "عملية": ["عمليتين", "عمليات"], "أسرة": ["أسرتين", "أسر"], "مريض": ["مريضين", "مرضى"], "طفل": ["طفلين", "أطفال"],
-    "ليلة": ["ليلتين", "ليالي"], "علبة": ["علبتين", "علب"], "حضانة": ["حضانتين", "حضانات"], "متر": ["مترين", "أمتار"], "ساعة": ["ساعتين", "ساعات"]
-  };
-  function unitForm(unit, n) {
-    var parts = String(unit || "").split("|").map(function (s) { return s.trim(); }), one = parts[0] || "", f = parts.length > 1 ? parts.slice(1) : FORMS[one];
-    if (n === 1 || !f) return one;
-    if (n === 2) return f[0] || one;
-    if (n >= 3 && n <= 10) return f[1] || f[0] || one;
-    return one;
-  }
   // Tile caption next to the big number: the number is already shown, so {n} is dropped and the unit takes the
   // form used after a numeral (2 جلسة، 3 جلسات، 11 جلسة) instead of the dual that would repeat the count.
   // Only a leading {n} is dropped: a count in the middle of the sentence ("لمدة {n} {unit}") stays, or the caption
@@ -61,13 +87,6 @@
     var u = unitForm(unit, n === 2 ? 1 : n);
     return out.replace(/^\s*\{n\}\s*/, "").replace(/\{unit\}/g, u).replace(/\s+/g, " ").trim();
   }
-  // "{n} {unit} ..." -> for 1 and 2 the unit form already carries the count, so {n} disappears there
-  function phrase(tpl, n, unit) {
-    var u = unitForm(unit, n), out = String(tpl || "{n} {unit}");
-    out = out.replace(/\{n\}\s*/g, n >= 3 ? fmt.format(n) + " " : "").replace(/\{unit\}/g, u);
-    return out.replace(/\s+/g, " ").trim();
-  }
-
   var DEFAULTS = { title: "تبرعك بيعمل إيه؟", intro: "اختار مبلغ وشوف بيغطي إيه بالظبط في مرسال.", default: 500, presets: [100, 250, 500, 1000, 5000], min: 50, max: 10000, campaigns: true, items: [] };
   var cfg, rows = [], amount = 0, els = {}, raf = null, liveT = null;
 

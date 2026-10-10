@@ -11,7 +11,7 @@
   // this site's own keys) | "mpgs" (Banque Misr Hosted Checkout).
   var SITE = /* mersal:site */ {
     payMode: "live",
-    payProvider: "app",
+    payProvider: "mpgs",
     hotline: "19340",
     phone: "01200002870",
     whatsapp: "",
@@ -114,7 +114,7 @@
   var FOOT = [
     ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"], ["/help.html", "طلب مساعدة"],
     ["/p/30.html", "مستشفى مرسال"], ["/#projects", "المشاريع"], ["/p/46.html", "فروع مرسال"],
-    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/gift.html", "اهدي تبرع"], ["/p/51.html", "الأسئلة الشائعة"],
+    ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/gift.html", "اهدي تبرع أو صدقة على روح"], ["/p/51.html", "الأسئلة الشائعة"],
     ["/news.html", "أخبار مرسال"], ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"],
     ["/privacy.html", "سياسة الخصوصية"], ["/terms.html", "شروط الاستخدام"]
   ].filter(function (n) { return n[0]; });
@@ -167,8 +167,11 @@
     var k = el.getAttribute("data-site"), v = String(SITE[k] || "").trim(), box = el.closest("[data-site-box]");
     if (box) box.hidden = !v;
     if (!v) return;
+    var old = el.textContent.trim(), named = el.closest("a[aria-label]");
     el.textContent = v;
     if (el.tagName === "A") el.href = siteHref(k, v, el);
+    // a card link named by aria-label (the hotline cards) says the same number it shows
+    if (named && old && old !== v) named.setAttribute("aria-label", named.getAttribute("aria-label").split(old).join(v));
   });
   // data-site-href="hotline|phone|whatsapp|email": only the link target comes from SITE (for links that hold more markup)
   document.querySelectorAll("a[data-site-href]").forEach(function (el) {
@@ -184,6 +187,25 @@
   if (!/donate\.html$/.test(location.pathname)) {
     var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname), pid = pm ? (pm[1] === "4" || pm[1] === "5" ? "31" : pm[1]) : ""; // p4/p5 = oncology centre (p31)
     var dHref = "/donate.html" + (pid ? "?for=p" + pid : "") + "#online";
+    // Project pages: the side card's own project code (for=p<id> on its gold button) also goes on the ways to give
+    // without a card, so a transfer, a wallet payment or a home pickup can still be earmarked for this project
+    // (forms.js prefill() selects ?for= in the transfer / pickup form). The generated pages stay untouched.
+    // Every generated page's side card carries for=p<id>, so pages that are not causes are left out here, or a transfer
+    // would be recorded against the FAQ or the branches page (donate.js does not list them either): about, doctors,
+    // clinic hours, volunteers (p26, p47), the Afya discount card (p29, a paid service), branches, ways to give, FAQ.
+    // p4/p5 (the oncology centre) stay in: forms.js and donate.js map them to p31.
+    var NOT_CAUSE = /^p(3|6|7|26|29|46|47|48|51)$/;
+    var sideBtn = document.querySelector(".page-side .side-card.donate a.btn-gold"), sideFor = "";
+    try { sideFor = sideBtn ? new URL(sideBtn.href, location.href).searchParams.get("for") || "" : ""; } catch (e) {}
+    if (/^p\d+$/.test(sideFor) && !NOT_CAUSE.test(sideFor) && !sideBtn.parentNode.querySelector(".side-ways")) {
+      var wHref = "/donate.html?for=" + sideFor;
+      sideBtn.parentNode.insertAdjacentHTML("beforeend",
+        '<div class="side-ways"><p>مش معاك كارت؟ تبرع لنفس المشروع بـ</p>' +
+          '<a href="' + wHref + '#wallets">إنستاباي أو فوري</a>' +
+          '<a href="' + wHref + '#bank">تحويل بنكي</a>' +
+          '<a href="' + wHref + '#home">مندوب لحد البيت</a>' +
+          "<small>بعد ما تحوّل سجّل تبرعك في الصفحة عشان يتخصص للمشروع ده.</small></div>");
+    }
     // the floating donate button (phones; desktop has the sticky header button) stays off the request/contact forms
     if (!/(help|volunteer|contact)\.html$/.test(location.pathname)) document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>');
     document.body.insertAdjacentHTML("beforeend",
@@ -475,7 +497,7 @@
   menuCta();
   new MutationObserver(menuCta).observe(nav, { childList: true });
 
-  // Extras: js/extras.js + css/extras.css (announcement bar under the header, WhatsApp button, "بتتبرع من خلال" strip).
+  // Extras: js/extras.js + css/extras.css (announcement bar under the header, WhatsApp button, "اتبرع من بنكك أو محفظتك" strip).
   // A page that showed the bar last time gets its room back before the first paint (extras.js keeps its height), so nothing jumps.
   (function () {
     var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "/css/extras.css"; document.head.appendChild(css);

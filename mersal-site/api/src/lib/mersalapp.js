@@ -22,10 +22,18 @@ function cfg() {
   const url = u && URL_RE.test(u) ? u.replace(/\/+$/, "") : DEFAULT_URL;
   return { url, key: env("MERSAL_SUPABASE_KEY") || DEFAULT_KEY, functions: `${url}/functions/v1` };
 }
-// Names of the overrides that are set but unusable ([] = ready; the defaults always are)
+// The app's function refused this site itself (401/403, e.g. "missing_app_signature": it now wants a signature only the
+// app can make). Card payment is then treated as unavailable for BLOCK_MS (donors get the other ways to give, no call is
+// made), and tried again after that, so it comes back by itself once the app's side lets the website in.
+const BLOCK_MS = 10 * 60e3;
+let blocked = null; // { code, at }
+const blockedNow = () => (blocked && Date.now() - blocked.at < BLOCK_MS ? blocked : null);
+// Names of the overrides that are set but unusable, + the app's refusal while it lasts ([] = ready)
 function missing() {
   const out = [];
   if (env("MERSAL_SUPABASE_URL") && !URL_RE.test(env("MERSAL_SUPABASE_URL"))) out.push("MERSAL_SUPABASE_URL");
+  const b = blockedNow();
+  if (b) out.push("سيستم التطبيق رافض طلبات الموقع (" + b.code + ")");
   return out;
 }
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -105,8 +113,12 @@ async function createDonation({ amount, purpose, name, email, phone, idempotency
   if (r.status === 400) throw err(400, redact(r.data.error || "rejected"));
   if (r.status === 0) throw fail(`payments-donations 0: ${r.data.error}`, r.data.error);
   if (r.status < 200 || r.status >= 300) {
-    throw fail(`payments-donations ${r.status}: ${redact(r.data.error || r.data.message || r.data.raw || "")}`, "upstream_" + r.status + (r.data.error ? ":" + codeOf(r.data.error) : ""));
+    const code = "upstream_" + r.status + (r.data.error ? ":" + codeOf(r.data.error) : "");
+    const e = fail(`payments-donations ${r.status}: ${redact(r.data.error || r.data.message || r.data.raw || "")}`, code);
+    if (r.status === 401 || r.status === 403) { blocked = { code, at: Date.now() }; e.unavailable = true; }
+    throw e;
   }
+  blocked = null;
   const orderId = r.data.orderId, url = r.data.iframeUrl;
   if (!validOrderId(orderId)) throw fail("payments-donations: no order reference (got " + codeOf(typeof orderId) + ")", "no_order:" + codeOf(typeof orderId));
   if (!checkoutUrlOk(url)) throw fail("payments-donations: checkout URL is not a Paymob page (" + codeOf(hostOf(url)) + ")", "bad_url:" + codeOf(hostOf(url)));
@@ -128,4 +140,4 @@ async function donationStatus(orderId, { cancelled = false } = {}) {
   };
 }
 
-module.exports = { cfg, missing, campaignFor, CAMPAIGNS, GENERAL, egyptMobile, asciiDigits, validOrderId, checkoutUrlOk, createDonation, donationStatus, redact, DEFAULT_URL, CREATE_TIMEOUT, STATUS_TIMEOUT };
+module.exports = { cfg, missing, blockedNow, _unblock: () => { blocked = null; }, BLOCK_MS, campaignFor, CAMPAIGNS, GENERAL, egyptMobile, asciiDigits, validOrderId, checkoutUrlOk, createDonation, donationStatus, redact, DEFAULT_URL, CREATE_TIMEOUT, STATUS_TIMEOUT };

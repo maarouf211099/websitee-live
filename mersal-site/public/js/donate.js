@@ -42,10 +42,11 @@
   var MODE = (window.MERSAL_SITE && window.MERSAL_SITE.payMode) || "off";
   var PROVIDER = (window.MERSAL_SITE && window.MERSAL_SITE.payProvider) || "";
   // what the donor is told about the gateway (Banque Misr wording unchanged; neutral while the server picks the gateway)
-  var GW = PROVIDER === "mpgs" ? { secure: "🔒 دفع آمن عبر بنك مصر", page: "صفحة بنك مصر", go: "جاري التحويل لبوابة بنك مصر…" }
-    : PROVIDER === "paymob" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري التحويل لصفحة الدفع الآمنة (Paymob)…" }
-    : PROVIDER === "app" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري فتح صفحة الدفع الآمنة (Paymob)…" }
-    : { secure: "🔒 دفع آمن ومشفّر", page: "صفحة الدفع", go: "جاري التحويل لصفحة الدفع الآمنة…" };
+  // (the lock is an icon next to this text in donate.html: .pay-lock)
+  var GW = PROVIDER === "mpgs" ? { secure: "دفع آمن عبر بنك مصر", page: "صفحة بنك مصر", go: "جاري التحويل لبوابة بنك مصر…" }
+    : PROVIDER === "paymob" ? { secure: "دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري التحويل لصفحة الدفع الآمنة (Paymob)…" }
+    : PROVIDER === "app" ? { secure: "دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري فتح صفحة الدفع الآمنة (Paymob)…" }
+    : { secure: "دفع آمن ومشفّر", page: "صفحة الدفع", go: "جاري التحويل لصفحة الدفع الآمنة…" };
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   // ٠١٢… / ۰۱۲… -> 012…
@@ -100,6 +101,41 @@
       clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove("done"); t.textContent = "نسخ"; }, 1600);
     });
   });
+  // The donation receipt ("تأكيد التبرع", paidScreen): "احفظ التأكيد" prints only the receipt (css: html.rcpt-print in
+  // forms.css), "ابعت الفرحة لصحابك" shares the page (never the amount): the phone's share sheet, else WhatsApp.
+  var JOY = "اتبرعت لمرضى مرسال النهارده، وانت كمان تقدر تبعت فرحة #ابعت_فرحة";
+  // In-app browsers (Facebook, Instagram, Messenger, TikTok, any Android WebView) ignore window.print(): there the
+  // button asks for a screenshot instead of doing nothing
+  var NO_PRINT = typeof window.print !== "function" || /; wv\)|FBAN|FBAV|FB_IAB|Instagram|musical_ly|BytedanceWebview|Snapchat/.test(navigator.userAgent);
+  document.addEventListener("click", function (e) {
+    var pr = e.target.closest("[data-print-rcpt]");
+    if (pr) {
+      if (NO_PRINT) {
+        var box = pr.closest(".rcpt"), hint = box && box.querySelector(".rcpt-hint");
+        if (box && !hint) {
+          hint = document.createElement("p"); hint.className = "rcpt-hint"; hint.setAttribute("role", "status");
+          box.appendChild(hint);
+          setTimeout(function () { hint.textContent = "خد سكرين شوت للتأكيد ده واحتفظ برقم العملية"; }, 50);
+        }
+        return;
+      }
+      document.documentElement.classList.add("rcpt-print");
+      window.print();
+      return;
+    }
+    if (e.target.closest("[data-share-joy]")) {
+      var url = location.origin + "/donate.html";
+      var wa = function () { window.open("https://wa.me/?text=" + encodeURIComponent(JOY + " " + url), "_blank", "noopener"); };
+      if (navigator.share) navigator.share({ title: "مؤسسة مرسال", text: JOY, url: url }).catch(function (x) { if (!x || x.name !== "AbortError") wa(); });
+      else wa();
+    }
+  });
+  addEventListener("afterprint", function () { document.documentElement.classList.remove("rcpt-print"); });
+  // "ابعت رسالة على 9599": on a touch phone the side picture opens the SMS app with the word ready; elsewhere it stays
+  // a link to the wallets tab (the hashchange handler above opens it)
+  if (window.matchMedia && matchMedia("(pointer: coarse)").matches) {
+    document.querySelectorAll("[data-sms]").forEach(function (a) { a.href = "sms:9599?&body=" + encodeURIComponent("مرسال"); });
+  }
   // Bank accounts, wallets and the account abroad come from /data/donate.json (edited from the console, "بيانات الموقع");
   // the markup already in donate.html is the fallback while it loads or if it fails.
   function row(label, value) { return '<div class="bank"><div><b>' + esc(label) + "</b><code>" + esc(value) + '</code></div><button class="copy" data-copy="' + esc(value) + '">' + CI + "<span>نسخ</span></button></div>"; }
@@ -180,6 +216,11 @@
       var bankBox = document.getElementById("bank-accounts");
       bankBox.innerHTML = bankCards(banks);
       bankLogoFallback(bankBox);
+      // "في 7 بنوك": the distinct banks, with the Arabic counted noun (3-10 بنوك, 11+ بنك, 2 بنكين, 1 بنك واحد)
+      var names = {}, k = 0;
+      banks.forEach(function (b) { var n = String(b.name).trim(); if (n && !names[n]) { names[n] = 1; k++; } });
+      document.querySelectorAll("[data-bank-count]").forEach(function (el) { el.textContent = k > 2 ? k : ""; });
+      document.querySelectorAll("[data-bank-word]").forEach(function (el) { el.textContent = k > 10 ? "بنك" : k > 2 ? "بنوك" : k === 2 ? "بنكين" : "بنك واحد"; });
     }
     var wallets = (d.wallets || []).filter(function (w) { return w && w.name && w.value; });
     document.getElementById("wallet-numbers").innerHTML = wallets.map(function (w) { return row(w.name, w.value); }).join("");
@@ -216,10 +257,13 @@
   syncChips();
 
   // Purpose list: general/zakat/sadaqa + every project and service imported from the old site
+  var CAMPAIGNS = []; // the home campaigns (content.json), for the #impact line
   Promise.all([
     fetch("/content.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
     fetch("/data/menu.json").then(function (r) { return r.json(); }).catch(function () { return []; })
   ]).then(function (res) {
+    CAMPAIGNS = ((res[0] || {}).campaigns) || [];
+    if (!Array.isArray(CAMPAIGNS)) CAMPAIGNS = [];
     // one option per cause: pages that are aliases of another code (LEGACY, e.g. p4/p5 -> p31) are skipped, and a
     // second page with a title that is already listed becomes an alias of the first one (so ?for= still finds it)
     var groups = {}, seen = {}, titles = {}, alias = {};
@@ -270,13 +314,84 @@
   amount.addEventListener("input", function () { syncChips(); updateImpact(); changedLater(); });
   purpose.addEventListener("change", function () { updateImpact(); changedLater(); });
 
-  // What a donation can do (figures from the old site's pages)
+  // ---------- intention chips «نيتك» (display only) ----------
+  // A chip picks the same #purpose option a donor could pick by hand and fires the same "change", so updateImpact() and
+  // changedLater() run exactly as for a manual pick; nothing else is sent. The chips follow the select: a project
+  // picked in it clears them, ?for= (zakat.html's link) lights the matching one once the options are in.
+  (function niyyaChips() {
+    var box = document.getElementById("niyya-chips"), note = document.getElementById("niyya-note");
+    if (!box) return;
+    var chips = Array.prototype.slice.call(box.querySelectorAll("[data-p]"));
+    var NOTE = {
+      general: "تبرعك بيروح للمكان اللي محتاجه أكتر.",
+      zakat: "هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها في مرسال: علاج وكفالات المرضى الفقراء، ديونهم الطبية، وابن السبيل.",
+      sadaqa: "هيتسجّل تبرعك «صدقة». ربنا يتقبّل منك.",
+      p30: "صدقة جارية في بناء مستشفى مرسال للأطفال، ربنا يجعلها في ميزان حسناتك."
+    };
+    var shownKey = note && note.textContent.trim() === NOTE.general ? "general" : null; // donate.html ships the general line
+    function visible() { return chips.filter(function (c) { return !c.hidden; }); }
+    function sync() {
+      var v = purpose.value, on = null;
+      chips.forEach(function (c) {
+        c.hidden = !purpose.querySelector('option[value="' + c.dataset.p + '"]'); // p30 waits for the project options
+        var hit = !c.hidden && c.dataset.p === v;
+        c.setAttribute("aria-checked", hit ? "true" : "false");
+        if (hit) on = c;
+      });
+      var tab = on || visible()[0]; // roving tabindex: the checked chip, or the first one when a project is picked
+      chips.forEach(function (c) { c.tabIndex = c === tab ? 0 : -1; });
+      var key = Object.prototype.hasOwnProperty.call(NOTE, v) ? v : "";
+      if (!note || key === shownKey) return; // the live region speaks only when the line really changes
+      shownKey = key;
+      note.textContent = key ? NOTE[key] : "";
+      if (key === "zakat") {
+        var a = document.createElement("a"); a.href = "/zakat.html#zakat-uses"; a.textContent = "التفاصيل ←";
+        note.appendChild(document.createTextNode(" ")); note.appendChild(a);
+      }
+    }
+    function pick(c) {
+      purpose.value = c.dataset.p;
+      purpose.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    box.addEventListener("click", function (e) {
+      var c = e.target.closest("[data-p]");
+      if (!c || c.hidden) return;
+      pick(c);
+      if (window.mersalTap) window.mersalTap(8);
+    });
+    // radiogroup keys: the arrows move to the next / previous chip and pick it (Left is "next" in RTL), Home / End jump
+    box.addEventListener("keydown", function (e) {
+      var vis = visible(), i = vis.indexOf(document.activeElement);
+      if (i < 0) return;
+      var rtl = getComputedStyle(box).direction === "rtl", n = vis.length, j = -1;
+      if (e.key === "ArrowDown" || e.key === (rtl ? "ArrowLeft" : "ArrowRight")) j = (i + 1) % n;
+      else if (e.key === "ArrowUp" || e.key === (rtl ? "ArrowRight" : "ArrowLeft")) j = (i - 1 + n) % n;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = n - 1;
+      if (j < 0) return;
+      e.preventDefault();
+      vis[j].focus();
+      pick(vis[j]);
+    });
+    purpose.addEventListener("change", sync);
+    if (window.MutationObserver) new MutationObserver(sync).observe(purpose, { childList: true, subtree: true });
+    sync();
+  })();
+
+  // What a donation can do (figures from the old site's pages). Between the hospital / monthly-treatment lines and the
+  // generic ones: the same "{n} {unit} في {campaign}" line as the home dock (window.mersalUnit from js/impact.js), over
+  // every open home campaign for a general gift, or over the chosen project's own campaign. Zakat and sadaqa keep the
+  // generic lines, so no campaign is presented as zakat-eligible.
+  function unitLine(a, list) { return window.mersalUnit && list.length ? window.mersalUnit.line(a, list) : ""; }
   function updateImpact() {
-    var a = Number(amount.value) || 0, msg = "";
+    var a = Number(amount.value) || 0, msg = "", l = "", camp = null;
     if (purpose.value === "p30" && a >= 25000) msg = "تبرعك يساوي متر وقف خيري في مستشفى مرسال للأطفال 🏥";
     else if (purpose.value === "p30" && a >= 1000) msg = "تبرعك يساوي " + fmt.format(Math.floor(a / 1000)) + " سهم عام في مستشفى مرسال 🏥";
     else if (purpose.value === "p30" && a >= 500) msg = "تبرعك يساوي سهم أجهزة طبية في مستشفى مرسال 🏥";
     else if (purpose.value === "p37" && a >= 100) msg = "سهم التبرع للعلاج الشهري 100 جنيه، تبرعك = " + fmt.format(Math.floor(a / 100)) + " سهم 💊";
+    else if (purpose.value === "general" && (l = unitLine(a, CAMPAIGNS))) msg = "تبرعك يساوي " + l + " 💚";
+    else if (purpose.value !== "zakat" && purpose.value !== "sadaqa" &&
+      (camp = CAMPAIGNS.filter(function (c) { return c && c.purpose === purpose.value; })[0]) && (l = unitLine(a, [camp]))) msg = "تبرعك يساوي " + l;
     else if (a >= 5000) msg = "تبرعك ممكن يغطي العلاج الشهري لمريض كامل 💚";
     else if (a >= 500) msg = "تبرعك بيساهم في كشف وتحاليل لمريض غير قادر 🩺";
     else if (a >= 10) msg = "كل جنيه بيفرق مع مريض محتاج 💚";
@@ -396,6 +511,8 @@
     s.setAttribute("data-error", "mersalPayError");
     s.setAttribute("data-cancel", "mersalPayCancel");
     s.onload = done;
+    // the bank's page script could not load (network, blocker): say so instead of spinning forever
+    s.onerror = function () { s.remove(); window.mersalPayError({ message: "تعذّر فتح صفحة الدفع الآمنة لبنك مصر. اتأكد من الإنترنت وحاول تاني، أو اتبرع بطريقة تانية من التبويبات اللي فوق." }); };
     document.head.appendChild(s);
   }
   function openMpgs(d) {
@@ -530,9 +647,17 @@
     forget(o.orderId);
     form.hidden = true;
     recordDonation({ orderId: o.orderId, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
-    show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(amt) + " جنيه</b> بنجاح.<br>" +
-      'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
-      '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
+    // the receipt ("تأكيد التبرع", not an official receipt): amount, purpose, date and the order number to quote
+    show("ok", '<div class="rcpt"><div class="rcpt-head"><span class="rcpt-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>' +
+      '<h2 tabindex="-1">شكراً لك! تبرعك وصل</h2><p class="dua">' + ((saved.purpose || o.purpose) === "zakat" ? "ربنا يتقبّل زكاتك ويبارك لك في مالك" : "ربنا يتقبّل منك ويجعله في ميزان حسناتك") + "</p></div>" +
+      '<dl class="rcpt-rows"><dt>المبلغ</dt><dd><b>' + fmt.format(amt) + " جنيه</b></dd>" +
+      "<dt>الغرض</dt><dd>" + esc(saved.purposeTitle || purposeText().trim() || "تبرع عام") + "</dd>" +
+      "<dt>التاريخ</dt><dd>" + new Date().toLocaleDateString("ar-EG-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }) + "</dd>" +
+      '<dt class="rcpt-ref">رقم العملية</dt><dd class="rcpt-ref"><code dir="ltr">' + esc(o.orderId) + '</code> <button type="button" class="copy" data-copy="' + esc(o.orderId) + '" aria-label="نسخ رقم العملية">' + CI + "<span>نسخ</span></button></dd></dl>" +
+      '<p class="rcpt-next">احتفظ برقم العملية. لو عندك أي سؤال عن تبرعك كلّمنا على <a href="tel:19340">19340</a> وقول الرقم ده.</p>' +
+      '<div class="rcpt-actions"><button type="button" class="btn btn-ghost-teal" data-print-rcpt>احفظ التأكيد</button>' +
+      '<button type="button" class="btn btn-ghost-teal" data-share-joy>ابعت الفرحة لصحابك</button>' +
+      '<a class="btn btn-gold" href="/community.html">شوف هداياك في مرسال كوميونيتي</a></div></div>');
     if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
     var al = result.querySelector(".alert"); if (al) { al.setAttribute("tabindex", "-1"); focusLater(al); }
   }

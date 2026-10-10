@@ -1,6 +1,6 @@
 /* ===================================================================
    Mersal home page — visual layer v2 (loaded after site.css, index only)
-   Hero full-bleed, overlapping donate strip, ticker, rich cards, motion.
+   Hero full-bleed, overlapping donate strip, trust strip, rich cards, motion.
    =================================================================== */
 
 /* ---------- donate strip overlapping the hero ---------- */
@@ -14,16 +14,54 @@
 .home .quick-donate .amounts button { border-radius: 12px; border-width: 2px; }
 .home .qd-go { border-radius: 14px; padding: 12px 30px; }
 
-/* ---------- ticker ---------- */
-.ticker { overflow: hidden; margin: 26px 0 0; padding: 12px 0; border-block: 1px solid var(--line); background: #fff; -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.ticker-track { display: flex; width: max-content; gap: 0; animation: tick 48s linear infinite; }
-.ticker:hover .ticker-track { animation-play-state: paused; }
-.ticker-track span { white-space: nowrap; padding: 0 26px; font-size: 15px; color: var(--muted); font-weight: 600; position: relative; }
-.ticker-track span::after { content: "✦"; position: absolute; inset-inline-end: -8px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 12px; }
-.ticker-track b { color: var(--teal-dark); font-family: "Titillium Web", "Cairo", sans-serif; font-size: 18px; margin-inline-end: 4px; }
-.ticker-track .hash { color: var(--teal-text); }
-.ticker-track .hash b { color: var(--gold-dark); font-size: 18px; }
-@keyframes tick { to { transform: translateX(50%); } }
+/* phones: a slimmer gold button keeps the trust line on one line at 360px; its min-width holds "تبرع بـ 1,000 ج", so
+   picking an amount never re-flows the title beside it */
+@media (max-width: 760px) { .home .quick-donate .qd-go { padding: 8px 12px; min-width: 8.3em; } }
+/* desktop: the same idea at the 12px 30px padding («تبرع بـ 1,000 ج» measures 160.3px), so the four chips never shift under
+   the pointer when 1,000 is picked */
+@media (min-width: 761px) { .home .quick-donate .qd-go { min-width: 162px; } }
+/* the amount on the gold button pops once when a chip changes it (home.js adds .bump) */
+.home .qd-go.bump b { animation: pop .3s var(--spring); }
+@media (prefers-reduced-motion: reduce) { .home .qd-go.bump b { animation: none; } }
+
+/* ---------- «ليه تطمن لمرسال»: four reasons to trust + three more ways to give (still: no motion) ---------- */
+.home .trust-strip { padding: 16px 0 8px; }
+.ts-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ts-tile { display: flex; align-items: center; gap: 8px; min-height: 64px; height: 100%; padding: 10px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-1); color: inherit; }
+.ts-tile:hover { border-color: var(--teal); color: inherit; }
+.ts-tile:focus-visible { box-shadow: 0 0 0 6px rgba(0,89,89,.85), var(--sh-1); } /* its own shadow would drop the halo that gives the gold ring its contrast */
+.ts-tile > span:last-child { min-width: 0; }
+.ts-ic { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--teal-soft); color: var(--teal-text); display: grid; place-items: center; }
+.ts-ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ts-tile b { display: block; font-size: 14px; line-height: 1.4; font-weight: 800; color: var(--teal-ink); }
+.ts-tile small { display: block; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.ts-tile bdi { font-family: "Titillium Web", "Cairo", sans-serif; font-weight: 700; }
+.ts-ways { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.ts-ways a { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 6px 8px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-sm); font: 700 12.5px/1.2 "Cairo", sans-serif; color: var(--teal-ink); }
+.ts-ways a:hover { border-color: var(--teal); color: var(--teal-ink); }
+.ts-ways picture { display: contents; }
+.ts-ways img { flex: none; height: 20px; width: auto; max-width: 48px; object-fit: contain; }
+.ts-ways b { font-family: "Titillium Web", "Cairo", sans-serif; }
+/* the InstaPay file is a square with a wide white margin: drawn larger so its mark matches the other two logos */
+.ts-ways img.ts-ip { height: 30px; max-width: 30px; margin-block: -5px; }
+/* phones: the logo sits above its label, so "فودافون كاش" stays on one line in a third of 360px */
+@media (max-width: 480px) {
+  .ts-ways a { flex-direction: column; gap: 3px; padding: 6px 4px; text-align: center; }
+}
+/* narrow phones (360-400px): a smaller icon leaves the words more room, so the titles break once instead of twice */
+@media (max-width: 400px) {
+  .ts-tile { gap: 7px; padding: 10px 8px; }
+  .ts-ic { width: 28px; height: 28px; }
+  .ts-ic svg { width: 16px; height: 16px; }
+  .ts-tile b { font-size: 13.5px; line-height: 1.35; }
+}
+@media (min-width: 761px) {
+  .ts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .ts-ic { width: 36px; height: 36px; }
+  /* the three links are wide here: bigger logos keep the MegaKheir wordmark and the InstaPay mark readable (44px still holds) */
+  .ts-ways img { height: 28px; max-width: 84px; }
+  .ts-ways img.ts-ip { height: 40px; max-width: 40px; margin-block: -6px; }
+}
 
 /* ---------- section titles, split layout ---------- */
 .home .section-title h2 { font-size: clamp(28px, 4.4vw, 44px); font-weight: 800; letter-spacing: 0; }
@@ -75,24 +113,88 @@
 .home #projects { background: var(--bg-2); }
 .home .car-track .card { border-radius: 22px; border: 0; }
 .home .ways-sec { background: #fff; }
-/* news strip (js/news.js, shown once data/news.json has items) sits between campaigns (white) and partners (bg-2): sand keeps them apart */
-.home .nw-home { background: var(--sand); }
+/* news strip (js/news.js, shown once data/news.json has items) sits between «على نيتك» (sand) and about (white): the light
+   teal-grey keeps it apart from both */
+.home .nw-home { background: var(--bg-2); }
 .home .way2 { border-radius: 20px; border: 0; }
+/* the bank / wallet logo rail follows the ways grid as one "how to pay" block (the id beats extras.css, which loads later) */
+.home #partners.pt-sec { background: #fff; padding-top: 0; }
+/* the InstaPay logo file is a square with a wide white margin: drawn larger in its card so the mark matches its neighbours */
+.home #partners .pt-logo[src*="3536unnamed-1c52e3b3"] { max-height: 66px; margin-block: -10px; }
+@media (max-width: 760px) { .home #partners .pt-logo[src*="3536unnamed-1c52e3b3"] { max-height: 56px; margin-block: -10px; } }
 
-/* ---------- slogan band ---------- */
-.home .slogan-band { background: var(--bg-2); position: relative; overflow: hidden; padding: 64px 0; }
-.home .slogan-band::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 20%, rgba(0,144,145,.10), transparent 55%); pointer-events: none; }
+/* ---------- slogan band (v8: the closing band: one verse, the slogan + CTA, the hotline card and two contact cards) ---------- */
+.home .slogan-band { background: var(--sand); position: relative; overflow: hidden; padding: 72px 0; }
+.home .slogan-band::before { display: none; }
 .home .slogan-band .wrap { position: relative; }
-.home .slogan-band .tag { font-size: 28px; }
 .home .contact-cards a { border-radius: 16px; }
+.sb-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center; text-align: start; }
+.sb-copy .slogan-art img { width: min(260px, 70%); margin: 0 0 10px; }
+.sb-copy p { margin: 0 0 18px; max-width: 46ch; }
+.slogan-band .contact-cards { grid-template-columns: 1fr 1fr; margin-top: 12px; }
+.slogan-band .contact-cards a { min-height: 64px; justify-content: center; }
+@media (min-width: 761px) { .slogan-band .hot-card { min-height: 168px; } }
+
+/* ---------- «على نيتك»: five intentions, each opens a flow that already exists (zakat calculator, donate, gift card) ---------- */
+.home .niyya-sec { background: var(--sand); padding: 56px 0; }
+.niyya { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.niyya a { display: flex; flex-direction: column; gap: 4px; min-height: 132px; height: 100%; padding: 18px; border-radius: var(--r-lg); background: #fff; border: 1px solid var(--sand-line); box-shadow: var(--sh-1); color: var(--ink); }
+.niyya a:hover { color: var(--ink); border-color: var(--teal); }
+.niyya a:focus-visible { box-shadow: 0 0 0 6px rgba(0,89,89,.85), var(--sh-1); } /* the tile's own shadow would drop the halo that gives the gold ring its contrast */
+.niyya b { font-size: 18px; font-weight: 800; line-height: 1.4; color: var(--teal-ink); }
+.niyya small { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+.n-ico { flex: none; width: 44px; height: 44px; border-radius: 14px; background: var(--teal-soft); color: var(--teal-text); display: grid; place-items: center; margin-bottom: 6px; }
+.n-ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.n-zakat a, .n-zakat a:hover { border: 2px solid var(--gold); }
+.n-zakat .n-ico { background: var(--gold); color: var(--teal-ink); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .niyya a { transition: transform .2s ease, box-shadow .2s ease, border-color .2s; }
+  .niyya a:hover { transform: translateY(-2px); box-shadow: var(--sh-2); }
+}
+/* zakat as a full-width row (icon beside the two lines) on tablets and phones; the other four share the rows under it */
+@media (max-width: 1023px) {
+  .niyya { grid-template-columns: repeat(4, 1fr); }
+  .niyya .n-zakat { grid-column: 1 / -1; }
+  .n-zakat a { display: grid; grid-template-columns: auto 1fr; align-content: center; column-gap: 12px; row-gap: 0; min-height: 76px; }
+  .n-zakat .n-ico { grid-row: 1 / span 2; margin: 0; }
+}
+@media (max-width: 760px) {
+  .home .niyya-sec { padding: 36px 0; }
+  .niyya { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .niyya a { min-height: 112px; padding: 14px; }
+  .niyya .n-zakat a { min-height: 76px; }
+  .niyya b { font-size: 16.5px; }
+  .niyya small { font-size: 13px; }
+}
+
+/* ---------- hospital: the three shares as tiles that open donate with the purpose + amount ---------- */
+.home .hospital-feature .hf-lead { color: var(--teal-ink); font-size: 15.5px; line-height: 1.7; margin: 16px 0 0; }
+.hf-shares { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+.hf-shares a { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; padding: 14px; min-height: 88px; border-radius: 18px; background: #fff; border: 1.5px solid var(--line); color: var(--teal-ink); }
+.hf-shares a:hover { color: var(--teal-ink); border-color: var(--teal); }
+.hf-shares b { font: 700 22px/1.1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); font-variant-numeric: tabular-nums; }
+.hf-shares b small { font: 700 13px "Cairo", sans-serif; }
+.hf-shares span { font-size: 13.5px; font-weight: 700; line-height: 1.45; }
+.hf-shares .waqf, .hf-shares .waqf:hover { background: var(--sand); border-color: var(--gold); }
+.hf-shares .waqf em { font: 800 11.5px/1 "Cairo", sans-serif; color: var(--gold-ink); background: #fff3d6; border-radius: 999px; padding: 3px 8px; align-self: flex-start; margin-bottom: 4px; }
+.hf-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.home .hospital-feature .hf-cta .btn { margin: 0; min-height: 46px; }
+.hf-more { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font-weight: 700; font-size: 15px; color: var(--teal-text); }
+.hf-more:hover { text-decoration: underline; }
+/* phones and tablets (the text column is too narrow for three tiles up to 1023px): each share is one 56px row,
+   what it buys at the start, the amount at the end */
+@media (max-width: 1023px) {
+  .hf-shares { grid-template-columns: 1fr; gap: 8px; }
+  .hf-shares a { flex-direction: row; justify-content: flex-start; align-items: center; gap: 8px; min-height: 56px; padding: 8px 14px; border-radius: 14px; }
+  .hf-shares span { order: -2; font-size: 14.5px; }
+  .hf-shares .waqf em { order: -1; align-self: center; margin: 0; }
+  .hf-shares b { margin-inline-start: auto; font-size: 20px; white-space: nowrap; }
+}
 
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
   .home .quick-bar { margin-top: -26px !important; }
   .home .quick-donate { padding: 12px; border-radius: 18px; }
-  .ticker { margin-top: 18px; padding: 9px 0; }
-  .ticker-track span { font-size: 13.5px; padding: 0 18px; }
-  .ticker-track b { font-size: 16px; }
   .home .section-title.split { flex-direction: column; align-items: flex-start; gap: 6px; }
   .home .section-title.split p { font-size: 14px; }
   /* news.css centres its split header for a row layout; stacked here it would be the only centred header on the page */
@@ -106,8 +208,13 @@
   .home .num b { font-size: 32px; }
   .home .hf-pic img { border-radius: 20px; }
   .home .about-pic img { border-radius: 20px; }
-  .home .slogan-band { padding: 40px 0; }
-  .home .slogan-band .tag { font-size: 22px; }
+  .home .slogan-band { padding: 48px 0; }
+  .sb-grid { grid-template-columns: 1fr; gap: 20px; }
+  .sb-copy { text-align: center; }
+  .sb-copy .slogan-art img { width: min(200px, 70%); margin-inline: auto; }
+  .sb-copy p { margin-inline: auto; }
+  .slogan-band .hot-card { width: 100%; }
+  .hf-cta .btn { flex: 1 1 100%; }
 }
 
 /* ---------- motion: scroll-driven reveals (progressive enhancement) ---------- */
@@ -120,9 +227,6 @@
 }
 @keyframes sdaReveal { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
 @keyframes sdaZoom { from { opacity: 0; transform: scale(.92) translateY(16px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) {
-  .ticker-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
-}
 .hf-pic img, .about-pic img { height: auto; }
 
 /* about photo as a captioned card */
@@ -231,6 +335,11 @@
 }
 /* short phones (iPhone SE size): a lower cap keeps the quick-donate card above the fold */
 @media (max-width: 760px) and (max-height: 620px) { .sl-card { max-height: 50vh; max-height: 50svh; } }
+/* 706-780px tall phones (360x740): the hero card gives up just enough height that the quick-donate card, its impact line
+   included, clears the bottom bar and its raised donate circle on the first screen (353px = the rest of that first screen:
+   header, slider padding and dots, the card and the bar). Below 706px tall, 50% would be the larger value, so the cap would
+   only shrink the photo without clearing the bar: those phones (390x664, 375x667, 360x640) keep min(60svh, 500px). */
+@media (max-width: 760px) and (min-height: 706px) and (max-height: 780px) { .sl-card { max-height: max(50vh, calc(100vh - 353px)); max-height: max(50svh, calc(100svh - 353px)); } }
 @media (min-width: 761px) {
   .home .slider { padding: 18px 0 54px; }
   .sl-track { max-width: 1400px; margin: 0 auto; border-radius: var(--r-xl); box-shadow: 0 30px 60px -20px rgba(0,0,0,.45); }
@@ -357,8 +466,6 @@
 @media (prefers-reduced-motion: reduce) { .camp.filled .bar i::after, .camp.filled .bar em, .camp.filled .camp-num, .camp.filled .camp-pct, .camp-hot::before, .eyebrow.live::before { animation: none; } }
 
 /* ================= polish v4 ================= */
-.ticker-track .dup { display: contents; }
-.ticker.off .ticker-track, .ticker:active .ticker-track { animation-play-state: paused; }
 .num b, .facts b { font-variant-numeric: tabular-nums; direction: ltr; } /* the static "+5,000" reads like the odometer (.odo is ltr) */
 @media (hover: none) {
   .btn, button, .card a, .way2, .svc, .num { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -378,10 +485,6 @@
   .home .quick-donate { backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; }
   .home .num { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(0,40,40,.32); }
 }
-.ticker { -webkit-mask: none; mask: none; position: relative; }
-.ticker::before, .ticker::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 1; pointer-events: none; }
-.ticker::before { right: 0; background: linear-gradient(270deg, #fff, rgba(255,255,255,0)); }
-.ticker::after { left: 0; background: linear-gradient(90deg, #fff, rgba(255,255,255,0)); }
 @media (max-width: 760px) { .home .sl-track { animation: none !important; } }
 /* odometer: every digit rolls on the compositor (transform only); the units digit goes first and each
    digit to its left follows 80ms later with a slight spring overshoot. Sharp digits (no blur); the 1.15em cell

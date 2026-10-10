@@ -290,6 +290,7 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 .site-footer { background: var(--teal-dark); }
 .site-footer .copyright { background: #004646; margin-top: 32px; border: 0; }
 .site-footer .two-col { columns: 2; column-gap: 20px; }
+.site-footer .two-col li { break-inside: avoid; text-wrap: balance; } /* a two-line label (اهدي تبرع أو صدقة على روح) breaks evenly, never across the columns */
 
 @media (max-width: 1100px) {
   .menu-toggle { display: block; }
@@ -542,6 +543,19 @@ html.pm-open, html.pm-open body { overflow: hidden; }
   .quick-donate .amounts { grid-column: 1 / -1; grid-row: 2; }
   .quick-donate .amounts button { padding: 8px 0; font-size: 14.5px; }
   .quick-donate .qd-go { grid-column: 2; grid-row: 1; padding: 8px 18px; font-size: 14px; width: auto; }
+}
+/* dock: a trust line under the title, the amount on the gold button, and one line saying what that amount does
+   (js/home.js writes it; the static default matches today's data, so nothing shifts) */
+.quick-donate .qd-text .qd-trust { display: inline-flex; align-items: center; gap: 5px; color: var(--teal-text); font-weight: 700; }
+.quick-donate .qd-trust svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.quick-donate .qd-impact { margin: 0; font: 700 13.5px/1.5 "Cairo", sans-serif; color: var(--teal-text); min-height: 1.5em; text-align: center; text-wrap: balance; }
+.quick-donate { flex-wrap: wrap; row-gap: 4px; }
+.quick-donate .qd-impact { flex-basis: 100%; order: 5; }
+.quick-donate .qd-go { gap: 5px; }
+.qd-go b { font-family: "Titillium Web", "Cairo", sans-serif; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .quick-donate .qd-impact { grid-column: 1 / -1; grid-row: 3; margin-top: -4px; }
+  .quick-donate .qd-text .qd-trust { font-size: 12.5px; }
 }
 
 /* ===== donation campaigns (old home "التبرعات") ===== */
@@ -1480,7 +1494,7 @@ body.menu-open .m-bar { z-index: 96; }
 /* donate side: the hotline card is HTML now (the old 282px image was blurry on phones) */
 .side-ads > a.hot-card, .hot-card { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-height: 100%; aspect-ratio: 282 / 239; padding: 18px 18px 16px; border-radius: 18px; overflow: hidden;
   color: #fff; text-decoration: none; text-align: start; background: radial-gradient(120% 90% at 85% 0%, rgba(254,200,48,.22), transparent 55%), linear-gradient(160deg, #0a8f8f, #005959 70%); box-shadow: 0 16px 32px -18px rgba(0,60,60,.7); isolation: isolate; }
-.side-ads > a.hot-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: url(../img/pattern-white.png) 0 0 / 180px; background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")); opacity: .08; }
+.hot-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: url(../img/pattern-white.png) 0 0 / 180px; background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")); opacity: .08; }
 .hot-card svg { position: absolute; top: 14px; inset-inline-end: 14px; width: 30px; height: 30px; fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .hot-card .hc-t { font-weight: 700; font-size: 14.5px; line-height: 1.45; max-width: 75%; }
 .hot-card b { font: 700 clamp(34px, 9vw, 46px)/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; color: #fff; direction: ltr; text-align: center; }
@@ -1545,3 +1559,143 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .site-footer .logo-box { max-width: 264px; }
 .site-footer .logo-box img { height: 40px; }
 @media (max-width: 760px) { .site-footer .logo-box img { height: 34px; } }
+
+/* ===== v8 donate page: visible safety, icons on the ways to give, Egyptian pay habits ===== */
+/* .dua: a short prayer line (the receipt; zakat and project pages reuse it). teal-ink on sand: 12.8:1 */
+.dua { font-weight: 800; color: var(--teal-ink); background: var(--sand); border-inline-start: 4px solid var(--gold); padding: 10px 14px; border-radius: 12px; margin: 8px 0; }
+/* page head: three still trust chips under the line. White text on a dark-teal glass (a light glass let the brightest
+   bits of the photo drop white text to 3.7:1 on phones; this keeps it at 4.5:1 or more over every pixel) */
+.ph-trust { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; }
+.ph-trust li { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(0,48,48,.38); border: 1px solid rgba(255,255,255,.35); color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+.ph-trust svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ph-trust bdi { font-family: "Titillium Web", "Cairo", sans-serif; }
+@media (max-width: 760px) {
+  /* no taller than the 190px head it replaces: h1 + line + two rows of chips */
+  .donate-page .page-head.has-photo { min-height: 0; padding: 30px 0 16px; }
+  .donate-page .page-head h1 { font-size: 26px; line-height: 1.3; }
+  .donate-page .ph-trust li { padding-block: 4px; }
+}
+/* tabs: one icon per way to give (a mask, so it takes the tab's text colour); the phone's gold check stays.
+   Scoped to donate.html: gift.html has its own .tabs */
+.donate-page .tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.donate-page .tabs button::before { content: ""; width: 18px; height: 18px; flex: none; background: currentColor; -webkit-mask: var(--ti) center / contain no-repeat; mask: var(--ti) center / contain no-repeat; }
+/* wider screens: five equal columns in one row, the icon above its label (with the icons and the longer wallets label
+   the five tabs no longer fit side by side: they wrapped to a second row at 1366px and to three-line labels at 1024px) */
+@media (min-width: 761px) {
+  .donate-page .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; }
+  .donate-page .tabs button { flex-direction: column; justify-content: flex-start; gap: 4px; padding: 12px 6px 10px; font-size: 14.5px; line-height: 1.3; }
+  .donate-page .tabs button::before { width: 20px; height: 20px; }
+}
+/* from 1180px the bar is at its full 820px: each tab on one line, its icon beside the label, sized to its label (the
+   wallets tab gets the room for «إنستاباي وفوري والمحافظ»), so the bar is a 46px row again */
+@media (min-width: 1180px) {
+  .donate-page .tabs { display: flex; flex-wrap: nowrap; }
+  .donate-page .tabs button { flex: 1 1 auto; flex-direction: row; justify-content: center; gap: 6px; padding: 12px 10px; }
+}
+#t-online { --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='5' width='19' height='14' rx='2.5'/%3E%3Cpath d='M2.5 10h19M6.5 15h4'/%3E%3C/svg%3E"); }
+#t-wallets { --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18.5 8V6a1.5 1.5 0 0 0-1.5-1.5H5.5A2.5 2.5 0 0 0 3 7v10a2.5 2.5 0 0 0 2.5 2.5h13A1.5 1.5 0 0 0 20 18V9.5A1.5 1.5 0 0 0 18.5 8H5.5A2.5 2.5 0 0 1 3 5.5'/%3E%3Ccircle cx='16' cy='14' r='1.5' fill='%23000' stroke='none'/%3E%3C/svg%3E"); }
+#t-bank { --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9.5L12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20.5h18'/%3E%3C/svg%3E"); }
+#t-home { --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 11L12 4l8.5 7M6 9.5V20h12V9.5M10 20v-5h4v5'/%3E%3C/svg%3E"); }
+#t-abroad { --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3a13.5 13.5 0 0 1 0 18a13.5 13.5 0 0 1 0-18z'/%3E%3C/svg%3E"); }
+/* step 3: the cards, a lock and the gateway wording in one green box (#11683f on #e6f6ee: 6.1:1) */
+.pay-trust { background: #e6f6ee; border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 14px; }
+.pay-trust .pay-methods { margin: 0; }
+.pay-trust .pm { background: #fff; border-color: #cfe9db; color: var(--teal-ink); }
+.pay-lock { width: 16px; height: 16px; flex: none; fill: none; stroke: #11683f; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-inline-start: auto; }
+.pay-trust .secure { margin-inline-start: 0; color: #11683f; font-weight: 700; }
+/* narrow phones: the lock + wording take the first line, the cards the second (they never split apart) */
+@media (max-width: 560px) {
+  .pay-trust .pay-lock, .pay-trust .secure { order: -1; }
+  .pay-trust .pay-lock { margin-inline-start: 0; }
+  .pay-trust .secure { flex: 1 1 calc(100% - 24px); }
+}
+/* wallets: InstaPay's three taps, what to say at a Fawry outlet, a one-tap SMS on phones */
+.pw-steps { margin: 6px 0 0; padding-inline-start: 20px; font-size: 14.5px; line-height: 1.8; }
+.pw-steps li::marker { color: var(--teal-text); font-weight: 800; }
+.pw .pw-say { margin-top: 8px; font-weight: 700; color: var(--teal-dark); }
+.pw-act { margin-top: 10px; min-height: 44px; }
+@media (pointer: fine) { .sms-only { display: none; } }
+@media print {
+  .ph-trust li { background: none; border-color: #999; color: #000; }
+  .pw-act { display: none !important; }
+}
+
+/* ===== v8 giving intentions: one verse per page, the closing band's hotline card, the donate intention chips ===== */
+/* .ayah: the page's single Quran verse (home closing band; zakat.html reuses it). Still text: never animated, never in a
+   carousel or a share image. teal-ink on sand 12.8:1, the gold-ink ornaments and citation 5.14:1 */
+.ayah { margin: 0 auto 24px; max-width: 34ch; text-align: center; font: 700 clamp(20px, 5.2vw, 28px)/2 "Cairo", sans-serif; color: var(--teal-ink); }
+.ayah p { margin: 0; color: inherit; max-width: none; font: inherit; text-wrap: balance; }
+/* the ornate brackets ﴿ ﴾ stay in the text (copy / paste keeps them), but Cairo draws them as plain parentheses that face
+   away from the verse in RTL: the glyph is made invisible and a gold SVG bracket is drawn in its place, the first one
+   opening towards the verse on the start side, the last one on the end side */
+.ayah .orn { display: inline-block; width: .42em; height: 1.18em; vertical-align: -.26em; margin-inline: .14em; overflow: hidden; color: transparent; background: var(--gold-ink);
+  --orn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 28'%3E%3Cpath fill='%23000' d='M1.6 1C8.6 6 8.6 22 1.6 27C4.4 21 4.4 7 1.6 1zM8.6 12L9.9 14L8.6 16L7.3 14z'/%3E%3C/svg%3E");
+  -webkit-mask: var(--orn) center / contain no-repeat; mask: var(--orn) center / contain no-repeat; }
+.ayah .orn:last-child { --orn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 28'%3E%3Cpath fill='%23000' d='M8.4 1C1.4 6 1.4 22 8.4 27C5.6 21 5.6 7 8.4 1zM1.4 12L2.7 14L1.4 16L0.1 14z'/%3E%3C/svg%3E"); }
+@media (forced-colors: active) { .ayah .orn { background: CanvasText; } }
+.ayah cite { display: block; margin-top: 4px; font: 600 13px "Cairo", sans-serif; font-style: normal; color: var(--gold-ink); }
+.slogan-band .hot-card { aspect-ratio: auto; min-height: 0; }
+/* the card's own shadow would drop the teal halo that gives the gold focus ring its contrast (on sand or white) */
+.side-ads > a.hot-card:focus-visible, .hot-card:focus-visible { box-shadow: 0 0 0 6px rgba(0,89,89,.85), 0 16px 32px -18px rgba(0,60,60,.7); }
+/* donate step 1: «نيتك» chips pick the same #purpose option a donor could pick by hand (js/donate.js, display only) */
+.niyya-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.niyya-chips button { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font: 700 14.5px "Cairo", sans-serif; color: var(--teal-dark); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.niyya-chips button[hidden] { display: none; }
+.niyya-chips button:hover { border-color: var(--teal); }
+.niyya-chips button[aria-checked="true"] { background: var(--teal-text); color: #fff; border-color: var(--teal-text); }
+.niyya-chips button[data-p="zakat"][aria-checked="true"] { background: var(--gold); color: var(--teal-ink); border-color: var(--gold); }
+.niyya-note { min-height: 1.6em; margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--teal-dark); }
+/* 12px above and below a 21.6px line = a 45.6px tap target; the matching negative margin keeps the note's line height */
+.niyya-note a { font-weight: 700; color: var(--teal-text); text-decoration: underline; display: inline-block; padding-block: 12px; margin-block: -12px; }
+@media (prefers-reduced-motion: no-preference) { .niyya-chips button { transition: background .2s, color .2s, border-color .2s; } }
+/* phones: four chips never fit one row, so they sit two by two at equal widths (a lone chip on a second row looked stray) */
+@media (max-width: 560px) { .niyya-chips { display: grid; grid-template-columns: 1fr 1fr; } }
+/* the success screens' prayer line keeps the .dua ink (forms.css greys every paragraph in them) */
+.req-success .dua { color: var(--teal-ink); margin: 2px 0 12px; }
+
+/* ===== v8 zakat uses + ways to give without a card (zakat.html, project pages) ===== */
+/* zakat result card: the other ways out, each opening its donate tab with zakat preselected (?for=zakat) */
+/* The links wrap as flex items, each «·» sits in the 20px gap before a link, and a dot that would open a line falls
+   outside the clipped box (the row starts 20px past it), so no line ever starts or ends on a dangling separator.
+   The 4px / 3px padding keeps the links' focus ring inside the clip. */
+.z-ways { margin: 7px -4px -3px; padding: 3px 4px; overflow: hidden; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.88); }
+.zw-row { display: flex; flex-wrap: wrap; align-items: center; margin-inline-start: -20px; }
+.zw-row > * { position: relative; margin-inline-start: 20px; }
+/* narrower than one line (375px): «أو أخرجها بـ تحويل بنكي» takes the first line and the other two share the second */
+.z-ways { container: zw / inline-size; }
+@container zw (max-width: 400px) { .zw-row > span { flex-basis: calc(100% - 20px); } }
+.zw-row > a::before { content: "\00B7"; content: "\00B7" / ""; position: absolute; inset-inline-start: -20px; top: 0; width: 20px; text-align: center; color: rgba(255,255,255,.88); font-weight: 700; pointer-events: none; }
+.z-ways a { color: #fff; text-decoration: underline; text-underline-offset: 3px; display: inline-block; min-height: 44px; line-height: 44px; font-weight: 700; }
+.z-ways a:hover { color: var(--gold); }
+.z-ways a:focus-visible { outline: 3px solid var(--gold); outline-offset: 0; border-radius: 4px; }
+/* «زكاتك بتروح فين في مرسال؟»: the page's one verse, then the zakat uses listed in the FAQ (p/51), without its figures */
+.zk-uses { background: var(--sand); padding: 48px 0; }
+.zk-uses h2 { margin: 0 0 6px; text-align: center; font-size: clamp(22px, 4.6vw, 28px); color: var(--teal-ink); }
+.zk-uses .zk-lead { margin: 0 auto; max-width: 60ch; text-align: center; color: var(--muted); font-size: 15px; text-wrap: balance; }
+.zk-cards { list-style: none; margin: 16px auto; padding: 0; max-width: 880px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.zk-cards li { background: #fff; border-radius: 14px; padding: 14px 16px; border-inline-start: 4px solid var(--gold); box-shadow: var(--sh-1); }
+.zk-cards b { display: block; color: var(--teal-ink); font-size: 16px; margin-bottom: 2px; }
+.zk-cards span { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.zk-src { margin: 0; text-align: center; font-size: 14px; color: var(--muted); text-wrap: balance; }
+/* each phrase stays whole; below 480px the line (401px) no longer fits, so the two phrases stack and the dot goes */
+.zk-src > span { display: inline-block; }
+@media (max-width: 480px) { .zk-src > span { display: block; } .zk-src > .zk-sep { display: none; } }
+/* 44px tall links on a 24px line: the padding gives the target, the negative margin keeps the line */
+.zk-src a { display: inline-block; padding-block: 10px; margin-block: -10px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) { .zk-cards { grid-template-columns: 1fr; } .zk-uses { padding: 40px 0; } }
+/* project pages (js/layout.js): the side card's project code also goes on the transfer / wallet / pickup routes */
+.side-ways { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.side-ways p { width: 100%; margin: 0; font: 700 13.5px/1.5 "Cairo", sans-serif; color: var(--teal-dark); }
+.side-ways a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13.5px; font-weight: 700; color: var(--teal-ink); text-decoration: none; }
+.side-ways a:hover { border-color: var(--teal); background: var(--teal-soft); }
+.side-ways a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.side-ways small { width: 100%; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+/* donate step 1: the impact line wraps into two even lines (no emoji left alone on the second one) */
+.impact { text-wrap: balance; }
+/* news.html before anything is published (js/news.js): the "coming soon" line leads to the official pages and the albums */
+.nw-empty.nw-soon { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 560px; margin: 0 auto; padding: 32px 0 8px; font-size: 16px; line-height: 1.8; color: var(--ink); text-wrap: balance; }
+.nw-empty.nw-soon[hidden] { display: none; }
+.nw-soon .nw-soc { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.nw-soon .nw-soc .btn { min-height: 44px; padding: 8px 18px; } /* the three fit one row at 360px */
+.nw-soon .nw-alb { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+@media print { .zk-uses .zk-src, .z-ways { display: none; } }

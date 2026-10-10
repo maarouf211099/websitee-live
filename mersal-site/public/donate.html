@@ -24,12 +24,17 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://www.mersal-ngo.org/donate.html">
 </head>
-<body>
+<body class="donate-page">
 <div id="site-header"></div>
 
 <div class="page-head has-photo"><picture><source type="image/webp" srcset="/img/old/9270-381d6513-ms.webp 1324w, /img/old/9270-381d6513-m.webp 1766w" sizes="100vw"><img class="ph-bg" src="/img/old/9270-381d6513-m.jpg" srcset="/img/old/9270-381d6513-ms.jpg 1324w, /img/old/9270-381d6513-m.jpg 1766w" sizes="100vw" alt="" fetchpriority="high" width="1766" height="1140" style="object-position:50% 28%"></picture><div class="wrap">
   <h1>طرق التبرع</h1>
-  <p>تبرعك بيوصل لمستحقيه - صدقة أو زكاة.</p>
+  <p>صدقة أو زكاة، بالطريقة اللي تريحك.</p>
+  <ul class="ph-trust" role="list">
+    <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>دفع آمن ومشفّر</li>
+    <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-2.2-1.4L13.6 21 12 19.6 10.4 21l-2.2-1.4L6 21z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/></svg>رقم متابعة لتبرعك</li>
+    <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>اسألنا على <bdi data-site="hotline">19340</bdi></li>
+  </ul>
 </div></div>
 
 <main>
@@ -38,8 +43,8 @@
       <div>
         <div class="tabs" role="tablist">
           <button role="tab" class="only-online" id="t-online" aria-controls="online" aria-selected="true">بالبطاقة البنكية</button>
+          <button role="tab" id="t-wallets" aria-controls="wallets" aria-selected="false">إنستاباي وفوري والمحافظ</button>
           <button role="tab" id="t-bank" aria-controls="bank" aria-selected="false">الحسابات البنكية</button>
-          <button role="tab" id="t-wallets" aria-controls="wallets" aria-selected="false">المحافظ والتطبيقات</button>
           <button role="tab" id="t-home" aria-controls="home" aria-selected="false">مندوب لحد البيت</button>
           <button role="tab" id="t-abroad" aria-controls="abroad" aria-selected="false">من خارج مصر</button>
         </div>
@@ -55,8 +60,15 @@
 
             <fieldset class="step" data-step="1">
               <legend class="sr-only">المبلغ وجهة التبرع</legend>
+              <div class="niyya-chips" id="niyya-chips" role="radiogroup" aria-label="نيتك">
+                <button type="button" role="radio" data-p="general" aria-checked="true" tabindex="0">تبرع عام</button>
+                <button type="button" role="radio" data-p="zakat" aria-checked="false" tabindex="-1">زكاة</button>
+                <button type="button" role="radio" data-p="sadaqa" aria-checked="false" tabindex="-1">صدقة</button>
+                <button type="button" role="radio" data-p="p30" aria-checked="false" tabindex="-1" hidden>صدقة جارية</button>
+              </div>
+              <p class="niyya-note" id="niyya-note" aria-live="polite">تبرعك بيروح للمكان اللي محتاجه أكتر.</p>
               <div class="field">
-                <label for="purpose">تبرع لـ</label>
+                <label for="purpose">أو اختار مشروع معيّن</label>
                 <select id="purpose" name="purpose">
                   <optgroup label="عام">
                     <option value="general">تبرع عام - حيث الحاجة أكبر</option>
@@ -96,7 +108,7 @@
                 <input id="email" name="email" type="email" autocomplete="email" maxlength="120" dir="ltr" inputmode="email" required>
               </div>
               <label class="check"><input type="checkbox" id="anon"> تبرع بدون ذكر اسمي</label>
-              <label class="check"><input type="checkbox" id="gift-on"> اهدي التبرع ده</label>
+              <label class="check"><input type="checkbox" id="gift-on"> اهدي التبرع ده، أو اجعله صدقة على روح حد غالي</label>
               <div class="gf-step-gift" id="gift-fields" hidden>
                 <div class="field">
                   <label for="gift-occasion">المناسبة</label>
@@ -126,9 +138,11 @@
             <fieldset class="step" data-step="3" hidden>
               <legend class="sr-only">مراجعة والدفع</legend>
               <dl class="summary" id="summary"></dl>
-              <div class="pay-methods">
-                <span class="pm">VISA</span><span class="pm">Mastercard</span><span class="pm">Meeza</span>
-                <span class="secure">دفع آمن ومشفّر</span>
+              <div class="pay-trust">
+                <div class="pay-methods">
+                  <span class="pm">VISA</span><span class="pm">Mastercard</span><span class="pm">Meeza</span>
+                  <svg class="pay-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="secure">دفع آمن ومشفّر</span>
+                </div>
               </div>
               <div class="step-nav">
                 <button class="btn btn-ghost-teal" type="button" data-prev>تعديل</button>
@@ -146,7 +160,7 @@
         </div>
 
         <div class="tab-panel" id="bank" role="tabpanel" aria-labelledby="t-bank" hidden>
-          <p>يمكنك التبرع على حساب مؤسسة مرسال عن طريق تحويل بنكي من خلال البنوك التالية:</p>
+          <div class="bk-official"><span class="bk-off-ic" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.6-3.1 8.4-7.5 9.9-4.4-1.5-7.5-5.3-7.5-9.9V6z"/><path d="M8.6 12.2l2.4 2.4 4.6-4.8"/></svg></span><div><b>حسابات مرسال الرسمية</b><p>دي حسابات مؤسسة مرسال في <span data-bank-count>7</span> <span data-bank-word>بنوك</span>. حوّل عليها بس، ولو حد كلمك باسم مرسال وطلب تحويل على رقم تاني، كلّمنا الأول على <a href="tel:19340" data-site="hotline">19340</a>.</p></div></div>
           <!-- filled from /data/donate.json (banks) by js/donate.js; this markup is the no-JS fallback -->
           <div id="bank-accounts">
           <div class="bk-grid">
@@ -336,6 +350,7 @@
               <section id="tr-success" class="stepper req-success" hidden aria-live="polite">
                 <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
                 <h2 tabindex="-1">سجّلنا تبرعك، شكراً ليك 💚</h2>
+                <p class="dua">ربنا يتقبّل منك</p>
                 <p class="req-recap" data-recap hidden></p>
                 <p>هنراجع التحويل ونأكده ونخصصه للغرض اللي اخترته.</p>
                 <div class="ref-box"><div><small>رقم الطلب - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
@@ -355,7 +370,7 @@
           <div class="pay-ways">
             <article class="pw" data-brand="instapay">
               <span class="pw-badge has-logo" aria-hidden="true"><picture><source type="image/webp" srcset="/img/old/3536unnamed-1c52e3b3.webp"><img src="/img/old/3536unnamed-1c52e3b3.png" alt="" width="48" height="48" loading="lazy" decoding="async"></picture></span>
-              <div class="pw-body"><h3>إنستاباي</h3><p>من <b>قائمة التبرعات</b> في التطبيق اختار <b>مرسال</b> وخصص تبرعك.</p></div>
+              <div class="pw-body"><h3>إنستاباي</h3><ol class="pw-steps"><li>افتح تطبيق إنستاباي</li><li>ادخل على «التبرعات»</li><li>اختار «مرسال» وحدد المبلغ</li></ol></div>
             </article>
             <article class="pw" data-brand="wallets">
               <span class="pw-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M16 14.5h2"/></svg></span>
@@ -365,7 +380,8 @@
             <article class="pw" data-brand="fawry">
               <span class="pw-badge has-logo" aria-hidden="true"><picture><source type="image/webp" srcset="/img/old/98894335english-logo-copy-f5f96cd8.webp"><img src="/img/old/98894335english-logo-copy-f5f96cd8.png" alt="" width="48" height="48" loading="lazy" decoding="async"></picture></span>
               <div class="pw-body"><h3>فوري</h3><p>من تطبيق فوري أو <b>أقرب منفذ فوري</b> بكود مرسال:</p>
-                <div class="pw-code"><b dir="ltr">9200</b><button type="button" class="copy" data-copy="9200" aria-label="نسخ كود فوري 9200"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div></div>
+                <div class="pw-code"><b dir="ltr">9200</b><button type="button" class="copy" data-copy="9200" aria-label="نسخ كود فوري 9200"><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
+                <p class="pw-say">في أي منفذ فوري قول: «تبرع لمؤسسة مرسال، كود 9200»</p></div>
             </article>
             <article class="pw" data-brand="talabat">
               <span class="pw-badge" aria-hidden="true">ط</span>
@@ -377,7 +393,8 @@
             </article>
             <article class="pw" data-brand="sms">
               <span class="pw-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 3z"/><path d="M8 9h8M8 12h5"/></svg></span>
-              <div class="pw-body"><h3>رسالة قصيرة</h3><p>ابعت رسالة فيها كلمة <b>مرسال</b> على <b dir="ltr">9599</b> بـ 5 جنيه بس.</p></div>
+              <div class="pw-body"><h3>رسالة قصيرة</h3><p>ابعت رسالة فيها كلمة <b>مرسال</b> على <b dir="ltr">9599</b> بـ 5 جنيه بس.</p>
+                <a class="btn btn-gold pw-act sms-only" href="sms:9599?&amp;body=%D9%85%D8%B1%D8%B3%D8%A7%D9%84">ابعت الرسالة دلوقتي</a></div>
             </article>
           </div>
           <p class="hint pw-more">وكمان من خلال MyFawry ومصاري وأمان ومحافظ البنوك (من خلال فوري).</p>
@@ -518,6 +535,7 @@
           <section id="pk-success" class="stepper req-success" hidden aria-live="polite">
             <div class="ok-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
             <h2 tabindex="-1">وصلنا طلبك 💚</h2>
+            <p class="dua">ربنا يتقبّل منك</p>
             <p class="req-recap" data-recap hidden></p>
             <p>مندوب مرسال هيكلمك على الموبايل اللي كتبته يأكد الميعاد قبل ما ييجي.</p>
             <p>يمكنك متابعة طلبك بالكود ده:</p>
@@ -547,17 +565,17 @@
       </div>
 
       <aside class="side-ads">
-        <a class="hot-card" href="tel:19340" aria-label="اتصل بالخط الساخن 19340 ليصلك مندوبنا لحد باب البيت">
+        <a class="hot-card" href="tel:19340" data-site-href="hotline" aria-label="اتصل بالخط الساخن 19340 ليصلك مندوبنا لحد باب البيت">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.2"/><path d="M5 21v-2.5A5.5 5.5 0 0 1 10.5 13h3a5.5 5.5 0 0 1 5.5 5.5V21M12 13l-1 4 1 2 1-2z"/></svg>
           <span class="hc-t">يمكنك التبرع من خلال الخط الساخن</span>
           <b data-site="hotline">19340</b>
           <span class="hc-s">ليصلك مندوبنا لحد باب البيت</span>
         </a>
-        <picture><source type="image/webp" srcset="/img/mega-5eer.webp"><img src="/img/mega-5eer.jpg" alt="5 جنيه بتفرق - ابعت رسالة على 9599 لمريض بمرسال" width="960" height="960" loading="lazy"></picture>
+        <a class="sms-card" href="#wallets" data-sms aria-label="ابعت رسالة فيها كلمة مرسال على 9599 بـ 5 جنيه"><picture><source type="image/webp" srcset="/img/mega-5eer.webp"><img src="/img/mega-5eer.jpg" alt="5 جنيه بتفرق - ابعت رسالة على 9599 لمريض بمرسال" width="960" height="960" loading="lazy"></picture></a>
       </aside>
     </div>
   </section>
-  <section class="alt" aria-label="تبرعك بيعمل إيه"><div class="wrap"><div id="impact-calc"></div></div></section>
+  <section class="alt" aria-label="تبرعك بيعمل إيه"><div class="wrap"><details class="ic-more"><summary>تبرعك بيعمل إيه؟ شوف كل مبلغ بيغطي إيه</summary><div id="impact-calc"></div></details></div></section>
 </main>
 
 <div id="site-footer"></div>

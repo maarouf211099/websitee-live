@@ -1,7 +1,7 @@
 // Site extras on every page. js/layout.js loads this file together with css/extras.css:
 //   (a) announcement bar under the header  <- /data/announce.json  (console tab "شريط الإعلان والشركاء")
 //   (b) floating WhatsApp button           <- MERSAL_SITE.whatsapp (console tab "بيانات الموقع"); nothing shows while it is empty
-//   (c) "بتتبرع من خلال" strip              <- /data/partners.json, rendered into <section id="partners"></section> where a page has one
+//   (c) "اتبرع من بنكك أو محفظتك" strip     <- /data/partners.json, rendered into <section id="partners"></section> where a page has one
 // Every string from the JSON files is escaped, and links must start with / # https:// http:// tel: mailto: (the API's own rule).
 (function () {
   "use strict";
@@ -138,7 +138,7 @@
     }
   }
 
-  // ---------- (c) "بتتبرع من خلال": donation channels strip ----------
+  // ---------- (c) "اتبرع من بنكك أو محفظتك": donation channels strip ----------
   function card(p) {
     var name = str(p.name, 60), logo = okImg(str(p.logo, 500)) ? str(p.logo, 500) : "", link = okHref(str(p.link, 500)) ? str(p.link, 500) : "";
     var inner = logo
@@ -155,7 +155,7 @@
       if (!list.length) { box.hidden = true; return; }
       box.classList.add("pt-sec");
       box.setAttribute("aria-labelledby", "pt-title");
-      box.innerHTML = '<div class="wrap"><div class="section-title"><span class="eyebrow">طرق التبرع</span><h2 id="pt-title">بتتبرع من خلال</h2>' +
+      box.innerHTML = '<div class="wrap"><div class="section-title"><span class="eyebrow">حسابات مرسال الرسمية</span><h2 id="pt-title">اتبرع من بنكك أو محفظتك</h2>' +
         "<p>البنوك اللي فيها حسابات مرسال، والمحافظ والتطبيقات اللي تقدر تتبرع من خلالها.</p></div></div>" +
         '<div class="pt-viewport"><div class="pt-rail"><ul class="pt-list">' + list.map(card).join("") + "</ul></div></div>" +
         '<div class="wrap pt-foot"><button type="button" class="pt-pause" aria-pressed="false" aria-label="إيقاف حركة الشريط" hidden>' + I.pause + I.play + "</button>" +

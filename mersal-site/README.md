@@ -27,7 +27,7 @@ mersal-site/
     js/layout.js         الهيدر والفوتر وشريط الموبايل (بيانات التواصل بين علامتي mersal:site)
     staticwebapp.config.json  تحويل الروابط القديمة (/Donation ...) للصفحات الجديدة + الكاش والـheaders
   api/                   Azure Functions (Node 20)
-    checkout             يبدأ الدفع على البوابة المختارة: Paymob (payment intention ← رابط صفحة الدفع) أو بنك مصر (INITIATE_CHECKOUT)
+    checkout             يبدأ الدفع على البوابة المختارة: Paymob عن طريق تطبيق مرسال (دالة التطبيق payments-donations)، أو Paymob بمفاتيح الموقع (payment intention ← رابط صفحة الدفع)، أو بنك مصر (INITIATE_CHECKOUT)
     verify               رجوع المتبرع: يسأل البوابة نفسها؛ التبرع يتحسب بس لو اتدفع فعلاً، وبعدها يتبعت للسيستم الجديد
     paymob               POST /api/paymob/callback: إشعار Paymob (HMAC + قراءة العملية من Paymob نفسها قبل التسجيل)
     payments             مراجعة العمليات المعلقة من اللوحة + إشعار بنك مصر
@@ -38,11 +38,12 @@ mersal-site/
 ## الدفع بالبطاقة
 الإعداد في أول `public/js/layout.js` ← `payMode` (من اللوحة: الإعدادات ← **الدفع بالبطاقة**):
 - `"demo"`: كل خطوات التبرع شغالة (المبلغ والمشروع ← البيانات ← المراجعة) وبتقف قبل صفحة الدفع برسالة إن الدفع قيد التفعيل وإن **مفيش أي مبلغ اتخصم**، وبتعرض طرق تانية للتبرع. مفيش أي طلب بيروح للـAPI ولا لبوابة الدفع، ومفيش تبرع بيتسجل.
-- `"live"` (الحالي، على **Paymob**): دفع حقيقي على بوابة الدفع المختارة (تحت)، ومحتاج إعداداتها في Azure + `PUBLIC_BASE_URL`. لحد ما إعدادات البوابة تتحط في Azure، المتبرع بيكمل الخطوات ويوصل لنفس رسالة `demo` ("قيد التفعيل… لم يتم خصم أي مبلغ" + الطرق التانية)، لأن `/api/checkout` بيرد `{ unavailable: true }`؛ وأول ما الإعدادات تتحط، الدفع الحقيقي بيشتغل لوحده من غير أي خطوة تانية.
+- `"live"` (الحالي، على **Paymob عن طريق تطبيق مرسال**): دفع حقيقي على بوابة الدفع المختارة (تحت). لو البوابة المختارة إعداداتها ناقصة في Azure، المتبرع بيكمل الخطوات ويوصل لنفس رسالة `demo` ("قيد التفعيل… لم يتم خصم أي مبلغ" + الطرق التانية)، لأن `/api/checkout` بيرد `{ unavailable: true }`؛ وأول ما الإعدادات تتحط، الدفع الحقيقي بيشتغل لوحده.
 - `"off"`: يخفي الدفع بالبطاقة خالص.
 
 **بوابة الدفع** (`payProvider` جنب `payMode` في نفس الملف، من اللوحة: الإعدادات ← **بوابة الدفع**):
-- `"paymob"`: صفحة Paymob الموحدة (Unified Checkout): كروت فيزا / ماستركارد / ميزة، ومحافظ إلكترونية لو ضفت Integration ID بتاعها. التفاصيل في قسم **Paymob** تحت.
+- `"app"` (الحالي): **Paymob عن طريق تطبيق مرسال**، نفس الدفع بتاع التطبيق والموقع التاني (`mersal-website`)، ومن غير أي إعدادات في Azure. التفاصيل في قسم **Paymob عن طريق تطبيق مرسال** تحت.
+- `"paymob"`: صفحة Paymob الموحدة (Unified Checkout) بمفاتيح الموقع نفسه في Azure: كروت فيزا / ماستركارد / ميزة، ومحافظ إلكترونية لو ضفت Integration ID بتاعها. التفاصيل في قسم **Paymob** تحت.
 - `"mpgs"`: صفحة الدفع الآمنة لبنك مصر (Hosted Checkout، زي ما كان).
 - لو محدش اختار من اللوحة لسه (المفتاح مش موجود في الملف): الموقع بيشتغل على **بنك مصر** (البوابة الأصلية)، مهما كانت إعدادات Azure. يعني إضافة أو شيل إعدادات `PAYMOB_*` عمرها ما بتنقل الدفع الحقيقي لبوابة تانية؛ Paymob بتشتغل بس لما تختارها وتحفظ. واللوحة بتسجّل البوابة في الملف كل مرة الدفع يتحط على `live` (حتى لو الطلب ما بعتش `payProvider`)، فالبوابة الشغالة بتبقى مكتوبة دايماً. تبويب الإعدادات ← "حالة الربط" بيعرض البوابة الشغالة دلوقتي، وإعدادات Paymob متظبطة ولا لأ (وأسماء الناقص منها بس، من غير قيم).
 - اللوحة مش بتقبل `live` على بوابة إعداداتها ناقصة (409 برسالة فيها أسماء الإعدادات الناقصة). ولو البوابة الشغالة (Paymob أو بنك مصر) إعداداتها اتشالت بعد كده، `/api/checkout` بيرفض بـ503 (واللوج فيه أسماء الإعدادات الناقصة) ومش بيحوّل لبوابة تانية من نفسه.
@@ -51,9 +52,35 @@ mersal-site/
 
 `GET /api/checkout/status` بيقول الدفع بالبطاقة يقدر يبدأ دلوقتي ولا لأ: `{ mode, provider, ready, missing? }` (`missing` = أسماء الإعدادات الناقصة أو سبب رفض المفاتيح، من غير أي قيمة). افتحه في المتصفح بعد ما تحط الإعدادات: `"ready": true` معناها الدفع الحقيقي شغال.
 وكمان فيه حد (للبوابتين): `CHECKOUT_RATE_LIMIT` (10) جلسات لكل IP في الساعة و`CHECKOUT_GLOBAL_LIMIT` (300) في الساعة للكل، عشان محدش يستخدم حساب التاجر لتجربة كروت مسروقة. والمبلغ (من `MIN_AMOUNT` لـ`MAX_AMOUNT`) والغرض بيتراجعوا على السيرفر قبل أي طلب للبوابة.
-كل جلسة دفع بتتسجل كـ "عملية معلقة" في جدول `orders` (لو `DONATIONS_STORAGE` موجود) ومعاها البوابة (`provider`)، ولو المتبرع دفع وقفل الصفحة قبل ما يرجع للموقع، زرار **"مراجعة العمليات المعلقة"** في تبويب التبرعات بيسأل البوابة اللي العملية اتعملت عليها (بنك مصر: RETRIEVE ORDER، Paymob: Transaction Inquiry) عن أي عملية عدّى عليها 15 دقيقة ويسجّل المدفوع ويبعته للـwebhook (مرة واحدة بس لكل `orderId`). اللي مش مدفوع بعد يوم بيتقفل "انتهت"، واللي محتاج حد يشوفه بيتحوّل لحالة `review` ويطلع من الطابور (تحت في **Paymob** ← المسار). لو بنك مصر فعّل إشعارات الـwebhook عندهم: ظبّط `MPGS_NOTIFICATION_SECRET` وخليهم يبعتوا على `POST /api/mpgs/notify` بالـheader `X-Notification-Secret`؛ العملية بتتقري من البنك نفسه مش من الطلب.
+مع بوابتي **Paymob بمفاتيح الموقع** و**بنك مصر** بس (مش مع "Paymob عن طريق تطبيق مرسال"، اللي التطبيق نفسه بيسجّل تبرعاته): كل جلسة دفع بتتسجل كـ "عملية معلقة" في جدول `orders` (لو `DONATIONS_STORAGE` موجود) ومعاها البوابة (`provider`)، ولو المتبرع دفع وقفل الصفحة قبل ما يرجع للموقع، زرار **"مراجعة العمليات المعلقة"** في تبويب التبرعات بيسأل البوابة اللي العملية اتعملت عليها (بنك مصر: RETRIEVE ORDER، Paymob: Transaction Inquiry) عن أي عملية عدّى عليها 15 دقيقة ويسجّل المدفوع ويبعته للـwebhook (مرة واحدة بس لكل `orderId`). اللي مش مدفوع بعد يوم بيتقفل "انتهت"، واللي محتاج حد يشوفه بيتحوّل لحالة `review` ويطلع من الطابور (تحت في **Paymob** ← المسار). لو بنك مصر فعّل إشعارات الـwebhook عندهم: ظبّط `MPGS_NOTIFICATION_SECRET` وخليهم يبعتوا على `POST /api/mpgs/notify` بالـheader `X-Notification-Secret`؛ العملية بتتقري من البنك نفسه مش من الطلب.
 
 أي زرار "تبرع الآن" جوا صفحة مشروع بيفتح التبرع ومحدد فيه المشروع ده (`/donate.html?for=p30`).
+
+## Paymob عن طريق تطبيق مرسال (الحالي)
+مفاتيح Paymob بتاعة مرسال متظبطة في سيستم **تطبيق مرسال** (مشروع Supabase بتاع التطبيق، Edge Functions)، والموقع التاني `mersal-website` بيدفع من خلاله. الموقع ده بقى بيعمل نفس الحاجة بالظبط (`api/src/lib/mersalapp.js`)، فمفيش أي مفتاح Paymob في Azure ولا في الكود:
+1. المتبرع يدوس "ادفع" ← `POST /api/checkout`: السيرفر بيراجع البيانات والحد، وبيطلب من دالة التطبيق `payments-donations` تعمل التبرع: `{ campaignId, amountEgp, donorName, donorPhone, donorEmail, subOption: "website" }`. الرد `{ orderId: "mersal-…", checkoutUrl }`، والرابط لازم يكون صفحة على `paymob.com` وإلا بيترفض.
+2. صفحة الدفع بتاعة Paymob بتفتح **جوه صفحة التبرع** (نافذة بملء الشاشة على الموبايل)، لأن Paymob بعد الدفع بترجع لصفحة التطبيق مش للموقع ده.
+3. الصفحة بتسأل `GET /api/verify?gw=app&orderId=…` كل 4 ثواني، وده بيسأل دالة التطبيق `donation-status` (اللي بتسأل Paymob نفسها لو العملية لسه معلقة). `paid` ← شاشة الشكر والهدايا وفتح مرسال كوميونيتي؛ `failed` / `refunded` ← رجوع لخطوة الدفع ومفيش أي مبلغ اتخصم. لو المتبرع قفل النافذة بيتسأل مرة أخيرة بـ `cancelled=1`، ولو الصفحة اتقفلت أو اتعملها reload وهو بيدفع، أول ما يرجع لصفحة التبرع (خلال يوم) بتتسأل مرة.
+4. **التبرع بيتسجل في سيستم التطبيق** (جدول `donations` بـ `sub_option = website`، من أول ما المتبرع يبدأ الدفع، وحالته بتتحدّث لما Paymob تأكد) مع تبرعات التطبيق والموقع التاني، وبيظهر في لوحة التطبيق / لوحة `mersal-website` ← التبرعات، **مش** في تبويب التبرعات في اللوحة دي. ومع البوابة دي الموقع مش بيستخدم جدول `orders` ولا "مراجعة العمليات المعلقة" ولا `DONATION_WEBHOOK_URL` (دول للبوابتين التانيين).
+5. النافذة: زرار ✕ أو Escape أو زرار الرجوع في الموبايل بيقفلها، والصفحة اللي وراها مش بتتلمس وهي مفتوحة. بعد نص ساعة السؤال بيبقى كل 30 ثانية، ولحد 3 ساعات.
+
+القواعد اللي دالة التطبيق ماشية بيها: المبلغ بالجنيه من غير قروش، ورقم موبايل مصري (`01xxxxxxxxx`؛ و`+20` / `0020` قبل الرقم، بالصفر أو من غيره، والأرقام العربية بتتحول). الموقع بيراجعهم قبل ما يبعت. وسياسة الخصوصية (`privacy.html`) بتقول إن بيانات المتبرع بتروح لسيستم التطبيق (Supabase).
+
+**الحملات** (الغرض اللي المتبرع اختاره ← حملة في جدول `campaigns` بتاع التطبيق، نفس اختيارات لوحة الموقع التاني):
+
+| الغرض في الموقع | حملة التطبيق |
+|---|---|
+| تبرع عام، حالات، مستشفى مرسال (`p30`)، وأي صفحة مشروع تانية | `c4835befefa` (تبرع عام) |
+| زكاة المال | `zakat:zakat-patients` |
+| صدقة | `sadaqa:sadaqa-general` |
+| مركز الأورام (`p31`، `p4`، `p5`) | `zakat:zakat-oncology` |
+| العلاج الشهري (`p37`) | `zakat:zakat-sanad` |
+
+تغيير الربط ده في `CAMPAIGNS` جوه `api/src/lib/mersalapp.js`.
+
+عنوان المشروع والمفتاح العام (publishable key) بتوع Supabase مكتوبين في الكود زي التطبيق والموقع التاني: ده مفتاح المتصفح بتاع Supabase (مش سر، والصلاحيات بتتحكم فيها Row Level Security). ولو اتغيروا: `MERSAL_SUPABASE_URL` / `MERSAL_SUPABASE_KEY` في Azure.
+
+**مهم لو رجعت لمفاتيح Paymob بتاعة الموقع (`"paymob"`):** ما تغيرش الـWebhook URL بتاع الـIntegration IDs اللي التطبيق شغال عليها، وإلا التطبيق هيبطل يسجل تبرعاته؛ اطلب من Paymob أرقام Integration منفصلة للموقع.
 
 ## Paymob
 ### الإعدادات (Static Web App → Settings → Environment variables)
@@ -74,15 +101,15 @@ mersal-site/
 
 **الموقع بياخد فلوس حقيقية بس:** مفاتيح Test (`egy_sk_test_…` / `egy_pk_test_…`) مش بتبدأ أي عملية دفع (المتبرع بيشوف رسالة "قيد التفعيل" والطرق التانية، و`/api/checkout/status` وحالة الربط في اللوحة بيقولوا إن المفاتيح تجريبية)، إلا لو حطيت `PAYMOB_ALLOW_TEST` = `1` (للنسخة التجريبية بس، تحت). ومفتاح عام من وضع غير المفتاح السري مرفوض دايماً.
 
-### التشغيل الحقيقي على طول (من غير تجربة)
-الموقع نفسه متظبط خلاص على `payMode: "live"` و`payProvider: "paymob"`، فاللي فاضل كله في Azure ولوحة Paymob:
+### التشغيل بمفاتيح الموقع نفسه (بدل تطبيق مرسال)
+اختار من اللوحة "بوابة الدفع: Paymob" (أو `payProvider: "paymob"` في `layout.js`)، وبعدين كل اللي فاضل في Azure ولوحة Paymob:
 1. في لوحة Paymob اختار **Live** من فوق (مش Test) وهات منها: Secret Key (`egy_sk_live_…`)، Public Key (`egy_pk_live_…`)، API Key، HMAC Secret، والـIntegration IDs بتوع **Live** (الكارت الأول).
 2. Azure Portal ← الـStatic Web App (`jolly-moss-063f03a10`) ← Settings ← **Environment variables** ← Production ← ضيف: `PAYMOB_SECRET_KEY`، `PAYMOB_PUBLIC_KEY`، `PAYMOB_API_KEY`، `PAYMOB_HMAC_SECRET`، `PAYMOB_INTEGRATION_IDS`، و`PUBLIC_BASE_URL` (عنوان الموقع الحالي `https://jolly-moss-063f03a10.3.azurestaticapps.net` لحد ما الدومين يتنقل، وبعدها `https://www.mersal-ngo.org`)، و`DONATIONS_STORAGE` (عشان التبرعات تتسجل وتتراجع) ← **Apply** ← Save.
-3. في لوحة Paymob على كل Integration ID **Live**: Webhook URL = `<PUBLIC_BASE_URL>/api/paymob/callback` وRedirect URL = `<PUBLIC_BASE_URL>/donate.html?gw=paymob` ← Save Changes. (ولما الدومين يتنقل غيّر الرابطين و`PUBLIC_BASE_URL` مع بعض.)
+3. في لوحة Paymob على كل Integration ID **Live** خاص بالموقع (مش بتوع التطبيق): Webhook URL = `<PUBLIC_BASE_URL>/api/paymob/callback` وRedirect URL = `<PUBLIC_BASE_URL>/donate.html?gw=paymob` ← Save Changes. (ولما الدومين يتنقل غيّر الرابطين و`PUBLIC_BASE_URL` مع بعض.)
 4. افتح `<PUBLIC_BASE_URL>/api/checkout/status`: لازم يبقى `"ready": true`. لو فيه `missing` هتلاقي فيه اسم الإعداد الناقص أو إن المفاتيح تجريبية.
 5. اعمل تبرع حقيقي صغير (مثلاً 10 جنيه) من الموبايل وتأكد إنه ظهر في لوحة Paymob (Transactions) وفي تبويب التبرعات.
 
-### في لوحة Paymob نفسها (مرة واحدة، لكل Integration ID في الوضعين)
+### في لوحة Paymob نفسها (مرة واحدة، لكل Integration ID خاص بالموقع في الوضعين، مش بتوع التطبيق)
 Settings ← Payment Integrations ← دوس على الـIntegration ID ← ظبّط وبعدين Save Changes:
 - **Webhook URL** (Transaction processed callback): `https://www.mersal-ngo.org/api/paymob/callback`
 - **Redirect URL** (Transaction response callback): `https://www.mersal-ngo.org/donate.html?gw=paymob`
@@ -128,14 +155,14 @@ Settings ← Payment Integrations ← دوس على الـIntegration ID ← ظ�
 | `PUBLIC_BASE_URL` | `https://www.mersal-ngo.org` بعد ربط الدومين (منه روابط الرجوع والإشعار للبوابتين) |
 | `PAYMOB_SECRET_KEY` / `PAYMOB_PUBLIC_KEY` / `PAYMOB_API_KEY` / `PAYMOB_HMAC_SECRET` / `PAYMOB_INTEGRATION_IDS` | لـPaymob، شوف قسم **Paymob** فوق (فين تلاقي كل واحد) |
 
-اختياري: `PAYMOB_BASE_URL`، `PAYMOB_CHECKOUT_URL`، `MPGS_GATEWAY`، `MERCHANT_DISPLAY_NAME` (افتراضي MERSAL CHARITY)، `MIN_AMOUNT` (10)، `MAX_AMOUNT`، `ORDER_PREFIX` (MERSAL-WEB)، `PAY_MODE` (يثبّت وضع الدفع للسيرفر)، `PAYMOB_ALLOW_TEST` (`1` = مفاتيح Paymob التجريبية تبدأ عمليات، للنسخة التجريبية بس)، `CHECKOUT_RATE_LIMIT` / `CHECKOUT_GLOBAL_LIMIT`، `VERIFY_RATE_LIMIT` (30 تأكيد Paymob لكل IP في الساعة)، `MPGS_NOTIFICATION_SECRET`، `CLIENT_IP_HEADER` (اسم header تاني للـIP لو المنصة اتغيرت؛ الافتراضي `X-Azure-ClientIP` / `X-Client-IP` وبعدها آخر عنوان عام في `X-Forwarded-For`).
+اختياري: `PAYMOB_BASE_URL`، `PAYMOB_CHECKOUT_URL`، `MPGS_GATEWAY`، `MERCHANT_DISPLAY_NAME` (افتراضي MERSAL CHARITY)، `MIN_AMOUNT` (10)، `MAX_AMOUNT`، `ORDER_PREFIX` (MERSAL-WEB)، `PAY_MODE` (يثبّت وضع الدفع للسيرفر)، `PAYMOB_ALLOW_TEST` (`1` = مفاتيح Paymob التجريبية تبدأ عمليات، للنسخة التجريبية بس)، `MERSAL_SUPABASE_URL` / `MERSAL_SUPABASE_KEY` (عنوان ومفتاح سيستم تطبيق مرسال لو اتغيروا)، `CHECKOUT_RATE_LIMIT` / `CHECKOUT_GLOBAL_LIMIT`، `VERIFY_RATE_LIMIT` (30 تأكيد Paymob لكل IP في الساعة)، `MPGS_NOTIFICATION_SECRET`، `CLIENT_IP_HEADER` (اسم header تاني للـIP لو المنصة اتغيرت؛ الافتراضي `X-Azure-ClientIP` / `X-Client-IP` وبعدها آخر عنوان عام في `X-Forwarded-For`).
 
 ## الدومين
 Static Web App → **Custom domains** → `www.mersal-ngo.org` (CNAME) و`mersal-ngo.org`.
 غيّر الـDNS بس بعد ما تجرب تبرع حقيقي على رابط `*.azurestaticapps.net`.
 
 ## إرسال التبرعات للسيستم الجديد
-بعد ما البوابة (بنك مصر أو Paymob) تأكد الدفع، الموقع يبعت `POST` لـ `DONATION_WEBHOOK_URL` بنفس الشكل للبوابتين (مع Paymob: `gatewayTransactionId` = رقم العملية عند Paymob و`receipt` = رقم الإيصال لو موجود):
+بعد ما البوابة (بنك مصر أو Paymob بمفاتيح الموقع) تأكد الدفع، الموقع يبعت `POST` لـ `DONATION_WEBHOOK_URL` (التبرعات عن طريق تطبيق مرسال مش بتعدّي على الـwebhook ده، لأنها بتتسجل في سيستم التطبيق نفسه) بنفس الشكل للبوابتين (مع Paymob: `gatewayTransactionId` = رقم العملية عند Paymob و`receipt` = رقم الإيصال لو موجود):
 ```json
 {
   "source": "mersal-website",

@@ -137,6 +137,7 @@ app.http("adminMe", {
         // Paymob: ready to take real donations, or the NAMES of the missing settings + why the keys cannot (never values),
         // and test/live from the key prefix
         paymob: paymob.ready(), paymobMissing: pay.missingFor("paymob"), paymobMode: paymob.mode(),
+        app: pay.ready("app"), // Paymob through the Mersal app's backend: ready unless MERSAL_SUPABASE_URL is set wrong
         payModeEnv: String(process.env.PAY_MODE || "").trim().toLowerCase() || null });
       return p.renew ? { ...res, cookies: [await sessionFor(req, p.userDetails, p.auth)] } : res;
     } catch (e) { return fail(e, ctx); }
@@ -283,7 +284,7 @@ app.http("adminSettings", {
     try {
       const p = await requireAdmin(req);
       const path = "public/js/layout.js";
-      const providers = () => ({ paymob: pay.ready("paymob"), mpgs: pay.ready("mpgs") });
+      const providers = () => ({ app: pay.ready("app"), paymob: pay.ready("paymob"), mpgs: pay.ready("mpgs") });
       if (req.method === "GET") {
         const s = pay.read(await readFile(path));
         return json(200, { payMode: s.mode, payProvider: pay.effective(s.provider), payProviderSaved: s.provider, providers: providers() });
@@ -300,6 +301,7 @@ app.http("adminSettings", {
         // real payments only through a gateway whose settings are in Azure (names only in the message)
         if (b.payMode === "live" && !pay.ready(provider)) {
           throw Object.assign(new Error(provider === "mpgs" ? "إعدادات بنك مصر (MPGS_MERCHANT / MPGS_API_PASSWORD) مش متظبطة في Azure"
+            : provider === "app" ? "MERSAL_SUPABASE_URL في إعدادات Azure مش رابط https صحيح (امسحه عشان يرجع للعنوان الأصلي)"
             : "إعدادات Paymob مش متظبطة في Azure، ناقص: " + pay.missingFor("paymob").join("، ")), { status: 409 });
         }
         return [{ path, content: pay.write(js, b.payMode, b.payProvider || (b.payMode === "live" ? provider : null)) }];

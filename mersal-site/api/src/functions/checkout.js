@@ -1,6 +1,9 @@
 // POST /api/checkout  { amount, purpose, name, email, phone }
 // Starts a card payment at the gateway chosen in the console ("بوابة الدفع" = payProvider in js/layout.js, lib/pay.js;
 // not chosen yet = Banque Misr, whatever settings exist; a chosen gateway whose settings are missing = 503, never another):
+//   App:         Paymob through the Mersal app's own backend (lib/mersalapp.js, the app's payments-donations function, which
+//                records the donation in the app's table) -> { orderId: "mersal-…", provider: "app", checkoutUrl }, shown
+//                inside the donate page; whole pounds and an Egyptian mobile number only (what that function takes)
 //   Paymob:      creates a payment intention (lib/paymob.js) -> { orderId, provider: "paymob", redirect } (Unified Checkout URL)
 //   Banque Misr: creates a Hosted Checkout session with the same INITIATE_CHECKOUT body that is live today (hco-v100c)
 //                -> { orderId, sessionId, successIndicator }
@@ -22,6 +25,8 @@ const limits = require("../lib/limits");
 const donations = require("../lib/donations");
 const paymob = require("../lib/paymob");
 const pay = require("../lib/pay");
+const mersalapp = require("../lib/mersalapp");
+const { randomUUID } = require("crypto");
 
 const PURPOSES = {
   general: "تبرع عام", zakat: "زكاة", sadaqa: "صدقة",
@@ -36,7 +41,7 @@ const OTHER_WAYS = "تقدر تتبرع بالتحويل البنكي أو ال�
 // card payment cannot start at all right now (switch off / unknown, gateway settings missing): the page offers the rest
 const unavailable = (status, message) => ({ status, jsonBody: { message, unavailable: true } });
 
-// -> { mode: "off" | "demo" | "live", provider: "paymob" | "mpgs" }
+// -> { mode: "off" | "demo" | "live", provider: "app" | "paymob" | "mpgs" }
 let payCache = null;
 const settled = (mode, saved) => ({ mode, provider: pay.effective(saved) });
 async function paySettings() {
@@ -88,7 +93,8 @@ app.http("checkout", {
     if (ps.mode !== "live") return unavailable(403, "الدفع بالبطاقة مش مفعّل دلوقتي. " + OTHER_WAYS);
     // the chosen gateway cannot start a payment (settings missing, Paymob test keys): before the limits, nothing to count
     if (!pay.ready(ps.provider)) {
-      ctx.error(ps.provider === "paymob" ? "checkout: Paymob not ready:" : "checkout: Banque Misr settings missing:", pay.missingFor(ps.provider).join(", "));
+      ctx.error(ps.provider === "paymob" ? "checkout: Paymob not ready:" : ps.provider === "app" ? "checkout: Mersal app backend settings invalid:"
+        : "checkout: Banque Misr settings missing:", pay.missingFor(ps.provider).join(", "));
       return unavailable(503, "الدفع بالبطاقة مش متاح دلوقتي. " + OTHER_WAYS);
     }
 
@@ -100,13 +106,18 @@ app.http("checkout", {
     if (!Number.isFinite(amount) || amount < MIN || amount > MAX) return bad(`المبلغ يجب أن يكون بين ${MIN} و ${MAX} جنيه`);
     const name = clean(b.name, 80);
     const email = clean(b.email, 120);
-    const phone = clean(b.phone, 20).replace(/[^\d+]/g, "");
+    const phone = mersalapp.asciiDigits(clean(b.phone, 20)).replace(/[^\d+]/g, ""); // ٠١٠… typed on an Arabic keyboard counts
     // general/zakat/... or a project page from the old site ("p30" = /p/30.html); own keys only ("constructor" is not one)
     const pk = typeof b.purpose === "string" ? b.purpose : "";
     const purpose = Object.prototype.hasOwnProperty.call(PURPOSES, pk) || /^p\d{1,4}$/.test(pk) ? pk : "general";
     if (name.length < 2) return bad("من فضلك اكتب الاسم");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("البريد الإلكتروني غير صحيح");
     if (phone.length < 8) return bad("رقم الموبايل غير صحيح");
+    // Paymob through the app: whole pounds and an Egyptian mobile number, as the app's function takes them
+    if (ps.provider === "app") {
+      if (!Number.isInteger(amount)) return bad("المبلغ لازم يكون بالجنيه من غير قروش");
+      if (!mersalapp.egyptMobile(phone)) return bad("اكتب رقم موبايل مصري صحيح (11 رقم يبدأ بـ 01)");
+    }
 
     // every session counts (the bank call is what card testing abuses)
     const ip = limits.clientIp(req), log = (...a) => ctx.warn(...a), now = Date.now();
@@ -118,6 +129,7 @@ app.http("checkout", {
     await limits.hit("checkout", ip, now, log);
     await limits.hit("checkout", "*", now, log);
 
+    if (ps.provider === "app") return appCheckout({ amount, purpose, name, email, phone }, ctx);
     const orderId = newOrderId();
     const origin = String(process.env.PUBLIC_BASE_URL || new URL(req.url).origin).trim().replace(/\/+$/, "");
     if (ps.provider === "paymob") return paymobCheckout({ orderId, amount, purpose, name, email, phone, origin }, ctx);
@@ -182,6 +194,25 @@ app.http("checkoutStatus", {
     return out({ mode: ps.mode, provider: ps.provider, ready: ps.mode === "live" && !missing.length, ...(missing.length ? { missing } : {}) });
   },
 });
+
+// Paymob through the Mersal app's backend: the app's function creates its order and the Paymob checkout and records the
+// donation in the app's own table (nothing is saved here). The donate page shows the checkout inside the page and asks
+// /api/verify?gw=app until the app reports it paid or failed.
+async function appCheckout({ amount, purpose, name, email, phone }, ctx) {
+  let r;
+  try {
+    r = await mersalapp.createDonation({ amount, purpose, name, email, phone, idempotencyKey: "web-" + randomUUID() });
+  } catch (e) {
+    if (e.status === 400) {
+      ctx.warn("app checkout: refused by the app's function", mersalapp.redact(e.message));
+      return bad("بيانات التبرع مش مقبولة، راجع المبلغ ورقم الموبايل وحاول تاني.");
+    }
+    ctx.error("app checkout failed", mersalapp.redact(e.message));
+    return { status: 502, jsonBody: { message: "تعذّر الاتصال ببوابة الدفع. حاول مرة أخرى بعد قليل." } };
+  }
+  ctx.log("checkout created", r.orderId, amount, purpose, "app");
+  return { status: 200, headers: { "Cache-Control": "no-store" }, jsonBody: { orderId: r.orderId, provider: "app", checkoutUrl: r.checkoutUrl } };
+}
 
 // Paymob: pending order first (when the orders table exists: no payment is started that the callback could not match),
 // then the intention; the donor is sent to Paymob's Unified Checkout with the returned URL (public key + client secret).

@@ -42,10 +42,11 @@
   var MODE = (window.MERSAL_SITE && window.MERSAL_SITE.payMode) || "off";
   var PROVIDER = (window.MERSAL_SITE && window.MERSAL_SITE.payProvider) || "";
   // what the donor is told about the gateway (Banque Misr wording unchanged; neutral while the server picks the gateway)
-  var GW = PROVIDER === "mpgs" ? { secure: "🔒 دفع آمن عبر بنك مصر", page: "صفحة بنك مصر", go: "جاري التحويل لبوابة بنك مصر…" }
-    : PROVIDER === "paymob" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري التحويل لصفحة الدفع الآمنة (Paymob)…" }
-    : PROVIDER === "app" ? { secure: "🔒 دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري فتح صفحة الدفع الآمنة (Paymob)…" }
-    : { secure: "🔒 دفع آمن ومشفّر", page: "صفحة الدفع", go: "جاري التحويل لصفحة الدفع الآمنة…" };
+  // (the lock is an icon next to this text in donate.html: .pay-lock)
+  var GW = PROVIDER === "mpgs" ? { secure: "دفع آمن عبر بنك مصر", page: "صفحة بنك مصر", go: "جاري التحويل لبوابة بنك مصر…" }
+    : PROVIDER === "paymob" ? { secure: "دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري التحويل لصفحة الدفع الآمنة (Paymob)…" }
+    : PROVIDER === "app" ? { secure: "دفع آمن عبر Paymob", page: "صفحة Paymob", go: "جاري فتح صفحة الدفع الآمنة (Paymob)…" }
+    : { secure: "دفع آمن ومشفّر", page: "صفحة الدفع", go: "جاري التحويل لصفحة الدفع الآمنة…" };
   var fmt = new Intl.NumberFormat("ar-EG-u-nu-latn");
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   // ٠١٢… / ۰۱۲… -> 012…
@@ -100,6 +101,28 @@
       clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove("done"); t.textContent = "نسخ"; }, 1600);
     });
   });
+  // The donation receipt ("تأكيد التبرع", paidScreen): "احفظ التأكيد" prints only the receipt (css: html.rcpt-print in
+  // forms.css), "ابعت الفرحة لصحابك" shares the page (never the amount): the phone's share sheet, else WhatsApp.
+  var JOY = "اتبرعت لمرضى مرسال النهارده، وانت كمان تقدر تبعت فرحة #ابعت_فرحة";
+  document.addEventListener("click", function (e) {
+    if (e.target.closest("[data-print-rcpt]")) {
+      document.documentElement.classList.add("rcpt-print");
+      window.print();
+      return;
+    }
+    if (e.target.closest("[data-share-joy]")) {
+      var url = location.origin + "/donate.html";
+      var wa = function () { window.open("https://wa.me/?text=" + encodeURIComponent(JOY + " " + url), "_blank", "noopener"); };
+      if (navigator.share) navigator.share({ title: "مؤسسة مرسال", text: JOY, url: url }).catch(function (x) { if (!x || x.name !== "AbortError") wa(); });
+      else wa();
+    }
+  });
+  addEventListener("afterprint", function () { document.documentElement.classList.remove("rcpt-print"); });
+  // "ابعت رسالة على 9599": on a touch phone the side picture opens the SMS app with the word ready; elsewhere it stays
+  // a link to the wallets tab (the hashchange handler above opens it)
+  if (window.matchMedia && matchMedia("(pointer: coarse)").matches) {
+    document.querySelectorAll("[data-sms]").forEach(function (a) { a.href = "sms:9599?&body=" + encodeURIComponent("مرسال"); });
+  }
   // Bank accounts, wallets and the account abroad come from /data/donate.json (edited from the console, "بيانات الموقع");
   // the markup already in donate.html is the fallback while it loads or if it fails.
   function row(label, value) { return '<div class="bank"><div><b>' + esc(label) + "</b><code>" + esc(value) + '</code></div><button class="copy" data-copy="' + esc(value) + '">' + CI + "<span>نسخ</span></button></div>"; }
@@ -180,6 +203,11 @@
       var bankBox = document.getElementById("bank-accounts");
       bankBox.innerHTML = bankCards(banks);
       bankLogoFallback(bankBox);
+      // "في 7 بنوك": the distinct banks, with the Arabic counted noun (3-10 بنوك, 11+ بنك, 2 بنكين, 1 بنك واحد)
+      var names = {}, k = 0;
+      banks.forEach(function (b) { var n = String(b.name).trim(); if (n && !names[n]) { names[n] = 1; k++; } });
+      document.querySelectorAll("[data-bank-count]").forEach(function (el) { el.textContent = k > 2 ? k : ""; });
+      document.querySelectorAll("[data-bank-word]").forEach(function (el) { el.textContent = k > 10 ? "بنك" : k > 2 ? "بنوك" : k === 2 ? "بنكين" : "بنك واحد"; });
     }
     var wallets = (d.wallets || []).filter(function (w) { return w && w.name && w.value; });
     document.getElementById("wallet-numbers").innerHTML = wallets.map(function (w) { return row(w.name, w.value); }).join("");
@@ -530,9 +558,17 @@
     forget(o.orderId);
     form.hidden = true;
     recordDonation({ orderId: o.orderId, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "", demo: false });
-    show("ok", "شكراً لك! تم استلام تبرعك بمبلغ <b>" + fmt.format(amt) + " جنيه</b> بنجاح.<br>" +
-      'رقم العملية: <code dir="ltr">' + esc(o.orderId) + "</code><br>احتفظ برقم العملية للرجوع إليه." +
-      '<br><a class="btn btn-gold" href="/community.html" style="margin-top:10px">🎁 شوف هداياك في مرسال كوميونيتي</a>');
+    // the receipt ("تأكيد التبرع", not an official receipt): amount, purpose, date and the order number to quote
+    show("ok", '<div class="rcpt"><div class="rcpt-head"><span class="rcpt-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>' +
+      '<h2 tabindex="-1">شكراً لك! تبرعك وصل</h2><p class="dua">' + ((saved.purpose || o.purpose) === "zakat" ? "ربنا يتقبّل زكاتك ويبارك لك في مالك" : "ربنا يتقبّل منك ويجعله في ميزان حسناتك") + "</p></div>" +
+      '<dl class="rcpt-rows"><dt>المبلغ</dt><dd><b>' + fmt.format(amt) + " جنيه</b></dd>" +
+      "<dt>الغرض</dt><dd>" + esc(saved.purposeTitle || purposeText().trim() || "تبرع عام") + "</dd>" +
+      "<dt>التاريخ</dt><dd>" + new Date().toLocaleDateString("ar-EG-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }) + "</dd>" +
+      '<dt class="rcpt-ref">رقم العملية</dt><dd class="rcpt-ref"><code dir="ltr">' + esc(o.orderId) + '</code> <button type="button" class="copy" data-copy="' + esc(o.orderId) + '" aria-label="نسخ رقم العملية">' + CI + "<span>نسخ</span></button></dd></dl>" +
+      '<p class="rcpt-next">احتفظ برقم العملية. لو عندك أي سؤال عن تبرعك كلّمنا على <a href="tel:19340">19340</a> وقول الرقم ده.</p>' +
+      '<div class="rcpt-actions"><button type="button" class="btn btn-ghost-teal" data-print-rcpt>احفظ التأكيد</button>' +
+      '<button type="button" class="btn btn-ghost-teal" data-share-joy>ابعت الفرحة لصحابك</button>' +
+      '<a class="btn btn-gold" href="/community.html">شوف هداياك في مرسال كوميونيتي</a></div></div>');
     if (window.MersalGift) window.MersalGift.afterDonation(result.querySelector(".alert"), { paid: true, amount: amt, purpose: saved.purpose || o.purpose || "general", purposeTitle: saved.purposeTitle || "" });
     var al = result.querySelector(".alert"); if (al) { al.setAttribute("tabindex", "-1"); focusLater(al); }
   }

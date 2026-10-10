@@ -33,8 +33,8 @@
   var fmtN = new Intl.NumberFormat("en-US");
   // Odometer: "16,601" -> each digit rolls to its value (transform only, so it stays smooth on phones).
   // --i counts from the units digit, so the roll starts on the right and carries leftwards like a real
-  // odometer (CSS adds the delay, spring overshoot and the short blur). Returns the ms until it settles.
-  var ODO_MS = 1100, ODO_STEP = 80;
+  // odometer (CSS adds the delay and the spring overshoot; ODO_MS matches the CSS transition). Returns the ms until it settles.
+  var ODO_MS = 800, ODO_STEP = 80;
   function odometer(el, value, prefix) {
     var str = fmtN.format(Math.round(value)), total = str.replace(/\D/g, "").length, k = 0;
     // role="img" + aria-label: the rolling digits are presentational and the number is read once, as a whole
@@ -208,9 +208,11 @@
       }
       // imported blurbs are cut at 110 characters: end them on a whole word with an ellipsis
       var t = String(c.text || "").trim(); if (t.length >= 110) t = t.replace(/\s+\S*$/, "").replace(/[\s،,.:؛]+$/, "") + "…";
+      // gold is for giving: a plain link to a project page is a teal outline "اعرف أكتر"; a donate link stays gold
+      var info = /^\/p\//.test(c.link || "") && !c.button;
       return '<article class="card"><div class="media-box">' + window.mersalPic(c.imageSm || c.image, { alt: c.title, cls: "media", w: 600, h: 375 }) + "</div>" +
         '<div class="body"><h3>' + esc(c.title) + "</h3><p>" + esc(t) + "</p>" + bar +
-        '<a class="btn btn-gold" href="' + esc(c.link || "/donate.html") + '">' + esc(c.button || (/^\/p\//.test(c.link || "") ? "اعرف أكثر" : "تبرع للحملة")) + "</a></div></article>";
+        '<a class="btn ' + (info ? "btn-ghost-teal" : "btn-gold") + '" href="' + esc(c.link || "/donate.html") + '">' + esc(info ? "اعرف أكتر" : c.button || "تبرع للحملة") + "</a></div></article>";
     }).join("");
     carouselArrows(track);
     fitMedia(track);

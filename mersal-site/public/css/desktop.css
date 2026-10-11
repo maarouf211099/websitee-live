@@ -221,7 +221,7 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .section-title { text-align: start; margin-bottom: 40px; }
 .section-title h2::after { display: none; }
 .section-title p, .home .section-title p { margin: 12px 0 0; }
-.section-title.split, .home .section-title.split { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; align-items: end; }
+.section-title.split, .home .section-title.split { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 24px; align-items: end; }
 .section-title.split > div { grid-column: 1; grid-row: 1; min-width: 0; }
 .section-title.split > p, .home .section-title.split > p { grid-column: 1; grid-row: 2; margin: 12px 0 0; max-width: 56ch; }
 .section-title.split > :not(div):not(p) { grid-column: 2; grid-row: 1; align-self: end; }
@@ -268,6 +268,10 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 /* §5 Zakat, gift and community (body.zakat-page, body.gift, body.community) */
 
 /* §6 Project and content pages (/p/*.html, contact, help, volunteer, albums, afia, news, legal, 404) */
+
+/* news.html: its head photo is a social-media post with a white frame; in the framed window (§2) a slight zoom keeps
+   that frame out of view */
+.news .page-head .ph-bg { transform: scale(1.14); object-position: 50% 22%; }
 
 /* Project pages: the "ادعم: ..." side card sits beside the article from the first screen.
    legacy.js inserts .share-bar right after the article and site.css pins it to column 1 (row 2), so the

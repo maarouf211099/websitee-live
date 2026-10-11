@@ -56,6 +56,10 @@ section.alt { background: var(--sand); } /* the grey --bg-2 band is retired on w
 
 /* --- header, every width from 761px: one bar (the top bar's links moved into it), no scroll-progress line --- */
 .topbar { display: none; }
+/* js/layout.js (a deferred script) replaces the #site-header placeholder with the bar; until then the placeholder holds
+   the bar's exact room and colour, so a first paint before the script runs moves nothing (the room js/layout.js reserves
+   for a remembered announcement bar is added in the same script run, so a second visit does not shift either) */
+#site-header { min-height: var(--hdr-h); background: var(--teal-dark); }
 .site-header, .site-header.scrolled { box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 8px 24px -16px rgba(0,0,0,.5); }
 .site-header::after { display: none; }
 .site-header .wrap { min-height: var(--hdr-h); gap: 10px; }
@@ -73,6 +77,9 @@ section.alt { background: var(--sand); } /* the grey --bg-2 band is retired on w
 .hdr-zakat { align-items: center; flex: none; min-height: 44px; padding: 0 12px; border: 1.5px solid rgba(254,200,48,.6); border-radius: 999px;
   color: var(--gold); font-size: 14.5px; font-weight: 700; white-space: nowrap; text-decoration: none; transition: background .2s, color .2s; }
 .hdr-zakat:hover, .hdr-zakat[aria-current="page"] { background: rgba(254,200,48,.14); color: var(--gold); }
+/* press feedback (transform only), like the site's buttons */
+.hdr-tel, .hdr-zakat, .m-close { transition: background .2s, border-color .2s, color .2s, transform .22s var(--spring, ease); }
+.hdr-tel:active, .hdr-zakat:active, .m-close:active { transform: scale(.94); }
 
 /* --- desktop header (1180px and wider): logo | menu | zakat | hotline | search | gold "تبرع الآن", one row.
    Measured with today's menu (Cairo 15px bold): with 8px gaps and 8px menu padding the row fits inside the shared column
@@ -124,6 +131,9 @@ section.alt { background: var(--sand); } /* the grey --bg-2 band is retired on w
   .site-header .hdr-tel + .search-btn { margin-inline-start: 0; }
   .site-header .wrap > .btn-gold { order: 4; padding: 0 18px; }
   .site-header .menu-toggle { order: 5; width: 44px; height: 44px; margin: 0; flex: none; }
+  /* once the page scrolls the logo settles a little smaller (transform only: the 68px bar and the page do not move) */
+  .site-header .brand { transform-origin: 100% 50%; }
+  .site-header.scrolled .brand, .site-header.scrolled .brand:hover { transform: scale(.9); }
 }
 body.nav-compact .site-header .wrap { min-height: 68px; }
 body.nav-compact .site-header .brand { order: 1; }
@@ -301,5 +311,5 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 /* §9 Reduced motion (always last) */
 @media (prefers-reduced-motion: reduce) {
   .m-sheet, .m-sheet.closing, body.menu-open:has(#m-sheet:not([hidden]))::before, body:has(#m-sheet.closing)::before { animation: none !important; }
-  .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
+  .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .site-header .brand, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
 }

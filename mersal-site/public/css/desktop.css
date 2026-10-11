@@ -39,5 +39,17 @@
   .page-grid > .legacy ~ .page-side { grid-column: 2; grid-row: 1 / span 2; }
   .page-grid:has(> .legacy ~ .page-side) { grid-template-rows: auto 1fr; }
 }
+/* Short desktop viewports (a 1366x768 laptop leaves ~657px, 1920x1080 at 125% leaves ~730px): the stuck card
+   (622px, 654px when the title wraps) would end below the fold for the whole article, so the hotline card
+   stays cut off and a focused link in it stays off-screen (the page scrolls, the stuck card moves with it).
+   Drop the hotline card there, as site.css already does at 960px and below (19340 stays in the top bar, the
+   page's "اتصل 19340" button and the footer): the card is then 510-543px and ends by 627px. Below 640px tall
+   even that does not fit, so the card stops sticking and scrolls with the page instead of being cut off. */
+@media (min-width: 961px) and (max-height: 760px) {
+  .page-grid > .legacy ~ .page-side .side-card.hot { display: none; }
+}
+@media (min-width: 961px) and (max-height: 639px) {
+  .page-grid > .legacy ~ .page-side { position: static; }
+}
 
 /* §9 Reduced motion (always last) */

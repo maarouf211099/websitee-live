@@ -16,6 +16,10 @@ const SIZES = "(max-width: 1400px) 100vw, 1400px";
 // browser scales them by HEIGHT: the photo is 80% of a 4:5.4 card that is 100vw-28px wide, which draws the crop
 // ~140vw wide. Saying so in sizes is what makes a dpr-2 phone pick the 1.5x crop and a 3x phone the 2x one.
 const M_SIZES = "(max-width: 760px) 140vw";
+// A "split" slide (it has the -ms/-m photo crops AND a title) shows the same photo crop at every width: the card on phones,
+// the photo beside the real HTML title from 761px (css/desktop.css §3). One candidate set, no media query; phones still
+// resolve 140vw and pick the same file as before, tablets and desktops the crop at its drawn width.
+const D_SIZES = "(max-width: 760px) 140vw, (max-width: 960px) 92vw, (max-width: 1599px) 54vw, 760px";
 
 // Phone candidates for a slide: [{src, w}] from opts.mobileSet (tools/render-home.js: the -ms/-m pair written by
 // tools/optimize_images.py with their real widths) or the single slide.mobile / opts.mobileFor(banner) file.
@@ -24,12 +28,25 @@ function mobileSet(s, opts) {
   const m = s.mobile || (opts.mobileFor ? opts.mobileFor(s.banner) : null);
   return m ? [{ src: m }] : [];
 }
+const isSplit = (s, opts) => !!(s && s.banner && s.title && mobileSet(s, opts || {}).length);
 const srcsetOf = (set, fn) => set.map((c) => esc(fn(c.src)) + (c.w ? ` ${c.w}w` : "")).join(", ");
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
 
 function picture(s, i, opts) {
   const full = s.banner, sm = s.bannerSm, mset = mobileSet(s, opts);
   const pre = i >= 2 ? "data-" : ""; // cards 3+ wake up after window load (see home.js)
+  const prio = i === 0 ? ' fetchpriority="high"' : i === 1 ? ' fetchpriority="low"' : "";
+  const alt = esc(s.alt || s.title || "");
+  if (isSplit(s, opts)) {
+    const last = mset[mset.length - 1], dim = last.w === 1766 ? ' width="1766" height="1140"' : "";
+    if (mset.length > 1) {
+      let h = "<picture>";
+      if (mset.every((c) => webp(c.src))) h += `<source type="image/webp" ${pre}srcset="${srcsetOf(mset, webp)}" sizes="${D_SIZES}">`;
+      return h + `<img ${pre}src="${esc(last.src)}" ${pre}srcset="${srcsetOf(mset, (u) => u)}" sizes="${D_SIZES}"${dim} alt="${alt}"${prio} decoding="async"></picture>`;
+    }
+    // a single crop: a plain src (an admin upload has no .webp sibling; a tool-made one gets its webp source)
+    return "<picture>" + (webp(last.src) ? `<source type="image/webp" ${pre}srcset="${esc(webp(last.src))}">` : "") + `<img ${pre}src="${esc(last.src)}"${dim} alt="${alt}"${prio} decoding="async"></picture>`;
+  }
   let h = "<picture>";
   if (mset.length) {
     const sz = mset.length > 1 ? ` sizes="${M_SIZES}"` : "";
@@ -39,7 +56,6 @@ function picture(s, i, opts) {
   const set = sm ? `${esc(sm)} 1200w, ${esc(full)} 1920w` : esc(full);
   const setW = sm ? (webp(sm) && webp(full) ? `${esc(webp(sm))} 1200w, ${esc(webp(full))} 1920w` : null) : webp(full) && esc(webp(full));
   if (setW) h += `<source type="image/webp" ${pre}srcset="${setW}"${sm ? ` sizes="${SIZES}"` : ""}>`;
-  const prio = i === 0 ? ' fetchpriority="high"' : i === 1 ? ' fetchpriority="low"' : "";
   h += `<img ${pre}src="${esc(full)}"${sm ? ` ${pre}srcset="${set}" sizes="${SIZES}"` : ""} width="1920" height="570" alt="${esc(s.alt || s.title || "")}"${prio} decoding="async"></picture>`;
   return h;
 }
@@ -56,7 +72,8 @@ function card(s, i, n, opts) {
   const style = s.banner ? ` style="--focus:${esc(s.focus || "50% 50%")}"` : ` style="--bg:url('${esc(s.image || "/img/hero.jpg")}')"`;
   // ARIA carousel pattern: the slide is a group (role + roledescription live here, so the link keeps
   // its link role); the link's name is "button: title" instead of every word of the card plus the alt.
-  return `<div class="sl-card${i === 0 ? " on" : ""}${s.banner ? "" : " txt"}"${style} role="group" aria-roledescription="slide" aria-label="${i + 1} من ${n}">` +
+  const kind = !s.banner ? " txt" : isSplit(s, opts) ? " split" : " poster";
+  return `<div class="sl-card${i === 0 ? " on" : ""}${kind}"${style} role="group" aria-roledescription="slide" aria-label="${i + 1} من ${n}">` +
     `<a class="sl-link" href="${esc(s.link || "/donate.html")}" aria-label="${esc(button)}: ${esc(title)}">` +
     (s.banner ? picture(s, i, opts) : "") + copy + "</a></div>";
 }
@@ -76,6 +93,12 @@ function preload(s, opts) {
   if (!s || !s.banner) return "";
   opts = opts || {};
   const mset = mobileSet(s, opts), mobile = mset.length > 0;
+  if (isSplit(s, opts)) {
+    // the same candidates and sizes as the split <picture>, for every width: one request, reused by the <img>
+    const allW = mset.every((c) => webp(c.src)), fn = allW ? webp : (u) => u, type = allW ? ' type="image/webp"' : "";
+    if (mset.length > 1) return `<link rel="preload" as="image"${type} imagesrcset="${srcsetOf(mset, fn)}" imagesizes="${D_SIZES}" fetchpriority="high">`;
+    return `<link rel="preload" as="image"${type} href="${esc(fn(mset[0].src))}" fetchpriority="high">`;
+  }
   const out = [];
   if (mobile) {
     // same candidates and sizes as the <source> above, so the browser reuses the preloaded file
@@ -120,4 +143,4 @@ function apply(indexHtml, content, opts) {
   return out.replace(/(id="slides" data-rev=")[^"]*(")/, `$1${rev(content.slides || [])}$2`);
 }
 
-module.exports = { html, dots, preload, data, rev, apply, webp };
+module.exports = { html, dots, preload, data, rev, apply, webp, D_SIZES };

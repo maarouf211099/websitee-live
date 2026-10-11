@@ -391,7 +391,15 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 /* campaigns: the first (admin order) is featured across the row, the others are horizontal cards, 2 a row from 961px.
    The 1:1 posters are never cropped; their price and state chips sit under the picture instead of over its text. */
 .home .campaigns-sec { padding-top: 56px; }
-@media (min-width: 1600px) { .home .campaigns-sec { padding-top: 64px; } }
+/* from 1180px the lead sits beside the title (end of the row), so a 1920x1080 first screen reaches the featured card */
+@media (min-width: 1180px) {
+  .home .camp-title.split { margin-bottom: 28px; }
+  .home .camp-title.split > p { grid-column: 2; grid-row: 1; align-self: end; max-width: 36ch; margin: 0 0 8px; text-align: end; }
+}
+@media (min-width: 1600px) {
+  .home .campaigns-sec { padding-top: 48px; }
+  .home .sl-card.split picture { width: min(100%, 720px); justify-self: end; }
+}
 .home .camp-carousel .car-track { display: grid; grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); gap: var(--gap);
   overflow: visible; padding: 0; margin: 0; scroll-snap-type: none; }
 .home .camp-carousel .car-arrow { display: none; }
@@ -431,6 +439,7 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .home .about-pic img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 30%; border-radius: var(--r-xl); box-shadow: var(--sh-2); }
 @media (max-width: 1179px) {
   .home .about-intro .grid-2 { display: flex; flex-direction: column-reverse; align-items: stretch !important; gap: 32px; }
+  .home .about-pic { width: 100%; max-width: none; margin: 0; }
   .home .about-pic img { aspect-ratio: 16 / 9; max-height: 420px; }
   .home .hospital-feature .grid-2 { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .home .hf-pic img { aspect-ratio: 16 / 9; max-height: 420px; width: 100%; object-fit: cover; }
@@ -445,7 +454,7 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .home .num:first-child { padding-inline-start: 0; }
 .home .num:hover { background: none; transform: translateY(-3px); }
 .home .num b { font-size: var(--fs-stat); }
-.home .num span { font-size: 15px; color: rgba(255,255,255,.92); }
+.home .num > span { font-size: 15px; color: rgba(255,255,255,.92); }
 .home a.num::after { display: inline-flex; align-items: center; min-height: 44px; padding-top: 4px; font-size: 13.5px; color: #fff; }
 .home a.num:hover::after { color: var(--gold); }
 /* hospital: the photo 7 columns at the start, the story 5 at the end; the facts as a stat row */
@@ -469,6 +478,10 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 
 /* lower sections */
 .home .ic-title { font-size: var(--fs-h2); }
+/* impact calculator (css/impact.css may load after this file: the page class wins): 8 tiles = 2 full rows from 1240px */
+.home .ic-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1180px) { .home .ic { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } .home .ic-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1240px) { .home .ic-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .home .svc-i { background: var(--teal-soft); color: var(--teal-text); }
 .home #projects { background: var(--sand); }
 /* the projects carousel: its arrows sit in a row above the track at the end, level with the section title, never over a card */
@@ -485,7 +498,8 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .home #projects .card img.media.fit { object-fit: contain; background: var(--teal-soft); }
 /* ways: the card tile is the teal feature (2 rows), the other six fill 3 x 2, no orphan row */
 @media (min-width: 1180px) {
-  .home .ways-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+  .home .ways-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+  .home .ways-grid .way2 { flex: none; }
   .home .ways-grid > .way2.only-online { grid-row: span 2; justify-content: center; background: var(--teal-text); color: #fff; }
   .home .ways-grid > .way2.only-online b { color: #fff; font-size: 20px; }
   .home .ways-grid > .way2.only-online small { color: rgba(255,255,255,.92); font-size: 14px; }

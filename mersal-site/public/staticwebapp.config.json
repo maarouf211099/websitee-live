@@ -34,7 +34,7 @@
       "headers": {
         "X-Robots-Tag": "noindex, nofollow",
         "Cache-Control": "no-cache",
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-eEXHgkW/HNcIlBcoANz+ilt9qKESofsKvfYnddGaXmw='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'"
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'"
       }
     },
     {

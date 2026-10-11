@@ -119,6 +119,7 @@
     ["/privacy.html", "سياسة الخصوصية"], ["/terms.html", "شروط الاستخدام"]
   ].filter(function (n) { return n[0]; });
   var here = location.pathname.replace(/index\.html$/, "");
+  var PHONE_PATH = "M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z";
 
   var header =
     '<div class="topbar"><div class="wrap">' +
@@ -133,15 +134,30 @@
       '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo.webp"><img src="/img/brand-logo.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></picture></a>' +
       '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
-        return '<li><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
+        return "<li" + (n[0] === "/" ? ' class="nav-home"' : "") + '><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
       }).join("") + "</ul>" +
+      // tablets and desktop only (css/site.css hides both on phones, where the top bar and the bottom bar carry them):
+      // the zakat calculator from 1280px, the hotline as an icon (from 1366px, with its number from 1600px; tablets: icon)
+      '<a class="hdr-zakat" href="/zakat.html"' + (/^\/zakat\.html$/.test(location.pathname) ? ' aria-current="page"' : "") + ">حساب الزكاة</a>" +
+      (SITE.hotline ? '<a class="hdr-tel" href="tel:' + escA(SITE.hotline) + '" aria-label="الخط الساخن ' + escA(SITE.hotline) + '" title="الخط الساخن">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + PHONE_PATH + '"/></svg><b>' + escA(SITE.hotline) + "</b></a>" : "") +
       '<button type="button" class="search-btn" aria-label="بحث في الموقع"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>' +
       '<a class="btn btn-gold" href="/donate.html">تبرع الآن</a>' +
     "</div></header>";
 
   var year = new Date().getFullYear();
+  // Pre-footer strip (tablets and desktop; hidden on phones): hotline + donate + zakat, on every page except the home page,
+  // the pages that end with their own "ساهم مع مرسال" band (main .cta-band: every /p/ page), donate and zakat.
+  // No h3 in it: the first footer h3 stays the foundation's name.
+  var fStrip = document.body.classList.contains("home") || document.querySelector("main .cta-band") || /\/(donate|zakat)\.html$/.test(location.pathname) ? "" :
+    '<div class="f-strip"><div class="wrap">' +
+      '<p class="fs-text"><b>محتاج مساعدة في التبرع؟</b><span>مندوبنا يوصلك لحد باب البيت</span></p>' +
+      (SITE.hotline ? '<a class="fs-tel" href="tel:' + escA(SITE.hotline) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + PHONE_PATH + '"/></svg>' +
+        "<span><small>كلمنا على الخط الساخن</small><b>" + escA(SITE.hotline) + "</b></span></a>" : "") +
+      '<div class="fs-btns"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a><a class="btn btn-ghost" href="/zakat.html">احسب زكاتك</a></div>' +
+    "</div></div>";
   var footer =
-    '<footer class="site-footer"><div class="wrap cols">' +
+    '<footer class="site-footer">' + fStrip + '<div class="wrap cols">' +
       "<div>" +
         '<div class="logo-box"><picture><source type="image/webp" srcset="/img/brand-logo-h.webp"><img src="/img/brand-logo-h.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="302" height="52" loading="lazy" decoding="async"></picture></div>' +
         "<h3>" + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + "</h3>" +
@@ -199,6 +215,7 @@
     try { sideFor = sideBtn ? new URL(sideBtn.href, location.href).searchParams.get("for") || "" : ""; } catch (e) {}
     if (/^p\d+$/.test(sideFor) && !NOT_CAUSE.test(sideFor) && !sideBtn.parentNode.querySelector(".side-ways")) {
       var wHref = "/donate.html?for=" + sideFor;
+      sideBtn.insertAdjacentHTML("afterend", '<p class="side-trust">دفع آمن ومشفّر · رقم متابعة لكل تبرع</p>');
       sideBtn.parentNode.insertAdjacentHTML("beforeend",
         '<div class="side-ways"><p>مش معاك كارت؟ تبرع لنفس المشروع بـ</p>' +
           '<a href="' + wHref + '#wallets">إنستاباي أو فوري</a>' +
@@ -281,7 +298,7 @@
     var cur = it.href && here === it.href ? ' aria-current="page"' : "";
     if (!kids.length) return it.href ? '<li><a href="' + esc(it.href) + '"' + cur + ">" + esc(it.title) + "</a></li>" : "";
     var open = kids.some(function (k) { return k.href === here; });
-    return '<li class="has-sub' + (open ? " active" : "") + '"><button type="button" class="sub-toggle" aria-expanded="false">' + esc(it.title) + '<span aria-hidden="true">▾</span></button>' +
+    return '<li class="has-sub' + (open ? " active" : "") + '"><button type="button" class="sub-toggle" aria-expanded="false">' + esc(it.title) + '<span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></button>' +
       '<ul class="sub">' + (it.href ? '<li><a href="' + esc(it.href) + '">' + esc(it.title) + "</a></li>" : "") +
       kids.map(function (k) { return '<li><a href="' + esc(k.href) + '"' + (k.href === here ? ' aria-current="page"' : "") + ">" + esc(k.title) + "</a></li>"; }).join("") + "</ul></li>";
   }
@@ -295,14 +312,18 @@
       });
     });
   }
-  document.addEventListener("click", function () {
+  var tabletUp = matchMedia("(min-width: 761px)");
+  document.addEventListener("click", function (e) {
     document.querySelectorAll("#nav .has-sub.open").forEach(function (x) { x.classList.remove("open"); x.firstChild.setAttribute("aria-expanded", "false"); });
+    // tablets and desktop: a click outside the open drawer (on its scrim) closes it, and the focus goes back to the burger
+    if (tabletUp.matches && document.getElementById("m-sheet") && menuOpen() && !(e.target.closest && e.target.closest("#m-sheet, .menu-toggle"))) { setMenu(false); toggle.focus(); }
   });
   fetch("/data/menu.json").then(function (r) { return r.json(); }).then(function (tree) {
     if (!tree || !tree.length) return;
-    document.getElementById("nav").innerHTML = '<li><a href="/"' + (here === "/" ? ' aria-current="page"' : "") + ">الرئيسية</a></li>" + tree.map(navItem).join("");
+    document.getElementById("nav").innerHTML = '<li class="nav-home"><a href="/"' + (here === "/" ? ' aria-current="page"' : "") + ">الرئيسية</a></li>" + tree.map(navItem).join("");
     bindSubs();
     buildSheet(tree);
+    fitHeader();
   }).catch(function () {});
 
   // Phone menu: a full-height sheet (quick actions, groups as accordions, contact, social) built from the same tree
@@ -328,7 +349,12 @@
         (it.href ? row({ href: it.href, title: "كل " + it.title }) : "") + kids.map(row).join("") + "</div></div></details>";
     }).join("");
     var wa = SITE.whatsapp ? String(SITE.whatsapp).replace(/\D/g, "") : "";
-    var html = '<div class="m-sheet" id="m-sheet" hidden><div class="m-sheet-in">' +
+    // .m-sheet-head is the tablet drawer's logo + close button (hidden on phones). It sits before .m-sheet-in, so the
+    // phone sheet's rows keep their places (and their staggered entrance).
+    var html = '<div class="m-sheet" id="m-sheet" hidden>' +
+      '<div class="m-sheet-head"><a class="m-brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo.webp"><img src="/img/brand-logo.png" alt="" width="78" height="46" loading="lazy" decoding="async"></picture></a>' +
+        '<button type="button" class="m-close" aria-label="إغلاق القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+      '<div class="m-sheet-in">' +
       '<button type="button" class="m-search-row" id="m-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>ابحث في الموقع…</span></button>' +
       '<div class="m-quick">' +
         '<a href="/donate.html#online" class="q-donate">' + ic.donate + "<span>تبرع الآن</span></a>" +
@@ -351,6 +377,7 @@
     sheet.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { setMenu(false, true, true); })) setMenu(false, true); });
     // the sheet's history entry is handed over to the search panel (no Back in between)
     document.getElementById("m-search").addEventListener("click", function () { setMenu(false, true, true); openSearch(); });
+    sheet.querySelector(".m-close").addEventListener("click", function () { setMenu(false); toggle.focus(); });
     // groups: <details> opens at once (so the rows exist), then .is-open grows the height (css grid-rows); closing runs the other way
     sheet.querySelectorAll(".m-group > summary").forEach(function (sm) {
       sm.addEventListener("click", function (e) {
@@ -395,7 +422,7 @@
     return true;
   }
   addEventListener("popstate", function () {
-    if (menuOpen()) setMenu(false, true, true);
+    if (menuOpen()) { setMenu(false, true, true); if (tabletUp.matches && document.getElementById("m-sheet")) toggle.focus({ preventScroll: true }); }
     if (!panel.hidden) closeSearch(true);
   });
 
@@ -466,7 +493,7 @@
     if (!noHistory) { if (open && !was) overlayOpen("menu"); else if (!open && was) overlayClosed("menu"); }
     if (sheet) {
       clearTimeout(sheetTimer); sheet.classList.remove("closing");
-      if (open) { sheet.hidden = false; sheet.scrollTop = 0; }
+      if (open) { sheet.hidden = false; sheet.scrollTop = 0; if (tabletUp.matches) { var mc = sheet.querySelector(".m-close"); if (mc) mc.focus({ preventScroll: true }); } }
       else if (instant || sheet.hidden || reduce) sheet.hidden = true;
       else { sheet.classList.add("closing"); sheetTimer = setTimeout(function () { sheet.hidden = true; sheet.classList.remove("closing"); }, 200); }
       nav.classList.remove("open");
@@ -489,6 +516,25 @@
     var sub = document.querySelector("#nav .has-sub.open");
     if (sub) { sub.classList.remove("open"); var t = sub.querySelector(".sub-toggle"); if (t) { t.setAttribute("aria-expanded", "false"); t.focus(); } }
   });
+  // Header guard (1180px and wider, where the whole menu sits in one row): the menu comes from the console, so a longer
+  // menu must never push the header past the screen. When the row overflows, .hdr-tight hides the zakat link and the
+  // hotline and tightens the menu; when it still overflows, body.nav-compact switches to the tablet header and its
+  // drawer at that width (css/desktop.css). Runs after the menu renders, on resize and once the fonts are in.
+  var wideHdr = matchMedia("(min-width: 1180px)"), fitRaf = 0;
+  function fitHeader() {
+    var w = hdr.querySelector(".wrap"), body = document.body;
+    hdr.classList.remove("hdr-tight"); body.classList.remove("nav-compact");
+    if (wideHdr.matches && w.scrollWidth > w.clientWidth + 1) {
+      hdr.classList.add("hdr-tight");
+      if (w.scrollWidth > w.clientWidth + 1) body.classList.add("nav-compact");
+    }
+    // the drawer only exists below 1180px (or in compact mode): one left open while the window grew is closed
+    if (wideHdr.matches && !body.classList.contains("nav-compact") && document.getElementById("m-sheet") && menuOpen()) setMenu(false, true);
+  }
+  addEventListener("resize", function () { if (!fitRaf) fitRaf = requestAnimationFrame(function () { fitRaf = 0; fitHeader(); }); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHeader);
+  fitHeader();
+
   // Mobile menu footer: donate + hotline (added once the menu is built)
   function menuCta() {
     if (nav.querySelector(".m-menu-cta")) return;

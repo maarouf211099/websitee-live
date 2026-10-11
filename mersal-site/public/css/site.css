@@ -279,9 +279,9 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 }
 .nav .sub a { color: var(--ink); display: block; padding: 8px 12px; font-weight: 600; font-size: 14px; white-space: normal; }
 .nav .sub a:hover, .nav .sub a[aria-current="page"] { background: var(--teal-soft); color: var(--teal-text); }
-@media (hover: hover) and (min-width: 1101px) {
-  .nav .has-sub:hover > .sub { opacity: 1; visibility: visible; transform: none; transition: opacity .2s, transform .2s; }
-  .nav .has-sub:hover > .sub-toggle span { transform: rotate(180deg); }
+@media (hover: hover) and (min-width: 1180px) {
+  body:not(.nav-compact) .nav .has-sub:hover > .sub { opacity: 1; visibility: visible; transform: none; transition: opacity .2s, transform .2s; }
+  body:not(.nav-compact) .nav .has-sub:hover > .sub-toggle span { transform: rotate(180deg); }
 }
 .nav .has-sub.open > .sub { opacity: 1; visibility: visible; transform: none; transition: opacity .2s, transform .2s; }
 .menu-toggle span { background: #fff; }
@@ -292,7 +292,7 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 .site-footer .two-col { columns: 2; column-gap: 20px; }
 .site-footer .two-col li { break-inside: avoid; text-wrap: balance; } /* a two-line label (اهدي تبرع أو صدقة على روح) breaks evenly, never across the columns */
 
-@media (max-width: 1100px) {
+@media (max-width: 1179px) {
   .menu-toggle { display: block; }
   .site-header .btn-gold { display: none; }
   .nav { display: none; position: absolute; top: 100%; inset-inline: 0; flex-direction: column; background: var(--teal-dark); padding: 8px 16px 16px; max-height: calc(100vh - 110px); overflow-y: auto; box-shadow: 0 16px 30px rgba(0,0,0,.25); }
@@ -337,8 +337,8 @@ a.card:hover, .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px
 .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
 .skip-link { position: absolute; top: -48px; inset-inline-start: 12px; z-index: 300; background: var(--gold); color: var(--teal-ink); padding: 8px 14px; border-radius: 0 0 10px 10px; font-weight: 700; }
 .skip-link:focus { top: 0; color: var(--teal-ink); }
-@media (max-width: 1100px) { .search-btn { margin-inline-start: auto; } .menu-toggle { margin-inline-start: 0; } }
-@media (max-width: 1100px) { .site-header .search-btn { order: 2; } .site-header .menu-toggle { order: 3; } }
+@media (max-width: 1179px) { .search-btn { margin-inline-start: auto; } .menu-toggle { margin-inline-start: 0; } }
+@media (max-width: 1179px) { .site-header .search-btn { order: 2; } .site-header .menu-toggle { order: 3; } }
 
 /* home: about intro, hospital feature, services */
 .eyebrow { display: inline-block; color: var(--gold-dark); font-weight: 800; font-size: 14px; letter-spacing: .3px; margin-bottom: 6px; }
@@ -744,7 +744,7 @@ html.pm-open, html.pm-open body { overflow: hidden; }
 .m-bar .m-donate svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
 .m-bar .m-call, .m-bar .m-zakat { color: var(--teal-dark); gap: 2px; }
 .m-menu-cta { display: none; }
-@media (max-width: 1100px) {
+@media (max-width: 1179px) {
   body.menu-open { overflow: hidden; }
   .menu-toggle span { transition: transform .25s, opacity .25s; }
   .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -865,7 +865,7 @@ img.media { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover;
 .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-@media (max-width: 1100px) { .menu-toggle { display: flex; } }
+@media (max-width: 1179px) { .menu-toggle { display: flex; } }
 
 @media (max-width: 760px) {
   .site-header .wrap { min-height: 60px; }
@@ -1208,7 +1208,7 @@ form#contact .btn { min-width: 160px; }
 .m-social a { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; color: var(--teal); }
 .m-social svg { width: 20px; height: 20px; }
 body.menu-open .m-bar { z-index: 96; }
-@media (min-width: 1101px) { .m-sheet { display: none !important; } }
+@media (min-width: 1180px) { body:not(.nav-compact) .m-sheet { display: none !important; } }
 @media (max-width: 760px) {
   .m-bar.six { grid-template-columns: repeat(6, 1fr); padding: 0 2px; }
   .m-bar.six a, .m-bar.six button { font-size: 10.5px; }
@@ -1272,9 +1272,9 @@ body.menu-open .m-bar { z-index: 96; }
   .fab-donate::before { content: ""; position: absolute; inset: -3px; border-radius: 999px; border: 2px solid rgba(254,200,48,.7); animation: ring 2.4s ease-out infinite; pointer-events: none; }
   .fab-donate:not(.show)::before { animation-play-state: paused; }
 }
-/* wide screens: the sticky header always shows its own "تبرع الآن" (hidden below 1101px), so no floating copy covers
-   the content; phones use the bottom bar, and 761-1100px tablets keep the floating button */
-@media (min-width: 1101px) {
+/* wide screens: the sticky header always shows its own "تبرع الآن", so no floating copy covers the content (phones use
+   the bottom bar). From 761px css/desktop.css hides it too: the tablet header (761-1179px) has its own gold button */
+@media (min-width: 1180px) {
   .fab-donate { display: none; }
 }
 
@@ -1699,3 +1699,9 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .nw-soon .nw-soc .btn { min-height: 44px; padding: 8px 18px; } /* the three fit one row at 360px */
 .nw-soon .nw-alb { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
 @media print { .zk-uses .zk-src, .z-ways { display: none; } }
+
+/* ===== v9 desktop hooks: elements js/layout.js adds for tablets and desktop. Invisible on phones (css/desktop.css,
+   linked for 761px and wider, shows them), so the phone design stays exactly as it is ===== */
+.hdr-zakat, .hdr-tel, .m-sheet-head, .f-strip, .side-trust { display: none; }
+/* the dropdown caret is a small SVG chevron (it was a ▾ character) */
+.nav .sub-toggle span svg { display: block; width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }

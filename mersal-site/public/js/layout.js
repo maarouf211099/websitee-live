@@ -224,6 +224,17 @@
           '<a href="' + wHref + '#home">مندوب لحد البيت</a>' +
           "<small>بعد ما تحوّل سجّل تبرعك في الصفحة عشان يتخصص للمشروع ده.</small></div>");
     }
+    // "مبلغ تاني" under the side card's amount chips: same project code as the chips, any whole amount
+    var sideAm = document.querySelector(".page-side .side-card.donate .side-amounts");
+    if (sideAm && !sideAm.querySelector(".amt-other")) {
+      var amBase = ""; try { var a0 = sideAm.querySelector("a"); var u0 = a0 && new URL(a0.href, location.href); if (u0) { u0.searchParams.delete("amount"); u0.hash = ""; amBase = u0.pathname + u0.search; } } catch (e) {}
+      if (amBase) {
+        sideAm.insertAdjacentHTML("beforeend", '<form class="amt-other side-other"><span>مبلغ تاني</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="اكتب المبلغ" aria-label="اكتب مبلغ تاني بالجنيه"><button type="submit">تبرع</button></form>');
+        var sf = sideAm.querySelector(".side-other"), si = sf.querySelector("input");
+        si.addEventListener("input", function () { var r = si.value.replace(/[\u0660-\u0669]/g, function (d) { return d.charCodeAt(0) - 0x0660; }).replace(/\D/g, ""); if (si.value !== r) si.value = r; });
+        sf.addEventListener("submit", function (e) { e.preventDefault(); var n = parseInt(si.value, 10); if (!n) { si.focus(); return; } location.href = amBase + (amBase.indexOf("?") < 0 ? "?" : "&") + "amount=" + Math.max(10, n) + "#online"; });
+      }
+    }
     // the floating donate button (phones; desktop has the sticky header button) stays off the request/contact forms
     if (!/(help|volunteer|contact)\.html$/.test(location.pathname)) document.body.insertAdjacentHTML("beforeend", '<a class="btn btn-gold fab-donate" href="' + dHref + '">تبرع الآن</a>');
     document.body.insertAdjacentHTML("beforeend",

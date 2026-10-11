@@ -32,11 +32,24 @@
     b.addEventListener("click", function () {
       form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.remove("on"); });
       b.classList.add("on"); input.value = b.dataset.v; if (window.mersalTap) window.mersalTap(8);
+      if (qdOther) { qdOther.value = ""; qdOther.parentNode.classList.remove("on"); }
       var v = +b.dataset.v;
       if (qdAmt) qdAmt.textContent = fmt.format(v);
       if (qdGo) { qdGo.classList.remove("bump"); void qdGo.offsetWidth; qdGo.classList.add("bump"); }
       qdImpact(v);
     });
+  });
+  // "مبلغ تاني": any whole amount (Arabic or Latin digits); empty goes back to 500
+  var qdOther = document.getElementById("qd-other");
+  if (qdOther) qdOther.addEventListener("input", function () {
+    var raw = qdOther.value.replace(/[\u0660-\u0669]/g, function (d) { return d.charCodeAt(0) - 0x0660; }).replace(/[\u06F0-\u06F9]/g, function (d) { return d.charCodeAt(0) - 0x06F0; }).replace(/\D/g, "");
+    if (qdOther.value !== raw) qdOther.value = raw;
+    var v = parseInt(raw, 10) || 0, chips = form.querySelectorAll(".amounts button");
+    chips.forEach(function (x) { x.classList.toggle("on", !v && x.dataset.v === "500"); });
+    qdOther.parentNode.classList.toggle("on", !!v);
+    v = v || 500; input.value = v;
+    if (qdAmt) qdAmt.textContent = fmt.format(v);
+    qdImpact(v);
   });
   // (as a deferred script this runs while readyState is already "interactive" but before DOMContentLoaded; later() repeats it
   // with the fetched content.json in any case)
@@ -303,6 +316,7 @@
           (price && st !== "done" ? '<div class="camp-qty" role="group" aria-label="عدد ' + esc(unit) + '"><button type="button" data-d="1" aria-label="زيادة">+</button><output aria-live="polite">1</output><button type="button" data-d="-1" aria-label="تقليل">−</button></div>' : "") +
           '<a class="btn btn-gold camp-give" href="' + (st === "done" ? "/donate.html#online" : base + (price || "") + "#online") + '" data-base="' + base + '">' +
             (st === "done" ? "ادعم حالة تانية" : price ? (c.cta ? esc(c.cta) : 'تبرع بـ <b class="amt">' + fmt.format(price) + "</b> ج") : "تبرع الآن") + "</a></div>" +
+        '' + (st !== "done" ? '<a class="camp-other" href="' + base.replace(/&amount=$/, "") + '&custom=1#online">أو اكتب مبلغ تاني</a>' : "") +
         '<div class="camp-links"><a class="camp-more" href="' + esc(link) + '">تفاصيل الحملة ←</a>' +
           '<button type="button" class="camp-share" data-title="' + esc(c.title) + '" data-url="' + esc(link) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>شارك</button></div>' +
       "</div></article>";

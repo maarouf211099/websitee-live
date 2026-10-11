@@ -1705,3 +1705,13 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .hdr-zakat, .hdr-tel, .m-sheet-head, .f-strip, .side-trust { display: none; }
 /* the dropdown caret is a small SVG chevron (it was a ▾ character) */
 .nav .sub-toggle span svg { display: block; width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* "مبلغ تاني": a custom amount in every chip group (home quick-donate, project side cards); spans the group's full row */
+.amt-other { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; border: 1.5px dashed var(--line); border-radius: 12px; background: #fff; cursor: text; transition: border-color .2s, background .2s; }
+.amt-other > span { font-weight: 700; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.amt-other input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; padding: 10px 0; text-align: center; font: 800 17px "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); }
+.amt-other input::placeholder { font: 600 14px "Cairo", sans-serif; color: var(--muted); }
+.amt-other:focus-within, .amt-other.on { border-style: solid; border-color: var(--teal); background: var(--teal-soft); }
+.amt-other button { flex: none; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--gold); color: var(--teal-ink); font: 800 14px "Cairo", sans-serif; cursor: pointer; }
+.camp-other { display: block; margin-top: 6px; font-size: 13.5px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; text-align: center; padding-block: 6px; }
+.amt-other input:focus, .amt-other input:focus-visible { outline: 0; box-shadow: none; } /* the field's frame shows focus */

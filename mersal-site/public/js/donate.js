@@ -254,6 +254,7 @@
   function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
 
   if (q.get("amount")) amount.value = Math.max(10, parseInt(q.get("amount"), 10) || 500);
+  if (q.get("custom")) setTimeout(function () { try { amount.focus({ preventScroll: false }); amount.select(); } catch (e) {} }, 400);
   syncChips();
 
   // Purpose list: general/zakat/sadaqa + every project and service imported from the old site

@@ -132,7 +132,6 @@
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
       '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo.webp"><img src="/img/brand-logo.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></picture></a>' +
-      '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return "<li" + (n[0] === "/" ? ' class="nav-home"' : "") + '><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
       }).join("") + "</ul>" +
@@ -143,6 +142,8 @@
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + PHONE_PATH + '"/></svg><b>' + escA(SITE.hotline) + "</b></a>" : "") +
       '<button type="button" class="search-btn" aria-label="بحث في الموقع"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>' +
       '<a class="btn btn-gold" href="/donate.html">تبرع الآن</a>' +
+      // last in the row, so on tablets the DOM order is the visual order (logo, hotline, search, "تبرع الآن", menu)
+      '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
     "</div></header>";
 
   var year = new Date().getFullYear();
@@ -554,7 +555,9 @@
   new MutationObserver(menuCta).observe(nav, { childList: true });
 
   // Extras: js/extras.js + css/extras.css (announcement bar under the header, WhatsApp button, "اتبرع من بنكك أو محفظتك" strip).
-  // A page that showed the bar last time gets its room back before the first paint (extras.js keeps its height), so nothing jumps.
+  // A page that showed the bar last time gets its room back before the first paint (extras.js keeps its height), so nothing jumps:
+  // the inline script right after <div id="site-header"> in every page already put the #ann-bar placeholder there (it ends up
+  // right after .site-header once the bar above replaces the placeholder); this is the fallback for a page without it.
   (function () {
     var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "/css/extras.css"; document.head.appendChild(css);
     try {

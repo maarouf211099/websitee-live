@@ -532,3 +532,6 @@
 .card img.media.fit { object-fit: contain; padding: 14px; background: linear-gradient(135deg, #e4f3f3, #f4f8f8); }
 /* the about / hospital photos are <picture> (WebP): the picture box itself takes no part in the layout */
 .home .about-pic picture, .home .hf-pic picture { display: contents; }
+
+/* tablets and desktop only (css/desktop.css §3): the other ways to give, under the quick-donate button */
+.qd-alt { display: none; }

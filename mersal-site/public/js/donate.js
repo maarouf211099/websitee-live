@@ -234,6 +234,8 @@
   // switched off in the meantime
   var PAYMOB_RETURN = q.get("gw") === "paymob";
   var RETURNING = q.get("hcoReturn") === "1" || PAYMOB_RETURN;
+  // desktop (1180px and wider): the impact calculator under the tabs starts open (phones keep the collapsed <details>)
+  if (window.matchMedia && matchMedia("(min-width: 1180px)").matches) { var icMore = document.querySelector(".ic-more"); if (icMore) icMore.open = true; }
   if (MODE === "off" && !RETURNING) return;
 
   // ---------- stepper ----------
@@ -396,6 +398,12 @@
     else if (a >= 500) msg = "تبرعك بيساهم في كشف وتحاليل لمريض غير قادر 🩺";
     else if (a >= 10) msg = "كل جنيه بيفرق مع مريض محتاج 💚";
     document.getElementById("impact").textContent = msg;
+    // the desktop "ملخص تبرعك" rail (css/desktop.css shows it from 1180px): a display-only mirror of step 1
+    if (document.getElementById("don-sum")) {
+      document.getElementById("ds-amt").textContent = fmt.format(Number(amount.value) || 0);
+      var dsOpt = purpose.options[purpose.selectedIndex]; document.getElementById("ds-for").textContent = dsOpt ? dsOpt.text : "";
+      document.getElementById("ds-impact").textContent = msg;
+    }
   }
 
   var stepEls = form.querySelectorAll(".step"), dots = form.querySelectorAll(".steps li"), cur = 1;

@@ -1,0 +1,40 @@
+/* Mersal - tablet and desktop layer (761px and wider).
+   Every page links this file LAST in <head> with media="(min-width: 761px)", so phones never apply it and
+   the approved phone design stays exactly as site.css and the page stylesheets draw it.
+   Rules:
+   - Later sections win over earlier ones, and this file wins over site.css and the page stylesheets.
+   - Page rules are scoped by the page's body class (home, donate-page, gift, community, news, zakat-page,
+     contact-page, help-page, volunteer-page, afia-page, albums-page, legal-page, nf-page) or by a page
+     component (.page-grid on the project pages in /p/).
+   - Not in sw.js PRECACHE (only offline.html + site.css are): same-origin CSS is network-only there, with a
+     saved copy used when offline, so a change here needs no sw.js VERSION bump.
+   - §9 (reduced motion) stays the last section. */
+
+/* §0 Tokens (grid, type steps, spacing) */
+
+/* §1 Chrome: header, tablet drawer, footer and pre-footer strip, section headers */
+
+/* §2 Page head */
+
+/* §3 Home (body.home) */
+
+/* §4 Donate (body.donate-page) */
+
+/* §5 Zakat, gift and community (body.zakat-page, body.gift, body.community) */
+
+/* §6 Project and content pages (/p/*.html, contact, help, volunteer, albums, afia, news, legal, 404) */
+
+/* Project pages: the "ادعم: ..." side card sits beside the article from the first screen.
+   legacy.js inserts .share-bar right after the article and site.css pins it to column 1 (row 2), so the
+   auto-placed aside used to land in row 2 beside the share bar, at the end of the page. Spanning both rows
+   puts it at the top of column 2, where its sticky top: 84px (site.css) keeps it in view while reading.
+   Scoped to the legacy article so the legal pages' contents column (.lg-doc, no share bar) is untouched.
+   When the card is taller than a short article, the second row (1fr) takes the extra height, so the share
+   bar keeps the normal 36px gap under the article instead of drifting down.
+   Up to 960px the grid is one column and the order stays article -> share bar -> card. */
+@media (min-width: 961px) {
+  .page-grid > .legacy ~ .page-side { grid-column: 2; grid-row: 1 / span 2; }
+  .page-grid:has(> .legacy ~ .page-side) { grid-template-rows: auto 1fr; }
+}
+
+/* §9 Reduced motion (always last) */

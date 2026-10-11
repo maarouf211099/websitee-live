@@ -282,6 +282,7 @@ def head(title, desc):
 <link rel="preload" href="/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/legacy.css">
+<link rel="stylesheet" href="/css/desktop.css" media="(min-width: 761px)">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_EG">

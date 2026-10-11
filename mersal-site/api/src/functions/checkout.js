@@ -10,7 +10,7 @@
 // Server-side gate: sessions are created only while card payment is "live": the PAY_MODE application setting when it
 // is set, else payMode in js/layout.js (the console's "الدفع بالبطاقة" switch, cached 60 s): read through GitHub, or
 // from the live site itself when there is no GITHUB_TOKEN or GitHub fails (lib/pay.js readDeployed).
-// GET /api/checkout/status -> { mode, provider, ready, missing? }: can a card donation start right now (setting NAMES
+// GET /api/checkout/status -> { mode, provider, ready, missing?, providers }: can a card donation start right now (setting NAMES
 // only, never values), to check a go-live from outside. The donor never needs it: an unavailable gateway answers
 // { unavailable: true } and the donate page shows the other ways to give.
 // Limits (lib/limits.js): CHECKOUT_RATE_LIMIT (10) sessions per visitor IP per hour, CHECKOUT_GLOBAL_LIMIT (300) per hour
@@ -191,7 +191,9 @@ app.http("checkoutStatus", {
     let ps;
     try { ps = await paySettings(); } catch (e) { ctx.warn("checkout status: payMode unknown", e.message); return out({ mode: null, ready: false }); }
     const missing = ps.mode === "live" ? pay.missingFor(ps.provider) : [];
-    return out({ mode: ps.mode, provider: ps.provider, ready: ps.mode === "live" && !missing.length, ...(missing.length ? { missing } : {}) });
+    // which gateways could take payments right now (yes/no only), so settings added in Azure can be checked before a switch
+    const providers = Object.fromEntries(pay.PROVIDERS.map((p) => [p, pay.ready(p)]));
+    return out({ mode: ps.mode, provider: ps.provider, ready: ps.mode === "live" && !missing.length, ...(missing.length ? { missing } : {}), providers });
   },
 });
 

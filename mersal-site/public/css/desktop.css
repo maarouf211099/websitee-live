@@ -2,7 +2,10 @@
    Every page links this file LAST in <head> with media="(min-width: 761px)", so phones never apply it and
    the approved phone design stays exactly as site.css and the page stylesheets draw it.
    Rules:
-   - Later sections win over earlier ones, and this file wins over site.css and the page stylesheets.
+   - Later sections win over earlier ones, and this file wins over site.css and the page stylesheets linked
+     in <head>. It does NOT win by order over the sheets that scripts append at runtime, after it:
+     css/extras.css (layout.js, extras.js) and css/pwa.css (pwa.js), plus impact.css / news.css on pages that
+     do not link them. Override those with a more specific selector (e.g. the body class), never !important.
    - Page rules are scoped by the page's body class (home, donate-page, gift, community, news, zakat-page,
      contact-page, help-page, volunteer-page, afia-page, albums-page, legal-page, nf-page) or by a page
      component (.page-grid on the project pages in /p/).

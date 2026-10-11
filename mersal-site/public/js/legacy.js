@@ -51,11 +51,21 @@
     });
     $$("iframe:not([title])", legacyWrap).forEach(function (f) { f.title = /google\.com\/maps/i.test(f.src) ? "خريطة الموقع" : "محتوى مضمّن"; });
   }
-  // header photos smaller than the banner (most imported pictures are 512px) become a soft backdrop on wide screens
+  // header photos smaller than the banner (most imported pictures are 512px): css/desktop.css shows a crisp square
+  // (.ph-small, under 1000px) or no picture at all (.ph-tiny, under 400px) instead of a blocky upscale. The width
+  // attribute is used when it is the real size; the generated pages write width="1200" whatever the file is, so the
+  // decoded size decides: at once when the photo is already in, else on load. The band's height does not depend on it.
   (function () {
     var ph = document.querySelector(".page-head .ph-bg"); if (!ph) return;
-    function judge() { if (ph.naturalWidth && ph.naturalWidth < 1000) ph.closest(".page-head").classList.add("ph-small"); }
-    if (ph.complete) judge(); else ph.addEventListener("load", judge, { once: true });
+    var head = ph.closest(".page-head");
+    function judge(w) {
+      if (!w) return;
+      head.classList.toggle("ph-small", w < 1000);
+      head.classList.toggle("ph-tiny", w < 400);
+    }
+    var attr = parseInt(ph.getAttribute("width"), 10);
+    if (attr > 0 && attr < 1000) judge(attr);
+    if (ph.complete && ph.naturalWidth) judge(ph.naturalWidth); else ph.addEventListener("load", function () { judge(ph.naturalWidth); }, { once: true });
   })();
 
   // ---------- 2. picture strips: old Bootstrap carousels + rows of pictures -> one swipeable strip ----------

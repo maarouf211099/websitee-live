@@ -521,12 +521,22 @@
   // hotline and tightens the menu; when it still overflows, body.nav-compact switches to the tablet header and its
   // drawer at that width (css/desktop.css). Runs after the menu renders, on resize and once the fonts are in.
   var wideHdr = matchMedia("(min-width: 1180px)"), fitRaf = 0;
+  // the row overflows when an item leaves the content box (flex items at their min-content spill into the padding first,
+  // which scrollWidth does not count)
+  function hdrOverflows(w) {
+    var cs = getComputedStyle(w), box = w.getBoundingClientRect();
+    var l = box.left + parseFloat(cs.paddingLeft) - 1, r = box.right - parseFloat(cs.paddingRight) + 1;
+    return w.scrollWidth > w.clientWidth + 1 || Array.prototype.some.call(w.children, function (c) {
+      if (!c.offsetWidth) return false;
+      var b = c.getBoundingClientRect(); return b.left < l || b.right > r;
+    });
+  }
   function fitHeader() {
     var w = hdr.querySelector(".wrap"), body = document.body;
     hdr.classList.remove("hdr-tight"); body.classList.remove("nav-compact");
-    if (wideHdr.matches && w.scrollWidth > w.clientWidth + 1) {
+    if (wideHdr.matches && hdrOverflows(w)) {
       hdr.classList.add("hdr-tight");
-      if (w.scrollWidth > w.clientWidth + 1) body.classList.add("nav-compact");
+      if (hdrOverflows(w)) body.classList.add("nav-compact");
     }
     // the drawer only exists below 1180px (or in compact mode): one left open while the window grew is closed
     if (wideHdr.matches && !body.classList.contains("nav-compact") && document.getElementById("m-sheet") && menuOpen()) setMenu(false, true);

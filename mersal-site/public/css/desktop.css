@@ -13,11 +13,253 @@
      saved copy used when offline, so a change here needs no sw.js VERSION bump.
    - §9 (reduced motion) stays the last section. */
 
-/* §0 Tokens (grid, type steps, spacing) */
+/* §0 Tokens (grid, type steps, spacing)
+   One content edge for every row (header logo, page heads, sections, footer): .wrap is the shared column, var(--wrap-c)
+   wide (the full width on tablets) between two var(--gut) gutters. The content edge is at x = 991 (1024), 1303 (1366)
+   and 1620 (1920). Type steps: a page h1 is always one step above a section h2. */
+:root {
+  --gut: clamp(24px, 3.2vw, 48px); --wrap-c: 100%; --gap: 20px; --sec: 64px; --hdr-h: 68px;
+  --fs-display: 40px; --fs-h1: 34px; --fs-h2: 30px; --fs-h3: 20px; --fs-lead: 17px; --fs-stat: 44px;
+  --ph-h: clamp(168px, 13vw, 232px); --ink-2: #384646; --gold-soft: #fff6dc;
+}
+@media (min-width: 1180px) {
+  :root { --wrap-c: 1240px; --gap: 28px; --sec: 88px; --hdr-h: 76px;
+    --fs-display: 48px; --fs-h1: 42px; --fs-h2: 38px; --fs-h3: 22px; --fs-lead: 18px; --fs-stat: 52px; }
+}
+@media (min-width: 1600px) {
+  :root { --wrap-c: 1320px; --gap: 32px; --sec: 104px;
+    --fs-display: 58px; --fs-h1: 48px; --fs-h2: 44px; --fs-h3: 24px; --fs-lead: 19px; --fs-stat: 58px; }
+  body { font-size: 17px; }
+}
+/* the shared column; site.css:266 gives the header row its own 1280px with a stronger selector, so it is named here too */
+.wrap, .site-header .wrap { padding-inline: var(--gut); max-width: none; }
+@media (min-width: 1180px) {
+  .wrap, .site-header .wrap { max-width: calc(var(--wrap-c) + 2 * var(--gut)); }
+}
+/* 12-column helper on the shared column */
+.g12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); }
+
+/* type and surfaces. The page stylesheets size some of these with a page class (home.css: .home .section-title h2,
+   .home .big-title), so those selectors are named as well. css/extras.css is added after this file at runtime. */
+.page-head h1 { font-size: var(--fs-h1); line-height: 1.25; }
+.section-title h2, .home .section-title h2, .big-title, .home .big-title, .numbers-title, .ic-title, .cta-band h2, .zk-uses h2 {
+  font-size: var(--fs-h2); line-height: 1.3; font-weight: 800; letter-spacing: 0;
+}
+.section-title p, .home .section-title p, .page-head p { font-size: var(--fs-lead); max-width: 56ch; }
+/* body text in cards and sections reads darker; --muted stays for metadata (dates, captions, hints) */
+.card p, .about-intro p, .hospital-feature p, .svc p, .section-title p, .home .section-title p { color: var(--ink-2); }
+section { padding-block: var(--sec); }
+section.alt { background: var(--sand); } /* the grey --bg-2 band is retired on wide screens */
+.related { background: #fff; }
 
 /* §1 Chrome: header, tablet drawer, footer and pre-footer strip, section headers */
 
-/* §2 Page head */
+/* --- header, every width from 761px: one bar (the top bar's links moved into it), no scroll-progress line --- */
+.topbar { display: none; }
+.site-header, .site-header.scrolled { box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 8px 24px -16px rgba(0,0,0,.5); }
+.site-header::after { display: none; }
+.site-header .wrap { min-height: var(--hdr-h); gap: 10px; }
+.site-header .brand { flex: none; }
+.site-header .brand img { height: 42px; }
+.site-header .search-btn { width: 44px; height: 44px; flex: none; margin-inline-start: 0; }
+.site-header .wrap > .btn-gold { display: inline-flex; flex: none; min-height: 44px; padding: 0 20px; margin-inline-start: 0; white-space: nowrap; }
+/* the hotline: a 44px round button like the search one; its number shows from 1600px */
+.hdr-tel { align-items: center; justify-content: center; gap: 8px; flex: none; width: 44px; height: 44px; border-radius: 999px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: #fff; text-decoration: none; transition: background .2s, color .2s; }
+.hdr-tel svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hdr-tel b { display: none; font: 700 17px/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .3px; }
+.hdr-tel:hover { background: rgba(255,255,255,.14); color: var(--gold); }
+/* the zakat calculator: an outlined gold link (the filled gold button is the donation) */
+.hdr-zakat { align-items: center; flex: none; min-height: 44px; padding: 0 12px; border: 1.5px solid rgba(254,200,48,.6); border-radius: 999px;
+  color: var(--gold); font-size: 14.5px; font-weight: 700; white-space: nowrap; text-decoration: none; transition: background .2s, color .2s; }
+.hdr-zakat:hover, .hdr-zakat[aria-current="page"] { background: rgba(254,200,48,.14); color: var(--gold); }
+
+/* --- desktop header (1180px and wider): logo | menu | zakat | hotline | search | gold "تبرع الآن", one row.
+   Measured with today's menu (Cairo 15px bold): with 8px gaps and 8px menu padding the row fits inside the shared column
+   at every width, with 16-30px to spare (the zakat link joins at 1280px, the hotline icon at 1366px, its number at
+   1600px); 10px padding would overflow at 1366 and leave 1px at 1600 --- */
+@media (min-width: 1180px) {
+  .site-header .wrap { gap: 8px; }
+  body:not(.nav-compact) .nav { margin-inline-end: auto; }
+  .nav > li.nav-home { display: none; } /* the logo links home */
+  .nav > li > a, .nav .sub-toggle { display: flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 15px; font-weight: 700; }
+  .nav .sub-toggle { gap: 3px; }
+  /* the page you are on: gold text on a 2px gold underline (no pill) */
+  .nav > li > a[aria-current="page"], .nav .has-sub.active > .sub-toggle { background: none; color: var(--gold); border-radius: 0; box-shadow: inset 0 -2px 0 var(--gold); }
+  .nav .sub a { display: flex; align-items: center; min-height: 44px; padding: 6px 12px; border-radius: 8px; }
+  /* a long group (مشاريع مرسال has 9 pages) opens in two columns */
+  .nav .sub:has(> li:nth-child(7)) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 4px; min-width: 480px; }
+  /* the guard in js/layout.js: the row would overflow, so the zakat link and the hotline go and the menu tightens */
+  .site-header.hdr-tight .nav > li > a, .site-header.hdr-tight .nav .sub-toggle { padding-inline: 7px; font-size: 14px; }
+  /* 76px, 64px once the page scrolls. The bar is sticky in the page flow, so the 12px it gives up becomes a bottom margin
+     at the same moment: nothing below it moves (no layout shift, no scroll-anchoring loop) */
+  body:not(.nav-compact) .site-header { transition: box-shadow .25s, background .25s, transform .5s var(--soft-bounce), margin-bottom .25s var(--ease); }
+  body:not(.nav-compact) .site-header .wrap { transition: min-height .25s var(--ease); }
+  body:not(.nav-compact) .site-header.scrolled { margin-bottom: 12px; }
+  body:not(.nav-compact) .site-header.scrolled .wrap { min-height: 64px; }
+  body:not(.nav-compact) .site-header .brand { transform-origin: 100% 50%; }
+  body:not(.nav-compact) .site-header.scrolled .brand, body:not(.nav-compact) .site-header.scrolled .brand:hover { transform: scale(.86); }
+}
+@media (min-width: 1280px) {
+  body:not(.nav-compact) .site-header:not(.hdr-tight) .hdr-zakat { display: inline-flex; }
+}
+@media (min-width: 1366px) {
+  body:not(.nav-compact) .site-header:not(.hdr-tight) .hdr-tel { display: inline-flex; }
+}
+@media (min-width: 1600px) {
+  body:not(.nav-compact) .site-header:not(.hdr-tight) .hdr-tel { width: auto; padding-inline: 12px 16px; }
+  body:not(.nav-compact) .site-header:not(.hdr-tight) .hdr-tel b { display: inline; }
+}
+/* the dropdowns open after a short pause, so a pointer crossing the menu does not flash them */
+@media (hover: hover) and (min-width: 1180px) {
+  body:not(.nav-compact) .nav .has-sub:hover > .sub { transition: opacity .2s .12s, transform .2s .12s, visibility 0s .12s; }
+}
+
+/* --- tablet header (761-1179px, and from 1180px when the guard sets body.nav-compact): 68px, sticky, never hidden on
+   scroll. logo | hotline | search | gold "تبرع الآن" | burger. The menu is the drawer below. --- */
+@media (max-width: 1179px) {
+  .site-header .brand { order: 1; }
+  .site-header .hdr-tel { order: 2; display: inline-flex; margin-inline-start: auto; }
+  .site-header .search-btn { order: 3; margin-inline-start: auto; }
+  .site-header .hdr-tel + .search-btn { margin-inline-start: 0; }
+  .site-header .wrap > .btn-gold { order: 4; padding: 0 18px; }
+  .site-header .menu-toggle { order: 5; width: 44px; height: 44px; margin: 0; flex: none; }
+}
+body.nav-compact .site-header .wrap { min-height: 68px; }
+body.nav-compact .site-header .brand { order: 1; }
+body.nav-compact .site-header .hdr-tel { order: 2; display: inline-flex; margin-inline-start: auto; }
+body.nav-compact .site-header .search-btn { order: 3; margin-inline-start: auto; }
+body.nav-compact .site-header .hdr-tel + .search-btn { margin-inline-start: 0; }
+body.nav-compact .site-header .wrap > .btn-gold { order: 4; padding: 0 18px; }
+body.nav-compact .site-header .menu-toggle { order: 5; display: flex; width: 44px; height: 44px; margin: 0; flex: none; }
+body.nav-compact .nav { display: none; }
+body.nav-compact.menu-open { overflow: hidden; }
+body.nav-compact .menu-toggle span { transition: transform .25s, opacity .25s; }
+
+/* --- tablet drawer: the phone menu sheet (#m-sheet) as a 400px panel from the burger's side (the inline end) over a
+   scrim. js/layout.js adds its head (logo + "إغلاق القائمة"), focuses that button, and closes the drawer on Esc, Back,
+   the close button or a click on the scrim. site.css hides #m-sheet from 1180px unless body.nav-compact. --- */
+.m-sheet { inset-block: 0; inset-inline-start: auto; inset-inline-end: 0; width: min(400px, 86vw); background: #f4f8f8;
+  border-start-start-radius: 24px; border-end-start-radius: 24px; box-shadow: var(--sh-2); z-index: 95; animation: drawer-in .32s var(--ease) both; }
+.m-sheet.closing { animation: drawer-out .2s ease-in both; }
+.m-sheet-in { padding: 0 16px 24px; animation: none; }
+.m-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2; padding: 14px 16px 12px; background: #f4f8f8; }
+.m-brand { display: block; line-height: 0; border-radius: 10px; }
+.m-brand picture { display: contents; }
+.m-brand img { height: 42px; width: auto; }
+.m-close { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--teal-dark); cursor: pointer;
+  transition: background .2s, border-color .2s; }
+.m-close:hover { background: var(--teal-soft); border-color: var(--teal); }
+.m-close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.m-sheet .m-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.m-sheet .m-quick a { flex-direction: row; justify-content: flex-start; gap: 10px; min-height: 52px; padding: 10px 12px; font-size: 14px; text-align: start; }
+body.menu-open:has(#m-sheet:not([hidden]))::before, body:has(#m-sheet.closing)::before {
+  content: ""; position: fixed; inset: 0; z-index: 94; background: rgba(0,32,32,.45); animation: fade-in .2s ease-out both;
+}
+body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; pointer-events: none; }
+@keyframes drawer-in { from { transform: translateX(-100%); } } /* RTL: the inline end is the left edge */
+@keyframes drawer-out { to { transform: translateX(-100%); } }
+
+/* --- nothing floats over the content: the sticky header always shows "تبرع الآن", and back-to-top only appears where
+   it sits in the page gutter (1360px and wider) --- */
+.fab-donate { display: none !important; }
+@media (max-width: 1359px) {
+  .to-top { display: none; }
+  body .to-top.show ~ .wa-float { transform: none; } /* css/extras.css lifts WhatsApp above a back-to-top that is not there */
+}
+
+/* --- footer: three columns on the shared grid, 44px link rows; the pre-footer strip above them --- */
+.site-footer { padding-top: 56px; }
+.site-footer .cols { column-gap: var(--gap); row-gap: 32px; }
+.site-footer .cols ul:not(.social) > li { margin: 0; }
+.site-footer .cols ul:not(.social) > li > a { display: inline-block; padding-block: 10px; }
+.site-footer .cols ul:not(.social) > li:not(:has(> a)) { padding-block: 10px; }
+.site-footer .two-col { column-gap: var(--gap); }
+.site-footer .two-col a { white-space: nowrap; }
+.site-footer .social { gap: 8px; margin-top: 16px; }
+.site-footer .social a { width: 44px; height: 44px; display: grid; place-items: center; }
+.site-footer .social svg { width: 18px; height: 18px; }
+.site-footer .copyright { text-align: start; padding-inline: max(var(--gut), calc((100% - var(--wrap-c)) / 2)); }
+@media (min-width: 1180px) {
+  .site-footer .cols { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .site-footer .cols > div:nth-child(1) { grid-column: span 4; }
+  .site-footer .cols > div:nth-child(2) { grid-column: span 5; }
+  .site-footer .cols > div:nth-child(3) { grid-column: span 3; }
+}
+@media (max-width: 1179px) {
+  .site-footer .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "brand contact" "links links"; }
+  .site-footer .cols > div:nth-child(1) { grid-area: brand; }
+  .site-footer .cols > div:nth-child(2) { grid-area: links; }
+  .site-footer .cols > div:nth-child(3) { grid-area: contact; }
+  .site-footer .two-col { columns: 3; }
+}
+/* pre-footer strip (js/layout.js; not on the home page, the /p/ pages, donate or zakat): a teal band on the grid,
+   text 5 columns | hotline 3 | buttons 4 */
+.f-strip { display: block; margin: -56px 0 48px; padding-block: 28px; background: var(--teal-text); box-shadow: inset 0 -1px 0 rgba(255,255,255,.1); }
+.f-strip .wrap { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 16px; align-items: center; }
+.fs-text { grid-column: span 5; margin: 0; display: flex; flex-direction: column; line-height: 1.5; }
+.fs-text b { font-size: var(--fs-h3); font-weight: 800; color: #fff; }
+.fs-text span { font-size: 16px; color: rgba(255,255,255,.92); }
+.site-footer .fs-tel { grid-column: span 3; display: inline-flex; align-items: center; gap: 12px; justify-self: start; min-height: 48px; color: #fff; text-decoration: none; }
+.fs-tel svg { width: 48px; height: 48px; padding: 13px; flex: none; border-radius: 50%; background: rgba(255,255,255,.14); fill: none; stroke: var(--gold); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.fs-tel span { display: flex; flex-direction: column; line-height: 1.3; }
+.fs-tel small { font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.92); }
+.fs-tel b { font: 700 26px/1.15 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; }
+.site-footer .fs-tel:hover b { color: var(--gold); }
+.fs-btns { grid-column: span 4; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.fs-btns .btn { min-height: 48px; padding: 0 24px; white-space: nowrap; }
+.site-footer .fs-btns .btn-gold, .site-footer .fs-btns .btn-gold:hover { color: var(--teal-ink); }
+.site-footer .fs-btns .btn-ghost, .site-footer .fs-btns .btn-ghost:hover { color: #fff; }
+@media (max-width: 1179px) {
+  .fs-text { grid-column: 1 / span 7; }
+  .site-footer .fs-tel { grid-column: 8 / -1; justify-self: end; }
+  .fs-btns { grid-column: 1 / -1; justify-content: flex-start; }
+}
+
+/* --- section headers: start-aligned, no centred underline; .split puts an action (count, arrows, "all") at the row's
+   end and keeps the lead right under the h2 --- */
+.section-title { text-align: start; margin-bottom: 40px; }
+.section-title h2::after { display: none; }
+.section-title p, .home .section-title p { margin: 12px 0 0; }
+.section-title.split, .home .section-title.split { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; align-items: end; }
+.section-title.split > div { grid-column: 1; grid-row: 1; min-width: 0; }
+.section-title.split > p, .home .section-title.split > p { grid-column: 1; grid-row: 2; margin: 12px 0 0; max-width: 56ch; }
+.section-title.split > :not(div):not(p) { grid-column: 2; grid-row: 1; align-self: end; }
+
+/* --- the project side card's trust line (js/layout.js), where the card sits beside the article --- */
+@media (min-width: 961px) {
+  .page-side .side-trust { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0 0; font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--teal-text); text-align: center; }
+  .page-side .side-trust::before { content: ""; width: 14px; height: 14px; flex: none; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat; }
+}
+
+/* §2 Page head
+   One band on every inner page: brand gradient + pattern, the 4px gold rule, the text start-aligned in the first 7 of 12
+   columns of the shared column. A page photo is a framed window in the last 5 columns, var(--ph-h) tall (no full-bleed
+   blur, no zoom or parallax). .ph-small (legacy.js: the photo is narrower than 1000px) is a crisp square; .ph-tiny (<400px)
+   and .ph-pattern (volunteer.html: its "photo" is the pattern artwork) show no picture and give the text the full width.
+   The markup is the generated one; the LCP image keeps its fetchpriority and its width/height. */
+.page-head { display: grid; grid-template-columns: minmax(var(--gut), 1fr) minmax(0, var(--wrap-c)) minmax(var(--gut), 1fr); align-items: center;
+  min-height: 0; padding-block: 28px; }
+.page-head.has-photo { min-height: 0; align-items: center; }
+@media (min-width: 1180px) { .page-head { padding-block: 36px; } }
+.page-head > .wrap { grid-column: 2; grid-row: 1; width: 100%; max-width: none; margin: 0;
+  padding-inline: 0 calc(5 * (100% - 11 * var(--gap)) / 12 + 5 * var(--gap)); text-align: start; }
+.page-head h1 { text-shadow: none; }
+/* the band height is set by the window, so a late .ph-small / .ph-tiny (the photo's size is known once it loads) never
+   moves the content below */
+.page-head.has-photo:not(.ph-pattern) { grid-template-rows: minmax(var(--ph-h), auto); }
+.page-head.has-photo > picture { grid-column: 2; grid-row: 1; justify-self: end; position: relative; display: block; overflow: hidden;
+  width: calc(5 * (100% - 11 * var(--gap)) / 12 + 4 * var(--gap)); height: var(--ph-h); border-radius: var(--r-xl); background: rgba(0,40,40,.35);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 24px 44px -24px rgba(0,0,0,.6); }
+.page-head .ph-bg { position: absolute; inset: 0; z-index: auto; width: 100%; height: 100%; object-fit: cover; animation: none; filter: none; transform: none; translate: none; scale: none; }
+.page-head.ph-small .ph-bg { filter: none; transform: none; }
+.page-head.ph-small > picture { width: var(--ph-h); }
+.page-head.ph-tiny > picture, .page-head.ph-pattern > picture { display: none; }
+.page-head.ph-tiny > .wrap, .page-head.ph-pattern > .wrap { padding-inline-end: 0; }
+/* the dark photo overlay goes; every band gets the same soft glows */
+.page-head.has-photo::before { background: radial-gradient(420px 220px at 12% 110%, rgba(254,200,48,.22), transparent 70%), radial-gradient(520px 260px at 92% -20%, rgba(255,255,255,.14), transparent 70%); pointer-events: none; }
 
 /* §3 Home (body.home) */
 
@@ -53,3 +295,7 @@
 }
 
 /* §9 Reduced motion (always last) */
+@media (prefers-reduced-motion: reduce) {
+  .m-sheet, .m-sheet.closing, body.menu-open:has(#m-sheet:not([hidden]))::before, body:has(#m-sheet.closing)::before { animation: none !important; }
+  .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
+}

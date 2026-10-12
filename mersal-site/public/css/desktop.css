@@ -719,6 +719,141 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 
 /* §5 Zakat, gift and community (body.zakat-page, body.gift, body.community) */
 
+/* --- zakat: the form as a grid of calculator cards beside a sticky result (8/4 from 1180px, 7/5 at 961-1179px; at
+   761-960px the result follows the form). Labels sit above the inputs; each input shows its unit ('جنيه' / 'جرام', the
+   td's data-unit) inside the field at the inline end, like .input-suffix. Before anything is typed the result card shows
+   a prompt (.z-empty) instead of "0 جنيه", with its rows at 72% white (AA on --teal-dark, no opacity). The ids, data-add
+   and the stacked phone table are untouched (site.css). --- */
+.zakat-page .layout-side { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 961px) {
+  .zakat-page .layout-side { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: start; }
+  .zakat-page .layout-side > #zakat { grid-column: span 7; }
+  .zakat-page .layout-side > .zakat-result { grid-column: span 5; position: sticky; top: 96px; }
+}
+@media (min-width: 1180px) {
+  .zakat-page .layout-side > #zakat { grid-column: span 8; }
+  .zakat-page .layout-side > .zakat-result { grid-column: span 4; }
+}
+.zakat-page #zakat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.zakat-page #zakat > .alert, .zakat-page #zakat > .alert + .zakat-group, .zakat-page #zakat > .hint { grid-column: 1 / -1; }
+.zakat-page #zakat > .alert, .zakat-page #zakat > .hint { margin: 0; }
+.zakat-page .zakat-group { margin: 0; padding: 22px 24px 24px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+.zakat-page .zakat-group h3 { margin: 0 0 14px; font-size: 19px; }
+@media (max-width: 1179px) { .zakat-page .zakat-group { padding: 18px 18px 20px; } .zakat-page .zakat-group h3 { font-size: 18px; } }
+.zakat-page .zakat-table, .zakat-page .zakat-table tbody { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; width: 100%; }
+.zakat-page .alert + .zakat-group .zakat-table tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+.zakat-page .zakat-table tr { display: flex; flex-direction: column; gap: 6px; }
+.zakat-page .zakat-table td, .zakat-page .zakat-table td:last-child { display: block; width: auto; padding: 0; border: 0; }
+.zakat-page .zakat-table td:first-child { font-size: 14.5px; font-weight: 600; line-height: 1.5; color: var(--ink-2); }
+.zakat-page .zakat-table td:first-child label { display: block; }
+.zakat-page .zakat-table td[data-unit] { position: relative; }
+.zakat-page .zakat-table td[data-unit]::after { content: attr(data-unit); position: absolute; inset-inline-end: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; font-weight: 700; line-height: 1; color: var(--muted); pointer-events: none; }
+.zakat-page .zakat-table td[data-unit]:focus-within::after { color: var(--teal-text); }
+/* the number stays LTR; it sits at the field's start (right) and the unit at its end (left) */
+.zakat-page .zakat-table input { display: block; min-height: 48px; height: 48px; padding: 8px 14px; padding-left: 60px; text-align: right; font-size: 18px;
+  -moz-appearance: textfield; appearance: textfield; }
+.zakat-page .zakat-table input::-webkit-inner-spin-button, .zakat-page .zakat-table input::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+@media (hover: hover) { .zakat-page .zakat-table input:hover:not(:focus) { border-color: #b9cfcf; } }
+.zakat-page .zakat-result { padding: 26px 24px; border-radius: var(--r-lg); }
+.zakat-page .zakat-result .z-empty { margin: 6px 0 2px; font-size: 17px; font-weight: 700; line-height: 1.7; color: #fff; }
+.zakat-page .zakat-result.is-empty #z-total, .zakat-page .zakat-result.is-empty #z-note { display: none; }
+.zakat-page .zakat-result.is-empty .z-empty { display: block; }
+.zakat-page .zakat-result.is-empty dt, .zakat-page .zakat-result.is-empty dd { color: rgba(255,255,255,.72); }
+/* where the uses go: one row of four from 1180px across the shared column (the 880px cap goes); the verse stays centred */
+.zakat-page .zk-cards { max-width: none; margin: 24px 0; gap: var(--gap); }
+.zakat-page .zk-cards li { padding: 20px 22px; border-radius: var(--r-lg); }
+@media (min-width: 1180px) { .zakat-page .zk-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* --- gift: form 7 / preview 5 from 1180px (1fr / 340px at 961-1179px; the preview stays sticky, gift.css); occasion tiles
+   3 + 2; "إزاي توصّل تبرعك؟" on the shared column with the donate page's segmented tabs; the card panel a compact row --- */
+@media (min-width: 961px) { .gift .gf-layout { grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; } }
+/* the 340px preview (961-1179px): both action buttons keep their label on one line */
+@media (min-width: 961px) and (max-width: 1179px) { .gift .gf-actions .btn { padding: 10px 8px; gap: 6px; font-size: 14.5px; white-space: nowrap; } }
+@media (min-width: 1180px) { .gift .gf-layout { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px; } }
+.gift .gf-form { padding: 28px; border-radius: var(--r-lg); }
+.gift .gf-occ { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.gift .gf-occ label { grid-column: span 2; }
+.gift .gf-occ label:nth-child(n+4) { grid-column: span 3; }
+.gift .gf-occ label:nth-child(n+4) span { flex-direction: row; justify-content: center; gap: 12px; text-align: start; }
+.gift .gf-occ label:nth-child(n+4) svg { margin: 0; }
+.gift .gf-occ label:nth-child(n+4) b, .gift .gf-occ label:nth-child(n+4) small { display: block; }
+.gift .gf-preview { padding: 20px; border-radius: var(--r-lg); }
+@media (min-width: 1180px) { .gift .gf-preview .gf-canvas-box { max-width: 420px; margin-inline: auto; } }
+.gift .gf-ways { max-width: none; margin: 0; }
+.gift .gf-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; margin: 0 0 16px; padding: 0; border: 0; overflow: visible; }
+.gift .gf-tabs button { display: flex; align-items: center; justify-content: center; min-height: 56px; margin: 0; padding: 8px 14px; border: 1.5px solid var(--line); border-radius: var(--r-md);
+  background: #fff; color: var(--teal-dark); font-size: 15px; font-weight: 700; line-height: 1.3; text-align: center; white-space: normal; }
+.gift .gf-tabs button::after { content: none; }
+.gift .gf-tabs button:hover { border-color: var(--teal); color: var(--teal-text); }
+.gift .gf-tabs button[aria-selected="true"] { border-color: var(--teal-text); color: #fff; box-shadow: 0 10px 22px -12px rgba(0,89,89,.7);
+  background: var(--teal-text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23fec830'/%3E%3Cpath d='M6.5 12.5l3.6 3.6L17.5 8.6' fill='none' stroke='%23003c3c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") left 8px top 8px / 14px no-repeat; }
+.gift .gf-tabs button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0 6px rgba(0,89,89,.85); }
+.gift .gf-panel { padding: 22px 24px; border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+.gift #gf-p-card:not([hidden]) { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
+.gift #gf-p-card > p { flex: 1 1 320px; margin: 0; }
+.gift #gf-p-card > .btn { flex: none; margin: 0; min-width: 200px; }
+@media (min-width: 1180px) {
+  .gift .gf-banks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gift .gf-wlist { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* --- community: a sticky rail (welcome, badges, stats) beside the gifts and the history from 961px; the gate shows the
+   card beside the list of what opens after the first donation (#cm-preview, js/community.js) --- */
+@media (min-width: 961px) {
+  .community .cm-main > .wrap { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: repeat(5, auto) 1fr; column-gap: 32px; align-items: start; }
+  .community .cm-main > .wrap > * { grid-column: 2; min-width: 0; }
+  .community .cm-main > .wrap > .cm-rail { grid-column: 1; grid-row: 1 / -1; position: sticky; top: 96px; }
+  .community .cm-main > .wrap > .cm-h:first-of-type { margin-top: 0; }
+  .community .cm-rail .cm-welcome { grid-template-columns: auto minmax(0, 1fr); padding: 22px 20px; border-radius: var(--r-lg); }
+  .community .cm-rail .cm-stats { grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 14px 0 0; }
+  .community .cm-rail .cm-stat { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; text-align: start; border-radius: var(--r-md); }
+  .community .cm-rail .cm-stat b { font-size: 28px; order: 2; }
+  .community .cm-rail .cm-stat > span { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  .community .cm-gifts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 14px 0 32px; }
+  .community .cm-gift { border-radius: var(--r-lg); padding: 16px; }
+  .community .cm-history { max-width: 720px; }
+  .community .cm-history li { justify-content: flex-start; gap: 24px; padding: 12px 18px; }
+  .community .cm-cta { justify-content: flex-start; }
+
+  .community .cm-gate > .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+  .community .cm-gate .cm-card { max-width: none; margin: 0; padding: 36px 32px; border-radius: var(--r-xl); }
+  .community .cm-preview { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .community .cm-preview::before { content: attr(aria-label); content: attr(aria-label) / ""; display: block; margin-bottom: 4px; font-size: var(--fs-h3); font-weight: 800; color: var(--teal-dark); }
+  .community .cm-preview li { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; align-items: center; gap: 14px; padding: 12px 16px; background: #fff; border: 1px dashed #c9d9d9; border-radius: var(--r-md); }
+  .community .cm-preview .ic { width: 44px; height: 44px; border-radius: 14px; background: var(--bg-2, #f3f7f7); color: var(--muted); display: grid; place-items: center; }
+  .community .cm-preview .ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .community .cm-preview b { font-size: 15.5px; font-weight: 700; color: var(--muted); }
+  .community .cm-preview li::after { content: ""; width: 18px; height: 18px; background: var(--muted);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat; }
+}
+@media (min-width: 1180px) {
+  .community .cm-main > .wrap { grid-template-columns: 340px minmax(0, 1fr); }
+  .community .cm-gifts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* --- motion (transform and opacity only; §9 turns it off). Cards lift on hover and press; the result card and the gift
+   preview settle in once; the chosen occasion's icon pops; a newly opened ways panel slides in; js/layout.js and
+   js/community.js reveal the cards below the fold once (IntersectionObserver, staggered) --- */
+@media (prefers-reduced-motion: no-preference) {
+  .zakat-page .zakat-result, .gift .gf-preview { animation: rise-sm .5s var(--ease) .12s both; }
+  .zakat-page .zk-cards li, .gift .gf-steps li, .community .cm-preview li { transition: opacity .5s var(--ease), transform .45s var(--spring), box-shadow .25s; transition-delay: var(--d, 0s); }
+  .zakat-page .zk-cards li:hover, .gift .gf-steps li:hover { transform: translateY(-3px); box-shadow: var(--sh-2); transition-delay: 0s; }
+  .zakat-page .zakat-group { transition: opacity .5s var(--ease), transform .7s var(--spring), box-shadow .25s; transition-delay: var(--d, 0s); }
+  .zakat-page .zakat-group:focus-within { box-shadow: var(--sh-2); transition-delay: 0s; }
+  .gift .gf-occ input:checked + span svg { animation: pop-in .45s var(--bounce); }
+  .gift .gf-occ label:hover span { transform: translateY(-2px); }
+  .gift .gf-occ label:active span { transform: scale(.97); }
+  .gift .gf-tabs button { transition: transform .22s var(--spring), background-color .2s, border-color .2s, color .2s, box-shadow .2s; }
+  .gift .gf-tabs button:hover { transform: translateY(-2px); }
+  .gift .gf-tabs button:active { transform: scale(.97); transition-duration: .08s; }
+  .gift .gf-panel:not([hidden]) { animation: rise-sm .32s var(--ease) both; }
+  .community .cm-preview li:hover { transform: translateX(-3px); transition-delay: 0s; }
+  .community .cm-gift.reveal { transition: opacity .5s var(--ease), transform .45s var(--spring), box-shadow .25s, border-color .2s; transition-delay: var(--d, 0s); }
+  .community .cm-gift.reveal.in:hover, .community .cm-gift.reveal.in:active { transition-delay: 0s; }
+}
+
 /* §6 Project and content pages (/p/*.html, contact, help, volunteer, albums, afia, news, legal, 404) */
 
 /* news.html: its head photo is a social-media post with a white frame; in the framed window (§2) a slight zoom keeps
@@ -757,5 +892,7 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
   .home .sl-nav .sl-arrow, .home .ts-tile, .home .camp { transition: none; }
   .donate-page .don-sum, .donate-page .ds-impact { animation: none !important; }
   .donate-page .tabs button, .donate-page .pw, .donate-page .bk-card, .donate-page .side-ads > a { transition: none; transform: none; }
+  .zakat-page .zakat-result, .gift .gf-preview, .gift .gf-occ input:checked + span svg, .gift .gf-panel:not([hidden]) { animation: none !important; }
+  .zakat-page .zk-cards li, .zakat-page .zakat-group, .gift .gf-steps li, .gift .gf-occ span, .gift .gf-tabs button, .community .cm-preview li, .community .cm-gift { transition: none; transform: none; }
   .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .site-header .brand, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
 }

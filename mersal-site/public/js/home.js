@@ -310,7 +310,7 @@
     for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';
     return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (Number(c.maxUnits) || 50) + '" style="--p:0">' +
       // the image link is a duplicate of the title link (hidden from AT); the price badge and the state chip sit beside it so they are read
-      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, (max-width: 1179px) 40vw, 400px" : "" }) + "</a>" +
+      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 104px, (max-width: 1179px) 40vw, 400px" : "" }) + "</a>" +
         (price ? '<span class="camp-badge">' + esc(badge) + "</span>" : "") + (hot ? '<span class="camp-hot">' + hot + "</span>" : "") + "</div>" +
       '<div class="body"><h3><a href="' + esc(link) + '">' + esc(c.title) + "</a></h3>" +
         (c.impact ? '<p class="camp-impact">' + esc(c.impact) + "</p>" : "") +
@@ -336,7 +336,8 @@
     var count = document.getElementById("camp-count"), open = list.filter(function (c) { return !(c.status === "done" || (c.goal && (c.raised || 0) >= c.goal)); }).length;
     if (count) count.textContent = open + (open === 1 ? " حملة" : open === 2 ? " حملتين" : open <= 10 ? " حملات" : " حملة");
     if (!track.dataset.wired) { carouselArrows(track); track.dataset.wired = "1"; }
-    trackDots(track, document.getElementById("camp-dots"));
+    // phones show the campaigns as a vertical list (css/mobile.css): no dots and no snapped-card focus effect there
+    if (!phone) trackDots(track, document.getElementById("camp-dots"));
     // one clock drives the number, the percentage, the bar and its thumb: the bar and the % pill take
     // exactly as long as the odometer (units digit first, leftmost digit last), so all three settle together
     function animate(card, delay) {
@@ -360,12 +361,47 @@
       cards.forEach(function (c, i) { if (reduceMotion) c.classList.add("in"); else setTimeout(function () { c.classList.add("in"); }, i * 120); });
     }
     if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (en) { var i = 0; en.forEach(function (e) { if (e.isIntersecting) { revealAll(); animate(e.target, i++ * 120); io.unobserve(e.target); } }); }, { threshold: .35 });
+      // threshold .01: a card's counters start as soon as any of it shows, so no visible row reads "0 اتوفرت".
+      // Phones (a vertical list): each row rises in when it reaches the screen, staggered within the batch
+      var io = new IntersectionObserver(function (en) {
+        var i = 0;
+        en.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var d = i++ * 120, card = e.target;
+          if (phone) { if (reduceMotion) card.classList.add("in"); else setTimeout(function () { card.classList.add("in"); }, d); } else revealAll();
+          animate(card, d); io.unobserve(card);
+        });
+      }, { threshold: .01 });
       cards.forEach(function (c) { io.observe(c); });
     } else { revealAll(); cards.forEach(function (c) { animate(c, 0); }); }
     // (no mersalReveal here: .in + the counters are the cards' entrance; mersalReveal's animation would hold
     // the opacity that the snapped-card focus effect needs)
   }
+  // ---------- hospital: real progress of the p30 campaign (admin data) under the hospital title ----------
+  // Rendered with the hidden attribute: css/mobile.css shows it on phones (desktop may opt in with one rule).
+  function hfProgress(list) {
+    var title = document.querySelector(".hospital-feature .big-title"); if (!title) return;
+    var old = document.querySelector(".hospital-feature .hf-progress");
+    var c = (list || []).filter(function (x) { return x && x.purpose === "p30" && +x.goal > 0; })[0];
+    if (!c) { if (old) old.remove(); return; }
+    var goal = +c.goal, raised = Math.max(0, +c.raised || 0), pct = Math.min(100, raised / goal * 100), unit = c.unit || "سهم", SEGS = 20, segs = "";
+    for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';
+    var box = document.createElement("div");
+    box.className = "hf-progress"; box.hidden = true;
+    box.innerHTML = "<p>اتجمع <b>" + fmt.format(raised) + "</b> من <b>" + fmt.format(goal) + "</b> " + esc(unit) + ' <span class="hf-pct">' + Math.round(pct) + "%</span></p>" +
+      '<div class="bar seg" style="--n:' + SEGS + ";--p:" + pct.toFixed(1) + '" role="progressbar" aria-valuenow="' + Math.round(pct) + '" aria-valuemin="0" aria-valuemax="100" aria-label="' + Math.round(pct) + '% من هدف المستشفى">' + segs + "</div>";
+    if (old) old.replaceWith(box); else title.insertAdjacentElement("afterend", box);
+    if (window.mersalReveal) window.mersalReveal([box]); // the bar fills once when it comes into view (css/mobile.css)
+  }
+  // "آخر تحديث" under the numbers band: only when content.json carries a non-empty numbersAsOf
+  function numbersAsOf(v) {
+    var grid = document.querySelector(".numbers-grid"); if (!grid) return;
+    var old = document.querySelector(".numbers .num-asof"); if (old) old.remove();
+    if (typeof v !== "string" || !v.trim()) return;
+    var p = document.createElement("p"); p.className = "num-asof"; p.textContent = "آخر تحديث للأرقام: " + v.trim();
+    grid.insertAdjacentElement("afterend", p);
+  }
+
   // quantity stepper -> live CTA amount (delegated once; survives re-renders)
   document.addEventListener("click", function (e) {
     var b = e.target.closest("#donation-campaigns .camp-qty button"); if (!b) return;
@@ -400,14 +436,15 @@
   // content.json is read afterwards for the projects carousel and as a stale guard.
   var inline = document.getElementById("home-data"), data = null;
   try { data = inline && JSON.parse(inline.textContent); } catch (e) { data = null; }
-  function boot(d) { numbers(d.numbers); countUp(); slider(d.slides); donationCampaigns(d.campaigns); }
+  function boot(d) { numbers(d.numbers); countUp(); slider(d.slides); donationCampaigns(d.campaigns); hfProgress(d.campaigns); }
   if (data) boot(data);
   function later() {
     fetch("/content.json").then(function (r) { return r.json(); }).then(function (fresh) {
       if (Array.isArray(fresh.campaigns)) { liveCamps = fresh.campaigns; qdImpact(+input.value); }
+      numbersAsOf(fresh.numbersAsOf);
       if (!data) { boot(fresh); campaigns(fresh.projects); return; }
       campaigns(fresh.projects);
-      if (JSON.stringify(fresh.campaigns) !== JSON.stringify(data.campaigns)) donationCampaigns(fresh.campaigns);
+      if (JSON.stringify(fresh.campaigns) !== JSON.stringify(data.campaigns)) { donationCampaigns(fresh.campaigns); hfProgress(fresh.campaigns); }
       if (JSON.stringify(fresh.numbers) !== JSON.stringify(data.numbers)) { numbers(fresh.numbers); countUp(); }
       if (heroRev(fresh.slides) !== heroRev(data.slides)) console.warn("hero is older than content.json - run: node tools/render-home.js");
     }).catch(function () {});

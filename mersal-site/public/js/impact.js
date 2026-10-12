@@ -129,9 +129,11 @@
           '<div class="ic-help"><b>مش عارف تختار؟</b>كلمنا على <a href="tel:19340">19340</a> ومندوب مرسال يوصلك لحد البيت، أو تبرع بالبطاقة أو فوري أو إنستاباي.</div>' +
         "</div>" +
         '<div class="ic-body">' +
-          '<p class="ic-sum">بـ <b class="ic-amt">0</b> جنيه تبرعك يغطي:</p>' +
+          '<p class="ic-sum">بـ <b class="ic-amt">0</b> جنيه تقدر تغطي واحدة من دول:</p>' +
           '<p class="sr-only" aria-live="polite"></p>' +
           '<ul class="ic-tiles"></ul>' +
+          // phones show the first 4 rows (css/mobile.css reveals this button on the home page); only when there are more
+          (rows.length > 4 ? '<button type="button" class="ic-showall" aria-expanded="false" hidden>شوف كل البنود (' + rows.length + ")</button>" : "") +
           '<div class="ic-foot"><a class="btn btn-gold ic-cta" href="/donate.html#online">تبرع بالمبلغ ده</a><span class="ic-note">الأرقام تقريبية حسب أسعار الخدمات الحالية</span></div>' +
         "</div>" +
       "</section>";
@@ -149,6 +151,12 @@
         '<small class="ic-price">' + esc(unitForm(r.unit, 1) || r.label) + " " + fmt.format(r.price) + " ج" + (r.link ? ' <span class="ic-arrow" aria-hidden="true">←</span>' : "") + "</small>" +
         "</" + tag + "></li>";
     }
+    var more = root.querySelector(".ic-showall");
+    if (more) more.addEventListener("click", function () {
+      var all = els.tiles.classList.toggle("ic-all");
+      more.setAttribute("aria-expanded", all ? "true" : "false");
+      more.textContent = all ? "اعرض أقل" : "شوف كل البنود (" + rows.length + ")";
+    });
     els.input.addEventListener("input", function () { setAmount(els.input.value, "input"); });
     els.input.addEventListener("change", function () { setAmount(els.input.value, "change"); });
     els.range.addEventListener("input", function () { setAmount(els.range.value, "range"); });
@@ -189,7 +197,7 @@
     // reorder without rebuilding: appending existing nodes keeps their state and the bar transitions
     full.concat(part).forEach(function (li, k) { if (els.tiles.children[k] !== li) els.tiles.appendChild(li); });
     clearTimeout(liveT);
-    liveT = setTimeout(function () { els.live.textContent = "المبلغ " + fmt.format(a) + " جنيه، " + (covered ? "بيغطي " + covered + " من " + rows.length + " بند بالكامل" : "أقل من أصغر بند"); }, 500);
+    liveT = setTimeout(function () { els.live.textContent = "المبلغ " + fmt.format(a) + " جنيه، " + (covered === 1 ? "يكفي بالكامل بند واحد" : covered === 2 ? "يكفي بالكامل أي بند من بندين" : covered ? "يكفي بالكامل أي بند من " + covered + (covered <= 10 ? " بنود" : " بند") : "أقل من أصغر بند"); }, 500);
   }
   var counters = [];
   function countTo(el, target) {

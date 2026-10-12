@@ -50,6 +50,8 @@
 
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  // "٢٥٠٠" / "2,500" / "۲۵۰۰" -> "2500" (an Arabic keyboard's digits count like the Latin ones)
+  function asciiNum(v) { return String(v == null ? "" : v).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 0x660; }).replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 0x6f0; }).replace(/٫/g, ".").replace(/[^\d.]/g, ""); }
   function num(v, d) { v = Number(v); return isFinite(v) && v > 0 ? v : d; }
 
   // the stylesheet is normally linked by the page; load it here when it is not, and wait for it before painting
@@ -122,7 +124,7 @@
           '<h2 class="ic-title" id="ic-title">' + esc(cfg.title) + "</h2>" +
           (cfg.intro ? '<p class="ic-intro">' + esc(cfg.intro) + "</p>" : "") +
           '<label class="ic-label" for="ic-in">المبلغ بالجنيه</label>' +
-          '<div class="ic-input"><input id="ic-in" type="number" inputmode="numeric" min="10" max="1000000" step="1" autocomplete="off"><span>جنيه</span></div>' +
+          '<div class="ic-input"><input id="ic-in" type="text" inputmode="numeric" dir="ltr" maxlength="9" autocomplete="off"><span>جنيه</span></div>' +
           '<div class="ic-chips" role="group" aria-label="مبالغ مقترحة">' + (cfg.presets || []).map(function (p) { return '<button type="button" data-v="' + num(p, 0) + '" aria-pressed="false">' + fmt.format(num(p, 0)) + "</button>"; }).join("") + "</div>" +
           '<input class="ic-range" type="range" min="' + min + '" max="' + max + '" step="' + step + '" aria-label="المبلغ بالجنيه (سحب)">' +
           '<div class="ic-range-ends" aria-hidden="true"><span>' + fmt.format(min) + "</span><span>" + fmt.format(max) + "+</span></div>" +
@@ -169,7 +171,7 @@
   }
 
   function setAmount(v, from) {
-    var a = Math.round(Number(String(v).replace(/[^\d.]/g, "")) || 0);
+    var a = Math.round(Number(asciiNum(v)) || 0);
     if (from === "change" && a < 10) a = 10;
     amount = a;
     if (from !== "input") els.input.value = a; // on "change" too: a typed 3 becomes the 10 the CTA uses

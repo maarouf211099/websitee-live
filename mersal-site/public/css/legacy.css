@@ -12,12 +12,17 @@
 .legacy .row, .legacy .new-row { display: flex; flex-wrap: wrap; margin-inline: -12px; align-items: flex-start; }
 .legacy .row > *, .legacy .new-row > * { padding-inline: 12px; flex: 1 1 100%; min-width: 0; }
 .legacy .align-items-center { align-items: center; }
-@media (min-width: 768px) {
+/* Bootstrap-like columns respond to the article's own width, not the viewport: from 761px the article is a size
+   container. On a phone (<= 760px) there is no container and these never applied (the viewport was below 768px), so
+   rows stay one column there; on desktop the article is at most ~900px wide, so rows flow in one column too and a
+   gallery takes the full width instead of leaving a 300px text column or an empty half beside it. */
+@media (min-width: 761px) { .legacy { container: legacy / inline-size; } }
+@container legacy (min-width: 980px) {
   .legacy .col-md-2 { flex: 0 0 16.666%; } .legacy .col-md-3 { flex: 0 0 25%; } .legacy .col-md-4 { flex: 0 0 33.333%; }
   .legacy .col-md-5 { flex: 0 0 41.666%; } .legacy .col-md-6 { flex: 0 0 50%; } .legacy .col-md-7 { flex: 0 0 58.333%; }
   .legacy .col-md-8 { flex: 0 0 66.666%; } .legacy .col-md-9 { flex: 0 0 75%; } .legacy .col-md-12 { flex: 0 0 100%; }
 }
-@media (min-width: 992px) {
+@container legacy (min-width: 1100px) {
   .legacy .col-lg-3 { flex: 0 0 25%; } .legacy .col-lg-4 { flex: 0 0 33.333%; } .legacy .col-lg-6 { flex: 0 0 50%; }
   .legacy .col-lg-8 { flex: 0 0 66.666%; } .legacy .col-lg-12 { flex: 0 0 100%; }
 }

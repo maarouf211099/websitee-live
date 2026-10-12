@@ -33,6 +33,13 @@ body.has-mbar:not(:has(.site-footer)) { padding-bottom: 96px; }
   .sl-card { aspect-ratio: auto; max-height: none; height: min(calc((100vw - 60px) * 1.35 - 60px), calc(60svh - 60px), 440px); }
 }
 @media (min-height: 706px) and (max-height: 780px) { .sl-card { height: max(calc(50svh - 60px), calc(100svh - 413px)); } }
+/* the «مبلغ تاني» field under the chips adds one 44px row (+8px gap) to the donate box: the card gives that back too,
+   so the full-width gold button still clears the bottom bar */
+@media (min-height: 706px) {
+  .home .sl-card { height: min(calc((100vw - 60px) * 1.35 - 112px), calc(60svh - 112px), 388px); }
+  .home .quick-donate .amt-other { min-height: 44px; }
+}
+@media (min-height: 706px) and (max-height: 780px) { .home .sl-card { height: max(calc(50svh - 112px), calc(100svh - 465px)); } }
 /* gold is only for the money action: the slide button is white */
 .sl-btn { background: #fff; color: var(--teal-ink); box-shadow: none; }
 /* the neighbour peeking in at the edge shows its photo only, not scraps of its text */

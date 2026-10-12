@@ -26,7 +26,13 @@
 .cm-gift b { display: block; color: var(--teal-dark); font-size: 16px; }
 .cm-gift span { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .cm-gift .go { color: var(--teal); font-weight: 800; font-size: 20px; }
-.cm-gift.soon { opacity: .6; cursor: default; }
+/* a gift that is not ready yet: full-contrast title, its "قريباً" line a gold badge (--gold-ink on #fff6dc), no opacity (AA) */
+.cm-gift.soon { opacity: 1; cursor: default; }
+.cm-gift.soon:hover { transform: none; box-shadow: none; border-color: var(--line); }
+.cm-gift.soon b + span { width: fit-content; padding: 0 10px; border-radius: 999px; background: #fff6dc; color: var(--gold-ink, #8a6100); font-weight: 700; } /* the same height as the text line it replaces, so nothing below moves */
+.cm-gift.soon .go { visibility: hidden; }
+/* the gate's list of what opens after the first donation (js/community.js): shown from 961px only (desktop.css §5) */
+.cm-preview { display: none; }
 .cm-history { list-style: none; padding: 0; margin: 8px 0 26px; display: grid; gap: 8px; }
 .cm-history li { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
 .cm-history b { font-family: "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); font-size: 17px; }

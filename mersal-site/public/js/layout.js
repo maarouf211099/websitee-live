@@ -302,6 +302,8 @@
   };
   document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img").forEach(function (el) { el.classList.add("zoom"); });
   window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > div > img, main .legacy .row > *, main .legacy li, main .legacy > img, main .page-side, main .share-bar, .site-footer .cols > div"));
+  // desktop only (761px+, the phone keeps its approved motion): the zakat uses and the gift steps fade up once too
+  if (window.matchMedia && matchMedia("(min-width: 761px)").matches) window.mersalReveal(document.querySelectorAll("main .zk-cards li, main .gf-steps li"));
 
   // The whole menu (groups and their links) comes from /data/menu.json - edited from the console tab "القائمة"
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }

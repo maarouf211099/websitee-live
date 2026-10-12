@@ -1,0 +1,92 @@
+/* ===================================================================
+   Mersal — phone layer. Phone only: linked with media="(max-width: 760px)" after every other stylesheet, so
+   desktop never applies its rules and, loading last, it wins over site/home/legacy css at equal specificity.
+   Motion lives under (prefers-reduced-motion: no-preference), animates transform/opacity only and runs a
+   bounded number of times; under reduced motion the page is the static design. New phone-only DOM carries the
+   hidden attribute and is revealed here.
+   =================================================================== */
+
+/* Android "darken websites" / Samsung dark mode must not invert the gold buttons (the meta tag says the same) */
+:root { color-scheme: only light; }
+/* overscroll and the space under a short page are footer teal, not white */
+html { background: #004646; }
+
+/* ---------- chrome ---------- */
+/* solid header in the browser's theme colour (#005959): nothing ghosts through, no seam with the status bar */
+.site-header, .site-header.scrolled { background: var(--teal-dark); }
+/* the room for the floating bottom bar moves into the footer, so the page ends teal under the bar */
+body.has-mbar { padding-bottom: 0; }
+body.has-mbar .site-footer .copyright { padding-bottom: calc(16px + 96px + env(safe-area-inset-bottom)); }
+body.has-mbar:not(:has(.site-footer)) { padding-bottom: 96px; }
+/* the donate circle's halo: a ring that grows and fades three times (transform/opacity), not an endless box-shadow */
+.m-bar .m-donate i { animation: none; }
+.m-bar .m-donate i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid rgba(237,183,31,.6); opacity: 0; pointer-events: none; }
+
+/* photo page heads: the title and crumbs keep the 16px gutter (the grid made .wrap shrink to its text and centre) */
+.page-head.has-photo > .wrap { width: 100%; }
+
+/* ---------- home: hero ---------- */
+/* phones 706px and taller: the card gives back 60px so the full-width donate button below still sits above the
+   bottom bar. Shorter phones (360x640, 320x568, landscape) keep the compact quick-donate with the button on its top
+   row (see below), which is the only layout whose button clears the bar there. */
+@media (min-height: 706px) {
+  .sl-card { aspect-ratio: auto; max-height: none; height: min(calc((100vw - 60px) * 1.35 - 60px), calc(60svh - 60px), 440px); }
+}
+@media (min-height: 706px) and (max-height: 780px) { .sl-card { height: max(calc(50svh - 60px), calc(100svh - 413px)); } }
+/* the «مبلغ تاني» field under the chips adds one 44px row (+8px gap) to the donate box: the card gives that back too,
+   so the full-width gold button still clears the bottom bar */
+@media (min-height: 706px) {
+  .home .sl-card { height: min(calc((100vw - 60px) * 1.35 - 112px), calc(60svh - 112px), 388px); }
+  .home .quick-donate .amt-other { min-height: 44px; }
+}
+@media (min-height: 706px) and (max-height: 780px) { .home .sl-card { height: max(calc(50svh - 112px), calc(100svh - 465px)); } }
+/* gold is only for the money action: the slide button is white */
+.sl-btn { background: #fff; color: var(--teal-ink); box-shadow: none; }
+/* the neighbour peeking in at the edge shows its photo only, not scraps of its text */
+.sl-card:not(.on) .sl-copy { opacity: 0; }
+/* phones do not autoplay, so the active dot is a still gold pill (no progress fill) */
+.sl-dots button::after { display: none; }
+/* glass blur on small labels repaints under every scroll; their dark backgrounds already carry the contrast */
+.sl-kicker, .sl-arrow, .sl-hint, .camp-badge { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* the first paint shows the message: copy and donate box never start invisible */
+.sl-track:not(.moved) .sl-card.on .sl-copy > * { animation: none; }
+.quick-bar .hero-card { animation: none; }
+
+/* ---------- home: quick donate ---------- */
+/* the gold button takes its own full-width row at the end, after the amount it confirms; "مبلغ تاني؟" takes its old
+   place beside the title (phones 706px and taller) */
+@media (min-height: 706px) {
+  .home .quick-bar .quick-donate { grid-template-columns: 1fr auto; }
+  .home .quick-bar .quick-donate .qd-go { grid-column: 1 / -1; grid-row: 4; width: 100%; min-width: 0; min-height: 48px; font-size: 16.5px; }
+  .home .quick-donate .qd-other[hidden] { display: inline-flex !important; } /* site.css hides [hidden] with !important */
+  .home .quick-donate .qd-other { grid-column: 2; grid-row: 1; align-self: center; align-items: center; min-height: 44px; padding: 0 4px; font: 700 14px "Cairo", sans-serif; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+}
+
+/* ---------- home: lighter layers ---------- */
+.odo .od-roll { will-change: auto; }
+/* the "live" dot: still gold dot plus a ring that pings three times (transform/opacity) instead of an endless box-shadow */
+.eyebrow.live { position: relative; }
+.eyebrow.live::before { animation: none; box-shadow: none; }
+.eyebrow.live::after { content: ""; position: absolute; inset-inline-start: 0; top: 50%; width: 8px; height: 8px; margin-top: -4px; box-sizing: border-box; border: 2px solid var(--gold); border-radius: 50%; opacity: 0; pointer-events: none; }
+.is-urgent .camp-hot::before { animation-iteration-count: 3; }
+
+/* ---------- motion (phone) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* hero entrance on first load: the photo settles from a slight zoom, the copy rises (no fade: readable at once) */
+  .sl-track:not(.moved) .sl-card.on img { animation: m-settle .9s cubic-bezier(.2,.7,.2,1) both; }
+  .sl-track:not(.moved) .sl-card.on .sl-copy { animation: m-rise .6s .1s cubic-bezier(.2,.7,.2,1) both; }
+  .quick-bar .hero-card { animation: m-rise .6s .15s cubic-bezier(.2,.7,.2,1) both; }
+  .sl-card .sl-copy { transition: opacity .25s; }
+  .eyebrow.live::after { animation: m-ping 2s ease-out .6s 3; }
+  .m-bar .m-donate i::after { animation: m-ping-soft 2.6s ease-out 1.2s 3; }
+  /* the chip just picked pops once (only after a tap: the chips have focus then, so nothing pops on load) */
+  .amounts:focus-within button.on { animation: m-pop .28s cubic-bezier(.3,1.6,.5,1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-card .sl-copy { transition: none; }
+}
+@keyframes m-settle { from { transform: scale(1.06); } }
+@keyframes m-rise { from { transform: translateY(14px); } }
+@keyframes m-ping { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(2.4); } }
+@keyframes m-ping-soft { from { opacity: .8; transform: scale(1); } to { opacity: 0; transform: scale(1.35); } }
+@keyframes m-pop { 50% { transform: scale(1.08); } }

@@ -30,8 +30,8 @@
   }
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () {
-      form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.remove("on"); });
-      b.classList.add("on"); input.value = b.dataset.v; if (window.mersalTap) window.mersalTap(8);
+      form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); });
+      b.classList.add("on"); b.setAttribute("aria-pressed", "true"); input.value = b.dataset.v; if (window.mersalTap) window.mersalTap(8);
       if (qdOther) { qdOther.value = ""; qdOther.parentNode.classList.remove("on"); }
       var v = +b.dataset.v;
       if (qdAmt) qdAmt.textContent = fmt.format(v);
@@ -45,7 +45,7 @@
     var raw = qdOther.value.replace(/[\u0660-\u0669]/g, function (d) { return d.charCodeAt(0) - 0x0660; }).replace(/[\u06F0-\u06F9]/g, function (d) { return d.charCodeAt(0) - 0x06F0; }).replace(/\D/g, "");
     if (qdOther.value !== raw) qdOther.value = raw;
     var v = parseInt(raw, 10) || 0, chips = form.querySelectorAll(".amounts button");
-    chips.forEach(function (x) { x.classList.toggle("on", !v && x.dataset.v === "500"); });
+    chips.forEach(function (x) { var on = !v && x.dataset.v === "500"; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
     qdOther.parentNode.classList.toggle("on", !!v);
     v = v || 500; input.value = v;
     if (qdAmt) qdAmt.textContent = fmt.format(v);
@@ -119,6 +119,7 @@
     var jumping = -1, jumpEnd = null, resume = null;
     function setActive(i) {
       if (i === cur) return;
+      track.classList.add("moved"); // css/mobile.css: the first slide's copy is never faded in on load, later slides rise in
       cards[cur].classList.remove("on"); dotEls[cur].setAttribute("aria-selected", "false");
       cur = i; cards[i].classList.add("on"); dotEls[i].setAttribute("aria-selected", "true");
     }
@@ -151,8 +152,11 @@
       cards.forEach(function (c) { io.observe(c); });
       new IntersectionObserver(function (e) { seen = e[0].isIntersecting; seen ? play() : stop(); }, { threshold: .3 }).observe(root);
     }
+    // phones: no autoplay (the offer must not change while someone reads it); swipe, dots and keys still move it
+    var phoneMq = window.matchMedia ? matchMedia("(max-width: 760px)") : { matches: false };
     function play() {
       stop();
+      if (phoneMq.matches) return;
       if (userPaused || reduceMotion || !seen || document.hidden || document.body.classList.contains("menu-open")) return;
       root.classList.remove("paused"); refill();
       timer = setInterval(function () { if (!hold) goTo(cur + 1, true); }, DUR);
@@ -173,7 +177,9 @@
     root.addEventListener("keydown", function (e) { if (e.key === "ArrowLeft") goTo(cur + 1, true); if (e.key === "ArrowRight") goTo(cur - 1, true); });
     // visible pause/play (WCAG 2.2.2); under reduced motion nothing moves, so there is nothing to pause
     if (pauseBtn) {
-      if (reduceMotion) pauseBtn.hidden = true;
+      var pauseVis = function () { pauseBtn.hidden = reduceMotion || phoneMq.matches; };
+      pauseVis();
+      if (phoneMq.addEventListener) phoneMq.addEventListener("change", function () { pauseVis(); play(); });
       pauseBtn.addEventListener("click", function () {
         userPaused = !userPaused; root.classList.toggle("user-paused", userPaused);
         pauseBtn.setAttribute("aria-label", userPaused ? "تشغيل التحريك التلقائي" : "إيقاف التحريك التلقائي");

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
 <link rel="icon" type="image/png" href="/img/favicon.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#005959">
@@ -16,6 +17,7 @@
 <link rel="stylesheet" href="/css/news.css">
 <link rel="stylesheet" href="/css/impact.css">
 <link rel="stylesheet" href="/css/desktop.css" media="(min-width: 761px)">
+<link rel="stylesheet" href="/css/mobile.css" media="(max-width: 760px)">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>مؤسسة مرسال للأعمال الخيرية والتنموية</title>
@@ -65,10 +67,10 @@
       <form class="hero-card only-online quick-donate" id="quick-donate" action="/donate.html" method="get">
         <div class="qd-text"><b>ساهم مع مرسال</b><span class="qd-trust"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>دفع آمن ومشفّر · فيزا · ميزة</span></div>
         <div class="amounts" role="group" aria-label="المبلغ">
-          <button type="button" data-v="100">100</button>
-          <button type="button" data-v="250">250</button>
-          <button type="button" data-v="500" class="on">500</button>
-          <button type="button" data-v="1000">1,000</button>
+          <button type="button" data-v="100" aria-pressed="false" aria-label="100 جنيه">100</button>
+          <button type="button" data-v="250" aria-pressed="false" aria-label="250 جنيه">250</button>
+          <button type="button" data-v="500" class="on" aria-pressed="true" aria-label="500 جنيه">500</button>
+          <button type="button" data-v="1000" aria-pressed="false" aria-label="1,000 جنيه">1,000</button>
           <label class="amt-other"><span>مبلغ تاني</span><input id="qd-other" type="text" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="اكتب المبلغ" aria-label="اكتب مبلغ تاني بالجنيه"><span>جنيه</span></label>
         </div>
         <p class="qd-impact" id="qd-impact" aria-live="polite">بـ 500 جنيه: جرعة في علاج مرضى الأورام</p>

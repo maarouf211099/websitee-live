@@ -301,7 +301,7 @@
   }).catch(function () { updateImpact(); });
 
   function syncChips() {
-    form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.toggle("on", x.dataset.v === String(amount.value)); });
+    form.querySelectorAll(".amounts button").forEach(function (x) { var on = x.dataset.v === String(amount.value); x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
   }
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () { amount.value = b.dataset.v; syncChips(); updateImpact(); if (window.mersalTap) window.mersalTap(8); });

@@ -32,11 +32,24 @@
     b.addEventListener("click", function () {
       form.querySelectorAll(".amounts button").forEach(function (x) { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); });
       b.classList.add("on"); b.setAttribute("aria-pressed", "true"); input.value = b.dataset.v; if (window.mersalTap) window.mersalTap(8);
+      if (qdOther) { qdOther.value = ""; qdOther.parentNode.classList.remove("on"); }
       var v = +b.dataset.v;
       if (qdAmt) qdAmt.textContent = fmt.format(v);
       if (qdGo) { qdGo.classList.remove("bump"); void qdGo.offsetWidth; qdGo.classList.add("bump"); }
       qdImpact(v);
     });
+  });
+  // "مبلغ تاني": any whole amount (Arabic or Latin digits); empty goes back to 500
+  var qdOther = document.getElementById("qd-other");
+  if (qdOther) qdOther.addEventListener("input", function () {
+    var raw = qdOther.value.replace(/[\u0660-\u0669]/g, function (d) { return d.charCodeAt(0) - 0x0660; }).replace(/[\u06F0-\u06F9]/g, function (d) { return d.charCodeAt(0) - 0x06F0; }).replace(/\D/g, "");
+    if (qdOther.value !== raw) qdOther.value = raw;
+    var v = parseInt(raw, 10) || 0, chips = form.querySelectorAll(".amounts button");
+    chips.forEach(function (x) { var on = !v && x.dataset.v === "500"; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
+    qdOther.parentNode.classList.toggle("on", !!v);
+    v = v || 500; input.value = v;
+    if (qdAmt) qdAmt.textContent = fmt.format(v);
+    qdImpact(v);
   });
   // (as a deferred script this runs while readyState is already "interactive" but before DOMContentLoaded; later() repeats it
   // with the fetched content.json in any case)
@@ -297,7 +310,7 @@
     for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';
     return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (Number(c.maxUnits) || 50) + '" style="--p:0">' +
       // the image link is a duplicate of the title link (hidden from AT); the price badge and the state chip sit beside it so they are read
-      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, 380px" : "" }) + "</a>" +
+      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 82vw, (max-width: 1179px) 40vw, 400px" : "" }) + "</a>" +
         (price ? '<span class="camp-badge">' + esc(badge) + "</span>" : "") + (hot ? '<span class="camp-hot">' + hot + "</span>" : "") + "</div>" +
       '<div class="body"><h3><a href="' + esc(link) + '">' + esc(c.title) + "</a></h3>" +
         (c.impact ? '<p class="camp-impact">' + esc(c.impact) + "</p>" : "") +
@@ -309,6 +322,7 @@
           (price && st !== "done" ? '<div class="camp-qty" role="group" aria-label="عدد ' + esc(unit) + '"><button type="button" data-d="1" aria-label="زيادة">+</button><output aria-live="polite">1</output><button type="button" data-d="-1" aria-label="تقليل">−</button></div>' : "") +
           '<a class="btn btn-gold camp-give" href="' + (st === "done" ? "/donate.html#online" : base + (price || "") + "#online") + '" data-base="' + base + '">' +
             (st === "done" ? "ادعم حالة تانية" : price ? (c.cta ? esc(c.cta) : 'تبرع بـ <b class="amt">' + fmt.format(price) + "</b> ج") : "تبرع الآن") + "</a></div>" +
+        '' + (st !== "done" ? '<a class="camp-other" href="' + base.replace(/&amount=$/, "") + '&custom=1#online">أو اكتب مبلغ تاني</a>' : "") +
         '<div class="camp-links"><a class="camp-more" href="' + esc(link) + '">تفاصيل الحملة ←</a>' +
           '<button type="button" class="camp-share" data-title="' + esc(c.title) + '" data-url="' + esc(link) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>شارك</button></div>' +
       "</div></article>";

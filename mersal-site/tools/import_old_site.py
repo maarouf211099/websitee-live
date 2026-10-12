@@ -326,6 +326,11 @@ def crumbs_html(title, crumbs):
     return '<nav class="crumbs" aria-label="مسار الصفحة">' + "".join(parts) + "</nav>"
 
 
+# A visitor who saw the announcement bar last time gets its room back before the first paint (js/layout.js reuses this
+# placeholder; js/extras.js fills it). Keep it byte-identical to the copy in the root pages: staticwebapp.config.json allows
+# exactly this script by its sha256 (CSP script-src).
+ANN_ROOM = """<script>(function(){try{var a=JSON.parse(localStorage.getItem("mersalAnn")||"null"),h=a&&Math.round(+a.h);if(h>0&&h<160&&!(a.exp&&Date.now()>a.exp))document.getElementById("site-header").insertAdjacentHTML("afterend",'<div id="ann-bar" class="ann-bar t-'+(/^(gold|teal|red)$/.test(a.tone)?a.tone:"gold")+'" style="min-height:'+h+'px" aria-hidden="true"></div>')}catch(e){}})()</script>"""
+
 def page_html(title, body, desc, cover=None, share_img=None, pid=None, crumbs=None):
     """One imported page. `cover` is shown inside the body only when it is not already the banner photo
     (share_img); crumbs are pre-rendered when the menu is known (js/legacy.js builds them otherwise)."""
@@ -339,6 +344,7 @@ def page_html(title, body, desc, cover=None, share_img=None, pid=None, crumbs=No
     return f"""{head_html}
 <body>
 <div id="site-header"></div>
+{ANN_ROOM}
 <div class="page-head{' has-photo' if share_img else ''}">{hero_img(share_img)}<div class="wrap">{crumbs_html(title, crumbs) if crumbs is not None else ''}<h1>{html.escape(title)}</h1></div></div>
 <main id="main">
   <section>

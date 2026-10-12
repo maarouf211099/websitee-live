@@ -27,6 +27,7 @@
 </head>
 <body class="volunteer-page">
 <div id="site-header"></div>
+<script>(function(){try{var a=JSON.parse(localStorage.getItem("mersalAnn")||"null"),h=a&&Math.round(+a.h);if(h>0&&h<160&&!(a.exp&&Date.now()>a.exp))document.getElementById("site-header").insertAdjacentHTML("afterend",'<div id="ann-bar" class="ann-bar t-'+(/^(gold|teal|red)$/.test(a.tone)?a.tone:"gold")+'" style="min-height:'+h+'px" aria-hidden="true"></div>')}catch(e){}})()</script>
 
 <div class="page-head has-photo ph-pattern"><picture><source type="image/webp" srcset="/img/hero.webp"><img class="ph-bg" src="/img/hero.jpg" alt="" fetchpriority="high" width="1600" height="429"></picture><div class="wrap">
   <span class="chip">ساعد مرسال</span>

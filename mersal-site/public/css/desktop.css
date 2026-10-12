@@ -99,9 +99,10 @@ section.alt { background: var(--sand); } /* the grey --bg-2 band is retired on w
   /* the guard in js/layout.js: the row would overflow, so the zakat link and the hotline go and the menu tightens */
   .site-header.hdr-tight .nav > li > a, .site-header.hdr-tight .nav .sub-toggle { padding-inline: 7px; font-size: 14px; }
   /* 76px, 64px once the page scrolls. The bar is sticky in the page flow, so the 12px it gives up becomes a bottom margin
-     at the same moment: nothing below it moves (no layout shift, no scroll-anchoring loop) */
-  body:not(.nav-compact) .site-header { transition: box-shadow .25s, background .25s, transform .5s var(--soft-bounce), margin-bottom .25s var(--ease); }
-  body:not(.nav-compact) .site-header .wrap { transition: min-height .25s var(--ease); }
+     at the same moment: nothing below it moves (no layout shift, no scroll-anchoring loop). Only the logo animates (transform);
+     the height and the margin swap in one frame */
+  body:not(.nav-compact) .site-header { transition: transform .5s var(--soft-bounce); }
+  body:not(.nav-compact) .site-header .wrap { transition: none; }
   body:not(.nav-compact) .site-header.scrolled { margin-bottom: 12px; }
   body:not(.nav-compact) .site-header.scrolled .wrap { min-height: 64px; }
   body:not(.nav-compact) .site-header .brand { transform-origin: 100% 50%; }
@@ -123,25 +124,25 @@ section.alt { background: var(--sand); } /* the grey --bg-2 band is retired on w
 }
 
 /* --- tablet header (761-1179px, and from 1180px when the guard sets body.nav-compact): 68px, sticky, never hidden on
-   scroll. logo | hotline | search | gold "تبرع الآن" | burger. The menu is the drawer below. --- */
+   scroll. logo | hotline | search | gold "تبرع الآن" | burger, in DOM order (js/layout.js puts the burger last; the phone
+   order in site.css is undone here). The menu is the drawer below. --- */
 @media (max-width: 1179px) {
-  .site-header .brand { order: 1; }
-  .site-header .hdr-tel { order: 2; display: inline-flex; margin-inline-start: auto; }
-  .site-header .search-btn { order: 3; margin-inline-start: auto; }
+  .site-header .search-btn, .site-header .menu-toggle { order: 0; }
+  .site-header .hdr-tel { display: inline-flex; margin-inline-start: auto; }
+  .site-header .search-btn { margin-inline-start: auto; }
   .site-header .hdr-tel + .search-btn { margin-inline-start: 0; }
-  .site-header .wrap > .btn-gold { order: 4; padding: 0 18px; }
-  .site-header .menu-toggle { order: 5; width: 44px; height: 44px; margin: 0; flex: none; }
+  .site-header .wrap > .btn-gold { padding: 0 18px; }
+  .site-header .menu-toggle { width: 44px; height: 44px; margin: 0; flex: none; }
   /* once the page scrolls the logo settles a little smaller (transform only: the 68px bar and the page do not move) */
   .site-header .brand { transform-origin: 100% 50%; }
   .site-header.scrolled .brand, .site-header.scrolled .brand:hover { transform: scale(.9); }
 }
 body.nav-compact .site-header .wrap { min-height: 68px; }
-body.nav-compact .site-header .brand { order: 1; }
-body.nav-compact .site-header .hdr-tel { order: 2; display: inline-flex; margin-inline-start: auto; }
-body.nav-compact .site-header .search-btn { order: 3; margin-inline-start: auto; }
+body.nav-compact .site-header .hdr-tel { display: inline-flex; margin-inline-start: auto; }
+body.nav-compact .site-header .search-btn { margin-inline-start: auto; }
 body.nav-compact .site-header .hdr-tel + .search-btn { margin-inline-start: 0; }
-body.nav-compact .site-header .wrap > .btn-gold { order: 4; padding: 0 18px; }
-body.nav-compact .site-header .menu-toggle { order: 5; display: flex; width: 44px; height: 44px; margin: 0; flex: none; }
+body.nav-compact .site-header .wrap > .btn-gold { padding: 0 18px; }
+body.nav-compact .site-header .menu-toggle { display: flex; width: 44px; height: 44px; margin: 0; flex: none; }
 body.nav-compact .nav { display: none; }
 body.nav-compact.menu-open { overflow: hidden; }
 body.nav-compact .menu-toggle span { transition: transform .25s, opacity .25s; }
@@ -268,12 +269,453 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .page-head.ph-small > picture { width: var(--ph-h); }
 .page-head.ph-tiny > picture, .page-head.ph-pattern > picture { display: none; }
 .page-head.ph-tiny > .wrap, .page-head.ph-pattern > .wrap { padding-inline-end: 0; }
-/* the dark photo overlay goes; every band gets the same soft glows */
-.page-head.has-photo::before { background: radial-gradient(420px 220px at 12% 110%, rgba(254,200,48,.22), transparent 70%), radial-gradient(520px 260px at 92% -20%, rgba(255,255,255,.14), transparent 70%); pointer-events: none; }
+/* the dark photo overlay goes; every band gets the same soft glows (site.css darkens .ph-small at a higher specificity, so
+   the .ph-small / .ph-tiny bands are named too) */
+.page-head.has-photo::before, .page-head.has-photo.ph-small::before, .page-head.has-photo.ph-tiny::before { background: radial-gradient(420px 220px at 12% 110%, rgba(254,200,48,.22), transparent 70%), radial-gradient(520px 260px at 92% -20%, rgba(255,255,255,.14), transparent 70%); pointer-events: none; }
 
-/* §3 Home (body.home) */
+/* §3 Home (body.home)
+   Hero: a "split" slide (api/src/lib/hero.js: it has the photo crops and a title) is real HTML copy beside the photo crop
+   from 961px, and the phone story card, enlarged, at 761-960. A slide without crops (.poster) keeps the 1600x475 banner. */
+.home .slider { padding: 32px 0 88px; }
+.home .hero-wave { display: none; }
+.home .sl-track { max-width: none; margin-inline: max(var(--gut), calc((100% - var(--wrap-c)) / 2)); border-radius: 0; box-shadow: none; }
+.home .sl-track:has(> .split) { animation: none; } /* no scroll drift under the split copy */
+.home .sl-card.split { aspect-ratio: auto; background: none; overflow: visible; }
+.home .sl-card.split .sl-copy { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+.home .sl-card.split picture { position: relative; display: block; overflow: hidden; border-radius: var(--r-xl); background: rgba(0,40,40,.35); isolation: isolate;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.16), 0 30px 60px -28px rgba(0,0,0,.6); }
+.home .sl-card.split img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; }
+.home .sl-kicker { font-size: 15px; padding: 5px 12px; }
+.home .sl-pill { font-size: 19px; line-height: 1.3; }
+.home .sl-pill::before { width: 9px; height: 9px; }
+/* from 761px the slide button is white (12:1 teal ink): the gold buttons on the first screen stay the header's and the quick-donate one */
+.home .sl-card.split .sl-btn { height: 52px; padding: 0 24px; border-radius: 16px; background: #fff; color: var(--teal-ink); font-size: 16px;
+  box-shadow: 0 12px 26px -14px rgba(0,0,0,.55); }
+.home .sl-link:hover .sl-btn, .home .sl-link:focus-visible .sl-btn { background: #fff; }
+/* the nav cluster: prev, next, dots, pause (index.html order) */
+.home .sl-nav { gap: 6px; }
+.home .sl-nav .sl-arrow { position: static; flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0 0 3px; transition: background .2s, color .2s, transform .22s var(--spring); }
+.home .sl-nav .sl-arrow:active { transform: scale(.92); }
+.home .sl-nav .sl-arrow[hidden] { display: none; }
+.home .sl-pause { width: 44px; height: 44px; background: rgba(0,32,32,.45); }
+.home .sl-pause svg { width: 13px; height: 13px; }
+.home .sl-dots button { height: 44px; }
+.home .sl-dots button::before, .home .sl-dots button::after { inset: 18px 8px; }
 
-/* §4 Donate (body.donate-page) */
+@media (min-width: 961px) {
+  .home .slider { padding: 40px 0 96px; }
+  .home .sl-card.split .sl-link { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: center; height: auto; }
+  .home .sl-card.split .sl-copy { grid-column: 1 / span 5; grid-row: 1; gap: 14px; padding-bottom: 64px; }
+  .home .sl-card.split picture { grid-column: 6 / -1; grid-row: 1; aspect-ratio: 1766 / 1140; height: auto; }
+  .home .sl-card.split .sl-title { font-size: var(--fs-display); line-height: 1.2; max-width: 12ch; text-shadow: 0 2px 18px rgba(0,0,0,.25); }
+  .home .sl-card.split .sl-btn { margin-top: 10px; }
+  /* one cluster at the start of the copy column, level with the photo's bottom edge */
+  .home .sl-nav { position: absolute; bottom: 96px; inset-inline-start: max(var(--gut), calc((100% - var(--wrap-c)) / 2)); inset-inline-end: auto; justify-content: flex-start; }
+}
+/* 761-960: the phone's story card, enlarged: a 16:10 card, the copy over a teal scrim at its bottom start, the controls under it */
+@media (max-width: 960px) {
+  .home .sl-card.split { aspect-ratio: 16 / 10; border-radius: var(--r-xl); overflow: hidden; isolation: isolate; background: var(--teal-dark);
+    box-shadow: 0 30px 60px -28px rgba(0,0,0,.6); }
+  .home .sl-card.split .sl-link { position: relative; height: 100%; }
+  .home .sl-card.split picture { position: absolute; inset: 0; border-radius: 0; box-shadow: none; }
+  .home .sl-card.split picture::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(to left, rgba(0,72,72,.92) 0%, rgba(0,72,72,.7) 36%, rgba(0,72,72,0) 68%), linear-gradient(0deg, rgba(0,60,60,.75), rgba(0,60,60,0) 55%); }
+  .home .sl-card.split .sl-copy { position: absolute; inset-inline-start: 0; bottom: 0; z-index: 2; max-width: 64%; padding: 0 32px 32px; gap: 10px; }
+  .home .sl-card.split .sl-title { font-size: 34px; line-height: 1.22; max-width: 13ch; }
+  .home .sl-nav { position: static; margin-top: 14px; justify-content: center; }
+}
+/* a slide without crops: today's banner, sized to the shared column, its copy kept for screen readers */
+.home .sl-card.poster { aspect-ratio: 1600 / 475; border-radius: var(--r-xl); }
+
+/* hero entrance (also on every slide change): the copy rises (home.css slRise), the photo settles from a slight scale */
+@media (prefers-reduced-motion: no-preference) {
+  .home .sl-card.split.on picture { animation: heroSettle 1s var(--ease) both; }
+  .home .sl-card.split.on .sl-copy > * { animation: slRise .7s var(--spring) both; }
+}
+@keyframes heroSettle { from { opacity: .4; transform: scale(1.05); } }
+@media (hover: hover) {
+  .home .sl-nav .sl-arrow:hover { background: var(--gold); color: var(--teal-ink); }
+}
+
+/* quick-donate on the grid, overlapping the hero band */
+.home .quick-bar { margin-top: -56px !important; }
+.home .quick-bar .hero-card { max-width: none; border-radius: var(--r-lg); box-shadow: var(--sh-2), 0 24px 60px -28px rgba(0,48,48,.35); }
+.home .quick-bar .quick-donate { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 10px; align-items: center; padding: 20px 24px; }
+.home .quick-donate .qd-text b { font-size: 22px; line-height: 1.35; }
+.home .quick-donate .qd-text span { font-size: 14px; }
+.home .quick-donate .amounts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.home .quick-donate .amounts button { min-height: 56px; font-size: 18px; font-variant-numeric: tabular-nums; }
+.home .quick-donate .qd-go { min-height: 56px; height: auto; width: 100%; justify-content: center; font-size: 17px; }
+.home .quick-donate .qd-impact { flex-basis: auto; order: 0; margin: 0; text-align: start; font-size: 14.5px; }
+.qd-alt { margin: 0; font-size: 13.5px; font-weight: 700; color: var(--muted); line-height: 1.5; }
+.home .quick-donate .qd-alt { display: block; }
+.qd-alt a { display: inline-block; padding-block: 12px; margin-block: -12px; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.qd-alt a:hover { color: var(--teal-dark); }
+@media (min-width: 1180px) {
+  .home .quick-donate .qd-text { grid-column: 1 / span 3; grid-row: 1; }
+  .home .quick-donate .amounts { grid-column: 4 / span 6; grid-row: 1; }
+  .home .quick-donate .qd-go { grid-column: 10 / -1; grid-row: 1; }
+  .home .quick-donate .qd-impact { grid-column: 4 / span 6; grid-row: 2; }
+  .home .quick-donate .qd-alt { grid-column: 10 / -1; grid-row: 2; text-align: center; }
+}
+@media (max-width: 1179px) {
+  .home .quick-donate .qd-text { grid-column: 1 / span 7; grid-row: 1; }
+  .home .quick-donate .qd-go { grid-column: 8 / -1; grid-row: 1; }
+  .home .quick-donate .amounts { grid-column: 1 / -1; grid-row: 2; }
+  .home .quick-donate .qd-impact { grid-column: 1 / span 7; grid-row: 3; }
+  .home .quick-donate .qd-alt { grid-column: 8 / -1; grid-row: 3; text-align: end; white-space: nowrap; }
+}
+/* the card-less fallback (payments off): hotline 4 columns, CIB 5, the button 3 */
+.home.no-online-pay .quick-bar .quick-offline { display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: center; padding: 20px 24px; }
+.home .quick-offline .qo-item:nth-child(1) { grid-column: span 4; }
+.home .quick-offline .qo-item:nth-child(2) { grid-column: span 5; }
+.home .quick-offline .btn { grid-column: span 3; min-height: 56px; justify-content: center; }
+/* the chip you pick pops once */
+@media (prefers-reduced-motion: no-preference) {
+  .home .quick-donate .amounts button.on { animation: chipPop .32s var(--spring); }
+}
+@keyframes chipPop { 40% { transform: scale(1.06); } }
+
+/* trust strip: four equal tiles (2 x 2 below 900px); the other ways to give are the .qd-alt line in the card */
+.home .trust-strip { padding: 20px 0 0; }
+.home .ts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+.home .ts-tile { min-height: 76px; gap: 12px; padding: 14px 16px; border-radius: var(--r-lg); box-shadow: none; transition: border-color .2s, transform .25s var(--spring); }
+.home .ts-tile:hover { transform: translateY(-2px); }
+.home .ts-ic { width: 40px; height: 40px; }
+.home .ts-ic svg { width: 20px; height: 20px; }
+.home .ts-tile b { font-size: 15px; }
+.home .ts-tile small { font-size: 13px; color: #4d5c5c; }
+.home .ts-ways { display: none; }
+@media (max-width: 899px) { .home .ts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* campaigns: the first (admin order) is featured across the row, the others are horizontal cards, 2 a row from 961px.
+   The 1:1 posters are never cropped; their price and state chips sit under the picture instead of over its text. */
+.home .campaigns-sec { padding-top: 56px; }
+/* from 1180px the lead sits beside the title (end of the row), so a 1920x1080 first screen reaches the featured card */
+@media (min-width: 1180px) {
+  .home .camp-title.split { margin-bottom: 28px; }
+  .home .camp-title.split > p { grid-column: 2; grid-row: 1; align-self: end; max-width: 36ch; margin: 0 0 8px; text-align: end; }
+}
+@media (min-width: 1600px) {
+  .home .campaigns-sec { padding-top: 48px; }
+  .home .sl-card.split picture { width: min(100%, 720px); justify-self: end; }
+}
+.home .camp-carousel .car-track { display: grid; grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); gap: var(--gap);
+  overflow: visible; padding: 0; margin: 0; scroll-snap-type: none; }
+.home .camp-carousel .car-arrow { display: none; }
+@media (min-width: 961px) {
+  .home .camp-carousel .car-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home .camp-carousel .car-track > .camp:first-child, .home .camp-carousel .car-track > .camp:last-child:nth-child(even) { grid-column: 1 / -1; }
+}
+.home .camp { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: stretch; border-radius: var(--r-lg); box-shadow: var(--sh-1); border: 1px solid var(--line); }
+.home .camp-media { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; padding-bottom: 14px; background: var(--teal-soft); }
+.home .camp-img { flex: 0 0 100%; }
+.home .camp-img::after { display: none; }
+.home .camp-badge, .home .camp-hot { position: static; margin-inline-start: 14px; }
+.home .camp-hot + .camp-badge, .home .camp-badge + .camp-hot { margin-inline-start: 0; }
+.home .camp .body { padding: 20px 22px; gap: 8px; justify-content: center; }
+.home .camp .body p { flex: none; }
+.home .camp .camp-impact { font-size: 14px; color: var(--ink-2); }
+.home .camp-carousel .car-track > .camp:first-child { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+.home .camp-carousel .car-track > .camp:first-child .body { padding: 32px 40px; gap: 12px; }
+.home .camp-carousel .car-track > .camp:first-child h3 { font-size: 28px; line-height: 1.35; }
+.home .camp-carousel .car-track > .camp:first-child .camp-impact { font-size: 16px; }
+.home .camp-carousel .car-track > .camp:first-child .camp-num { font-size: 48px; }
+.home .camp-carousel .car-track > .camp:first-child .camp-cta { grid-template-columns: max-content minmax(0, 300px); justify-content: start; }
+.home .camp:hover { transform: translateY(-3px); box-shadow: var(--sh-2); }
+@media (max-width: 1179px) {
+  .home .camp-qty button { width: 36px; }
+  .home .camp .body { padding: 16px 18px; }
+}
+@media (min-width: 961px) and (max-width: 1179px) {
+  .home .camp-carousel .car-track > .camp:first-child .body { padding: 24px 28px; }
+  .home .camp-carousel .car-track > .camp:first-child h3 { font-size: 24px; }
+  .home .camp-carousel .car-track > .camp:first-child .camp-num { font-size: 40px; }
+}
+
+/* middle sections: calm bands, no decorative blobs */
+.home .n-zakat a, .home .n-zakat a:hover { background: var(--gold-soft); }
+.home .about-intro::before, .home .about-pic::before { display: none; }
+.home .about-pic img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 30%; border-radius: var(--r-xl); box-shadow: var(--sh-2); }
+@media (max-width: 1179px) {
+  .home .about-intro .grid-2 { display: flex; flex-direction: column-reverse; align-items: stretch !important; gap: 32px; }
+  .home .about-pic { width: 100%; max-width: none; margin: 0; }
+  .home .about-pic img { aspect-ratio: 16 / 9; max-height: 420px; }
+  .home .hospital-feature .grid-2 { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .home .hf-pic img { aspect-ratio: 16 / 9; max-height: 420px; width: 100%; object-fit: cover; }
+}
+/* numbers: four figures in a row on the band, hairline dividers instead of glass boxes */
+.home .numbers { padding-block: var(--sec); }
+.home .numbers-title { text-align: start; margin-bottom: 32px; }
+.home .numbers-title::after { display: none; }
+.home .numbers-grid { gap: 0; }
+.home .num { background: none; border: 0; border-radius: 0; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 8px 24px; text-align: start; }
+.home .num + .num { border-inline-start: 1px solid rgba(255,255,255,.18); }
+.home .num:first-child { padding-inline-start: 0; }
+.home .num:hover { background: none; transform: translateY(-3px); }
+.home .num b { font-size: var(--fs-stat); }
+.home .num > span { font-size: 15px; color: rgba(255,255,255,.92); }
+.home a.num::after { display: inline-flex; align-items: center; min-height: 44px; padding-top: 4px; font-size: 13.5px; color: #fff; }
+.home a.num:hover::after { color: var(--gold); }
+/* hospital: the photo 7 columns at the start, the story 5 at the end; the facts as a stat row */
+@media (min-width: 1180px) {
+  .home .hospital-feature .grid-2 { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: start !important; gap: var(--gap) calc(var(--gap) * 2); }
+  .home .hf-pic img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+}
+.home .facts { gap: 0; margin: 20px 0; }
+.home .facts div { background: none; box-shadow: none; border-radius: 0; padding: 4px 12px; text-align: start; }
+.home .facts div + div { border-inline-start: 1px solid var(--line); }
+.home .facts div:first-child { padding-inline-start: 0; }
+.home .facts b { color: var(--teal-text); }
+.home .hospital-feature .hf-lead { background: none; border: 0; padding: 0; color: var(--teal-ink); }
+.home .hf-shares { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 761px) and (max-width: 1023px) {
+  .home .hf-shares { gap: 10px; }
+  .home .hf-shares a { flex-direction: column; justify-content: center; align-items: flex-start; }
+  .home .hf-shares span, .home .hf-shares .waqf em { order: 0; }
+  .home .hf-shares b { margin-inline-start: 0; }
+}
+
+/* lower sections */
+.home .ic-title { font-size: var(--fs-h2); }
+/* impact calculator (css/impact.css may load after this file: the page class wins): 8 tiles = 2 full rows from 1240px */
+.home .ic-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1180px) { .home .ic { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } .home .ic-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1240px) { .home .ic-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.home .svc-i { background: var(--teal-soft); color: var(--teal-text); }
+.home #projects { background: var(--sand); }
+/* the projects carousel: its arrows sit in a row above the track at the end, level with the section title, never over a card */
+.home #projects .carousel.overflow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 10px; row-gap: 40px; margin-top: -88px; }
+.home #projects .carousel.overflow .car-arrow { position: static; grid-row: 1; transform: none; }
+.home #projects .carousel.overflow .car-prev { grid-column: 2; }
+.home #projects .carousel.overflow .car-next { grid-column: 3; }
+.home #projects .carousel.overflow .car-track { grid-column: 1 / -1; grid-row: 2; }
+.home #projects .car-track { gap: var(--gap); grid-auto-columns: calc((100% - var(--gap)) / 2); padding-block: 16px; margin-block: -16px; }
+@media (min-width: 1180px) { .home #projects .car-track { grid-auto-columns: calc((100% - 3 * var(--gap)) / 4); } }
+@media (min-width: 1600px) { .home #projects .car-track { grid-auto-columns: calc((100% - 4 * var(--gap)) / 5); } }
+.home #projects .card h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.home #projects .card p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; flex: none; }
+.home #projects .card img.media.fit { object-fit: contain; background: var(--teal-soft); }
+/* ways: the card tile is the teal feature (2 rows), the other six fill 3 x 2, no orphan row */
+@media (min-width: 1180px) {
+  .home .ways-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+  .home .ways-grid .way2 { flex: none; }
+  .home .ways-grid > .way2.only-online { grid-row: span 2; justify-content: center; background: var(--teal-text); color: #fff; }
+  .home .ways-grid > .way2.only-online b { color: #fff; font-size: 20px; }
+  .home .ways-grid > .way2.only-online small { color: rgba(255,255,255,.92); font-size: 14px; }
+  .home .ways-grid > .way2.only-online .w-ico { background: rgba(255,255,255,.14); color: #fff; }
+  .home.no-online-pay .ways-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.home .w-ico { width: 56px; height: 56px; }
+.home .w-ico.img img { max-height: 30px; width: auto; max-width: 44px; height: auto; }
+.home #partners.pt-sec { padding-top: 24px; }
+.home #partners .section-title h2 { font-size: var(--fs-h3); }
+@media (min-width: 1180px) { .home .sb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); } }
+
+/* odometers: no overshoot from 761px, a little quicker (the JS timing only places the .done class) */
+:root { --odo-spring: cubic-bezier(.2, .7, .2, 1); }
+.odo .od-roll { transition-duration: .6s; }
+
+/* §4 Donate (body.donate-page)
+   Head: the WP2 window (the mother and both children whole at 50% 28%), a shorter band so step 1 is in the first screen.
+   From 1180px the DOM stays as it is and the tab column becomes `display: contents`: the tab bar takes row 1 at the full
+   width, the open panel row 2, and the "ملخص تبرعك" rail (aside.side-ads) sits beside the card stepper, sticky. Any other
+   tab spans the full width and the rail goes. 761-1179px: one column, the hotline card as a slim strip under the panel. */
+.donate-page main > section:first-child { padding-top: 32px; }
+.donate-page .page-head { padding-block: 24px; }
+@media (min-width: 1180px) {
+  .donate-page .page-head { padding-block: 26px; }
+  .donate-page .page-head > .wrap { display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; }
+  .donate-page .page-head h1 { flex: 1 0 100%; }
+  .donate-page .page-head > .wrap > p { margin: 8px 0 0; }
+  .donate-page .ph-trust { margin: 8px 0 0; }
+}
+.donate-page .ph-trust li { padding: 6px 12px; font-size: 13px; }
+/* the head band stays <= 260px at every width (a 232px window + padding was 284px at 1920) */
+@media (min-width: 1600px) { .donate-page .page-head { --ph-h: 200px; } }
+
+/* --- the card stepper's companions: the hotline card is a compact horizontal strip; the SMS poster goes (the wallets tab
+   has the SMS card) --- */
+.donate-page .side-ads > .sms-card { display: none; }
+.donate-page .side-ads > a.hot-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "i t n" "i s n";
+  align-items: center; column-gap: 14px; row-gap: 2px; aspect-ratio: auto; min-height: 0; padding: 14px 18px; border-radius: var(--r-md); }
+.donate-page .hot-card svg { grid-area: i; position: static; width: 34px; height: 34px; }
+.donate-page .hot-card .hc-t { grid-area: t; max-width: none; padding: 0; font-size: 15px; line-height: 1.45; }
+.donate-page .hot-card .hc-s { grid-area: s; text-align: start; font-size: 13px; color: rgba(255,255,255,.9); }
+.donate-page .hot-card b { grid-area: n; font-size: 34px; }
+@media (max-width: 1179px) {
+  .donate-page .layout-side { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .donate-page .layout-side .side-ads { display: block; max-width: none; margin: 0; }
+}
+
+@media (min-width: 1180px) {
+  .donate-page .layout-side { grid-template-columns: minmax(0, 1fr) 360px; column-gap: 40px; row-gap: 0; align-items: start; }
+  .donate-page .layout-side > div:first-child { display: contents; }
+  .donate-page .layout-side .tabs { grid-column: 1 / -1; grid-row: 1; }
+  .donate-page .layout-side .tab-panel { grid-column: 1; grid-row: 2; }
+  .donate-page .layout-side .side-ads { grid-column: 2; grid-row: 2; position: sticky; top: 96px; gap: 12px; }
+  .donate-page .layout-side:has(#t-online[aria-selected="false"]) .tab-panel { grid-column: 1 / -1; }
+  .donate-page .layout-side:has(#t-online[aria-selected="false"]) .side-ads { display: none; }
+  /* the hotline card in the rail: its line on top, the number beside the "لحد باب البيت" line */
+  .donate-page .side-ads > a.hot-card { grid-template-columns: auto auto minmax(0, 1fr); grid-template-areas: "i t t" "i n s"; column-gap: 12px; row-gap: 4px; }
+  .donate-page .hot-card .hc-t { font-size: 14.5px; }
+  .donate-page .hot-card b { font-size: 30px; }
+
+  /* "ملخص تبرعك": a mirror of step 1 (js/donate.js fills it in updateImpact()), the cards, the hotline, the other ways */
+  .donate-page .don-sum { display: block; padding: 22px 22px 18px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+  .ds-now { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .ds-h { display: block; font-size: 15px; font-weight: 800; color: var(--teal-dark); }
+  .ds-amt { margin: 6px 0 0; font-size: 17px; font-weight: 700; color: var(--teal-ink); line-height: 1.2; }
+  .ds-amt b { font: 700 40px/1.1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .3px; color: var(--teal-ink); }
+  .ds-for { margin: 8px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .ds-for span { font-weight: 700; color: var(--teal-ink); }
+  .ds-impact { margin: 10px 0 0; padding: 10px 12px; border-radius: var(--r-sm); background: var(--teal-soft); color: var(--teal-text); font-size: 14px; font-weight: 700; line-height: 1.6; text-wrap: balance; }
+  .ds-impact:empty { display: none; }
+  .ds-safe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 14px 0 0; font-size: 13.5px; font-weight: 700; color: #11683f; }
+  .ds-safe .pm { padding: 6px 8px; font-size: 11px; color: var(--teal-ink); border-color: #cfe9db; }
+  .ds-tel { display: flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 8px; font-size: 14.5px; font-weight: 700; color: var(--teal-dark); text-decoration: none; }
+  .ds-tel b { font: 700 18px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); }
+  .ds-tel:hover b { text-decoration: underline; text-underline-offset: 3px; }
+  .ds-alt { margin: 2px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--muted); text-wrap: balance; }
+  .ds-alt a { display: inline-block; padding-block: 10px; margin-block: -10px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+}
+
+/* --- tabs: segmented pill-cards. 761-960px: 3 + 2; from 961px: five equal cards in one row; from 1180px a hint line ---
+   The gold check disc of the open tab is a background image, so ::after stays free for the hint. role=tab, aria-selected
+   and the t-* ids are the markup's own. */
+.donate-page .tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-flow: row; gap: 10px; margin: 0 0 20px; padding: 0; border: 0; overflow: visible; }
+.donate-page .tabs button { grid-column: span 2; display: grid; grid-template-columns: auto auto; justify-content: center; align-content: center; align-items: center;
+  column-gap: 8px; row-gap: 2px; min-height: 56px; padding: 8px 14px; border: 1.5px solid var(--line); border-radius: var(--r-md); background: #fff;
+  color: var(--teal-dark); font-size: 15px; line-height: 1.3; text-align: center; white-space: normal; }
+.donate-page .tabs button:nth-child(n+4) { grid-column: span 3; }
+.no-online-pay .donate-page .tabs button:nth-child(n+2) { grid-column: span 3; } /* no card tab: 2 + 2 */
+.donate-page .tabs button::before { width: 20px; height: 20px; }
+.donate-page .tabs button:hover { border-color: var(--teal); color: var(--teal-text); }
+.donate-page .tabs button[aria-selected="true"] { border-color: var(--teal-text); color: #fff; box-shadow: 0 10px 22px -12px rgba(0,89,89,.7);
+  background: var(--teal-text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23fec830'/%3E%3Cpath d='M6.5 12.5l3.6 3.6L17.5 8.6' fill='none' stroke='%23003c3c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") left 8px top 8px / 16px no-repeat; }
+.donate-page .tabs button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0 6px rgba(0,89,89,.85); }
+@media (min-width: 961px) {
+  .donate-page .tabs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .donate-page .tabs button, .donate-page .tabs button:nth-child(n+4), .no-online-pay .donate-page .tabs button:nth-child(n+2) { grid-column: auto; }
+}
+@media (min-width: 1180px) {
+  .donate-page .tabs button { min-height: 64px; padding: 14px 10px 6px; }
+  /* the disc sits in the top corner, above the label row (a long label like the wallets one reaches the corner) */
+  .donate-page .tabs button[aria-selected="true"] { background-position: left 6px top 5px; background-size: 14px; }
+  .donate-page .tabs button::after { grid-column: 1 / -1; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--muted); }
+  .donate-page .tabs button[aria-selected="true"]::after { color: rgba(255,255,255,.9); }
+  /* the hint is decoration (the alt text after "/" is empty): the tab's name stays its label */
+  #t-online::after { content: "فيزا · ماستركارد · ميزة"; content: "فيزا · ماستركارد · ميزة" / ""; }
+  #t-wallets::after { content: "إنستاباي · فوري 9200 · المحافظ"; content: "إنستاباي · فوري 9200 · المحافظ" / ""; }
+  #t-bank::after { content: "حسابات مرسال الرسمية"; content: "حسابات مرسال الرسمية" / ""; }
+  #t-home::after { content: "مندوبنا يجيلك لحد البيت"; content: "مندوبنا يجيلك لحد البيت" / ""; }
+  #t-abroad::after { content: "تحويل من بره مصر"; content: "تحويل من بره مصر" / ""; }
+}
+@media (min-width: 1180px) and (max-width: 1365px) { .donate-page .tabs button { font-size: 14.5px; } }
+
+/* --- one panel shell for all five tabs (from 1180px): the stepper and the forms lose their own card inside it --- */
+@media (min-width: 1180px) {
+  .donate-page .tab-panel { padding: 28px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+  .donate-page #online { padding: 18px 28px 24px; }
+  .donate-page #online .steps { margin-bottom: 14px; }
+  .donate-page #online .step[data-step="1"] > .amounts { margin-top: 12px; }
+  .donate-page #online > .stepper { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; }
+}
+
+/* --- the stepper. Steps: one row of circles and connectors (the 3px under-bar goes): [line][circle][label] per step --- */
+@media (min-width: 961px) {
+  .donate-page .steps { gap: 0; margin: 0 0 18px; }
+  .donate-page .steps li { display: grid; grid-template-columns: minmax(24px, 1fr) auto auto; align-items: center; column-gap: 10px; flex: 1 1 0; padding: 0; border-bottom: 0; font-size: 15px; text-align: start; }
+  .donate-page .steps li:first-child { grid-template-columns: auto auto; flex: none; }
+  .donate-page .steps li > span { grid-column: -3; grid-row: 1; }
+  .donate-page .steps li + li::before, .donate-page .steps li + li::after { position: static; grid-column: 1; grid-row: 1; width: auto; height: 2px; margin-inline: 12px 2px; inset: auto; }
+
+  /* step 1 on a 12-column grid, the DOM untouched (tab order: chips, purpose, amounts, amount, next; #impact is a live line) */
+  .donate-page .step[data-step="1"] { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 20px; align-items: start; }
+  .donate-page .step[data-step="1"] > .niyya-chips { grid-column: 1 / 8; grid-row: 1; margin: 0; }
+  .donate-page .step[data-step="1"] > .niyya-note { grid-column: 1 / 8; grid-row: 2; margin: 6px 0 0; }
+  .donate-page .step[data-step="1"] > .field:has(#purpose) { grid-column: 8 / -1; grid-row: 1 / span 2; margin: 0; }
+  .donate-page .step[data-step="1"] > .amounts { grid-column: 1 / -1; grid-row: 3; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin: 16px 0 0; }
+  .donate-page .step[data-step="1"] > .amounts button { min-height: 52px; padding: 0; font-size: 18px; }
+  .donate-page .step[data-step="1"] > .impact { grid-column: 1 / -1; grid-row: 4; margin: 12px 0 0; min-height: 24px; }
+  .donate-page .step[data-step="1"] > .amount-field { grid-column: 1 / 6; grid-row: 5; margin: 10px 0 0; }
+  .donate-page .step[data-step="1"] > [data-next] { grid-column: 7 / -1; grid-row: 5; justify-self: end; align-self: end; width: auto; min-width: 240px; min-height: 50px; padding: 0 40px; }
+
+  /* step 2: two columns, phone and e-mail share a row */
+  .donate-page .step[data-step="2"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+  .donate-page .step[data-step="2"] > * { grid-column: 1 / -1; }
+  .donate-page .step[data-step="2"] > .field:has(#phone), .donate-page .step[data-step="2"] > .field:has(#email) { grid-column: auto; }
+
+  /* back / edit: text buttons at the start; the gold button at the end */
+  .donate-page .step-nav { justify-content: space-between; align-items: center; }
+  .donate-page .step-nav .btn-ghost-teal { flex: none; min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--teal-text); text-decoration: underline; text-underline-offset: 4px; }
+  .donate-page .step-nav .btn-ghost-teal:hover { background: var(--teal-soft); color: var(--teal-text); }
+  .donate-page .step-nav .btn-gold { flex: none; min-width: 240px; min-height: 50px; padding-inline: 32px; }
+  /* step 3 shows the amount and the purpose in its summary list: the strip above it would repeat them */
+  .donate-page .stepper:has(.step[data-step="3"]:not([hidden])) .s-sum { display: none; }
+}
+@media (min-width: 1180px) { .donate-page .s-sum { display: none; } } /* the rail shows the same */
+
+/* --- bank accounts: short cards pack under tall ones (CSS columns; donate.json's order, read down each column) --- */
+@container bk-box (min-width: 640px) {
+  .donate-page .bk-grid { display: block; columns: 2; column-gap: 16px; }
+  .donate-page .bk-card { break-inside: avoid; margin-bottom: 16px; }
+}
+@container bk-box (min-width: 1000px) { .donate-page .bk-grid { columns: 3; } }
+
+/* --- wallets (from 1180px): 3 + 3, the second row compact; Talabat and Waffarha as neutral monograms --- */
+@media (min-width: 1180px) {
+  .donate-page .pay-ways { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .donate-page .pw:nth-child(n+4) { padding: 14px 16px; }
+  .donate-page .pw:nth-child(n+4) .pw-badge { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
+  .donate-page .pw:nth-child(n+4) h3 { font-size: 16px; }
+  .donate-page .pw:nth-child(n+4) p { font-size: 14px; line-height: 1.7; }
+  .donate-page .pw[data-brand="talabat"] .pw-badge, .donate-page .pw[data-brand="waffarha"] .pw-badge { background: var(--teal-soft); color: var(--teal-text); }
+  .donate-page .pw-more { margin: 0 0 20px; text-align: start; }
+
+  /* transfer and pickup forms: a plain header row, the opened form flat in the panel, fields in two columns */
+  .donate-page .tr-cta { margin: 20px 0 0; padding: 20px 0 0; background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; }
+  .donate-page #transfer-box { margin-top: 18px; }
+  .donate-page #transfer-box .req-form, .donate-page #transfer-box .req-success { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; }
+  .donate-page #home .req-form fieldset, .donate-page #transfer-box fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; align-content: start; }
+  .donate-page #home .req-form fieldset > *, .donate-page #transfer-box fieldset > * { grid-column: 1 / -1; }
+  .donate-page #home .req-form fieldset > .field:not(:has(textarea)), .donate-page #transfer-box fieldset > .field:not(:has(textarea)) { grid-column: auto; }
+  .donate-page #home .req-form fieldset > .seg-field { grid-column: 1 / -1; } /* the two kind cards need the group's width */
+  .donate-page #home .req-form .field textarea, .donate-page #transfer-box .field textarea { min-height: 96px; }
+  /* the pickup form's four groups two by two (the panel is 1240px wide on this tab) */
+  .donate-page #pk-form.req-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; align-items: start; padding: 0; border: 0; box-shadow: none; background: none; border-radius: 0; }
+  .donate-page #pk-form > :not(fieldset) { grid-column: 1 / -1; }
+  .donate-page #pk-form fieldset + fieldset { margin-top: 0; padding-top: 0; border-top: 0; }
+  .donate-page #pk-form fieldset:nth-of-type(n+3) { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .donate-page #pk-form .req-submit, .donate-page #transfer-box .req-submit { max-width: 360px; margin-top: 22px; }
+  .donate-page #pk-success { border: 0; box-shadow: none; padding: 0; }
+
+  /* abroad: the account card and a large framed picture of the details side by side */
+  .donate-page #abroad-body { display: grid; grid-template-columns: 7fr 5fr; column-gap: 32px; align-items: start; }
+  .donate-page #abroad-body > :not(.ab-card):not(.ab-thumb):not(.ab-more) { grid-column: 1 / -1; }
+  .donate-page #abroad-body > .ab-card { grid-column: 1; max-width: none; margin: 0; }
+  .donate-page #abroad-body > .ab-thumb { grid-column: 2; grid-row: span 2; display: flex; flex-direction: column; align-items: stretch; gap: 10px; max-width: 360px; padding: 10px; border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+  .donate-page #abroad-body > .ab-thumb img { width: 100%; height: auto; border-radius: var(--r-md); object-fit: contain; }
+  .donate-page #abroad-body > .ab-thumb span { padding: 0 6px 4px; text-align: center; }
+  .donate-page #abroad-body > .ab-more { grid-column: 1; margin-top: 16px; }
+}
+
+/* --- the calculator under the tabs (sand band): a teaser card; open by default from 1180px (js/donate.js) --- */
+.donate-page main > section.alt { padding-block: 48px; }
+.donate-page .ic-more > summary { min-height: 68px; padding: 12px 24px; border: 1px solid var(--sand-line); border-inline-start: 4px solid var(--gold); border-radius: var(--r-lg);
+  background: #fff; font-size: var(--fs-h3); color: var(--teal-ink); box-shadow: var(--sh-1); }
+
+/* --- motion (transform and opacity only; §9 turns it off): pill and card hover lifts, the rail settles in once --- */
+@media (prefers-reduced-motion: no-preference) {
+  .donate-page .tabs button { transition: transform .22s var(--spring), background-color .2s, border-color .2s, color .2s, box-shadow .2s; }
+  .donate-page .tabs button:hover { transform: translateY(-2px); }
+  .donate-page .tabs button:active { transform: scale(.97); transition-duration: .08s; }
+  .donate-page .pw, .donate-page .bk-card { transition: transform .25s var(--spring), box-shadow .25s; }
+  .donate-page .pw:hover, .donate-page .bk-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2); }
+  .donate-page .side-ads > a.hot-card:hover { transform: translateY(-2px); }
+  .donate-page .don-sum { animation: rise-sm .45s var(--ease) .1s both; }
+  .donate-page .ds-impact { animation: fade-in .3s ease-out both; }
+}
 
 /* §5 Zakat, gift and community (body.zakat-page, body.gift, body.community) */
 
@@ -311,5 +753,9 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 /* §9 Reduced motion (always last) */
 @media (prefers-reduced-motion: reduce) {
   .m-sheet, .m-sheet.closing, body.menu-open:has(#m-sheet:not([hidden]))::before, body:has(#m-sheet.closing)::before { animation: none !important; }
+  .home .sl-card.split.on picture, .home .sl-card.split.on .sl-copy > *, .home .quick-donate .amounts button.on { animation: none !important; }
+  .home .sl-nav .sl-arrow, .home .ts-tile, .home .camp { transition: none; }
+  .donate-page .don-sum, .donate-page .ds-impact { animation: none !important; }
+  .donate-page .tabs button, .donate-page .pw, .donate-page .bk-card, .donate-page .side-ads > a { transition: none; transform: none; }
   .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .site-header .brand, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
 }

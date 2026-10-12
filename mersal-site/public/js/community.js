@@ -22,7 +22,28 @@
   // totals, the badges or the certificate
   var history = (Array.isArray(all) ? all : []).filter(function (d) { return d && !d.demo && Number(d.amount) > 0; });
   var gate = document.getElementById("cm-gate"), main = document.getElementById("cm-main");
-  if (!history.length) { gate.hidden = false; return; }
+  var ICONS = {
+    certificate: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6M14 18l2 3 2-3"/></svg>',
+    share: '<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
+    impact: '<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>',
+    group: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M21 20a5 5 0 0 0-4-4.9"/></svg>',
+    volunteer: '<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg>',
+    monthly: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'
+  };
+  // desktop only (761px+): the cards below the fold fade up once as they come into view (js/layout.js mersalReveal)
+  function reveal(els) { if (window.mersalReveal && window.matchMedia && matchMedia("(min-width: 761px)").matches) window.mersalReveal(els); }
+  if (!history.length) {
+    gate.hidden = false;
+    // what opens after the first donation: the gift titles from data/community.json (no text, links or numbers)
+    fetch("/data/community.json").then(function (r) { return r.json(); }).then(function (cfg) {
+      var ul = document.getElementById("cm-preview"); if (!ul) return;
+      ul.innerHTML = (cfg.gifts || []).map(function (g) {
+        return '<li><span class="ic" aria-hidden="true">' + (ICONS[g.icon] || ICONS.certificate) + "</span><b>" + esc(g.title) + "</b></li>";
+      }).join("");
+      reveal(ul.children);
+    }).catch(function () {});
+    return;
+  }
   main.hidden = false;
 
   var total = history.reduce(function (s, d) { return s + (Number(d.amount) || 0); }, 0);
@@ -48,14 +69,6 @@
     return "<li><span>" + esc(new Date(d.date).toLocaleDateString(LOC)) + (d.purposeTitle ? " · " + esc(d.purposeTitle) : "") + "</span><b>" + fmt.format(d.amount) + " ج</b></li>";
   }).join("");
 
-  var ICONS = {
-    certificate: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6M14 18l2 3 2-3"/></svg>',
-    share: '<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
-    impact: '<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>',
-    group: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M21 20a5 5 0 0 0-4-4.9"/></svg>',
-    volunteer: '<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg>',
-    monthly: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'
-  };
 
   fetch("/data/community.json").then(function (r) { return r.json(); }).then(function (cfg) {
     document.getElementById("cm-intro").textContent = cfg.intro || "";
@@ -67,6 +80,7 @@
       return "<" + tag + ' class="cm-gift' + (soon ? " soon" : "") + '" data-i="' + i + '"' + (href ? ' href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : "") : ' type="button"') + (soon ? " disabled" : "") + ">" +
         '<span class="ic">' + (ICONS[g.icon] || ICONS.certificate) + "</span><span><b>" + esc(g.title) + "</b><span>" + esc(soon ? "قريباً" : g.text) + "</span></span><span class=\"go\" aria-hidden=\"true\">←</span></" + tag + ">";
     }).join("");
+    reveal(box.children);
     box.addEventListener("click", function (e) {
       var b = e.target.closest("button.cm-gift"); if (!b) return;
       var g = cfg.gifts[+b.dataset.i];

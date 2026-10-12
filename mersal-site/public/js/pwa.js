@@ -66,6 +66,8 @@
   // what the card must never cover: the bottom bar, the floating donate buttons and every donate / submit button
   var GUARD = ".m-bar, .m-donate i, .fab-donate, .z-bar, .btn-gold, .do-btn, .sl-btn, .camp-give, .way2, a.btn[href*='donate'], button[type='submit']";
   var deferred = null, card = null, cardAuto = false, seen = false, timer = 0, raf = 0, toastUp = false;
+  // no blinking: once tucked the card stays tucked for at least HOLD ms and until the scrolling has stopped
+  var HOLD = 1200, tuckedAt = 0, lastScroll = 0, recheck = 0;
 
   function canInstall() { return !standalone && (!!deferred || iosSafari); }
   function eligible() {
@@ -94,7 +96,7 @@
         ? '<p>اضغط <em>مشاركة</em> ' + I.share + ' وبعدين <em>إضافة إلى الشاشة الرئيسية</em> ' + I.add + '</p>' +
           '<div class="pwa-btns"><button type="button" class="btn btn-teal pwa-close">تمام</button></div>'
         : '<p>افتح مرسال من شاشتك الرئيسية بضغطة: التبرع والزكاة والخط الساخن، والصفحات اللي فتحتها قبل كده بتفتح حتى من غير نت.</p>' +
-          '<div class="pwa-btns"><button type="button" class="btn btn-teal pwa-install">ثبّت التطبيق</button><button type="button" class="pwa-later pwa-close">مش دلوقتي</button></div>') +
+          '<div class="pwa-btns"><button type="button" class="btn btn-teal pwa-install">ثبّت<span class="pwa-long"> التطبيق</span></button><button type="button" class="pwa-later pwa-close">مش دلوقتي</button></div>') +
       '</div><button type="button" class="pwa-x pwa-close" aria-label="إغلاق">' + I.x + "</button></div>";
   }
 
@@ -137,15 +139,25 @@
       }
     }
     if (card.contains(d.activeElement) && !toastUp) hit = false; // never pull the card away from a keyboard user inside it
+    var now = Date.now(), tucked = card.classList.contains("pwa-tucked");
+    clearTimeout(recheck);
+    if (hit) tuckedAt = now;
+    else if (tucked && !card.contains(d.activeElement)) {
+      var wait = Math.max(tuckedAt + HOLD - now, lastScroll + 300 - now);
+      if (wait > 0) { recheck = setTimeout(onMove, wait); return; }
+    }
     card.classList.toggle("pwa-tucked", hit);
     // the automatic card counts as "offered" once it has really been on screen (one time per device)
     if (!hit && !seen) { seen = true; if (cardAuto) setState("shown"); }
   }
   function onMove() { if (!raf) raf = requestAnimationFrame(check); }
+  function onScroll() { lastScroll = Date.now(); onMove(); }
   var poll = 0;
   function watch(on) {
     var m = on ? "addEventListener" : "removeEventListener";
-    window[m]("scroll", onMove, { passive: true });
+    window[m]("scroll", onScroll, { passive: true });
+    window[m]("scrollend", onMove);
+    if (!on) clearTimeout(recheck);
     window[m]("resize", onMove);
     clearInterval(poll);
     if (on) poll = setInterval(onMove, 700); // carousels and late content move without a scroll

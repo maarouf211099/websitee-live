@@ -516,7 +516,206 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 :root { --odo-spring: cubic-bezier(.2, .7, .2, 1); }
 .odo .od-roll { transition-duration: .6s; }
 
-/* §4 Donate (body.donate-page) */
+/* §4 Donate (body.donate-page)
+   Head: the WP2 window (the mother and both children whole at 50% 28%), a shorter band so step 1 is in the first screen.
+   From 1180px the DOM stays as it is and the tab column becomes `display: contents`: the tab bar takes row 1 at the full
+   width, the open panel row 2, and the "ملخص تبرعك" rail (aside.side-ads) sits beside the card stepper, sticky. Any other
+   tab spans the full width and the rail goes. 761-1179px: one column, the hotline card as a slim strip under the panel. */
+.donate-page main > section:first-child { padding-top: 32px; }
+.donate-page .page-head { padding-block: 24px; }
+@media (min-width: 1180px) {
+  .donate-page .page-head { padding-block: 26px; }
+  .donate-page .page-head > .wrap { display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; }
+  .donate-page .page-head h1 { flex: 1 0 100%; }
+  .donate-page .page-head > .wrap > p { margin: 8px 0 0; }
+  .donate-page .ph-trust { margin: 8px 0 0; }
+}
+.donate-page .ph-trust li { padding: 6px 12px; font-size: 13px; }
+/* the head band stays <= 260px at every width (a 232px window + padding was 284px at 1920) */
+@media (min-width: 1600px) { .donate-page .page-head { --ph-h: 200px; } }
+
+/* --- the card stepper's companions: the hotline card is a compact horizontal strip; the SMS poster goes (the wallets tab
+   has the SMS card) --- */
+.donate-page .side-ads > .sms-card { display: none; }
+.donate-page .side-ads > a.hot-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "i t n" "i s n";
+  align-items: center; column-gap: 14px; row-gap: 2px; aspect-ratio: auto; min-height: 0; padding: 14px 18px; border-radius: var(--r-md); }
+.donate-page .hot-card svg { grid-area: i; position: static; width: 34px; height: 34px; }
+.donate-page .hot-card .hc-t { grid-area: t; max-width: none; padding: 0; font-size: 15px; line-height: 1.45; }
+.donate-page .hot-card .hc-s { grid-area: s; text-align: start; font-size: 13px; color: rgba(255,255,255,.9); }
+.donate-page .hot-card b { grid-area: n; font-size: 34px; }
+@media (max-width: 1179px) {
+  .donate-page .layout-side { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .donate-page .layout-side .side-ads { display: block; max-width: none; margin: 0; }
+}
+
+@media (min-width: 1180px) {
+  .donate-page .layout-side { grid-template-columns: minmax(0, 1fr) 360px; column-gap: 40px; row-gap: 0; align-items: start; }
+  .donate-page .layout-side > div:first-child { display: contents; }
+  .donate-page .layout-side .tabs { grid-column: 1 / -1; grid-row: 1; }
+  .donate-page .layout-side .tab-panel { grid-column: 1; grid-row: 2; }
+  .donate-page .layout-side .side-ads { grid-column: 2; grid-row: 2; position: sticky; top: 96px; gap: 12px; }
+  .donate-page .layout-side:has(#t-online[aria-selected="false"]) .tab-panel { grid-column: 1 / -1; }
+  .donate-page .layout-side:has(#t-online[aria-selected="false"]) .side-ads { display: none; }
+  /* the hotline card in the rail: its line on top, the number beside the "لحد باب البيت" line */
+  .donate-page .side-ads > a.hot-card { grid-template-columns: auto auto minmax(0, 1fr); grid-template-areas: "i t t" "i n s"; column-gap: 12px; row-gap: 4px; }
+  .donate-page .hot-card .hc-t { font-size: 14.5px; }
+  .donate-page .hot-card b { font-size: 30px; }
+
+  /* "ملخص تبرعك": a mirror of step 1 (js/donate.js fills it in updateImpact()), the cards, the hotline, the other ways */
+  .donate-page .don-sum { display: block; padding: 22px 22px 18px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+  .ds-now { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .ds-h { display: block; font-size: 15px; font-weight: 800; color: var(--teal-dark); }
+  .ds-amt { margin: 6px 0 0; font-size: 17px; font-weight: 700; color: var(--teal-ink); line-height: 1.2; }
+  .ds-amt b { font: 700 40px/1.1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .3px; color: var(--teal-ink); }
+  .ds-for { margin: 8px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .ds-for span { font-weight: 700; color: var(--teal-ink); }
+  .ds-impact { margin: 10px 0 0; padding: 10px 12px; border-radius: var(--r-sm); background: var(--teal-soft); color: var(--teal-text); font-size: 14px; font-weight: 700; line-height: 1.6; text-wrap: balance; }
+  .ds-impact:empty { display: none; }
+  .ds-safe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 14px 0 0; font-size: 13.5px; font-weight: 700; color: #11683f; }
+  .ds-safe .pm { padding: 6px 8px; font-size: 11px; color: var(--teal-ink); border-color: #cfe9db; }
+  .ds-tel { display: flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 8px; font-size: 14.5px; font-weight: 700; color: var(--teal-dark); text-decoration: none; }
+  .ds-tel b { font: 700 18px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); }
+  .ds-tel:hover b { text-decoration: underline; text-underline-offset: 3px; }
+  .ds-alt { margin: 2px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--muted); text-wrap: balance; }
+  .ds-alt a { display: inline-block; padding-block: 10px; margin-block: -10px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+}
+
+/* --- tabs: segmented pill-cards. 761-960px: 3 + 2; from 961px: five equal cards in one row; from 1180px a hint line ---
+   The gold check disc of the open tab is a background image, so ::after stays free for the hint. role=tab, aria-selected
+   and the t-* ids are the markup's own. */
+.donate-page .tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-flow: row; gap: 10px; margin: 0 0 20px; padding: 0; border: 0; overflow: visible; }
+.donate-page .tabs button { grid-column: span 2; display: grid; grid-template-columns: auto auto; justify-content: center; align-content: center; align-items: center;
+  column-gap: 8px; row-gap: 2px; min-height: 56px; padding: 8px 14px; border: 1.5px solid var(--line); border-radius: var(--r-md); background: #fff;
+  color: var(--teal-dark); font-size: 15px; line-height: 1.3; text-align: center; white-space: normal; }
+.donate-page .tabs button:nth-child(n+4) { grid-column: span 3; }
+.no-online-pay .donate-page .tabs button:nth-child(n+2) { grid-column: span 3; } /* no card tab: 2 + 2 */
+.donate-page .tabs button::before { width: 20px; height: 20px; }
+.donate-page .tabs button:hover { border-color: var(--teal); color: var(--teal-text); }
+.donate-page .tabs button[aria-selected="true"] { border-color: var(--teal-text); color: #fff; box-shadow: 0 10px 22px -12px rgba(0,89,89,.7);
+  background: var(--teal-text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23fec830'/%3E%3Cpath d='M6.5 12.5l3.6 3.6L17.5 8.6' fill='none' stroke='%23003c3c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") left 8px top 8px / 16px no-repeat; }
+.donate-page .tabs button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0 6px rgba(0,89,89,.85); }
+@media (min-width: 961px) {
+  .donate-page .tabs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .donate-page .tabs button, .donate-page .tabs button:nth-child(n+4), .no-online-pay .donate-page .tabs button:nth-child(n+2) { grid-column: auto; }
+}
+@media (min-width: 1180px) {
+  .donate-page .tabs button { min-height: 64px; padding: 14px 10px 6px; }
+  /* the disc sits in the top corner, above the label row (a long label like the wallets one reaches the corner) */
+  .donate-page .tabs button[aria-selected="true"] { background-position: left 6px top 5px; background-size: 14px; }
+  .donate-page .tabs button::after { grid-column: 1 / -1; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--muted); }
+  .donate-page .tabs button[aria-selected="true"]::after { color: rgba(255,255,255,.9); }
+  /* the hint is decoration (the alt text after "/" is empty): the tab's name stays its label */
+  #t-online::after { content: "فيزا · ماستركارد · ميزة"; content: "فيزا · ماستركارد · ميزة" / ""; }
+  #t-wallets::after { content: "إنستاباي · فوري 9200 · المحافظ"; content: "إنستاباي · فوري 9200 · المحافظ" / ""; }
+  #t-bank::after { content: "حسابات مرسال الرسمية"; content: "حسابات مرسال الرسمية" / ""; }
+  #t-home::after { content: "مندوبنا يجيلك لحد البيت"; content: "مندوبنا يجيلك لحد البيت" / ""; }
+  #t-abroad::after { content: "تحويل من بره مصر"; content: "تحويل من بره مصر" / ""; }
+}
+@media (min-width: 1180px) and (max-width: 1365px) { .donate-page .tabs button { font-size: 14.5px; } }
+
+/* --- one panel shell for all five tabs (from 1180px): the stepper and the forms lose their own card inside it --- */
+@media (min-width: 1180px) {
+  .donate-page .tab-panel { padding: 28px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+  .donate-page #online { padding: 18px 28px 24px; }
+  .donate-page #online .steps { margin-bottom: 14px; }
+  .donate-page #online .step[data-step="1"] > .amounts { margin-top: 12px; }
+  .donate-page #online > .stepper { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; }
+}
+
+/* --- the stepper. Steps: one row of circles and connectors (the 3px under-bar goes): [line][circle][label] per step --- */
+@media (min-width: 961px) {
+  .donate-page .steps { gap: 0; margin: 0 0 18px; }
+  .donate-page .steps li { display: grid; grid-template-columns: minmax(24px, 1fr) auto auto; align-items: center; column-gap: 10px; flex: 1 1 0; padding: 0; border-bottom: 0; font-size: 15px; text-align: start; }
+  .donate-page .steps li:first-child { grid-template-columns: auto auto; flex: none; }
+  .donate-page .steps li > span { grid-column: -3; grid-row: 1; }
+  .donate-page .steps li + li::before, .donate-page .steps li + li::after { position: static; grid-column: 1; grid-row: 1; width: auto; height: 2px; margin-inline: 12px 2px; inset: auto; }
+
+  /* step 1 on a 12-column grid, the DOM untouched (tab order: chips, purpose, amounts, amount, next; #impact is a live line) */
+  .donate-page .step[data-step="1"] { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 20px; align-items: start; }
+  .donate-page .step[data-step="1"] > .niyya-chips { grid-column: 1 / 8; grid-row: 1; margin: 0; }
+  .donate-page .step[data-step="1"] > .niyya-note { grid-column: 1 / 8; grid-row: 2; margin: 6px 0 0; }
+  .donate-page .step[data-step="1"] > .field:has(#purpose) { grid-column: 8 / -1; grid-row: 1 / span 2; margin: 0; }
+  .donate-page .step[data-step="1"] > .amounts { grid-column: 1 / -1; grid-row: 3; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin: 16px 0 0; }
+  .donate-page .step[data-step="1"] > .amounts button { min-height: 52px; padding: 0; font-size: 18px; }
+  .donate-page .step[data-step="1"] > .impact { grid-column: 1 / -1; grid-row: 4; margin: 12px 0 0; min-height: 24px; }
+  .donate-page .step[data-step="1"] > .amount-field { grid-column: 1 / 6; grid-row: 5; margin: 10px 0 0; }
+  .donate-page .step[data-step="1"] > [data-next] { grid-column: 7 / -1; grid-row: 5; justify-self: end; align-self: end; width: auto; min-width: 240px; min-height: 50px; padding: 0 40px; }
+
+  /* step 2: two columns, phone and e-mail share a row */
+  .donate-page .step[data-step="2"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+  .donate-page .step[data-step="2"] > * { grid-column: 1 / -1; }
+  .donate-page .step[data-step="2"] > .field:has(#phone), .donate-page .step[data-step="2"] > .field:has(#email) { grid-column: auto; }
+
+  /* back / edit: text buttons at the start; the gold button at the end */
+  .donate-page .step-nav { justify-content: space-between; align-items: center; }
+  .donate-page .step-nav .btn-ghost-teal { flex: none; min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--teal-text); text-decoration: underline; text-underline-offset: 4px; }
+  .donate-page .step-nav .btn-ghost-teal:hover { background: var(--teal-soft); color: var(--teal-text); }
+  .donate-page .step-nav .btn-gold { flex: none; min-width: 240px; min-height: 50px; padding-inline: 32px; }
+  /* step 3 shows the amount and the purpose in its summary list: the strip above it would repeat them */
+  .donate-page .stepper:has(.step[data-step="3"]:not([hidden])) .s-sum { display: none; }
+}
+@media (min-width: 1180px) { .donate-page .s-sum { display: none; } } /* the rail shows the same */
+
+/* --- bank accounts: short cards pack under tall ones (CSS columns; donate.json's order, read down each column) --- */
+@container bk-box (min-width: 640px) {
+  .donate-page .bk-grid { display: block; columns: 2; column-gap: 16px; }
+  .donate-page .bk-card { break-inside: avoid; margin-bottom: 16px; }
+}
+@container bk-box (min-width: 1000px) { .donate-page .bk-grid { columns: 3; } }
+
+/* --- wallets (from 1180px): 3 + 3, the second row compact; Talabat and Waffarha as neutral monograms --- */
+@media (min-width: 1180px) {
+  .donate-page .pay-ways { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .donate-page .pw:nth-child(n+4) { padding: 14px 16px; }
+  .donate-page .pw:nth-child(n+4) .pw-badge { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
+  .donate-page .pw:nth-child(n+4) h3 { font-size: 16px; }
+  .donate-page .pw:nth-child(n+4) p { font-size: 14px; line-height: 1.7; }
+  .donate-page .pw[data-brand="talabat"] .pw-badge, .donate-page .pw[data-brand="waffarha"] .pw-badge { background: var(--teal-soft); color: var(--teal-text); }
+  .donate-page .pw-more { margin: 0 0 20px; text-align: start; }
+
+  /* transfer and pickup forms: a plain header row, the opened form flat in the panel, fields in two columns */
+  .donate-page .tr-cta { margin: 20px 0 0; padding: 20px 0 0; background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; }
+  .donate-page #transfer-box { margin-top: 18px; }
+  .donate-page #transfer-box .req-form, .donate-page #transfer-box .req-success { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; }
+  .donate-page #home .req-form fieldset, .donate-page #transfer-box fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; align-content: start; }
+  .donate-page #home .req-form fieldset > *, .donate-page #transfer-box fieldset > * { grid-column: 1 / -1; }
+  .donate-page #home .req-form fieldset > .field:not(:has(textarea)), .donate-page #transfer-box fieldset > .field:not(:has(textarea)) { grid-column: auto; }
+  .donate-page #home .req-form fieldset > .seg-field { grid-column: 1 / -1; } /* the two kind cards need the group's width */
+  .donate-page #home .req-form .field textarea, .donate-page #transfer-box .field textarea { min-height: 96px; }
+  /* the pickup form's four groups two by two (the panel is 1240px wide on this tab) */
+  .donate-page #pk-form.req-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; align-items: start; padding: 0; border: 0; box-shadow: none; background: none; border-radius: 0; }
+  .donate-page #pk-form > :not(fieldset) { grid-column: 1 / -1; }
+  .donate-page #pk-form fieldset + fieldset { margin-top: 0; padding-top: 0; border-top: 0; }
+  .donate-page #pk-form fieldset:nth-of-type(n+3) { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .donate-page #pk-form .req-submit, .donate-page #transfer-box .req-submit { max-width: 360px; margin-top: 22px; }
+  .donate-page #pk-success { border: 0; box-shadow: none; padding: 0; }
+
+  /* abroad: the account card and a large framed picture of the details side by side */
+  .donate-page #abroad-body { display: grid; grid-template-columns: 7fr 5fr; column-gap: 32px; align-items: start; }
+  .donate-page #abroad-body > :not(.ab-card):not(.ab-thumb):not(.ab-more) { grid-column: 1 / -1; }
+  .donate-page #abroad-body > .ab-card { grid-column: 1; max-width: none; margin: 0; }
+  .donate-page #abroad-body > .ab-thumb { grid-column: 2; grid-row: span 2; display: flex; flex-direction: column; align-items: stretch; gap: 10px; max-width: 360px; padding: 10px; border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+  .donate-page #abroad-body > .ab-thumb img { width: 100%; height: auto; border-radius: var(--r-md); object-fit: contain; }
+  .donate-page #abroad-body > .ab-thumb span { padding: 0 6px 4px; text-align: center; }
+  .donate-page #abroad-body > .ab-more { grid-column: 1; margin-top: 16px; }
+}
+
+/* --- the calculator under the tabs (sand band): a teaser card; open by default from 1180px (js/donate.js) --- */
+.donate-page main > section.alt { padding-block: 48px; }
+.donate-page .ic-more > summary { min-height: 68px; padding: 12px 24px; border: 1px solid var(--sand-line); border-inline-start: 4px solid var(--gold); border-radius: var(--r-lg);
+  background: #fff; font-size: var(--fs-h3); color: var(--teal-ink); box-shadow: var(--sh-1); }
+
+/* --- motion (transform and opacity only; §9 turns it off): pill and card hover lifts, the rail settles in once --- */
+@media (prefers-reduced-motion: no-preference) {
+  .donate-page .tabs button { transition: transform .22s var(--spring), background-color .2s, border-color .2s, color .2s, box-shadow .2s; }
+  .donate-page .tabs button:hover { transform: translateY(-2px); }
+  .donate-page .tabs button:active { transform: scale(.97); transition-duration: .08s; }
+  .donate-page .pw, .donate-page .bk-card { transition: transform .25s var(--spring), box-shadow .25s; }
+  .donate-page .pw:hover, .donate-page .bk-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2); }
+  .donate-page .side-ads > a.hot-card:hover { transform: translateY(-2px); }
+  .donate-page .don-sum { animation: rise-sm .45s var(--ease) .1s both; }
+  .donate-page .ds-impact { animation: fade-in .3s ease-out both; }
+}
 
 /* §5 Zakat, gift and community (body.zakat-page, body.gift, body.community) */
 
@@ -556,5 +755,7 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
   .m-sheet, .m-sheet.closing, body.menu-open:has(#m-sheet:not([hidden]))::before, body:has(#m-sheet.closing)::before { animation: none !important; }
   .home .sl-card.split.on picture, .home .sl-card.split.on .sl-copy > *, .home .quick-donate .amounts button.on { animation: none !important; }
   .home .sl-nav .sl-arrow, .home .ts-tile, .home .camp { transition: none; }
+  .donate-page .don-sum, .donate-page .ds-impact { animation: none !important; }
+  .donate-page .tabs button, .donate-page .pw, .donate-page .bk-card, .donate-page .side-ads > a { transition: none; transform: none; }
   .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .site-header .brand, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
 }

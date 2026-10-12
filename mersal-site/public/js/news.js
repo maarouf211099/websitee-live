@@ -58,21 +58,6 @@
       empty.innerHTML = "<span>" + esc("أخبار مرسال هتنزل هنا قريباً. لحد ما تنزل، تابع آخر أخبارنا على صفحاتنا الرسمية:") + "</span>" +
         (links.length ? '<span class="nw-soc">' + links.join("") + "</span>" : "") +
         '<a class="nw-alb" href="/albums.html">' + esc("صور من فعالياتنا ←") + "</a>";
-      // tablet and desktop only (the phone keeps its approved empty state and makes no extra request): the latest 3
-      // albums as cards under the line; ?a=<index> opens that album on /albums.html (its index in albums.json)
-      if (window.matchMedia && matchMedia("(min-width: 761px)").matches && !document.querySelector(".nw-albums")) {
-        fetch("/data/albums.json").then(function (r) { return r.ok ? r.json() : []; }).then(function (al) {
-          var top = (Array.isArray(al) ? al : []).map(function (a, i) { return { a: a, i: i }; })
-            .filter(function (x) { return x.a && x.a.title && ((x.a.thumbs && x.a.thumbs[0]) || (x.a.photos && x.a.photos[0])); })
-            .sort(function (x, y) { return String(y.a.date || "").localeCompare(String(x.a.date || "")) || x.i - y.i; }).slice(0, 3);
-          if (!top.length || document.querySelector(".nw-albums")) return;
-          empty.insertAdjacentHTML("afterend", '<div class="nw-albums"><h2>صور من فعالياتنا</h2><div class="nw-alb-grid">' + top.map(function (x) {
-            var cover = (x.a.thumbs && x.a.thumbs[0]) || x.a.photos[0];
-            return '<a class="nw-alb-card" href="/albums.html?a=' + x.i + '">' + (window.mersalPic ? window.mersalPic(cover, { alt: "", w: 600, h: 375 }) : '<img src="' + esc(cover) + '" alt="" width="600" height="375" loading="lazy">') +
-              '<h3 dir="auto">' + esc(x.a.title) + "</h3></a>";
-          }).join("") + '</div><a href="/albums.html">كل الألبومات ←</a></div>');
-        }).catch(function () {});
-      }
     }
     filters.innerHTML = [["", "الكل"]].concat(tags.map(function (t) { return [t, t]; })).map(function (t) {
       var n = t[0] ? items.filter(function (it) { return it.tag === t[0]; }).length : items.length;

@@ -83,3 +83,155 @@ body.has-mbar:not(:has(.site-footer)) { padding-bottom: 96px; }
 @keyframes m-ping { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(2.4); } }
 @keyframes m-ping-soft { from { opacity: .8; transform: scale(1); } to { opacity: 0; transform: scale(1.35); } }
 @keyframes m-pop { 50% { transform: scale(1.08); } }
+
+/* =================================================================== MWP2: type scale and readability (phone)
+   One scale for every page: page h1 28 > section h2 24 > card h3 19 (17 inside 2-column tile grids), lead 17,
+   meta text never under 14px and body-level text 15px. Selectors match or beat the ones they override
+   (site/home/impact/gift/legacy css), so equal specificity wins here by load order. */
+
+/* ---------- headings ---------- */
+.page-head h1, .donate-page .page-head h1 { font-size: 28px; line-height: 1.3; }
+.page-head p { font-size: 16px; }
+.section-title h2, .home .section-title h2, .numbers-title, .ic-title, .zk-uses h2, .cta-band h2, .nw-cta h2,
+.gf-remind h2, .contact-card.req-form > h2, .cm-card h2 { font-size: 24px; line-height: 1.35; }
+.big-title, .home .big-title { font-size: 24px; line-height: 1.35; }
+.home .camp h3, .card h3, .related .card h3, .side-card h3, .req-side .card h3, .zakat-group h3, .gf-prev-h { font-size: 19px; line-height: 1.4; }
+.lg-doc h2 { font-size: 22px; line-height: 1.35; }
+/* titles inside the 2-column tile grids */
+.grid-3 > .svc h3, .svc h3 { font-size: 17px; line-height: 1.4; }
+.way2 b { font-size: 17px; line-height: 1.4; }
+.album h3, .card.album h3 { font-size: 17px; line-height: 1.4; }
+/* slide titles grow with the screen (24px at 360, 27px at 412) */
+.sl-title { font-size: clamp(24px, 6.6vw, 28px); }
+
+/* ---------- section headers: start-aligned, one look ---------- */
+.section-title, .home .section-title { text-align: start; }
+.section-title p, .home .section-title p, .home .section-title.split p { margin-inline: 0; font-size: 15px; }
+/* the gold dash sits at the start under a title with no eyebrow; with an eyebrow, the eyebrow's dash is the accent */
+.section-title h2::after { margin-inline: 0; width: 44px; height: 3px; }
+.section-title:has(.eyebrow) h2::after { display: none; }
+.eyebrow, .home .eyebrow { font-size: 14px; font-weight: 800; color: var(--teal-text); }
+.numbers-title { text-align: start; }
+.numbers-title::after { margin-inline: 0; width: 44px; height: 3px; }
+.zk-uses h2 { text-align: start; }
+.zk-uses .zk-lead { margin-inline: 0; text-align: start; }
+/* inline-styled titles (afia) take the same start alignment */
+.section-title[style] { text-align: start !important; }
+/* closing bands stay centred */
+.cta-band h2, .nw-cta h2, .cm-locked h2 { text-align: center; }
+
+/* ---------- small-text floor: meta/trust 14px, body-level 15px ---------- */
+.hint, .field label small, .req-form .field .count, .page-head .chip, .community .page-head .chip, .news .page-head .chip, .crumbs, .page-head .crumbs { font-size: 14px; }
+.ts-tile b { font-size: 15px; line-height: 1.35; }
+.ts-tile small { font-size: 14px; }
+.ts-ways a { font-size: 14px; }
+.quick-donate .qd-text .qd-trust, .quick-donate .qd-text span, .home .quick-donate .qd-impact { font-size: 14px; }
+.sl-kicker { font-size: 14px; }
+.camp-foot, .camp-stat > span, .camp-impact, .camp-proof, .camp-first, .camp-more, .camp-share, .camp-other { font-size: 14px; }
+.home .camp-badge { font-size: 14px; }
+.camp-hot { font-size: 13px; }
+.camp-title .count { font-size: 14px; }
+.ic-t { font-size: 14px; }
+.ic-price, .ic-range-ends, .ic-label, .ic-note { font-size: 14px; }
+.svc p { font-size: 15px; line-height: 1.6; }
+.way2 small { font-size: 14px; }
+.niyya small { font-size: 14px; }
+.num span { font-size: 14px; } /* white on the teal band: size only */
+.facts span, .values span { font-size: 14px; }
+.pt-card .pt-name { font-size: 14px; }
+.contact-cards span, .contact-cards b { font-size: 14px; }
+.home .hf-status, .home .about-pic figcaption span, .home .about-pic .cap-eyebrow, .ic-eyebrow { font-size: 14px; }
+.hf-shares .waqf em { font-size: 13px; }
+.album .count { font-size: 13px; }
+.steps li { font-size: 14px; }
+.ph-trust li { font-size: 14px; }
+.tabs button { font-size: 15px; }
+.niyya-note, .hot-card .hc-s { font-size: 14px; }
+.z-ways, .zakat-result > div:first-child, .zakat-result #z-note, .ayah cite { font-size: 14px; }
+.gf-note, .gf-count, .gf-occ small { font-size: 14px; }
+.side-ways a, .side-ways p, .side-ways small { font-size: 14px; }
+.side-amounts a small { font-size: 12.5px; }
+.share-bar > span, .share-bar a, .share-bar button { font-size: 14px; }
+.req-privacy p { font-size: 14px; }
+.album p { font-size: 14px; }
+article .lg-sec .lg-fields li { font-size: 14px; }
+.bank b, main .grid-2 > div > .bank b { font-size: 14px; }
+
+/* ---------- impact tiles and gift reminder at every phone width (were <=400px only) ---------- */
+.ic-tiles { grid-template-columns: 1fr 1fr; gap: 8px; }
+.ic-tile-in { padding: 10px 10px 8px; gap: 2px 8px; grid-template-columns: minmax(0, 1fr); }
+.ic-ico { grid-row: auto; margin-bottom: 4px; }
+.ic-n { font-size: 26px; }
+.ic-cta { width: 100%; }
+.gf-rm-btns { grid-template-columns: 1fr; }
+
+/* ---------- no orange: gold-ink text, gold-dark dot; one icon frame (teal-soft circle) ---------- */
+.ic-pct { color: var(--gold-ink); }
+.camp-hot { color: var(--gold-ink); }
+.camp-hot::before { background: var(--gold-dark); }
+.is-near .camp-hot, .is-fresh .camp-hot { color: var(--teal-dark); }
+.is-near .camp-hot::before, .is-fresh .camp-hot::before, .is-done .camp-hot::before { background: var(--teal); }
+.is-done .camp-hot { color: var(--teal-text); }
+.camp-foot .left b { color: var(--gold-ink); }
+.svc-i, .home .svc-i, .w-ico, .ic-ico, .ic-tile.is-part .ic-ico { width: 44px; height: 44px; border-radius: 50%; background: var(--teal-soft); color: var(--teal-text); }
+.svc-i svg, .w-ico svg, .ic-ico svg { width: 24px; height: 24px; }
+.w-ico.img { background: #fff; border: 1px solid var(--line); }
+.w-ico.img img { width: 32px; height: 32px; }
+
+/* ---------- rhythm: one warm neutral, a hairline before the partners ---------- */
+section.alt, .home #projects { background: var(--sand); }
+.pt-sec { border-top: 1px solid var(--line); }
+
+/* ---------- photo page heads ---------- */
+/* gift, community, news, help: a 112px photo strip over a solid teal title band (the title never sits on a face) */
+:is(.gift, .community, .news, .help-page) .page-head.has-photo { display: block; min-height: 0; padding: 0; }
+:is(.gift, .community, .news, .help-page) .page-head.has-photo::before { display: none; }
+:is(.gift, .community, .news, .help-page) .page-head.has-photo > picture { display: block; height: 112px; overflow: hidden; }
+:is(.gift, .community, .news, .help-page) .page-head.has-photo .ph-bg { position: static; display: block; height: 112px; animation: none; translate: none; scale: none; }
+:is(.gift, .community, .news, .help-page) .page-head.has-photo > .wrap { padding-block: 18px 22px; }
+:is(.gift, .community, .news, .help-page) .page-head h1 { text-shadow: none; }
+/* the band behind the title is the footer's darker teal (white text >= 4.7:1 on every pixel, pattern included) */
+:is(.gift, .community, .news, .help-page) .page-head.has-photo {
+  background-image: url(../img/pattern-white.png), radial-gradient(ellipse at 50% 45%, #006e6f 0%, #005f60 55%, #004d4d 100%);
+  background-image: image-set(url(../img/pattern-white.webp) type("image/webp"), url(../img/pattern-white.png) type("image/png")), radial-gradient(ellipse at 50% 45%, #006e6f 0%, #005f60 55%, #004d4d 100%); }
+/* the other photo heads (project pages, volunteer; not donate): a stronger scrim so the title keeps 4.5:1 */
+body:not(.donate-page):not(.gift):not(.community):not(.news):not(.help-page) .page-head.has-photo::before {
+  background: linear-gradient(to top, rgba(0,52,52,.95) 0%, rgba(0,60,60,.78) 55%, rgba(0,70,70,.5) 100%); }
+
+/* ---------- old project pages: no filled slabs, gold checks, paragraphs in ink ---------- */
+.legacy { font-size: 16px; }
+.legacy h2, .legacy .content-sector h2 { display: block; background: none; color: var(--teal-ink); font-size: 22px; line-height: 1.35; border-radius: 0; padding: 0; padding-inline-start: 12px; border-inline-start: 4px solid var(--gold); }
+.legacy h4, .legacy .content-sector h4 { background: none; box-shadow: none; color: var(--teal-text); font-size: 18px; padding: 0; border-radius: 0; }
+.legacy p > strong:only-child { color: var(--ink); font-weight: 600; }
+.legacy ul li .img-icon { display: none; }
+.legacy ul li::before, .legacy ul li:not(:has(> .img-icon))::before {
+  content: "✓"; position: absolute; inset-inline-start: 0; top: 4px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--gold); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+.legacy ul ul li::before, .legacy ul ul li:not(:has(> .img-icon))::before { content: ""; width: 7px; height: 7px; top: 12px; inset-inline-start: 2px; background: var(--teal); }
+.legacy .gal-count { font-size: 13px; }
+
+/* ---------- focus halo and counters ---------- */
+.field input:focus-visible, .field textarea:focus-visible, .field select:focus-visible, .zakat-table input:focus { border-color: var(--teal-text); box-shadow: 0 0 0 3px rgba(0,120,121,.35); }
+.req-form .field .count { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+
+/* ---------- touch targets (44px) ---------- */
+.camp-qty button { width: 44px; }
+@media (max-width: 329px) { .camp-qty button { width: 40px; } }
+.page-head:not(.lg-head) .crumbs a { padding-block: 11px; margin-block: -11px; }
+.legacy .gal-dots { gap: 4px; }
+.legacy .gal-dots button { width: 32px; height: 44px; }
+.legacy .gal-dots button::before { inset: 18px 12px; }
+.legacy .gal-dots button.on::before { inset: 18px 5px; }
+.check-list a { display: inline-block; padding-block: 10px; margin-block: -10px; }
+.menu-toggle, .search-btn { width: 44px; height: 44px; }
+.site-footer .social a, .m-social a { width: 44px; height: 44px; }
+.stepper label.check { min-height: 44px; gap: 10px; }
+.stepper .check input { width: 22px; height: 22px; }
+.s-sum .link-btn { min-height: 44px; }
+
+/* ---------- press feedback (phone, motion allowed) ----------
+   cards, buttons and tiles already press in (site.css/home.css :active scale); once revealed, a card still carried the
+   reveal's stagger delay (up to .42s) and .7s duration, so a tap answered late. A press now answers at once. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal.in:active { transition-delay: 0s; transition-duration: .12s; }
+}

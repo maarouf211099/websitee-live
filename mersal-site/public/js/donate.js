@@ -54,6 +54,9 @@
     return String(s == null ? "" : s).replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 0x660); })
       .replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 0x6f0); });
   }
+  // the amount as a number, typed with Latin or Arabic digits and any thousands separator ("٢٬٥٠٠" -> 2500);
+  // NaN for anything else (the range check in valid() catches it)
+  function amt() { var v = asciiDigits(amount.value).replace(/[,٬\s]/g, ""); return /^\d+(\.\d+)?$/.test(v) ? Number(v) : NaN; }
   // 01xxxxxxxxx from an Egyptian mobile typed any usual way (+20 / 0020 / Arabic digits), else null (the API's rule)
   function egyptMobile(p) {
     var d = asciiDigits(p).replace(/[^\d+]/g, "").replace(/^\+/, "").replace(/^00/, "");
@@ -246,8 +249,12 @@
   (function gatewayWording() {
     var sec = form.querySelector(".pay-methods .secure"); if (sec) sec.textContent = GW.secure;
     var hint = form.querySelector('.step[data-step="3"] .hint');
+    // what happens after "ادفع" (Paymob: the bank's OTP, then back here to the confirmation and its order number)
+    var OTP = "وغالباً البنك هيبعتلك كود (OTP) في رسالة تكتبه، وبعدها ";
     if (hint && hint.firstChild && hint.firstChild.nodeType === 3) hint.firstChild.nodeValue = PROVIDER === "app"
-      ? 'بالضغط على "ادفع" هتفتح صفحة Paymob الآمنة جوه الصفحة دي لإدخال بيانات الدفع. مرسال لا تحتفظ ببيانات بطاقتك. '
+      ? 'بالضغط على "ادفع" هتفتح صفحة Paymob الآمنة جوه الصفحة دي تدخل فيها بيانات الكارت، ' + OTP + "هتلاقي تأكيد تبرعك ورقم العملية هنا. مرسال لا تحتفظ ببيانات بطاقتك. "
+      : PROVIDER === "paymob"
+      ? 'بالضغط على "ادفع" هتدخل بيانات الكارت في صفحة Paymob الآمنة، ' + OTP + "هترجع هنا تلاقي تأكيد تبرعك ورقم العملية. مرسال لا تحتفظ ببيانات بطاقتك. "
       : 'بالضغط على "ادفع" هيتم تحويلك ل' + GW.page + " الآمنة لإدخال بيانات " + (PROVIDER === "mpgs" ? "البطاقة" : "الدفع") + ". مرسال لا تحتفظ ببيانات بطاقتك. ";
     var t = document.getElementById("gw-title"); if (t) t.textContent = GW.go;
   })();
@@ -255,13 +262,13 @@
   var LEGACY = { hospital: "p30", oncology: "p31", cases: "general", p4: "p31", p5: "p31" };
   function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
 
-  if (q.get("amount")) amount.value = Math.max(10, parseInt(q.get("amount"), 10) || 500);
+  if (q.get("amount")) amount.value = Math.max(10, parseInt(asciiDigits(q.get("amount")), 10) || 500);
   if (q.get("custom")) setTimeout(function () { try { amount.focus({ preventScroll: false }); amount.select(); } catch (e) {} }, 400);
   syncChips();
 
   // Purpose list: general/zakat/sadaqa + every project and service imported from the old site
   var CAMPAIGNS = []; // the home campaigns (content.json), for the #impact line
-  Promise.all([
+  var optionsReady = Promise.all([
     fetch("/content.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
     fetch("/data/menu.json").then(function (r) { return r.json(); }).catch(function () { return []; })
   ]).then(function (res) {
@@ -301,7 +308,7 @@
   }).catch(function () { updateImpact(); });
 
   function syncChips() {
-    form.querySelectorAll(".amounts button").forEach(function (x) { var on = x.dataset.v === String(amount.value); x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
+    form.querySelectorAll(".amounts button").forEach(function (x) { var on = x.dataset.v === String(amt()); x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
   }
   form.querySelectorAll(".amounts button").forEach(function (b) {
     b.addEventListener("click", function () { amount.value = b.dataset.v; syncChips(); updateImpact(); if (window.mersalTap) window.mersalTap(8); });
@@ -387,7 +394,7 @@
   // generic lines, so no campaign is presented as zakat-eligible.
   function unitLine(a, list) { return window.mersalUnit && list.length ? window.mersalUnit.line(a, list) : ""; }
   function updateImpact() {
-    var a = Number(amount.value) || 0, msg = "", l = "", camp = null;
+    var a = amt() || 0, msg = "", l = "", camp = null;
     if (purpose.value === "p30" && a >= 25000) msg = "تبرعك يساوي متر وقف خيري في مستشفى مرسال للأطفال 🏥";
     else if (purpose.value === "p30" && a >= 1000) msg = "تبرعك يساوي " + fmt.format(Math.floor(a / 1000)) + " سهم عام في مستشفى مرسال 🏥";
     else if (purpose.value === "p30" && a >= 500) msg = "تبرعك يساوي سهم أجهزة طبية في مستشفى مرسال 🏥";
@@ -401,7 +408,7 @@
     document.getElementById("impact").textContent = msg;
     // the desktop "ملخص تبرعك" rail (css/desktop.css shows it from 1180px): a display-only mirror of step 1
     if (document.getElementById("don-sum")) {
-      document.getElementById("ds-amt").textContent = fmt.format(Number(amount.value) || 0);
+      document.getElementById("ds-amt").textContent = fmt.format(amt() || 0);
       var dsOpt = purpose.options[purpose.selectedIndex]; document.getElementById("ds-for").textContent = dsOpt ? dsOpt.text : "";
       document.getElementById("ds-impact").textContent = msg;
     }
@@ -417,7 +424,7 @@
     return function (n) {
       el.hidden = n < 2;
       if (n < 2) return;
-      el.querySelector("b").textContent = fmt.format(Number(amount.value) || 0) + " جنيه";
+      el.querySelector("b").textContent = fmt.format(amt() || 0) + " جنيه";
       el.querySelector(".s-for").textContent = purposeText();
     };
   })();
@@ -425,33 +432,91 @@
     // css: the new step slides in from the side it comes from (data-dir)
     form.dataset.dir = n > cur ? "fwd" : n < cur ? "back" : (form.dataset.dir || "fwd");
     cur = n;
+    clearPayAlert();
     stepEls.forEach(function (s) { s.hidden = Number(s.dataset.step) !== n; });
     sumBar(n);
-    dots.forEach(function (d) { var k = Number(d.dataset.step); d.classList.toggle("on", k === n); d.classList.toggle("done", k < n); });
+    dots.forEach(function (d) {
+      var k = Number(d.dataset.step); d.classList.toggle("on", k === n); d.classList.toggle("done", k < n);
+      if (k === n) d.setAttribute("aria-current", "step"); else d.removeAttribute("aria-current");
+    });
     if (n === 3) fillSummary();
-    var first = form.querySelector('.step[data-step="' + n + '"] input, .step[data-step="' + n + '"] select');
+    var first = form.querySelector('.step[data-step="' + n + '"] input:not([disabled]), .step[data-step="' + n + '"] select');
     form.scrollIntoView({ behavior: SMOOTH, block: "start" });
     if (first && n === 2) setTimeout(function () { first.focus({ preventScroll: true }); }, 300);
   }
-  function valid(n) {
-    var ok = true;
-    form.querySelectorAll('.step[data-step="' + n + '"] input[required]').forEach(function (i) { if (ok && !i.reportValidity()) ok = false; });
-    if (ok && n === 1 && (Number(amount.value) < 10 || Number(amount.value) > 1000000)) { amount.setCustomValidity("المبلغ من 10 إلى 1,000,000 جنيه"); amount.reportValidity(); amount.setCustomValidity(""); ok = false; }
-    if (ok && n === 2) {
-      var ph = document.getElementById("phone");
-      if (asciiDigits(ph.value).replace(/[^\d]/g, "").length < 10) { ph.setCustomValidity("اكتب رقم موبايل صحيح"); ph.reportValidity(); ph.setCustomValidity(""); ok = false; }
-      // Paymob through the app takes Egyptian mobile numbers only (its function's rule)
-      else if (PROVIDER === "app" && !egyptMobile(ph.value)) { ph.setCustomValidity("اكتب رقم موبايل مصري (11 رقم يبدأ بـ 01)"); ph.reportValidity(); ph.setCustomValidity(""); ok = false; }
-    }
-    return ok;
+  // Inline errors in Egyptian Arabic (no browser bubbles): a <p class="f-err" id="err-<field>"> inside the field's .field
+  // (forms.css shows it under .invalid), aria-invalid + aria-describedby on the input, focus on the first wrong field.
+  // The rules are the old ones (10..1,000,000; a name; 10+ digits, Egyptian 01… for the app's Paymob; an e-mail).
+  var MSG = { amount: "المبلغ من 10 لـ 1,000,000 جنيه", name: "اكتب اسمك", email: "اكتب إيميل صحيح",
+    phone: PROVIDER === "app" ? "اكتب رقم موبايل مصري (11 رقم يبدأ بـ 01)" : "اكتب رقم موبايل صحيح" };
+  function describe(input, id, on) {
+    var ids = (input.getAttribute("aria-describedby") || "").split(/\s+/).filter(function (x) { return x && x !== id; });
+    if (on) ids.push(id);
+    if (ids.length) input.setAttribute("aria-describedby", ids.join(" ")); else input.removeAttribute("aria-describedby");
   }
+  function setErr(input, html) {
+    var field = input.closest(".field"), id = "err-" + input.id, p = document.getElementById(id);
+    if (!field) return;
+    if (!html) {
+      field.classList.remove("invalid"); input.removeAttribute("aria-invalid"); describe(input, id, false);
+      if (p) p.remove();
+      return;
+    }
+    if (!p) { p = document.createElement("p"); p.className = "f-err"; p.id = id; (input.closest(".input-suffix") || input).insertAdjacentElement("afterend", p); } // right under the box, above any hint
+    p.innerHTML = html;
+    field.classList.add("invalid"); input.setAttribute("aria-invalid", "true"); describe(input, id, true);
+    p.querySelectorAll("[data-tab]").forEach(wireTab);
+  }
+  function phoneOk(v) { return asciiDigits(v).replace(/[^\d]/g, "").length >= 10 && (PROVIDER !== "app" || !!egyptMobile(v)); }
+  function emailOk(el) { return !!el.value.trim() && el.checkValidity(); }
+  function nameOk(el) { return el.disabled || !!el.value.trim(); }
+  function valid(n) {
+    var bad = [];
+    function check(el, ok, msg) { if (ok) setErr(el, ""); else bad.push([el, msg]); }
+    if (n === 1) { var a = amt(); check(amount, a >= 10 && a <= 1000000 && Math.floor(a) === a, MSG.amount); }
+    if (n === 2) {
+      var nm = document.getElementById("name"), ph = document.getElementById("phone"), em = document.getElementById("email");
+      check(nm, nameOk(nm), MSG.name);
+      // Paymob through the app takes Egyptian mobile numbers only (its function's rule): donors abroad get the account abroad
+      check(ph, phoneOk(ph.value), MSG.phone + (PROVIDER === "app" && asciiDigits(ph.value).replace(/[^\d]/g, "").length >= 10
+        ? ' <a href="#abroad" data-tab="abroad">أو حوّل على حساب مرسال في ألمانيا</a>' : ""));
+      check(em, emailOk(em), MSG.email);
+    }
+    bad.forEach(function (b) { setErr(b[0], b[1]); });
+    if (bad.length) {
+      var el = bad[0][0];
+      try { el.focus({ preventScroll: true }); } catch (x) {}
+      el.scrollIntoView({ behavior: SMOOTH, block: "center" });
+    }
+    return !bad.length;
+  }
+  // an error goes away as soon as the donor fixes the field
+  ["amount", "name", "phone", "email"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("input", function () { if (el.getAttribute("aria-invalid")) setErr(el, ""); });
+  });
+  // «تبرع بدون ذكر اسمي»: the name is not needed (disabled fields are skipped, nothing moves on the page); a polite line
+  // says what will be shown instead. The saved name stays in the field for the next time.
+  (function anonName() {
+    var anon = document.getElementById("anon"), nm = document.getElementById("name"), note = document.getElementById("anon-note");
+    if (!anon || !nm) return;
+    function sync() {
+      nm.disabled = anon.checked;
+      if (anon.checked) setErr(nm, "");
+      if (note) note.textContent = anon.checked ? "هيظهر اسمك: فاعل خير" : "";
+    }
+    anon.addEventListener("change", sync);
+    if (anon.checked) sync(); // restored by the browser
+  })();
+  // the hint for donors abroad only where a foreign number is accepted (the app's Paymob takes Egyptian mobiles only)
+  if (PROVIDER === "app") { var phHint = document.getElementById("phone-hint"); if (phHint) { describe(document.getElementById("phone"), "phone-hint", false); phHint.remove(); } }
   form.querySelectorAll("[data-next]").forEach(function (b) { b.addEventListener("click", function () { if (valid(cur)) go(cur + 1); }); });
   form.querySelectorAll("[data-prev]").forEach(function (b) { b.addEventListener("click", function () { go(cur - 1); }); });
   dots.forEach(function (d) { d.addEventListener("click", function () { var k = Number(d.dataset.step); if (k < cur) go(k); }); });
 
   function purposeText() { var o = purpose.options[purpose.selectedIndex]; return o ? o.textContent : ""; }
   function fillSummary() {
-    var a = Number(amount.value), anon = document.getElementById("anon").checked;
+    var a = amt(), anon = document.getElementById("anon").checked;
     document.getElementById("summary").innerHTML =
       "<dt>المبلغ</dt><dd><b>" + fmt.format(a) + " جنيه</b></dd>" +
       "<dt>تبرع لـ</dt><dd>" + esc(purposeText()) + "</dd>" +
@@ -461,12 +526,34 @@
     document.getElementById("pay-amount").textContent = fmt.format(a) + " جنيه";
   }
 
+  // the other ways to give (the same three buttons everywhere a card payment did not go through)
+  function altWays() {
+    return '<div class="gw-alt">' +
+      '<a class="btn btn-teal" href="tel:19340">📞 مندوب لحد البيت 19340</a>' +
+      '<a class="btn btn-ghost-teal" href="#bank" data-tab="bank">🏦 تحويل بنكي</a>' +
+      '<a class="btn btn-ghost-teal" href="#wallets" data-tab="wallets">📱 فوري 9200 / إنستاباي</a>' +
+      "</div>";
+  }
+  function wireTab(a) {
+    if (a._wired) return; a._wired = true;
+    a.addEventListener("click", function (ev) { ev.preventDefault(); openTab(a.dataset.tab); document.querySelector(".tabs").scrollIntoView({ behavior: SMOOTH }); });
+  }
+  function clearPayAlert() { var a = form.querySelector(".pay-alert"); if (a) a.remove(); }
   function show(kind, html) { result.innerHTML = '<div class="alert ' + kind + '">' + html + "</div>"; result.scrollIntoView({ behavior: SMOOTH, block: "center" }); }
   var gw = document.getElementById("gateway"), btn = document.getElementById("pay-btn"), payRun = 0;
+  // Back from the gateway's page with the browser's Back (the page comes back from the back-forward cache as it was
+  // left, spinner and all): the redirect is dropped and the donor is on step 3 again, with the pay button working
+  addEventListener("pageshow", function (e) {
+    if (!e.persisted || RETURNING || sheet || gw.hidden) return;
+    payRun++; gw.hidden = true; gw.classList.remove("stopped"); btn.disabled = false;
+    document.getElementById("gw-title").textContent = GW.go;
+    go(3);
+  });
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (cur !== 3) { if (valid(cur)) go(cur + 1); return; }
+    clearPayAlert();
     btn.disabled = true;
     stepEls.forEach(function (s) { s.hidden = true; }); sumBar(1);
     gw.hidden = false; gw.classList.remove("stopped");
@@ -483,17 +570,11 @@
     document.getElementById("gw-title").textContent = "بوابة الدفع الإلكتروني قيد التفعيل";
     document.getElementById("gw-body").innerHTML =
       "<p>وصلت لآخر خطوة قبل " + GW.page + ". الدفع بالبطاقة هيتفعّل قريب جداً، <b>ولم يتم خصم أي مبلغ</b>.</p>" +
-      '<p>تقدر تكمل تبرعك بـ <b>' + fmt.format(Number(amount.value)) + " جنيه</b> دلوقتي بطريقة من دول:</p>" +
-      '<div class="gw-alt">' +
-        '<a class="btn btn-teal" href="tel:19340">📞 مندوب لحد البيت 19340</a>' +
-        '<a class="btn btn-ghost-teal" href="#bank" data-tab="bank">🏦 تحويل بنكي</a>' +
-        '<a class="btn btn-ghost-teal" href="#wallets" data-tab="wallets">📱 فوري 9200 / إنستاباي</a>' +
-      "</div>" +
+      '<p>تقدر تكمل تبرعك بـ <b>' + fmt.format(amt()) + " جنيه</b> دلوقتي بطريقة من دول:</p>" +
+      altWays() +
       '<button type="button" class="link-btn" id="gw-back">← رجوع لتعديل التبرع</button>';
-    if (window.MersalGift) window.MersalGift.afterDonation(document.getElementById("gw-body"), { paid: false, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim(), before: document.getElementById("gw-back") });
-    gw.querySelectorAll("[data-tab]").forEach(function (a) {
-      a.addEventListener("click", function (ev) { ev.preventDefault(); openTab(a.dataset.tab); document.querySelector(".tabs").scrollIntoView({ behavior: SMOOTH }); });
-    });
+    if (window.MersalGift) window.MersalGift.afterDonation(document.getElementById("gw-body"), { paid: false, amount: amt() || 0, purpose: purpose.value, purposeTitle: purposeText().trim(), before: document.getElementById("gw-back") });
+    gw.querySelectorAll("[data-tab]").forEach(wireTab);
     document.getElementById("gw-back").addEventListener("click", function () { gw.hidden = true; btn.disabled = false; go(3); });
   }
 
@@ -504,7 +585,7 @@
     return fetch("/api/checkout", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: amount.value, purpose: purpose.value,
+        amount: String(amt()), purpose: purpose.value,
         name: anon ? "فاعل خير" : document.getElementById("name").value.trim(),
         email: document.getElementById("email").value.trim(), phone: document.getElementById("phone").value.trim()
       })
@@ -512,7 +593,7 @@
   }
   // what the donor chose travels with the order: the page reloads empty when the gateway sends them back
   function remember(d, gwName) {
-    try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, gw: gwName, successIndicator: d.successIndicator, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim(), at: Date.now() })); } catch (x) {}
+    try { localStorage.setItem(KEY, JSON.stringify({ orderId: d.orderId, gw: gwName, successIndicator: d.successIndicator, amount: amt() || 0, purpose: purpose.value, purposeTitle: purposeText().trim(), at: Date.now() })); } catch (x) {}
   }
   function loadMpgs(done) {
     var s = document.createElement("script");
@@ -545,10 +626,19 @@
       throw d;
     }).catch(failed);
   }
+  // the payment could not start: the message sits right above the pay button (the retry), with 19340 tappable and the
+  // other ways to give; it goes away on the next try or step change
   window.mersalPayError = function (err) {
     gw.hidden = true; btn.disabled = false; go(3);
     var m = err && typeof err.message === "string" && err.message ? err.message : "";
-    show("err", m ? esc(m) + (/19340/.test(m) ? "" : " لو المشكلة استمرت كلمنا على 19340.") : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو كلمنا على 19340.");
+    var txt = m ? esc(m) + (/19340/.test(m) ? "" : " لو المشكلة استمرت كلمنا على 19340.") : "حدث خطأ أثناء عملية الدفع. حاول مرة أخرى أو كلمنا على 19340.";
+    var box = document.createElement("div");
+    box.className = "alert err pay-alert"; box.setAttribute("role", "alert");
+    box.innerHTML = "<p>" + txt.replace(/19340/g, '<a href="tel:19340">19340</a>') + "</p>" + altWays();
+    var nav = form.querySelector('.step[data-step="3"] .step-nav');
+    nav.parentNode.insertBefore(box, nav);
+    box.querySelectorAll("[data-tab]").forEach(wireTab);
+    box.scrollIntoView({ behavior: SMOOTH, block: "center" });
   };
   window.mersalPayCancel = function () { gw.hidden = true; btn.disabled = false; go(3); show("info", "تم إلغاء عملية الدفع."); };
 
@@ -589,7 +679,7 @@
     if (backPending) { afterBack.push(run); setTimeout(run, 700); } else run();
   }
   function openEmbedded(d, run) {
-    var rec = { orderId: d.orderId, amount: Number(amount.value) || 0, purpose: purpose.value, purposeTitle: purposeText().trim() };
+    var rec = { orderId: d.orderId, amount: amt() || 0, purpose: purpose.value, purposeTitle: purposeText().trim() };
     remember(d, "app");
     if (sheet) closeSheet();
     sheet = document.createElement("div");
@@ -719,8 +809,27 @@
         } else if (o.status === "MISMATCH") {
           show("err", "مقدرناش نأكد عملية الدفع دي تلقائياً. لو تم خصم المبلغ تواصل معنا على 19340" + ref(o) + " وهنراجعها.");
         } else {
-          show("err", "لم تكتمل عملية الدفع (حالة الطلب: " + esc(o.status || "غير معروفة") + "). لم يتم خصم أي مبلغ، " +
-            (MODE === "off" ? 'وتقدر تتبرع بتحويل بنكي أو من المحافظ أو تكلمنا على 19340.' : "ويمكنك المحاولة مرة أخرى."));
+          // not paid (declined, cancelled, abandoned): plain words (never the gateway's status code), the amount and the
+          // purpose of a payment started in the last day come back, one tap to try again, or another way to give
+          var why = o.status === "DECLINED" ? "البنك رفض العملية ومفيش أي مبلغ اتخصم." : "العملية مكملتش ومفيش أي مبلغ اتخصم.";
+          if (MODE === "off") { show("err", why + " تقدر تتبرع بتحويل بنكي أو من المحافظ أو تكلمنا على 19340."); return; }
+          var back = Number(saved.amount) >= 10 && Date.now() - Number(saved.at) < 864e5;
+          if (back) {
+            amount.value = Math.round(Number(saved.amount)); syncChips(); updateImpact();
+            optionsReady.then(function () {
+              var pv = String(saved.purpose || "").replace(/[^\w-]/g, "");
+              if (pv && purpose.querySelector('option[value="' + pv + '"]') && purpose.value !== pv) { purpose.value = pv; purpose.dispatchEvent(new Event("change", { bubbles: true })); }
+            });
+          }
+          show("err", "<p>" + why + (back ? " تقدر تحاول تاني بنفس المبلغ، أو تتبرع بطريقة تانية:" : " تقدر تحاول تاني من الفورم تحت، أو تتبرع بطريقة تانية:") + "</p>" +
+            (back ? '<button type="button" class="btn btn-gold btn-block" id="pay-retry">حاول تاني بـ ' + fmt.format(amt()) + " جنيه</button>" : "") + altWays());
+          result.querySelectorAll("[data-tab]").forEach(wireTab);
+          var rb = document.getElementById("pay-retry");
+          if (rb) rb.addEventListener("click", function () {
+            var nm = document.getElementById("name"), ph = document.getElementById("phone"), em = document.getElementById("email");
+            result.innerHTML = "";
+            go(nameOk(nm) && phoneOk(ph.value) && emailOk(em) ? 3 : 2);
+          });
         }
       })
       .catch(function () { show("err", "تعذّر التأكد من عملية الدفع. لو تم خصم المبلغ تواصل معنا على 19340" + ref() + "."); });

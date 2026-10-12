@@ -57,9 +57,9 @@
           <div id="pay-result"></div>
           <form id="pay-form" class="stepper" novalidate>
             <ol class="steps" aria-label="خطوات التبرع">
-              <li class="on" data-step="1"><span>1</span>المبلغ</li>
-              <li data-step="2"><span>2</span>بياناتك</li>
-              <li data-step="3"><span>3</span>الدفع</li>
+              <li class="on" data-step="1" aria-current="step"><i class="sr-only">خطوة 1 من 3: </i><span>1</span>المبلغ</li>
+              <li data-step="2"><i class="sr-only">خطوة 2 من 3: </i><span>2</span>بياناتك</li>
+              <li data-step="3"><i class="sr-only">خطوة 3 من 3: </i><span>3</span>الدفع</li>
             </ol>
 
             <fieldset class="step" data-step="1">
@@ -91,7 +91,7 @@
               </div>
               <div class="field amount-field">
                 <label for="amount">أو اكتب المبلغ</label>
-                <div class="input-suffix"><input id="amount" name="amount" type="number" min="10" max="1000000" step="1" inputmode="numeric" value="500" required aria-describedby="amount-unit"><span id="amount-unit">جنيه</span></div>
+                <div class="input-suffix"><input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" maxlength="9" value="500" required aria-describedby="amount-unit"><span id="amount-unit">جنيه</span></div>
               </div>
               <p class="impact" id="impact"></p>
               <button class="btn btn-gold btn-block" type="button" data-next>التالي</button>
@@ -102,10 +102,12 @@
               <div class="field">
                 <label for="name">الاسم</label>
                 <input id="name" name="name" autocomplete="name" maxlength="80" required>
+                <p class="hint anon-note" id="anon-note" aria-live="polite"></p>
               </div>
               <div class="field">
                 <label for="phone">رقم الموبايل</label>
-                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx" required>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx" required aria-describedby="phone-hint">
+                <p class="hint field-hint" id="phone-hint">لو برّه مصر اكتبه بكود الدولة، مثال <bdi dir="ltr">+966…</bdi></p>
               </div>
               <div class="field">
                 <label for="email">البريد الإلكتروني <small>(لتأكيد التبرع)</small></label>

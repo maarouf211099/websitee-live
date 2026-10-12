@@ -351,6 +351,11 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .home .quick-donate .qd-alt { display: block; }
 .qd-alt a { display: inline-block; padding-block: 12px; margin-block: -12px; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .qd-alt a:hover { color: var(--teal-dark); }
+/* "مبلغ تاني" (#qd-other) beside the four chips on the same row, not a row of its own under them: 7 columns, the chips one
+   each and the field three, as tall as the chips (keeps the card's bottom inside a 1366x768 first screen) */
+.home .quick-donate .amounts { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.home .quick-donate .amt-other { grid-column: span 3; min-height: 56px; padding: 0 14px; border-radius: 12px; }
+.home .quick-donate .amt-other input { font-size: 18px; }
 @media (min-width: 1180px) {
   .home .quick-donate .qd-text { grid-column: 1 / span 3; grid-row: 1; }
   .home .quick-donate .amounts { grid-column: 4 / span 6; grid-row: 1; }
@@ -423,6 +428,15 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .home .camp-carousel .car-track > .camp:first-child .camp-num { font-size: 48px; }
 .home .camp-carousel .car-track > .camp:first-child .camp-cta { grid-template-columns: max-content minmax(0, 300px); justify-content: start; }
 .home .camp:hover { transform: translateY(-3px); box-shadow: var(--sh-2); }
+/* "أو اكتب مبلغ تاني" (.camp-other) shares the last row with "تفاصيل الحملة ←" and "شارك" instead of a row of its own:
+   the card body wraps as a row, every other child takes the full line */
+.home .camp .body { flex-flow: row wrap; align-content: center; justify-content: flex-start; }
+.home .camp .body > *, .home .camp .body > p { flex: 0 0 100%; min-width: 0; } /* (p: beats ".home .camp .body p { flex: none }") */
+.home .camp .body > .camp-other { order: 1; flex: none; display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 0; text-align: start; }
+.home .camp .body > .camp-links { order: 2; flex: 1 0 auto; column-gap: 4px; } /* never squeezed: on a narrow card (961-1179px) it takes its own line again */
+.home .camp .body > .camp-other + .camp-links { margin-inline-start: 6px; }
+.home .camp .camp-more { white-space: nowrap; }
+.home .camp .camp-share { padding-inline: 8px; }
 @media (max-width: 1179px) {
   .home .camp-qty button { width: 36px; }
   .home .camp .body { padding: 16px 18px; }
@@ -881,9 +895,148 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 @media (min-width: 961px) and (max-height: 760px) {
   .page-grid > .legacy ~ .page-side .side-card.hot { display: none; }
 }
+/* 700px tall and less (a 1366x768 laptop): the card with its "مبلغ تاني" row is compacted so it still sticks and ends on
+   screen: the small "دفع آمن" line goes (the gold button and the donate page say it), the chips and the card are tighter */
+@media (min-width: 961px) and (max-height: 700px) {
+  .page-grid > .legacy ~ .page-side .side-trust { display: none; }
+  .page-grid > .legacy ~ .page-side .side-card.donate { padding: 14px 16px; }
+  .page-grid > .legacy ~ .page-side .side-card p { margin-bottom: 8px; }
+  .page-grid > .legacy ~ .page-side .side-amounts a { padding-block: 4px; }
+  .page-grid > .legacy ~ .page-side .side-amounts .amt-other { min-height: 44px; }
+  .page-grid > .legacy ~ .page-side .side-ways { margin-top: 10px; padding-top: 10px; }
+}
 @media (min-width: 961px) and (max-height: 639px) {
   .page-grid > .legacy ~ .page-side { position: static; }
 }
+
+/* --- project pages (WP6): the article and the side card on the grid; the old site's content reads as one clean column
+   (css/legacy.css makes .legacy a size container from 761px, so its Bootstrap columns stay one column here) --- */
+@media (min-width: 961px) {
+  .page-grid:has(> .legacy) { grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; }
+}
+@media (min-width: 1180px) {
+  .page-grid:has(> .legacy) { grid-template-columns: minmax(0, 1fr) 360px; gap: 56px; }
+}
+.legacy p:not([style*="center"]), .legacy li { max-width: 720px; }
+/* typographic headings: no filled tags. h2 is a heading with a gold bar at its start, h4 a teal sub-heading */
+.legacy h2, .legacy .content-sector h2 { display: block; position: relative; background: none; color: var(--teal-ink); border-radius: 0;
+  padding: 0; padding-inline-start: 14px; border-inline-start: 4px solid var(--gold); font-size: 30px; line-height: 1.35; font-weight: 800; margin: 8px 0 18px; }
+.legacy h4, .legacy .content-sector h4 { background: none; color: var(--teal-text); border-radius: 0; box-shadow: none; padding: 0; font-size: 20px; line-height: 1.45; font-weight: 800; margin: 26px 0 10px; }
+/* a paragraph that is all bold (the old CMS wrote whole sections that way, p/31) reads as body text */
+.legacy p > strong:only-child { color: var(--ink); font-weight: 600; }
+/* the side card is the donate action beside the article, so the in-article button steps back to an outline */
+@media (min-width: 961px) {
+  .legacy .do-btn, .legacy a.btn-donate { background: #fff; color: var(--teal-text); border: 2px solid var(--teal-text); box-shadow: none; }
+  .legacy .do-btn:hover, .legacy a.btn-donate:hover { background: var(--teal-soft); color: var(--teal-text); box-shadow: none; }
+}
+/* the share bar: quiet outline pills, only the icons carry the brand colours */
+.share-bar .sh-wa, .share-bar .sh-fb, .share-bar .sh-x, .share-bar .sh-native { background: #fff; border-color: var(--line); color: var(--ink); }
+.share-bar .sh-wa svg { color: #25d366; } .share-bar .sh-fb svg { color: #0866ff; } .share-bar .sh-x svg { color: #111; } .share-bar .sh-native svg { color: var(--teal-text); }
+.share-bar .sh-wa:hover, .share-bar .sh-fb:hover, .share-bar .sh-x:hover, .share-bar .sh-native:hover { background: #fff; border-color: var(--teal); color: var(--teal-text); filter: none; }
+/* related pages: white band, 3 a row (4 from 1600px) */
+.related .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+@media (min-width: 1600px) { .related .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 960px) { .related .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* --- contact (body.contact-page): the details as tiles beside the form. 5 / 7 columns from 1180px, 6 / 6 at 961-1179px
+   (the e-mail needs the room). The hotline tile is the highlighted one; the map sits under the tiles --- */
+@media (min-width: 961px) {
+  .contact-page main .grid-2 { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
+  .contact-page main .grid-2 > div:first-child { grid-column: span 6; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .contact-page main .grid-2 > .contact-form { grid-column: span 6; }
+  .contact-page main .grid-2 > div:first-child > :not(.bank) { grid-column: 1 / -1; }
+  .contact-page main .grid-2 > div:first-child > p { margin: 0 0 4px; font-size: var(--fs-lead); color: var(--ink-2); }
+  .contact-page main .grid-2 > div > .bank { flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 0; margin: 0; padding: 16px 18px 18px; gap: 12px; border-radius: var(--r-lg); }
+  .contact-page main .grid-2 > div > .bank::before { position: static; translate: none; }
+  .contact-page main .grid-2 > div > .bank > div { min-width: 0; }
+  .contact-page main .grid-2 > div > .bank:has([data-site="hotline"]) { background: var(--teal-soft); border-color: #bfe0e0; }
+  .contact-page main .grid-2 > div > .bank:has([data-site="hotline"])::before { background-color: #fff; }
+  .contact-page main .grid-2 > div > .bank [data-site="hotline"] { font: 700 28px/1.15 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; color: var(--teal-ink); }
+  .contact-page main .grid-2 > div > .bank [data-site="email"] { font-size: 15.5px; }
+  /* WhatsApp set in the site details: 5 tiles, the address takes the last row */
+  .contact-page main .grid-2 > div > [data-site-box]:not([hidden]) ~ .bank:has([data-site="address"]) { grid-column: 1 / -1; }
+  .contact-page main .grid-2 > div:first-child > a { margin-top: 4px; }
+  .contact-page main .grid-2 > div > a > img[alt*="خريطة"] { width: 100%; margin-top: 0 !important; border-radius: var(--r-lg) !important; }
+  .contact-page #contact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; align-content: start; }
+  .contact-page #contact > * { grid-column: 1 / -1; }
+  .contact-page #contact > .field[data-field="name"], .contact-page #contact > .field[data-field="phone"] { grid-column: auto; }
+}
+@media (min-width: 1180px) {
+  .contact-page main .grid-2 > div:first-child { grid-column: span 5; }
+  .contact-page main .grid-2 > .contact-form { grid-column: span 7; }
+  .contact-page main .grid-2 > div > .bank [data-site="email"] { font-size: 16.5px; }
+}
+
+/* --- help and volunteer: the form 8 / the side 4. The side is taller than a laptop screen (help: ~810px), so a sticky
+   side would hide its last card, the "حالة مستعجلة؟ 19340" one. Instead the side runs the form's full height and that
+   last card sticks under the header (top = header + 20px), so it stays in view through the long form --- */
+@media (min-width: 961px) {
+  .help-page .req-layout, .volunteer-page .req-layout { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--gap); }
+  .help-page .req-side, .volunteer-page .req-side { align-self: stretch; align-content: start; }
+  .help-page .req-side > :last-child, .volunteer-page .req-side > :last-child { position: sticky; top: calc(var(--hdr-h) + 20px); }
+}
+
+/* --- albums: 3 a row (4 from 1600px), the picture count at the top start (clear of captions in the photos), equal
+   card heights, titles clamp to 2 lines --- */
+.albums-page #albums { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); align-items: stretch; }
+@media (min-width: 1600px) { .albums-page #albums { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.albums-page .album { display: flex; flex-direction: column; height: 100%; border-radius: var(--r-lg); }
+.albums-page .album .thumb { flex: none; }
+.albums-page .album .count { top: 12px; bottom: auto; inset-inline-start: 12px; padding: 8px 12px; font-size: 13px; }
+.albums-page .album .body { flex: 1 1 auto; padding: 16px 18px 18px; }
+.albums-page .album h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 18px; }
+
+/* --- afia: the gold bar starts at the heading's start (not centred under its last word), the two splits 6 / 6 --- */
+/* (not keyed on the inline style="text-align:right": js/layout.js's reveal rewrites that attribute as "text-align: right") */
+.afia-page main .section-title h2::after { display: block; margin-inline: 0; }
+.afia-page main .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(var(--gap) * 2); align-items: center; }
+.afia-page main .grid-2 > picture { display: block; }
+.afia-page main .grid-2 > picture > img { width: 100%; height: auto; }
+
+/* --- news: with nothing published, the official pages as three large cards and the latest albums (js/news.js, from 761px) --- */
+.news .nw-empty.nw-soon { max-width: none; align-items: stretch; text-align: start; padding-top: 8px; }
+.news .nw-soon > span:first-child { font-size: var(--fs-lead); font-weight: 700; color: var(--teal-ink); }
+.news .nw-soon .nw-soc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+.news .nw-soon .nw-soc .btn { display: flex; align-items: center; justify-content: flex-start; gap: 14px; min-height: 88px; padding: 18px 22px; border: 1px solid var(--line);
+  border-radius: var(--r-lg); background: #fff; color: var(--teal-ink); font-size: var(--fs-h3); font-weight: 800; box-shadow: var(--sh-1); }
+.news .nw-soon .nw-soc .btn::before { content: ""; width: 48px; height: 48px; flex: none; border-radius: 14px; background: var(--teal-soft) center / 24px no-repeat; }
+.news .nw-soon .nw-soc .btn[href*="facebook"]::before { background-color: #e8f0ff; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%230866ff' d='M14 8h3V4h-3c-2.8 0-5 2.2-5 5v2H6v4h3v7h4v-7h3l1-4h-4V9c0-.6.4-1 1-1z'/%3E%3C/svg%3E"); }
+.news .nw-soon .nw-soc .btn[href*="instagram"]::before { background-color: #fdeef4; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c13584' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='5'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Ccircle cx='17.5' cy='6.5' r='1' fill='%23c13584'/%3E%3C/svg%3E"); }
+.news .nw-soon .nw-soc .btn[href*="youtube"]::before { background-color: #ffecec; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e00' d='M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12a31 31 0 0 0 .4 3.8 3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .4-3.8 31 31 0 0 0-.4-3.8zM10 15.1V8.9l5.2 3.1z'/%3E%3C/svg%3E"); }
+.news .nw-soon .nw-soc .btn::after { content: "←"; margin-inline-start: auto; color: var(--teal-text); }
+.news .nw-soon .nw-soc .btn:hover { border-color: var(--teal); background: #fff; color: var(--teal-ink); }
+.news .nw-soon:has(~ .nw-albums) .nw-alb { display: none; } /* the albums strip below says the same */
+.nw-albums { margin-top: 40px; }
+.nw-albums h2 { margin: 0 0 20px; font-size: var(--fs-h3); font-weight: 800; color: var(--teal-ink); }
+.nw-alb-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+.nw-alb-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-lg); background: #fff; color: inherit; text-decoration: none; box-shadow: var(--sh-1); }
+.nw-alb-card picture { display: block; }
+.nw-alb-card img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+.nw-alb-card h3 { margin: 0; padding: 14px 18px 16px; font-size: 16.5px; line-height: 1.5; color: var(--teal-dark); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.nw-albums > a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- legal pages and 404 --- */
+.legal-page .lg-doc { max-width: 760px; }
+.legal-page .lg-sec h2 { font-size: var(--fs-h3); }
+.nf-page .nf-links { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: none; gap: var(--gap); }
+
+/* --- motion (transform and opacity only; §9 turns it off): the legacy h2 bar draws in as the heading scrolls into view
+   (a scroll-driven animation where supported, otherwise once on load), tiles and cards lift on hover and press --- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .legacy h2, .legacy .content-sector h2 { border-inline-start-color: transparent; }
+    .legacy h2::before, .legacy .content-sector h2::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: -4px; width: 4px; background: var(--gold); border-radius: 2px;
+      transform-origin: 50% 0; animation: barDraw linear both; animation-timeline: view(); animation-range: entry 10% entry 90%; }
+  }
+  .contact-page main .grid-2 > div > .bank, .albums-page .album, .nw-alb-card, .news .nw-soon .nw-soc .btn, .related .card, .nf-page .nf-links a {
+    transition: transform .25s var(--spring), box-shadow .25s, border-color .2s, opacity .5s var(--ease); transition-delay: var(--d, 0s); }
+  .contact-page main .grid-2 > div > .bank:hover, .albums-page .album:hover, .nw-alb-card:hover, .news .nw-soon .nw-soc .btn:hover, .related .card:hover { transform: translateY(-3px); box-shadow: var(--sh-2); transition-delay: 0s; }
+  .contact-page main .grid-2 > div > .bank:active, .albums-page .album:active, .nw-alb-card:active, .news .nw-soon .nw-soc .btn:active, .related .card:active { transform: scale(.98); transition-duration: .08s; }
+  .nw-alb-card img { transition: transform .6s var(--ease); }
+  .nw-alb-card:hover img { transform: scale(1.04); }
+  .nw-albums { animation: rise-sm .5s var(--ease) both; }
+}
+@keyframes barDraw { from { transform: scaleY(0); } }
 
 /* §9 Reduced motion (always last) */
 @media (prefers-reduced-motion: reduce) {
@@ -894,5 +1047,7 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
   .donate-page .tabs button, .donate-page .pw, .donate-page .bk-card, .donate-page .side-ads > a { transition: none; transform: none; }
   .zakat-page .zakat-result, .gift .gf-preview, .gift .gf-occ input:checked + span svg, .gift .gf-panel:not([hidden]) { animation: none !important; }
   .zakat-page .zk-cards li, .zakat-page .zakat-group, .gift .gf-steps li, .gift .gf-occ span, .gift .gf-tabs button, .community .cm-preview li, .community .cm-gift { transition: none; transform: none; }
+  .contact-page main .grid-2 > div > .bank, .albums-page .album, .nw-alb-card, .nw-alb-card img, .news .nw-soon .nw-soc .btn, .related .card, .nf-page .nf-links a { transition: none; }
+  .nw-albums { animation: none !important; }
   .site-header, .site-header .wrap, body:not(.nav-compact) .site-header, body:not(.nav-compact) .site-header .wrap, .site-header .brand, .hdr-tel, .hdr-zakat, .m-close { transition: none; }
 }

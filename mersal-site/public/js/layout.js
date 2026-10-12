@@ -31,6 +31,9 @@
     }
   } /* /mersal:site */;
   SITE.social = SITE.social || {}; SITE.footer = SITE.footer || {};
+  // Legal identity (إشهار / fundraising permit): filled in by the owner. Nothing renders while regNo is empty.
+  var LEGAL = { regNo: "", regYear: "", regBody: "", permitNo: "", permitUntil: "" };
+  window.MERSAL_LEGAL = LEGAL;
   SITE.onlinePayment = SITE.payMode !== "off";
   // WhatsApp number -> wa.me link (an Egyptian 01xxxxxxxxx number gets the +20 country code)
   function waLink(n) { var d = String(n || "").replace(/\D/g, ""); if (/^0\d{10}$/.test(d)) d = "20" + d.slice(1); return "https://wa.me/" + d; }
@@ -157,6 +160,7 @@
         "<span><small>كلمنا على الخط الساخن</small><b>" + escA(SITE.hotline) + "</b></span></a>" : "") +
       '<div class="fs-btns"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a><a class="btn btn-ghost" href="/zakat.html">احسب زكاتك</a></div>' +
     "</div></div>";
+  var legalLine = LEGAL.regNo ? "مؤسسة أهلية غير هادفة للربح · مشهرة برقم " + LEGAL.regNo + (LEGAL.regYear ? " لسنة " + LEGAL.regYear : "") + (LEGAL.regBody ? " – " + LEGAL.regBody : "") : "";
   var footer =
     '<footer class="site-footer">' + fStrip + '<div class="wrap cols">' +
       "<div>" +
@@ -165,19 +169,24 @@
         (SITE.footer.text ? "<p>" + escA(SITE.footer.text) + "</p>" : "") +
         social() +
       "</div>" +
-      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + escA(n[0]) + '">' + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
+      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + escA(n[0]) + '"' + (/^https?:/.test(n[0]) ? ' target="_blank" rel="noopener"' : "") + ">" + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
       "<div><h3>تواصل معنا</h3><ul>" +
-        (SITE.address ? "<li>" + escA(SITE.address) + "</li>" : "") +
-        (SITE.hotline ? '<li>الخط الساخن: <a href="tel:' + escA(SITE.hotline) + '">' + escA(SITE.hotline) + "</a></li>" : "") +
-        (SITE.phone ? '<li>الهاتف: <a href="tel:' + escA(SITE.phone) + '" dir="ltr">' + escA(SITE.phone) + "</a></li>" : "") +
-        (SITE.whatsapp ? '<li>واتساب: <a href="' + waLink(SITE.whatsapp) + '" target="_blank" rel="noopener" dir="ltr">' + escA(SITE.whatsapp) + "</a></li>" : "") +
-        (SITE.email ? '<li><a href="mailto:' + escA(SITE.email) + '">' + escA(SITE.email) + "</a></li>" : "") +
+        (SITE.address ? '<li class="f-addr"><a href="/p/46.html">' + escA(SITE.address) + "</a></li>" : "") +
+        (SITE.hotline ? '<li class="f-hot"><span class="f-lbl">الخط الساخن: </span><a href="tel:' + escA(SITE.hotline) + '">' + escA(SITE.hotline) + "</a></li>" : "") +
+        (SITE.phone ? '<li class="f-tel"><span class="f-lbl">الهاتف: </span><a href="tel:' + escA(SITE.phone) + '" dir="ltr">' + escA(SITE.phone) + "</a></li>" : "") +
+        (SITE.whatsapp ? '<li class="f-wa"><span class="f-lbl">واتساب: </span><a href="' + waLink(SITE.whatsapp) + '" target="_blank" rel="noopener" dir="ltr">' + escA(SITE.whatsapp) + "</a></li>" : "") +
+        (SITE.email ? '<li class="f-mail"><a href="mailto:' + escA(SITE.email) + '">' + escA(SITE.email) + "</a></li>" : "") +
       "</ul></div>" +
     "</div>" +
-    '<div class="copyright">© ' + year + " " + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + ' - جميع الحقوق محفوظة</div></footer>';
+    '<div class="copyright">© ' + year + " " + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + ' - جميع الحقوق محفوظة' + (legalLine ? '<span class="f-legal">' + escA(legalLine) + "</span>" : "") + "</div></footer>";
 
   document.getElementById("site-header").outerHTML = header;
   document.getElementById("site-footer").outerHTML = footer;
+  // privacy.html (and any page) can hold <p data-legal hidden>: filled and shown only once LEGAL.regNo is set
+  if (legalLine) document.querySelectorAll("[data-legal]").forEach(function (el) {
+    el.textContent = legalLine + (LEGAL.permitNo ? " · تصريح جمع التبرعات رقم " + LEGAL.permitNo + (LEGAL.permitUntil ? " ساري حتى " + LEGAL.permitUntil : "") : "");
+    el.hidden = false;
+  });
   // Pages can show a site detail with data-site="hotline|phone|whatsapp|email|address" (text + href filled from SITE);
   // a wrapper with data-site-box is hidden when that value is empty - e.g. the WhatsApp card on contact.html
   document.querySelectorAll("[data-site]").forEach(function (el) {
@@ -243,11 +252,16 @@
         '<a class="m-call" href="tel:' + escA(SITE.hotline) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>اتصل</span></a>' +
         '<a class="m-donate" href="' + dHref + '"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/></svg></i><span>تبرع</span></a>' +
         '<a class="m-zakat' + (/zakat\.html$/.test(location.pathname) ? " on" : "") + '" href="/zakat.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h6"/></svg><span>الزكاة</span></a>' +
-        (donated ? '<a class="m-gift' + (/community\.html$/.test(location.pathname) ? " on" : "") + '" href="/community.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-7-4-6 0M12 7c2-4 7-4 6 0"/></svg><span>هداياك</span></a>' : "") +
         '<button type="button" class="m-menu" aria-label="القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>القائمة</span></button>' +
       "</nav>");
     var bar = document.querySelector(".m-bar");
-    if (donated) bar.classList.add("six");
+    bar.querySelectorAll(".on").forEach(function (el) { el.setAttribute("aria-current", "page"); });
+    // donors: the menu (whose sheet starts with the community row) carries a red dot until the community page is visited
+    if (donated) {
+      var giftSeen = /community\.html$/.test(location.pathname);
+      try { if (giftSeen) localStorage.setItem("mersalGiftSeen", "1"); else giftSeen = localStorage.getItem("mersalGiftSeen") === "1"; } catch (e) {}
+      if (!giftSeen) { var mmg = bar.querySelector(".m-menu"); mmg.classList.add("has-gift"); mmg.setAttribute("aria-label", "القائمة (فيها هداياك كمتبرع)"); }
+    }
     document.body.classList.add("has-mbar");
     // Active-item pill: --i is the index of the lit item and the pill slides there (transform only). A tap moves it
     // at once, and the cross-document view transition (css: m-ind) carries it into the next page.
@@ -387,11 +401,14 @@
     "</div></div>";
     document.body.insertAdjacentHTML("beforeend", html);
     var sheet = document.getElementById("m-sheet");
+    // a non-modal dialog (no aria-modal: the header burger and the bar's menu button stay usable to close it)
+    sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-label", "القائمة");
+    document.querySelectorAll(".menu-toggle, .m-bar .m-menu").forEach(function (b) { b.setAttribute("aria-controls", "m-sheet"); });
     // a tapped link closes the sheet at once, so the page transition starts from a clean page
     sheet.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { setMenu(false, true, true); })) setMenu(false, true); });
     // the sheet's history entry is handed over to the search panel (no Back in between)
     document.getElementById("m-search").addEventListener("click", function () { setMenu(false, true, true); openSearch(); });
-    sheet.querySelector(".m-close").addEventListener("click", function () { setMenu(false); toggle.focus(); });
+    sheet.querySelector(".m-close").addEventListener("click", function () { setMenu(false); menuBack(); });
     // groups: <details> opens at once (so the rows exist), then .is-open grows the height (css grid-rows); closing runs the other way
     sheet.querySelectorAll(".m-group > summary").forEach(function (sm) {
       sm.addEventListener("click", function (e) {
@@ -408,6 +425,19 @@
       });
     });
   }
+
+  // A tap on a link to the page you are on (الرئيسية on the home page, the logo, a lit bar item) scrolls to the top
+  // instead of reloading it; the header comes back. Modifier and middle clicks keep their browser meaning.
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest(".m-bar a, .site-header .brand, .nav a, #m-sheet a");
+    if (!a || e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || (a.target && a.target !== "_self")) return;
+    var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+    if (u.origin !== location.origin || u.pathname.replace(/index\.html$/, "") !== here || u.search !== location.search || u.hash !== location.hash) return;
+    e.preventDefault();
+    if (menuOpen()) setMenu(false, true);
+    hdr.classList.remove("hide"); document.body.classList.remove("hdr-hide");
+    scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+  });
 
   // Skip link + back-to-top
   document.body.insertAdjacentHTML("afterbegin", '<a class="skip-link" href="#main">تخطي إلى المحتوى</a>');
@@ -436,9 +466,27 @@
     return true;
   }
   addEventListener("popstate", function () {
-    if (menuOpen()) { setMenu(false, true, true); if (tabletUp.matches && document.getElementById("m-sheet")) toggle.focus({ preventScroll: true }); }
+    if (menuOpen()) { var hadFocus = document.getElementById("m-sheet") && document.getElementById("m-sheet").contains(document.activeElement); setMenu(false, true, true); if (document.getElementById("m-sheet") && (tabletUp.matches || hadFocus)) menuBack(); }
     if (!panel.hidden) closeSearch(true);
   });
+
+  // Dialog focus containment without aria-modal: everything outside the open overlay becomes inert (no Tab, no taps,
+  // hidden from screen readers). keep = the elements that stay live; ancestors of a kept element are walked into,
+  // so only their other children go inert. Calling it again with on=false clears every inert it set.
+  var inertSet = [];
+  function setInert(on, keep) {
+    inertSet.forEach(function (el) { el.inert = false; el.removeAttribute("inert"); });
+    inertSet = [];
+    if (!on) return;
+    keep = keep.filter(Boolean);
+    (function walk(parent) {
+      Array.prototype.forEach.call(parent.children, function (el) {
+        if (keep.indexOf(el) > -1 || /^(SCRIPT|STYLE|LINK)$/.test(el.tagName)) return;
+        if (keep.some(function (k) { return el.contains(k); })) { walk(el); return; }
+        if (!el.inert) { el.inert = true; el.setAttribute("inert", ""); inertSet.push(el); }
+      });
+    })(document.body);
+  }
 
   // Site search over the imported pages + main pages
   var STATIC = [
@@ -459,13 +507,14 @@
   document.body.insertAdjacentHTML("beforeend",
     '<div class="search-panel" hidden role="dialog" aria-modal="true" aria-label="بحث في الموقع"><div class="search-box">' +
     '<input type="search" placeholder="ابحث في موقع مرسال… (مثلاً: الأورام، العيادات، التطوع)" aria-label="كلمة البحث">' +
+    '<p class="sr-only" role="status" id="s-count"></p>' +
     '<button type="button" class="search-close" aria-label="إغلاق">×</button><ul class="search-results"></ul></div></div>');
   var panel = document.querySelector(".search-panel"), sInput = panel.querySelector("input"), sList = panel.querySelector(".search-results");
-  var searchFrom = null;
+  var searchFrom = null, sCount = panel.querySelector("#s-count"), sCountT = 0;
   function openSearch() {
     searchFrom = document.activeElement;
     if (panel.hidden) overlayOpen("search");
-    panel.hidden = false; sInput.value = ""; sList.innerHTML = ""; setTimeout(function () { sInput.focus(); }, 30);
+    panel.hidden = false; setInert(true, [panel]); sCount.textContent = ""; sInput.value = ""; sList.innerHTML = ""; setTimeout(function () { sInput.focus(); }, 30);
     if (!index) fetch("/data/pages.json").then(function (r) { return r.json(); }).then(function (pg) {
       index = STATIC.concat(Object.keys(pg).map(function (id) { return { t: pg[id].title, u: "/p/" + id + ".html", d: pg[id].desc }; }));
       runSearch();
@@ -473,7 +522,7 @@
   }
   function closeSearch(fromHistory) {
     if (panel.hidden) return;
-    panel.hidden = true;
+    panel.hidden = true; setInert(false);
     if (!fromHistory) overlayClosed("search");
     // focus goes back to what opened the search (or the header search button), not to <body>
     var back = searchFrom && searchFrom !== document.body && searchFrom.getClientRects().length ? searchFrom : document.querySelector(".search-btn");
@@ -481,11 +530,14 @@
   }
   function runSearch() {
     var q = norm(sInput.value.trim());
-    if (!index || !q) { sList.innerHTML = ""; return; }
+    clearTimeout(sCountT);
+    if (!index || !q) { sList.innerHTML = ""; sCount.textContent = ""; return; }
     var hits = index.filter(function (x) { return norm(x.t + " " + x.d).indexOf(q) > -1; })
       .sort(function (a, b) { return (norm(b.t).indexOf(q) > -1) - (norm(a.t).indexOf(q) > -1); }).slice(0, 8);
     sList.innerHTML = hits.length ? hits.map(function (x) { return '<li><a href="' + esc(x.u) + '"><b>' + esc(x.t) + "</b><span>" + esc((x.d || "").slice(0, 90)) + "</span></a></li>"; }).join("")
       : '<li class="none">مفيش نتايج. جرّب كلمة تانية أو كلمنا على 19340.</li>';
+    // screen readers hear the count once typing pauses
+    sCountT = setTimeout(function () { sCount.textContent = hits.length ? (hits.length === 1 ? "نتيجة واحدة" : hits.length + " نتايج") : "مفيش نتايج"; }, 400);
   }
   sInput.addEventListener("input", runSearch);
   sList.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { closeSearch(true); })) closeSearch(); });
@@ -500,15 +552,22 @@
   var toggle = document.querySelector(".menu-toggle"), nav = document.getElementById("nav");
   // On phones the menu is the #m-sheet (built once menu.json arrives); before that, and on tablets, it is the nav list
   function menuOpen() { var sheet = document.getElementById("m-sheet"); return sheet ? !sheet.hidden : nav.classList.contains("open"); }
-  var sheetTimer = null;
+  var sheetTimer = null, menuFrom = null;
   // noHistory: the caller handles the history entry (Back already popped it, or a link / the search takes it over)
   function setMenu(open, instant, noHistory) {
     var sheet = document.getElementById("m-sheet"), was = menuOpen();
     if (!noHistory) { if (open && !was) overlayOpen("menu"); else if (!open && was) overlayClosed("menu"); }
     if (sheet) {
       clearTimeout(sheetTimer); sheet.classList.remove("closing");
-      if (open) { sheet.hidden = false; sheet.scrollTop = 0; if (tabletUp.matches) { var mc = sheet.querySelector(".m-close"); if (mc) mc.focus({ preventScroll: true }); } }
-      else if (instant || sheet.hidden || reduce) sheet.hidden = true;
+      if (open) {
+        if (!was) menuFrom = document.activeElement;
+        sheet.hidden = false; sheet.scrollTop = 0;
+        // everything but the sheet, the burger and the bar's menu button goes inert while the sheet is open
+        setInert(true, [sheet, toggle, document.querySelector(".m-bar .m-menu")]);
+        var mf = tabletUp.matches ? sheet.querySelector(".m-close") : document.getElementById("m-search");
+        if (mf) mf.focus({ preventScroll: true });
+      }
+      else if (setInert(false), instant || sheet.hidden || reduce) sheet.hidden = true;
       else { sheet.classList.add("closing"); sheetTimer = setTimeout(function () { sheet.hidden = true; sheet.classList.remove("closing"); }, 200); }
       nav.classList.remove("open");
     }
@@ -519,13 +578,19 @@
     var mm = document.querySelector(".m-bar .m-menu"); if (mm) mm.setAttribute("aria-expanded", open ? "true" : "false");
     if (window.mersalBarInd) window.mersalBarInd(open ? "menu" : null);
   }
+  // after the sheet closes the focus goes back to what opened it (the burger or the bar's menu button), else the burger
+  function menuBack() {
+    var t = menuFrom && menuFrom !== document.body && document.contains(menuFrom) && menuFrom.getClientRects().length && !(document.getElementById("m-sheet") || nav).contains(menuFrom) ? menuFrom : toggle;
+    if (!t.getClientRects().length) t = document.querySelector(".m-bar .m-menu") || toggle;
+    t.focus({ preventScroll: true });
+  }
   toggle.addEventListener("click", function (e) { e.stopPropagation(); setMenu(!menuOpen()); });
   var mMenu = document.querySelector(".m-bar .m-menu");
   if (mMenu) mMenu.addEventListener("click", function (e) { e.stopPropagation(); hdr.classList.remove("hide"); document.body.classList.remove("hdr-hide"); var open = !menuOpen(); setMenu(open); if (open && !document.getElementById("m-sheet")) scrollTo({ top: 0, behavior: "smooth" }); });
   nav.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { setMenu(false, true, true); })) setMenu(false); });
   addEventListener("keydown", function (e) {
     if (e.key !== "Escape") return;
-    if (menuOpen()) { setMenu(false); toggle.focus(); return; }
+    if (menuOpen()) { setMenu(false); menuBack(); return; }
     // an open desktop dropdown closes too, and the focus goes back to its button
     var sub = document.querySelector("#nav .has-sub.open");
     if (sub) { sub.classList.remove("open"); var t = sub.querySelector(".sub-toggle"); if (t) { t.setAttribute("aria-expanded", "false"); t.focus(); } }

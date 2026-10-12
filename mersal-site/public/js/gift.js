@@ -354,7 +354,7 @@
       "</div>" +
       '<p class="gf-rm-next" aria-live="polite"></p>' +
       '<div class="gf-rm-btns"><button type="button" class="btn btn-gold" data-ics>' + svg("calendar") + "ذكّرني كل شهر</button>" +
-        '<a class="btn btn-ghost-teal" data-gcal href="https://calendar.google.com/" target="_blank" rel="noopener">أضف لـ <bdi dir="ltr">Google Calendar</bdi></a></div>' +
+        '<a class="btn btn-ghost-teal" data-gcal href="https://calendar.google.com/" target="_blank" rel="noopener"><span style="display:inline-flex;gap:inherit;white-space:nowrap">أضف لـ <bdi dir="ltr">Google Calendar</bdi></span></a></div>' +
       '<p class="hint gf-rm-hint">زرار "ذكّرني كل شهر" بينزّل ملف تذكير بيفتح في تقويم الموبايل (آيفون، سامسونج، أوتلوك). بتستخدم <bdi dir="ltr">Google Calendar</bdi>؟ دوس على الزرار التاني.</p>';
     var dSel = box.querySelector("#" + idp + "-day"), tSel = box.querySelector("#" + idp + "-time"), next = box.querySelector(".gf-rm-next"), gcal = box.querySelector("[data-gcal]");
     function opts() { return { day: dSel.value, time: tSel.value }; }

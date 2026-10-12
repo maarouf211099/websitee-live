@@ -242,3 +242,96 @@ body:not(.donate-page):not(.gift):not(.community):not(.news):not(.help-page) .pa
 @media (prefers-reduced-motion: no-preference) {
   .reveal.in:active { transition-delay: 0s; transition-duration: .12s; }
 }
+
+/* =================================================================== MWP3: phone chrome
+   Compact footer (same DOM and link order), 19340 in the header, a calmer bottom bar, slim install card,
+   safe-area insets (0 on Android), large-text fixes. */
+
+/* ---------- header: the hotline pill between the logo and the buttons ---------- */
+.site-header .hdr-tel { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; font: 800 16px/1 "Titillium Web", "Cairo", sans-serif; margin-inline: auto; white-space: nowrap; flex: none; text-decoration: none; }
+.site-header .hdr-tel svg { width: 17px; height: 17px; flex: none; fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.site-header .hdr-tel b { font-weight: 800; letter-spacing: .3px; }
+.site-header .hdr-tel:active { transform: scale(.95); }
+.brand, .brand img { flex: none; }
+@media (max-width: 339px) { .site-header .hdr-tel { padding: 0 10px; gap: 4px; font-size: 15px; } }
+/* condensed header: the shadow is a separate layer that fades in (opacity), not an animated box-shadow */
+.site-header, .site-header.scrolled { box-shadow: none; }
+.site-header::before { content: ""; position: absolute; inset-inline: 0; top: 100%; height: 14px; background: linear-gradient(rgba(0,32,32,.22), rgba(0,32,32,0)); opacity: 0; pointer-events: none; }
+.site-header.scrolled:not(.hide)::before { opacity: 1; }
+
+/* ---------- footer ---------- */
+.site-footer { padding-top: 18px; }
+.site-footer .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.site-footer h3 { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.site-footer .logo-box { display: inline-flex; align-items: center; padding: 8px 12px; margin: 0 0 8px; border-radius: 10px; max-width: none; }
+.site-footer .logo-box img { height: 28px; }
+.site-footer .cols > div:first-child > p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,.86);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.site-footer .social { display: flex; flex-wrap: nowrap; gap: 8px; margin: 0; }
+.site-footer .social li { margin: 0; }
+.site-footer .social a { width: 44px; height: 44px; border-radius: 50%; }
+/* links as wrapping chips */
+.site-footer .two-col { columns: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+.site-footer .two-col li { margin: 0; break-inside: auto; }
+.site-footer .two-col li a, .site-footer .two-col #pwa-foot .pwa-foot-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 9px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; font-size: 13.5px; line-height: 1.3; color: #fff; text-decoration: none; text-wrap: nowrap; }
+.site-footer .two-col li a:active, .site-footer .two-col #pwa-foot .pwa-foot-btn:active { background: rgba(255,255,255,.12); }
+/* contact: one row of buttons (19340 gold, phone, email), the address as one muted line */
+.site-footer .cols > div:last-child > ul { display: flex; flex-wrap: wrap; gap: 8px; }
+.site-footer .cols > div:last-child li { margin: 0; flex: 1 1 auto; display: flex; }
+.site-footer .f-lbl { display: none; }
+.site-footer .cols > div:last-child li > a { flex: 1; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.28); font: 800 15px/1.2 "Titillium Web", "Cairo", sans-serif; color: #fff; text-decoration: none; white-space: nowrap; }
+.site-footer .cols > div:last-child li.f-hot > a { background: var(--gold); border-color: var(--gold); color: var(--teal-ink); font-size: 17px; }
+.site-footer .cols > div:last-child li.f-mail > a { font-size: 0; }
+.site-footer .cols > div:last-child li.f-mail > a::before { content: "الإيميل"; font: 700 14.5px/1.2 "Cairo", sans-serif; }
+.site-footer .cols > div:last-child li.f-addr { order: 9; flex-basis: 100%; }
+.site-footer .f-addr > a, .site-footer .cols > div:last-child li.f-addr > a { justify-content: flex-start; min-height: 28px; padding: 0; border: 0; border-radius: 0; font: 600 13.5px/1.5 "Cairo", sans-serif; color: rgba(255,255,255,.8); white-space: normal; text-decoration: underline; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 3px; }
+.site-footer .copyright { margin-top: 10px; padding-top: 10px; padding-inline: 8px; text-wrap: balance; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,.85); }
+.site-footer .copyright .f-legal { margin-top: 2px; }
+/* the room under the copyright clears the bar and its raised donate circle (bar 74px + circle 24px) with 4px to spare */
+body.has-mbar .site-footer .copyright { padding-bottom: calc(14px + 88px + env(safe-area-inset-bottom)); }
+
+/* ---------- bottom bar: one grey for inactive items, labels that fit their cells ---------- */
+.m-bar { grid-template-columns: repeat(5, minmax(0, 1fr)); bottom: max(10px, env(safe-area-inset-bottom)); }
+.m-bar a span, .m-bar button span { font-size: 12.5px; font-weight: 700; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-inline: 2px; box-sizing: border-box; }
+.m-bar a, .m-bar button { min-width: 0; }
+/* the donate label sits on the same baseline as the other four labels */
+.m-bar .m-donate { padding-bottom: 12px; }
+/* donors: a red dot on the menu (its sheet opens with "مرسال كوميونيتي") until the community page is seen */
+.m-bar .m-menu.has-gift::after { content: ""; position: absolute; top: 9px; inset-inline-end: calc(50% - 20px); width: 9px; height: 9px; border-radius: 50%; background: #d63031; border: 2px solid #fff; }
+.m-bar .m-menu.has-gift::before { content: ""; position: absolute; top: 7px; inset-inline-end: calc(50% - 22px); width: 13px; height: 13px; border-radius: 50%; background: rgba(214,48,49,.45); opacity: 0; pointer-events: none; }
+body.menu-open .m-bar .m-menu.has-gift::after, body.menu-open .m-bar .m-menu.has-gift::before { display: none; }
+
+/* ---------- install card: a slim 64px strip ---------- */
+body .pwa-card:not(.pwa-ios) { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 12px; padding-inline-end: 48px; min-height: 64px; max-height: 64px; box-sizing: border-box; border-radius: 18px; inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)); }
+body .pwa-card:not(.pwa-ios) .pwa-app, body .pwa-card:not(.pwa-ios) .pwa-app img { width: 36px; height: 36px; border-radius: 10px; }
+body .pwa-card:not(.pwa-ios) .pwa-body { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+body .pwa-card:not(.pwa-ios) .pwa-body b { font-size: 15px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+body .pwa-card:not(.pwa-ios) .pwa-body p, body .pwa-card:not(.pwa-ios) .pwa-later, body .pwa-card .pwa-long { display: none; }
+body .pwa-card:not(.pwa-ios) .pwa-btns { flex: none; }
+body .pwa-card:not(.pwa-ios) .pwa-btns .btn { min-height: 40px; padding: 0 18px; }
+body .pwa-card:not(.pwa-ios) .pwa-x { top: 50%; margin-top: -22px; }
+
+/* ---------- safe area (notches, iOS home indicator; every value is 0 on Android and desktop) ---------- */
+.site-header { padding-top: env(safe-area-inset-top); }
+.m-sheet { top: calc(60px + env(safe-area-inset-top)); }
+.s-sum { top: calc(64px + env(safe-area-inset-top)); }
+.wrap { padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); }
+.z-bar { inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)); }
+body .wa-float { inset-inline-end: max(14px, env(safe-area-inset-left), env(safe-area-inset-right)); }
+
+/* ---------- large text (130% / 200%) ---------- */
+.skip-link, .skip-link:focus { top: 0; }
+.skip-link { transform: translateY(-120%); }
+.skip-link:focus { transform: none; }
+.home .camp .camp-give { height: auto; min-height: 46px; white-space: normal; line-height: 1.2; padding-block: 4px; }
+
+/* ---------- 404: the bottom bar already carries home / donate / zakat ---------- */
+body.has-mbar .nf-actions { display: none; }
+
+/* ---------- motion (phone, MWP3) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .site-header::before { transition: opacity .25s ease; }
+  .m-bar .m-menu.has-gift::before { animation: m-ping 2s ease-out 1s 3; }
+  .site-footer .two-col li a, .site-footer .cols > div:last-child li > a { transition: transform .12s, background-color .2s; }
+  .site-footer .two-col li a:active, .site-footer .cols > div:last-child li > a:active { transform: scale(.96); }
+}

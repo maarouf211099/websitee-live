@@ -970,6 +970,7 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .home .hf-shares a.reveal, .home .services .svc.reveal { transition: opacity .4s ease, transform .5s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
   /* the side cards on donate rise once (they already carry .reveal from layout.js) */
   .donate-page .side-ads > .reveal { transition: opacity .45s ease, transform .5s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+}
 /* ===================================================================
    MWP7 deferred
    =================================================================== */
@@ -978,3 +979,117 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   html .m-trust-static[hidden] { display: block !important; margin: 24px 16px; }
   html .m-trust-static h3 { margin-top: 0; }
 }
+
+/* =================================================================== Polish 3 (Fable): header hotline, bottom bar, heartbeat, live counters
+   Owner feedback: the 19340 pill in the header, the bottom bar, and "the counter and the heart should pulse in an
+   eye-catching, interactive way". Additive on the blocks above: the 19340 becomes a real white call button with a
+   gold phone badge, the bottom bar a cleaner floating card with a solid teal capsule under the lit icon, the gold
+   heart beats continuously (double beat + two rings that grow and fade), squashes on press and bursts hearts on tap
+   (layout.js), and the counters pop with a gold bloom and a digit bounce when they land. Every animation is
+   transform/opacity only (rings are pseudo-elements that scale and fade; no box-shadow or filter animates), so the
+   continuous beat stays on the compositor. Under reduced motion everything here is static. No layout shift: the bar
+   keeps its 64px height and bottom offset, so the hero's gold button still clears it on the first screen. */
+@media (max-width: 760px) {
+  /* ---------- header: 19340 as a call button (white pill, gold phone badge, "الخط الساخن" caption) ---------- */
+  .site-header .hdr-tel { position: relative; height: 44px; gap: 8px; padding-inline: 5px 14px; border-radius: 999px; background: #fff; color: var(--teal-ink);
+    font: 800 17px/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .4px;
+    box-shadow: 0 1px 2px rgba(0,32,32,.18), 0 10px 22px -10px rgba(0,32,32,.55), inset 0 0 0 1px rgba(0,89,89,.06); }
+  .site-header .hdr-tel svg { width: 34px; height: 34px; padding: 9px; box-sizing: border-box; border-radius: 50%; stroke: var(--teal-ink); stroke-width: 2.5; fill: none;
+    background: linear-gradient(150deg, #ffe08a 0%, var(--gold) 45%, var(--gold-dark) 100%); box-shadow: 0 2px 6px -1px rgba(233,173,12,.6); }
+  .site-header .hdr-tel b { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font-weight: 800; letter-spacing: .4px; }
+  .site-header .hdr-tel b::before { content: "الخط الساخن"; font: 700 10.5px/1 "Cairo", sans-serif; letter-spacing: 0; color: var(--teal-text); }
+  .site-header .hdr-tel:active { transform: scale(.95); }
+  @media (max-width: 359px) { .site-header .hdr-tel { gap: 6px; padding-inline: 4px 11px; font-size: 16px; } .site-header .hdr-tel svg { width: 30px; height: 30px; padding: 7px; } .site-header .hdr-tel b::before { display: none; } }
+
+  /* ---------- bottom bar: floating white card, bolder labels, a solid teal capsule under the lit icon ---------- */
+  .m-bar { --pad: 6px; inset-inline: 12px; padding: 0 var(--pad); border-radius: 26px; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,48,48,.06), 0 18px 40px -14px rgba(0,48,48,.5), 0 0 0 1px rgba(0,89,89,.08); }
+  .m-bar a, .m-bar button { gap: 3px; color: #5c6a6a; border-radius: 20px; }
+  .m-bar a span, .m-bar button span { font-size: 12px; font-weight: 800; }
+  .m-bar svg { width: 24px; height: 24px; stroke-width: 2.1; }
+  /* the pill (.m-ind, slides with transform) is now a 52x31 capsule centred on the icon; the lit icon turns white on it */
+  .m-bar .m-ind { top: 0; height: 64px; border-radius: 0; background: none; }
+  .m-bar .m-ind::before { content: ""; position: absolute; top: 8px; left: 50%; width: 52px; height: 31px; margin-left: -26px; border-radius: 999px;
+    background: linear-gradient(135deg, #00a9aa 0%, var(--teal-text) 55%, #005f60 100%); box-shadow: 0 6px 14px -6px rgba(0,120,121,.8); }
+  .m-bar .on, body.menu-open .m-bar .m-menu { color: var(--teal-text); }
+  .m-bar .on svg, body.menu-open .m-bar .m-menu svg { color: #fff; transform: none; }
+  .m-bar .on span, body.menu-open .m-bar .m-menu span { color: var(--teal-text); }
+  .m-bar .m-donate span { color: var(--teal-dark); }
+  /* the gold heart: 62px, a brighter gradient, a thin gold halo line (static) */
+  .m-bar .m-donate i { top: -26px; width: 62px; height: 62px; border: 4px solid #fff; background: linear-gradient(150deg, #ffe08a 0%, var(--gold) 45%, var(--gold-dark) 100%);
+    box-shadow: 0 2px 4px rgba(0,48,48,.1), 0 12px 26px -6px rgba(233,173,12,.8), 0 0 0 1px rgba(233,173,12,.4); z-index: 2; }
+  .m-bar .m-donate i svg { width: 28px; height: 28px; }
+  .m-bar .m-donate i::after { content: none; } /* the MWP3 three-ping halo: replaced by the two rings below */
+  /* two rings behind the heart (grow and fade; transform/opacity): static and invisible until the motion block below */
+  .m-bar .m-donate::before, .m-bar .m-donate::after { content: ""; position: absolute; top: 5px; left: 50%; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; opacity: 0; pointer-events: none; z-index: 1; }
+  .m-bar .m-donate::before { border: 2px solid rgba(254,200,48,.95); }
+  .m-bar .m-donate::after { background: rgba(254,200,48,.45); }
+  /* the hearts that burst out on a tap (layout.js adds .p3-hearts with --x/--y per heart, then removes it) */
+  .m-bar .m-donate .p3-hearts { position: absolute; top: 5px; left: 50%; width: 0; height: 0; pointer-events: none; z-index: 3; }
+  .m-bar .m-donate .p3-hearts i { position: absolute; top: -7px; left: -7px; width: 14px; height: 14px; border: 0; border-radius: 0; background: none; box-shadow: none; opacity: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fec830' d='M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z'/%3E%3C/svg%3E") center / contain no-repeat; }
+  .m-bar .m-donate .p3-hearts i:nth-child(even) { width: 10px; height: 10px; top: -5px; left: -5px; }
+
+  /* ---------- counters: a gold bloom behind the number (pseudo, opacity) and room for the pop ---------- */
+  .odo { position: relative; isolation: isolate; }
+  .odo::after { content: ""; position: absolute; inset: -12px -18px; z-index: -1; border-radius: 999px; opacity: 0; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(254,200,48,.55), rgba(254,200,48,0)); }
+  .home .facts b.odo::after, .camp .camp-num.odo::after { background: radial-gradient(closest-side, rgba(254,200,48,.4), rgba(254,200,48,0)); }
+  /* the campaign bar's gold thumb gets a ring that pulses with it once the clock lands */
+  .home .camp .bar.seg em::after { content: ""; position: absolute; inset: -5px; border-radius: 10px; border: 2px solid var(--gold); opacity: 0; pointer-events: none; }
+  .home .camp.is-done .bar.seg em::after { border-color: var(--teal); }
+}
+
+/* ---------- motion (phone, Polish 3): transform/opacity only; the heart and the thumb are the only infinite ones ---------- */
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  /* header: the phone badge rings every 5s (1.2s of movement) */
+  .site-header .hdr-tel { transition: transform .15s; }
+  .site-header .hdr-tel svg { animation: p3-ring-call 5s ease-in-out 2s infinite; }
+  /* bottom bar: lit icon pops in, taps squash */
+  .m-bar .on svg { animation: p3-icon-in .5s var(--bounce); }
+  /* the heartbeat: a double beat every 1.6s, the rings grow out of it */
+  .m-bar .m-donate i { animation: p3-beat 1.6s ease-in-out infinite; transform-origin: 50% 50%; }
+  .m-bar .m-donate i svg { animation: p3-beat-inner 1.6s ease-in-out infinite; }
+  .m-bar .m-donate::before { animation: p3-ring 1.6s cubic-bezier(.2,.6,.3,1) infinite; }
+  .m-bar .m-donate::after { animation: p3-ring-fill 1.6s cubic-bezier(.2,.6,.3,1) .25s infinite; }
+  /* press: squash and hold; release/tap: a burst (bigger pop, both rings fly out, the hearts scatter) */
+  .m-bar .m-donate:active i { animation: p3-squash .22s ease-out forwards; }
+  .m-bar .m-donate.burst i { animation: p3-burst .6s var(--bounce); }
+  .m-bar .m-donate.burst::before { animation: p3-ring-burst .55s ease-out; }
+  .m-bar .m-donate.burst::after { animation: p3-ring-burst .45s ease-out .05s; }
+  .m-bar .m-donate .p3-hearts i { animation: p3-fly .75s cubic-bezier(.2,.7,.3,1) forwards; animation-delay: var(--t, 0s); }
+  /* the page is hidden (tab in background): the beat pauses */
+  html.p3-paused .m-bar .m-donate i, html.p3-paused .m-bar .m-donate i svg, html.p3-paused .m-bar .m-donate::before, html.p3-paused .m-bar .m-donate::after, html.p3-paused .site-header .hdr-tel svg { animation-play-state: paused; }
+  /* counters: when the odometer lands (.done from home.js countUp, .filled from the campaign clock) the number
+     pops, a gold bloom blooms and fades behind it, and the digits hop in turn from the units digit up */
+  .odo.done, .camp.filled .camp-num { animation: p3-cnt-pop .6s var(--bounce); }
+  .odo.done::after, .camp.filled .camp-num::after { animation: p3-bloom 1s ease-out; }
+  .odo.done .od, .camp.filled .camp-num .od { animation: p3-digit .5s var(--bounce) calc(var(--i, 0) * 50ms) both; }
+  .camp.filled .camp-pct { animation: p3-cnt-pop .6s var(--bounce) .1s; }
+  /* the campaign thumb keeps a soft pulse after its landing bounce; its ring pulses with it */
+  .home .camp.filled .bar.seg em { animation: tipBounce .9s var(--spring) 1, p3-thumb 2.2s ease-in-out 1s infinite; }
+  .home .camp.filled .bar.seg em::after { animation: p3-ring 2.2s cubic-bezier(.2,.6,.3,1) 1s infinite; }
+  /* the hospital progress: the figures and the % pill pop once the bar has filled */
+  .home .hf-progress.reveal.in p b { animation: p3-cnt-pop .55s var(--bounce) .55s both; }
+  .home .hf-progress.reveal.in .hf-pct { animation: p3-cnt-pop .55s var(--bounce) .7s both; }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .site-header .hdr-tel svg, .m-bar .m-donate i, .m-bar .m-donate i svg, .m-bar .m-donate::before, .m-bar .m-donate::after, .m-bar .m-donate .p3-hearts i,
+  .odo.done, .odo.done::after, .odo.done .od, .camp.filled .camp-num, .camp.filled .camp-num::after, .camp.filled .camp-num .od, .camp.filled .camp-pct,
+  .home .camp.filled .bar.seg em, .home .camp.filled .bar.seg em::after, .home .hf-progress.reveal.in p b, .home .hf-progress.reveal.in .hf-pct { animation: none; }
+  .m-bar .m-donate::before, .m-bar .m-donate::after, .m-bar .m-donate .p3-hearts { display: none; }
+}
+@keyframes p3-ring-call { 0%, 24%, 100% { transform: rotate(0); } 4% { transform: rotate(-14deg); } 8% { transform: rotate(12deg); } 12% { transform: rotate(-10deg); } 16% { transform: rotate(8deg); } 20% { transform: rotate(-4deg); } }
+@keyframes p3-icon-in { from { transform: scale(.7); } 60% { transform: scale(1.12); } to { transform: none; } }
+@keyframes p3-beat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.09); } 24% { transform: scale(1); } 36% { transform: scale(1.14); } 56% { transform: scale(1); } }
+@keyframes p3-beat-inner { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.08); } 24% { transform: scale(.98); } 36% { transform: scale(1.18); } 56% { transform: scale(1); } }
+@keyframes p3-ring { 0% { transform: scale(.9); opacity: .9; } 100% { transform: scale(1.85); opacity: 0; } }
+@keyframes p3-ring-fill { 0% { transform: scale(.85); opacity: .6; } 100% { transform: scale(1.55); opacity: 0; } }
+@keyframes p3-squash { to { transform: scale(.84, .88); } }
+@keyframes p3-burst { 0% { transform: scale(.84, .88); } 45% { transform: scale(1.22); } 100% { transform: scale(1); } }
+@keyframes p3-ring-burst { 0% { transform: scale(.9); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+@keyframes p3-fly { 0% { transform: translate(0, 0) scale(.3); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--x, 0), var(--y, -40px)) scale(1.1); opacity: 0; } }
+@keyframes p3-cnt-pop { 0% { transform: scale(1); } 45% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes p3-bloom { 0% { opacity: 0; transform: scale(.5); } 35% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes p3-digit { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16%); } }
+@keyframes p3-thumb { 0%, 100% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.3); } }

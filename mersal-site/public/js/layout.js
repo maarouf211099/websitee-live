@@ -455,6 +455,17 @@
     });
   }
 
+  // Faster page-to-page moves: browsers that support speculation rules prefetch a same-site page as soon as a finger
+  // or the pointer lands on its link (moderate), so the next page is usually ready when the tap ends. Never the
+  // admin, the API or links with a query (donate links carry amounts/purposes and must load fresh).
+  try {
+    if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+      var sr = document.createElement("script"); sr.type = "speculationrules";
+      sr.textContent = JSON.stringify({ prefetch: [{ source: "document", where: { and: [{ href_matches: "/*" }, { not: { href_matches: "/admin/*" } }, { not: { href_matches: "/api/*" } }, { not: { href_matches: "/*\\?*" } }] }, eagerness: "moderate" }] });
+      document.head.appendChild(sr);
+    }
+  } catch (e) { /* no speculation rules: links behave as before */ }
+
   // A tap on a link to the page you are on (الرئيسية on the home page, the logo, a lit bar item) scrolls to the top
   // instead of reloading it; the header comes back. Modifier and middle clicks keep their browser meaning.
   document.addEventListener("click", function (e) {

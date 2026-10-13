@@ -249,8 +249,8 @@ async function requireAdmin(req, perm) {
 // Paths the admin may read/write, relative to the site root
 const ALLOWED = [
   /^public\/index\.html$/,
-  /^public\/(contact|afia|zakat|donate|albums|volunteer|help)\.html$/,
-  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community|news|impact|announce|partners)\.json$/,
+  /^public\/(contact|afia|zakat|donate|albums|volunteer|help|gift|news)\.html$/,
+  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community|news|impact|announce|partners|texts)\.json$/,
   /^public\/p\/\d{1,4}\.html$/, /^public\/js\/layout\.js$/,
   /^public\/img\/uploads\/[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif)$/,
 ];

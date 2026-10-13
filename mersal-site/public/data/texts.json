@@ -1,0 +1,140 @@
+{
+  "_note": "نصوص الرئيسية وأزرار المبالغ في صفحة التبرع (تبويب «نصوص الموقع» في اللوحة). الحفظ من اللوحة بيكتبها جوه index.html و donate.html؛ لو عدّلت الملف يدوياً شغّل: node tools/render-home.js. {hotline} = الخط الساخن، {banks} = عدد البنوك.",
+  "home": {
+    "quick": {
+      "title": "ساهم مع مرسال",
+      "trust": "دفع آمن ومشفّر · فيزا · ميزة",
+      "amounts": [100, 250, 500, 1000],
+      "default": 500,
+      "offlineLabel": "بنك CIB - بالجنيه",
+      "offlineNumber": "100034654454"
+    },
+    "trust": {
+      "items": [
+        { "icon": "pin", "title": "فروع من القاهرة لسوهاج", "sub": "اتبرع في أقرب فرع", "link": "/p/46.html", "show": "all" },
+        { "icon": "bank", "title": "حسابات رسمية في {banks}", "sub": "الأهلي · مصر · CIB", "link": "/donate.html#bank", "show": "all" },
+        { "icon": "receipt", "title": "رقم متابعة لتبرعك", "sub": "بالكارت أو بتسجيل تحويلك", "link": "/donate.html#online", "show": "online" },
+        { "icon": "receipt", "title": "رقم متابعة لتبرعك", "sub": "بتسجيل تحويلك", "link": "/donate.html#bank", "show": "offline" },
+        { "icon": "phone", "title": "اسألنا قبل ما تتبرع", "sub": "الخط الساخن {hotline}", "link": "tel:{hotline}", "show": "all" }
+      ],
+      "ways": [
+        { "label": "إنستاباي", "code": "", "image": "/img/old/3536unnamed-1c52e3b3.png", "w": 20, "h": 20, "link": "/donate.html#wallets" },
+        { "label": "فوري", "code": "9200", "image": "/img/old/98894335english-logo-copy-f5f96cd8.png", "w": 63, "h": 20, "link": "/donate.html#wallets" },
+        { "label": "فودافون كاش", "code": "", "image": "/img/old/4542logo-pic-9eed272a.jpg", "w": 54, "h": 20, "link": "/donate.html#wallets" }
+      ]
+    },
+    "campaigns": {
+      "eyebrow": "حملات مفتوحة دلوقتي",
+      "title": "التبرعات",
+      "sub": "اختار حملة، حدّد عدد الأسهم، وتبرعك يوصل لمستحقيه."
+    },
+    "niyya": {
+      "eyebrow": "على نيتك",
+      "title": "تحب تبرعك يكون إيه؟",
+      "sub": "اختار نيتك، وإحنا نوصّلها لمستحقيها.",
+      "items": [
+        { "icon": "zakat", "title": "زكاة مالي", "sub": "احسبها وأخرجها في دقيقة", "link": "/zakat.html", "highlight": true },
+        { "icon": "heart", "title": "صدقة", "sub": "توصل كاملة لمستحقيها", "link": "/donate.html?for=sadaqa#online", "highlight": false },
+        { "icon": "hospital", "title": "صدقة جارية", "sub": "سهم في مستشفى مرسال للأطفال بـ\u00a0500\u00a0جنيه", "link": "/donate.html?for=p30&amount=500#online", "highlight": false },
+        { "icon": "moon", "title": "على روح حد غالي", "sub": "صدقة باسمه وكارت لأهله", "link": "/gift.html?occasion=soul", "highlight": false },
+        { "icon": "gift", "title": "فرحة لحد بتحبه", "sub": "تبرع هدية باسمه أو بمناسبة شفاء", "link": "/gift.html", "highlight": false }
+      ]
+    },
+    "about": {
+      "eyebrow": "من نحن",
+      "title": "مرسال…",
+      "mark": "فتح باب أمل جديد",
+      "text": "مرسال مؤسسة خيرية غير هادفة للربح تعمل في مجال الصحة، تسعى لتقديم كافة أنواع الرعاية الطبية بجودة عالية لكل من يحتاجها من غير القادرين بدون أي تفرقة، من خلال شبكة من الأطباء والمستشفيات المتعاقدة مع مرسال.",
+      "values": [
+        { "title": "المريض أولاً", "text": "له الأولوية المطلقة في المؤسسة" },
+        { "title": "الخصوصية", "text": "خصوصية المريض ميثاق شرف" },
+        { "title": "علاج بلا تمييز", "text": "باب مفتوح لجميع المرضى" },
+        { "title": "الشفافية", "text": "بنوضّحلك تبرعك بيروح فين" }
+      ],
+      "button": "اعرف أكثر عن مرسال",
+      "link": "/p/3.html",
+      "image": "/img/old/43img-7521-9c813483.jpg",
+      "imageSm": "/img/old/43img-7521-9c813483-sm.jpg",
+      "w": 1600,
+      "h": 1067,
+      "alt": "متطوعين مرسال بسترات المؤسسة",
+      "capEyebrow": "#ابعت_فرحة",
+      "capTitle": "متطوعين مرسال في الميدان",
+      "capText": "ناس زيّك قرروا يوصّلوا الفرحة بإيديهم"
+    },
+    "numbers": { "title": "مرسال بالأرقام" },
+    "hospital": {
+      "campaign": "p30",
+      "status": "تحت الإنشاء · نكمّل الحلم سوا",
+      "image": "/img/old/1-ce3f944d.jpg",
+      "imageSm": "/img/old/1-ce3f944d-sm.jpg",
+      "w": 1200,
+      "h": 900,
+      "alt": "طفلة على سرير مستشفى (صورة تعبيرية)",
+      "eyebrow": "الحلم اللي بنكمله سوا",
+      "title": "مستشفى",
+      "mark": "مرسال للأطفال",
+      "text": "بنبني مستشفى متكاملة لعلاج حالات الأطفال الحرجة من سن يوم لحد 18 سنة، فيها وحدة زرع نخاع ومعمل تحاليل وقسم أشعة وصيدلية.",
+      "facts": [
+        { "value": 5000, "label": "متر مربع" },
+        { "value": 35, "label": "سرير إقامة" },
+        { "value": 8, "label": "أسرّة عناية مركزة" },
+        { "value": 6, "label": "عيادات خارجية" }
+      ],
+      "dua": "صدقة جارية، ربنا يجعل أجرها ليك ولحبايبك طول ما المستشفى بتعالج أطفال.",
+      "shares": [
+        { "amount": 500, "label": "سهم أجهزة طبية", "tag": "" },
+        { "amount": 1000, "label": "سهم عام", "tag": "" },
+        { "amount": 25000, "label": "متر وقف خيري", "tag": "صدقة جارية" }
+      ],
+      "donate": "ساهم في بناء المستشفى",
+      "gift": "اجعلها على روح حد غالي",
+      "more": "تفاصيل المستشفى ←",
+      "moreLink": "/p/30.html"
+    },
+    "services": {
+      "eyebrow": "إزاي بنساعد",
+      "title": "خدمات مرسال",
+      "sub": "خدمات طبية واجتماعية متكاملة للمرضى غير القادرين وأسرهم.",
+      "items": [
+        { "icon": "pill", "title": "خدمة العلاج الشهري", "text": "أدوية شهرية للمرضى أصحاب الأمراض المزمنة.", "link": "/p/37.html" },
+        { "icon": "stethoscope", "title": "الكشف الطبي والفحوصات", "text": "كشوفات وتحاليل وأشعة للمرضى غير القادرين.", "link": "/p/38.html" },
+        { "icon": "hospital", "title": "العمليات الجراحية", "text": "تغطية تكاليف العمليات بالمستشفيات المتعاقدة.", "link": "/p/39.html" },
+        { "icon": "debt", "title": "سداد ديون المرضى", "text": "سداد مديونيات العلاج عن المرضى المتعثرين.", "link": "/p/40.html" },
+        { "icon": "wheelchair", "title": "المستلزمات الطبية", "text": "أجهزة ومستلزمات طبية لمن يحتاجها.", "link": "/p/41.html" },
+        { "icon": "home", "title": "كفالات أسر المرضى", "text": "دعم اجتماعي شهري لأسر المرضى.", "link": "/p/42.html" }
+      ]
+    },
+    "projects": { "eyebrow": "شغلنا على الأرض", "title": "مشاريع مرسال" },
+    "ways": {
+      "eyebrow": "اختار اللي يريحك",
+      "title": "طرق التبرع",
+      "sub": "بالكارت، فوري، إنستاباي، محفظة، أو مندوب لحد البيت. وتبرعك بيوصل لمستحقيه.",
+      "items": [
+        { "icon": "card", "image": "", "title": "بطاقة بنكية", "sub": "فيزا · ماستركارد · ميزة", "link": "/donate.html#online", "show": "online" },
+        { "icon": "bank", "image": "", "title": "تحويل بنكي", "sub": "CIB · الإمارات دبي · العربي الأفريقي", "link": "/donate.html#bank", "show": "all" },
+        { "icon": "card", "image": "/img/old/98894335english-logo-copy-f5f96cd8.png", "title": "فوري", "sub": "كود مرسال 9200", "link": "/donate.html#wallets", "show": "all" },
+        { "icon": "card", "image": "/img/old/4542logo-pic-9eed272a.jpg", "title": "رسالة SMS", "sub": "ابعت \"مرسال\" على 9599 بـ 5 جنيه", "link": "sms:9599?body=مرسال", "show": "all" },
+        { "icon": "card", "image": "/img/old/3536unnamed-1c52e3b3.png", "title": "إنستاباي والمحافظ", "sub": "فودافون كاش وغيرها", "link": "/donate.html#wallets", "show": "all" },
+        { "icon": "phone", "image": "", "title": "مندوب لحد البيت", "sub": "اتصل على 19340", "link": "tel:19340", "show": "all" },
+        { "icon": "globe", "image": "", "title": "من خارج مصر", "sub": "GLS Bank - ألمانيا", "link": "/donate.html#abroad", "show": "all" }
+      ]
+    },
+    "slogan": {
+      "ayah": "وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا",
+      "cite": "سورة المائدة، آية 32",
+      "text": "كل تبرع بيرسم ابتسامة على وش مريض. ابعت فرحة لمرضى مرسال بالكارت، أو فوري، أو إنستاباي، أو مندوب لحد البيت.",
+      "button": "ابعت فرحة دلوقتي",
+      "link": "/donate.html#online",
+      "hotTitle": "مندوبنا يوصلك لحد باب البيت",
+      "hotSub": "الخط الساخن",
+      "branchesLabel": "الفروع",
+      "branchesText": "عناوين فروع مرسال",
+      "branchesLink": "/p/46.html"
+    }
+  },
+  "donate": {
+    "amounts": [100, 250, 500, 1000, 2500, 5000],
+    "default": 500
+  }
+}

@@ -970,4 +970,11 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .home .hf-shares a.reveal, .home .services .svc.reveal { transition: opacity .4s ease, transform .5s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
   /* the side cards on donate rise once (they already carry .reveal from layout.js) */
   .donate-page .side-ads > .reveal { transition: opacity .45s ease, transform .5s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+/* ===================================================================
+   MWP7 deferred
+   =================================================================== */
+/* case-verification steps on donate and zakat (static markup, hidden on desktop; site.css hides [hidden] with !important) */
+@media (max-width: 760px) {
+  html .m-trust-static[hidden] { display: block !important; margin: 24px 16px; }
+  html .m-trust-static h3 { margin-top: 0; }
 }

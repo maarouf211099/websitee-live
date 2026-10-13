@@ -233,6 +233,8 @@
       if (Object.prototype.hasOwnProperty.call(LEGACY_FOR, want)) want = LEGACY_FOR[want];
       want = want.replace(/[^\w-]/g, "");
       if (!want || !sel || !sel.querySelector) return;
+      var nc = window.mersalNotCause; // a page that is not a cause never becomes a purpose option
+      if (nc && nc.test(want) && !sel.querySelector('option[value="' + want + '"]')) return;
       if (sel.querySelector('option[value="' + want + '"]')) { sel.value = want; return; }
       // a project page (p<id>) that is not in the short list: add it, named like the page, and select it
       if (!/^p\d{1,4}$/.test(want)) return;

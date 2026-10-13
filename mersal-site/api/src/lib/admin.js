@@ -55,11 +55,13 @@ async function settings() {
   return data;
 }
 const primeSettings = (data) => { settingsCache = { data, at: Date.now() }; };
-// Merge patch into settings.json (fresh read, retried when another commit lands first) and cache the result
+// Merge patch into settings.json (fresh read, retried when another commit lands first) and cache the result.
+// patch may be a function (fresh settings) -> patch, for changes that depend on the current file (the users list).
 async function saveSettings(patch, message, author) {
   let merged = null;
   const sha = await retry(commitFiles, async () => {
-    merged = Object.assign({}, await readSettingsFresh(), patch);
+    const cur = await readSettingsFresh();
+    merged = Object.assign({}, cur, typeof patch === "function" ? patch(cur) : patch);
     return [{ path: SETTINGS, content: JSON.stringify(merged, null, 2) + "\n" }];
   }, message, author);
   primeSettings(merged);
@@ -83,7 +85,8 @@ const sign = async (payload) => crypto.createHmac("sha256", await signingKey()).
 async function makeToken(user, auth) {
   const key = await signingKey(), now = Date.now();
   // strictly after sessionsValidAfter, even within the same millisecond as the change that moved it
-  const iat = Math.max(now, (Number((await settings()).sessionsValidAfter) || 0) + 1);
+  const s = await settings(), u = userOf(s, user);
+  const iat = Math.max(now, (Number(s.sessionsValidAfter) || 0) + 1, (u ? Number(u.validAfter) || 0 : 0) + 1);
   const payload = Buffer.from(JSON.stringify({ u: user, iat, auth: auth || iat, exp: now + TTL * 1000 })).toString("base64url");
   return payload + "." + crypto.createHmac("sha256", key).update(payload).digest("base64url");
 }
@@ -191,18 +194,55 @@ async function loginFailed(req) {
 }
 function loginOk(req) { attempts.delete(limits.clientIp(req)); }
 
+// ---- console users and permissions ----
+// The main account (ADMIN_USER) can do everything, including managing the other users. Other users live in
+// settings.json "users": { name: { hash, perms, disabled?, validAfter, created, by } } with the same peppered hash as the
+// main password; each one gets only the parts of the console in its perms. validAfter (bumped by a password change, a
+// disable or a reset) ends that user's sessions. Reading the public data files needs only a login; every save needs the perm.
+const PERMS = ["content", "site", "donations", "requests", "settings"];
+const USER_RE = /^[a-z0-9][a-z0-9._-]{2,31}$/;
+const normUser = (u) => String(u || "").trim().toLowerCase();
+const isOwnerName = (u) => !!u && safeEq(String(u), adminUser());
+function userOf(s, name) {
+  if (!name || isOwnerName(name)) return null;
+  const all = s && s.users && typeof s.users === "object" ? s.users : {};
+  return Object.prototype.hasOwnProperty.call(all, normUser(name)) ? all[normUser(name)] : null;
+}
+const cleanPerms = (list) => PERMS.filter((k) => Array.isArray(list) && list.includes(k));
+// A user created on another instance in the last minute is not in this instance's cache yet: read again (at most every 5 s)
+let lastMiss = 0;
+async function findUser(name) {
+  let u = userOf(await settings(), name);
+  if (!u && Date.now() - lastMiss > 5000) { lastMiss = Date.now(); const d = await readSettingsFresh(); primeSettings(d); u = userOf(d, name); }
+  return u;
+}
+// "owner" | "user" | null
+async function checkLogin(user, pass) {
+  if (!user || !pass) return null;
+  if (isOwnerName(user)) return (await verifyPassword(user, pass)) ? "owner" : null;
+  const u = await findUser(user);
+  if (!u || u.disabled || !u.hash) { await scrypt(pass, "x"); return null; } // same cost as a real check
+  return (await checkHash(pass, u.hash)) ? "user" : null;
+}
+
 // Only the console's own signed cookie counts (no client-supplied identity headers)
 async function principal(req) {
   const t = await readToken(cookies(req)[COOKIE]);
   if (!t) return null;
   const renew = Date.now() - t.iat > RENEW_AFTER * 1000 && Date.now() - t.auth < MAX_AGE * 1000;
-  return { userDetails: t.u, userRoles: ["admin"], via: "password", auth: t.auth, renew };
+  const base = { userDetails: t.u, via: "password", auth: t.auth, renew };
+  if (isOwnerName(t.u)) return { ...base, owner: true, perms: PERMS.concat("users"), userRoles: ["admin"] };
+  const u = await findUser(t.u);
+  if (!u || u.disabled || t.iat <= (Number(u.validAfter) || 0)) return null;
+  return { ...base, userDetails: normUser(t.u), owner: false, perms: cleanPerms(u.perms), userRoles: ["editor"] };
 }
 
-// Returns the principal or throws a 401 error (503 when GitHub cannot be read to check the session)
-async function requireAdmin(req) {
+// Returns the principal or throws a 401 error (503 when GitHub cannot be read to check the session).
+// perm: the part of the console the request touches ("users" = the main account only); 403 when this user lacks it.
+async function requireAdmin(req, perm) {
   const p = await principal(req);
   if (!p) throw httpError(401, "يلزم تسجيل الدخول");
+  if (perm && !p.perms.includes(perm)) throw httpError(403, "الحساب ده مالوش صلاحية على الجزء ده، كلّم الأدمن الرئيسي");
   return p;
 }
 
@@ -280,6 +320,6 @@ async function commitFiles(files, message, author) {
 const json = (status, body) => ({ status, headers: { "Cache-Control": "no-store" }, jsonBody: body });
 const fail = (e, ctx) => { if (ctx && (e.status || 500) >= 500) ctx.error(e); return json(e.status || 500, { message: e.message }); };
 
-module.exports = { principal, requireAdmin, readFile, commitFiles, checkPath, fileExists, json, fail, SITE_ROOT,
+module.exports = { principal, requireAdmin, checkLogin, findUser, userOf, normUser, isOwnerName, cleanPerms, PERMS, USER_RE, readFile, commitFiles, checkPath, fileExists, json, fail, SITE_ROOT,
   makeToken, sessionCookie, sessionFor, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk,
   TTL, MAX_AGE, githubReady, setupHint, hashState, settings, saveSettings, clientIp: limits.clientIp, cookies, _attempts: attempts };

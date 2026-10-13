@@ -310,7 +310,7 @@
     for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';
     return '<article class="card camp' + (st ? " is-" + st : "") + '" data-pct="' + pct.toFixed(1) + '" data-raised="' + raised + '" data-unit="' + price + '" data-max="' + (Number(c.maxUnits) || 50) + '" style="--p:0">' +
       // the image link is a duplicate of the title link (hidden from AT); the price badge and the state chip sit beside it so they are read
-      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 104px, (max-width: 1179px) 40vw, 400px" : "" }) + "</a>" +
+      '<div class="camp-media"><a class="camp-img" href="' + esc(link) + '" tabindex="-1" aria-hidden="true">' + window.mersalPic(c.imageSm || c.image, { alt: "", w: 900, h: 900, srcset: c.imageSm ? [[c.imageSm, "600w"], [c.image, "900w"]] : null, sizes: c.imageSm ? "(max-width: 760px) 84vw, (max-width: 1179px) 40vw, 400px" : "" }) + "</a>" +
         (price ? '<span class="camp-badge">' + esc(badge) + "</span>" : "") + (hot ? '<span class="camp-hot">' + hot + "</span>" : "") + "</div>" +
       '<div class="body"><h3><a href="' + esc(link) + '">' + esc(c.title) + "</a></h3>" +
         (c.impact ? '<p class="camp-impact">' + esc(c.impact) + "</p>" : "") +
@@ -336,8 +336,8 @@
     var count = document.getElementById("camp-count"), open = list.filter(function (c) { return !(c.status === "done" || (c.goal && (c.raised || 0) >= c.goal)); }).length;
     if (count) count.textContent = open + (open === 1 ? " حملة" : open === 2 ? " حملتين" : open <= 10 ? " حملات" : " حملة");
     if (!track.dataset.wired) { carouselArrows(track); track.dataset.wired = "1"; }
-    // phones show the campaigns as a vertical list (css/mobile.css): no dots and no snapped-card focus effect there
-    if (!phone) trackDots(track, document.getElementById("camp-dots"));
+    // phones: a swipeable card carousel (css/mobile.css) with dots and the snapped-card focus effect
+    trackDots(track, document.getElementById("camp-dots"));
     // one clock drives the number, the percentage, the bar and its thumb: the bar and the % pill take
     // exactly as long as the odometer (units digit first, leftmost digit last), so all three settle together
     function animate(card, delay) {
@@ -359,16 +359,22 @@
     function revealAll() {
       if (revealed) return; revealed = true;
       cards.forEach(function (c, i) { if (reduceMotion) c.classList.add("in"); else setTimeout(function () { c.classList.add("in"); }, i * 120); });
+      // phones: once the cards are in, the row nudges toward the next card and back (shows that it swipes);
+      // not when the visitor already swiped it
+      if (phone && !reduceMotion && cards.length > 1) setTimeout(function () {
+        if (Math.abs(track.scrollLeft) > 4) return;
+        track.classList.add("nudge");
+        track.addEventListener("animationend", function () { track.classList.remove("nudge"); }, { once: true });
+      }, 900);
     }
     if ("IntersectionObserver" in window) {
-      // threshold .01: a card's counters start as soon as any of it shows, so no visible row reads "0 اتوفرت".
-      // Phones (a vertical list): each row rises in when it reaches the screen, staggered within the batch
+      // threshold .01: a card's counters start as soon as any of it shows, so no visible card reads "0 اتوفرت"
       var io = new IntersectionObserver(function (en) {
         var i = 0;
         en.forEach(function (e) {
           if (!e.isIntersecting) return;
           var d = i++ * 120, card = e.target;
-          if (phone) { if (reduceMotion) card.classList.add("in"); else setTimeout(function () { card.classList.add("in"); }, d); } else revealAll();
+          revealAll();
           animate(card, d); io.unobserve(card);
         });
       }, { threshold: .01 });

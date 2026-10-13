@@ -53,9 +53,11 @@
   function pick(v, f) { return Array.isArray(v) ? v[f ? 1 : 0] : v; }
   function toLabel(occ, gender) { var l = pick(OCC[occ].toLabel, gender === "f"); return occ === "recovery" && gender === "f" ? "اسم اللي ربنا شفاها" : occ === "birthday" && gender === "f" ? "اسم صاحبة عيد الميلاد" : l; }
 
+  // "٥٠٠" / "1,000" / "۵۰۰" -> "500" (Arabic-keyboard digits count like Latin ones)
+  function asciiNum(v) { return String(v == null ? "" : v).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 0x660; }).replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 0x6f0; }).replace(/٫/g, ".").replace(/[^\d.]/g, ""); }
   function clean(o) {
     o = o || {};
-    var amount = Math.round(Number(String(o.amount == null ? "" : o.amount).replace(/[^\d.]/g, "")) || 0);
+    var amount = Math.round(Number(asciiNum(o.amount)) || 0);
     if (amount < 1 || amount > 100000000) amount = 0;
     return {
       occasion: OCC[o.occasion] ? o.occasion : "gift", gender: o.gender === "f" ? "f" : "m",
@@ -575,7 +577,7 @@
     els.to.value = str(saved.to, 60);
     els.from.value = str(typeof saved.from === "string" ? saved.from : donor.name, 60);
     els.msg.value = str(saved.msg, 120);
-    if (saved.amount) els.amount.value = parseInt(saved.amount, 10) || "";
+    if (saved.amount) els.amount.value = parseInt(asciiNum(saved.amount), 10) || "";
     if (q.get("amount")) els.amount.value = parseInt(q.get("amount"), 10) || "";
     els.show.checked = !!saved.show;
     var purposesReady = loadPurposes(els.purpose, q.get("for") || saved.purpose).catch(noop);

@@ -303,3 +303,19 @@
   html.rcpt-print .rcpt-rows dt, html.rcpt-print .rcpt-rows dd { border-color: #999; }
   html.rcpt-print .rcpt-head h2, html.rcpt-print .rcpt-rows dd, html.rcpt-print .rcpt-next a { color: #000; }
 }
+
+/* donate card stepper (js/donate.js): inline errors rise 4px once, the "هيظهر اسمك: فاعل خير" line and the hint for
+   numbers abroad sit under their field, a payment that could not start shows right above the pay button */
+#pay-form .f-err { animation: err-rise .22s var(--ease, ease) both; }
+@keyframes err-rise { from { opacity: 0; transform: translateY(4px); } }
+#pay-form .f-err a { color: inherit; text-decoration: underline; }
+#pay-form .field-hint, #pay-form .anon-note { margin: 4px 0 0; }
+#pay-form .anon-note:empty { margin: 0; }
+#pay-form .field-hint bdi { unicode-bidi: isolate; }
+#pay-form input:disabled { background: var(--bg-2, #f4f6f6); color: var(--muted, #5b6b6b); }
+#pay-form .pay-alert { margin: 4px 0 14px; }
+#pay-form .pay-alert p, #pay-result .alert > p:first-child { margin: 0; }
+#pay-form .pay-alert a[href^="tel:"]:not(.btn) { color: inherit; text-decoration: underline; font-weight: 800; }
+#pay-form .pay-alert .gw-alt, #pay-result .alert .gw-alt { margin: 12px 0 0; }
+#pay-result #pay-retry { margin-top: 12px; }
+#pay-form .pay-alert .gw-alt .btn, #pay-result .alert .gw-alt .btn { margin-block: 0; } /* site.css widens inline tel: links in alerts with a negative margin; not these buttons */

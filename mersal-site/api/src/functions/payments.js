@@ -18,7 +18,7 @@ app.http("adminReconcile", {
   methods: ["POST"], authLevel: "anonymous", route: "console/donations/reconcile",
   handler: async (req, ctx) => {
     try {
-      await requireAdmin(req);
+      await requireAdmin(req, "donations");
       if (!donations.enabled()) return json(409, { message: "مراجعة العمليات محتاجة DONATIONS_STORAGE (Azure Table) في إعدادات Azure" });
       if (!pay.ready("mpgs") && !pay.ready("paymob")) return json(409, { message: "مفيش بوابة دفع متظبطة في Azure (إعدادات Paymob أو بنك مصر MPGS_MERCHANT / MPGS_API_PASSWORD)" });
       const res = await orders.reconcile({ log: (...a) => ctx.warn(...a) });

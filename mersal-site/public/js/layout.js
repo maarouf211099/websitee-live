@@ -280,9 +280,35 @@
     setInd(onIdx);
     window.mersalBarInd = setInd;
     barItems.forEach(function (el, i) {
-      if (el.tagName !== "A" || /^tel:/.test(el.getAttribute("href") || "")) return;
+      // (Polish 3: not the heart, whose capsule would show under it on the way to donate)
+      if (el.tagName !== "A" || /^tel:/.test(el.getAttribute("href") || "") || el.classList.contains("m-donate")) return;
       el.addEventListener("click", function () { setInd(i); });
     });
+    // Polish 3: a tap on the gold heart bursts (css/mobile.css .burst: the heart pops, the rings fly out, seven small
+    // hearts scatter) with a short haptic tick; the page then goes to the same donate target 240ms later so the burst
+    // is seen. Modifier/middle clicks, reduced motion and a heart that links to the page you are on keep their plain
+    // behaviour (the same-page tap scrolls to the top via the document handler below).
+    var p3Reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (mdn && !p3Reduce) mdn.addEventListener("click", function (e) {
+      if (e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      var old = mdn.querySelector(".p3-hearts"); if (old) old.remove();
+      var hearts = document.createElement("b"); hearts.className = "p3-hearts"; hearts.setAttribute("aria-hidden", "true");
+      for (var k = 0; k < 7; k++) {
+        var h = document.createElement("i"), ang = (-165 + k * 25) * Math.PI / 180, dist = 36 + (k % 2) * 14;
+        h.style.setProperty("--x", (Math.cos(ang) * dist).toFixed(1) + "px"); h.style.setProperty("--y", (Math.sin(ang) * dist).toFixed(1) + "px"); h.style.setProperty("--t", (k % 3) * 40 + "ms");
+        hearts.appendChild(h);
+      }
+      mdn.appendChild(hearts);
+      mdn.classList.remove("burst"); void mdn.offsetWidth; mdn.classList.add("burst");
+      setTimeout(function () { mdn.classList.remove("burst"); hearts.remove(); }, 900);
+      if (window.mersalTap) window.mersalTap(12);
+      var u; try { u = new URL(mdn.href, location.href); } catch (x) { return; }
+      if (u.origin !== location.origin || u.pathname.replace(/index\.html$/, "") === location.pathname.replace(/index\.html$/, "")) return;
+      e.preventDefault();
+      setTimeout(function () { location.assign(mdn.href); }, 240);
+    });
+    // the continuous beat pauses while the tab is in the background (css: html.p3-paused)
+    document.addEventListener("visibilitychange", function () { document.documentElement.classList.toggle("p3-paused", document.hidden); });
   }
 
   // Header: shadow once the page scrolls; on phones it slides away while scrolling down and comes back on scroll up

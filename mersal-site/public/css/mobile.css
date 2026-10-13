@@ -345,48 +345,59 @@ body.has-mbar .nf-actions { display: none; }
 .home .ts-lead[hidden] { display: block !important; }
 .home .ts-lead { font: 800 14.5px/1.5 "Cairo", sans-serif; color: var(--teal-ink); margin: 0 0 8px; }
 
-/* ---------- campaigns: a vertical list of rows ---------- */
-.home .camp-carousel { margin-inline: 0; }
-.home .camp-carousel .car-track { display: grid; grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); gap: 12px; overflow: visible; padding: 2px 0 4px; scroll-snap-type: none; }
+/* ---------- campaigns: a swipeable card carousel (owner, Oct 13: «تحت بعضه مش حلو ومفيش انميشن») ----------
+   One big card in focus with the next one peeking in, dots under it. The poster fills the top of the card with the
+   price and the state chip on it; the numbers, bar and the gold button underneath. Motion (transform/opacity only):
+   the cards rise in one after another, the track nudges once to show it swipes, the card in focus grows while its
+   neighbours step back, and its poster settles from a slight zoom. */
+.home .camp-carousel { margin-inline: -16px; }
+.home .camp-carousel .car-track { display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: min(84%, 340px); gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; padding: 6px 16px 16px; }
 .home .camp-carousel .car-track::after { display: none; }
-.home .camp-carousel .car-arrow, .home #camp-dots { display: none; }
-.home .camp { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: start; gap: 0 12px; padding: 12px; border-radius: 18px; box-shadow: 0 10px 28px -18px rgba(0,48,48,.4); border: 1px solid var(--line); }
-.home .camp-media { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
-.home .camp-img { border-radius: 12px; overflow: hidden; background: var(--teal-soft); }
-.home .camp-img::after { display: none; }
-.home .camp-img img { width: 104px; height: 104px; aspect-ratio: 1 / 1; object-fit: contain; background: var(--teal-soft); }
-/* the price and the state are static chips under the poster: nothing covers its printed headline */
-.home .camp-badge, .home .camp-hot { position: static; justify-content: center; text-align: center; padding: 5px 6px; line-height: 1.25; border-radius: 8px; box-shadow: none; }
-.home .camp-badge { background: var(--teal-dark); color: var(--gold); font-size: 12.5px; white-space: nowrap; padding-inline: 2px; letter-spacing: -.2px; }
-.home .camp-hot { background: var(--teal-soft); font-size: 12.5px; gap: 4px; }
-.home .camp .body { padding: 0; gap: 6px; min-width: 0; }
-.home .camp h3 { font-size: 17.5px; line-height: 1.35; margin: 0; }
+.home .camp-carousel .car-track > .camp { scroll-snap-align: start; scroll-snap-stop: always; }
+.home .camp-carousel .car-arrow { display: none; }
+.home #camp-dots { display: flex; margin-top: 2px; }
+.home #camp-dots i { transition: width .3s cubic-bezier(.2,.7,.2,1), background .3s; }
+.home .camp { display: flex; flex-direction: column; padding: 0; border-radius: 22px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 16px 34px -22px rgba(0,48,48,.5); }
+.home .camp-media { position: relative; display: block; }
+.home .camp-img { display: block; aspect-ratio: 5 / 4; overflow: hidden; background: var(--teal-soft); border-radius: 0; }
+.home .camp-img::after { content: ""; display: block; position: absolute; inset: auto 0 0; height: 46%; background: linear-gradient(to top, rgba(0,40,40,.55), rgba(0,40,40,0)); pointer-events: none; }
+.home .camp-img img, .home .camp-img picture { display: block; width: 100%; height: 100%; }
+.home .camp-img img { aspect-ratio: auto; object-fit: cover; object-position: 50% 32%; background: var(--teal-soft); }
+.home .camp-badge, .home .camp-hot { position: absolute; z-index: 1; display: inline-flex; align-items: center; gap: 5px; line-height: 1.2; border-radius: 999px; box-shadow: 0 6px 16px -8px rgba(0,0,0,.45); }
+.home .camp-badge { inset-inline-start: 12px; bottom: 12px; padding: 6px 12px; background: var(--gold); color: var(--teal-ink); font-size: 14px; font-weight: 800; white-space: nowrap; letter-spacing: 0; }
+.home .camp-hot { inset-inline: 12px auto; top: 12px; bottom: auto; padding: 6px 11px; background: rgba(255,255,255,.94); font-size: 13px; font-weight: 800; }
+.home .camp .body { display: flex; flex-direction: column; flex: 1; padding: 14px 16px 16px; gap: 8px; min-width: 0; }
+.home .camp h3 { font-size: 19px; line-height: 1.35; margin: 0; }
 .home .camp h3 a { color: var(--teal-ink); text-decoration: none; }
 .home .camp .camp-impact { display: none; }
-.home .camp .camp-stat { flex-wrap: wrap; gap: 2px 6px; }
-.home .camp .camp-num { font-size: 24px; }
-@media (max-width: 374px) { .home .camp .camp-stat .camp-pct { display: none; } } /* the bar carries the share; the row stays one line */
-.home .camp .camp-stat .camp-pct { font-size: 14px; padding: 4px 8px; }
-.home .camp .bar.seg { height: 10px; margin: 2px 0 0; }
+.home .camp .camp-stat { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; }
+.home .camp .camp-num { font-size: 28px; }
+.home .camp .camp-stat .camp-pct { margin-inline-start: auto; font-size: 14px; padding: 4px 9px; }
+.home .camp .bar.seg { height: 10px; margin: 0; }
 .home .camp .bar.seg em { height: 16px; width: 8px; margin-inline-start: -4px; }
-.home .camp .camp-foot { flex-wrap: wrap; gap: 0 10px; font-size: 13.5px; }
-.home .camp .camp-first { font-size: 14px; font-weight: 700; color: var(--teal-text); }
-/* one gold button per row, the custom amount right under it */
+.home .camp .camp-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 10px; font-size: 13.5px; }
+.home .camp .camp-first { font-size: 15px; font-weight: 700; color: var(--teal-text); margin: 4px 0 2px; }
+.home .camp .camp-proof { margin: 0; }
 .home .camp .camp-qty, .home .camp .camp-links { display: none; }
-/* the gold button and «مبلغ تاني؟» share one row: the body is a 2-column grid, everything else spans both */
-.home .camp .body { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; }
-.home .camp .body > * { grid-column: 1 / -1; }
-.home .camp .body > .camp-cta { grid-column: 1; }
-.home .camp .body > .camp-other { grid-column: 2; }
-.home .camp .camp-cta, .home .camp .camp-cta.single { grid-template-columns: minmax(0, 1fr); margin-top: 2px; }
-.home .camp .camp-give { min-height: 44px; height: auto; font-size: 15px; }
-.home .camp .camp-other { display: inline-flex; align-items: center; justify-content: center; margin: 2px 0 0; padding: 0 2px; min-height: 44px; box-sizing: border-box; font-size: 0; text-decoration: none; }
-.home .camp .camp-other::before { content: "مبلغ تاني؟"; font: 700 14px/1.2 "Cairo", sans-serif; text-decoration: underline; text-underline-offset: 3px; }
-/* under 360px the text column is too narrow for both: «مبلغ تاني؟» drops under the button */
-@media (max-width: 359px) {
-  .home .camp .body > .camp-cta, .home .camp .body > .camp-other { grid-column: 1 / -1; }
-  .home .camp .camp-other { min-height: 40px; margin: 0; }
+.home .camp .camp-cta, .home .camp .camp-cta.single { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: auto; padding-top: 4px; }
+.home .camp .camp-give { min-height: 48px; height: auto; font-size: 16px; border-radius: 14px; }
+.home .camp .camp-other { display: flex; align-items: center; justify-content: center; margin: -2px 0 -6px; min-height: 40px; font-size: 14px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 359px) { .home .camp-carousel .car-track { grid-auto-columns: 86%; } .home .camp .camp-num { font-size: 24px; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the poster of the card in focus settles from a slight zoom; the others wait zoomed in */
+  .home .camp .camp-img img { transition: transform .9s cubic-bezier(.2,.7,.2,1); transform: scale(1.08); }
+  .home .camp.in.is-snapped .camp-img img, .home .car-track:not(:has(.is-snapped)) > .camp.in .camp-img img { transform: none; }
+  /* the chips pop in after the card */
+  .home .camp .camp-badge, .home .camp .camp-hot { transition: opacity .4s .35s, transform .5s .35s cubic-bezier(.3,1.5,.5,1); }
+  .home .camp:not(.in) .camp-badge, .home .camp:not(.in) .camp-hot { opacity: 0; transform: scale(.6); }
+  /* press feedback */
+  .home .camp .camp-give { transition: transform .15s; }
+  .home .camp .camp-give:active { transform: scale(.97); }
+  /* once, when the cards are in: the row slides a little toward the next card and back (it swipes) */
+  .home .camp-carousel .car-track.nudge { animation: camp-nudge 1.1s .2s cubic-bezier(.4,0,.2,1) both; }
 }
+@keyframes camp-nudge { 0%, 100% { transform: none; } 40% { transform: translateX(34px); } 70% { transform: translateX(-6px); } }
 
 /* ---------- impact calculator (home): one column of rows, 4 shown, the rest behind a button ---------- */
 .home #impact-calc .ic-tiles { grid-template-columns: minmax(0, 1fr); gap: 6px; }

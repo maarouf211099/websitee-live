@@ -150,3 +150,13 @@ code { background: #e4f3f3; padding: 2px 8px; border-radius: 6px; direction: ltr
 .u-perm span { grid-column: 2; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
 .u-form { max-width: 760px; }
 .u-item { display: block; }
+
+/* ---- site texts tab (tabs/texts.js): one collapsible card per section ---- */
+.tx-sec { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 16px; background: #fbfdfd; padding: 10px 14px; }
+.tx-sec > summary { cursor: pointer; padding: 4px 0; list-style-position: inside; }
+.tx-sec[open] > summary { margin-bottom: 6px; }
+.tx-sec .list { margin-bottom: 6px; }
+/* footer links in the site tab: one row each (name, link, buttons) */
+.item.flink { grid-template-columns: 1fr 1.3fr auto; align-items: end; padding: 8px 12px; gap: 10px; }
+.item.flink .item-actions { grid-column: auto; flex-wrap: nowrap; }
+@media (max-width: 860px) { .item.flink { grid-template-columns: 1fr; } .item.flink .item-actions { grid-column: 1 / -1; } }

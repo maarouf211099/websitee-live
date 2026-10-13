@@ -66,6 +66,7 @@
   <section class="quick-bar">
     <div class="wrap">
       <form class="hero-card only-online quick-donate" id="quick-donate" action="/donate.html" method="get">
+        <!-- mersal:t-quick -->
         <div class="qd-text"><b>ساهم مع مرسال</b><span class="qd-trust"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>دفع آمن ومشفّر · فيزا · ميزة</span></div>
         <div class="amounts" role="group" aria-label="المبلغ">
           <button type="button" data-v="100" aria-pressed="false" aria-label="100 جنيه">100</button>
@@ -74,14 +75,19 @@
           <button type="button" data-v="1000" aria-pressed="false" aria-label="1,000 جنيه">1,000</button>
           <label class="amt-other"><span>مبلغ تاني</span><input id="qd-other" type="text" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="اكتب المبلغ" aria-label="اكتب مبلغ تاني بالجنيه"><span>جنيه</span></label>
         </div>
+        <!-- /mersal:t-quick -->
         <p class="qd-impact" id="qd-impact" aria-live="polite">بـ 500 جنيه: جرعة في علاج مرضى الأورام</p>
         <p class="qd-alt">من غير كارت: <a href="/donate.html#wallets">إنستاباي أو فوري</a> · <a href="/donate.html#bank">تحويل بنكي</a></p>
+        <!-- mersal:t-quick-go -->
         <input type="hidden" id="qa" name="amount" value="500">
         <button class="btn btn-gold qd-go" type="submit">تبرع بـ <b id="qd-amt">500</b> ج</button>
+        <!-- /mersal:t-quick-go -->
       </form>
       <div class="hero-card quick-offline only-offline">
         <div class="qo-item"><span>الخط الساخن - مندوب لحد البيت</span><a href="tel:19340" data-site-href="hotline"><b data-site="hotline">19340</b></a></div>
+        <!-- mersal:t-quick-offline -->
         <div class="qo-item"><span>بنك CIB - بالجنيه</span><span><code>100034654454</code> <button class="copy" type="button" data-copy="100034654454">نسخ</button></span></div>
+        <!-- /mersal:t-quick-offline -->
         <a class="btn btn-gold" href="/donate.html">كل طرق التبرع</a>
       </div>
     </div>
@@ -91,6 +97,7 @@
     <div class="wrap">
       <p class="ts-lead" hidden>مرسال مؤسسة خيرية طبية بتعالج غير القادرين: علاج شهري، كشوفات، عمليات وأورام</p>
       <h2 id="ts-title" class="sr-only">ليه تطمن لمرسال</h2>
+      <!-- mersal:t-trust -->
       <ul class="ts-grid" role="list">
         <li><a class="ts-tile" href="/p/46.html"><span class="ts-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><span><b>فروع من القاهرة لسوهاج</b><small>اتبرع في أقرب فرع</small></span></a></li>
         <li><a class="ts-tile" href="/donate.html#bank"><span class="ts-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg></span><span><b>حسابات رسمية في <span data-bank-count>7</span> <span data-bank-word>بنوك</span></b><small>الأهلي · مصر · CIB</small></span></a></li>
@@ -103,12 +110,15 @@
         <a href="/donate.html#wallets"><picture><source type="image/webp" srcset="/img/old/98894335english-logo-copy-f5f96cd8.webp"><img src="/img/old/98894335english-logo-copy-f5f96cd8.png" alt="" width="63" height="20" loading="lazy" decoding="async"></picture><span>فوري <b dir="ltr">9200</b></span></a>
         <a href="/donate.html#wallets"><picture><source type="image/webp" srcset="/img/old/4542logo-pic-9eed272a.webp"><img src="/img/old/4542logo-pic-9eed272a.jpg" alt="" width="54" height="20" loading="lazy" decoding="async"></picture><span>فودافون كاش</span></a>
       </div>
+      <!-- /mersal:t-trust -->
     </div>
   </section>
 
   <section class="campaigns-sec" id="campaigns-sec">
     <div class="wrap">
+      <!-- mersal:t-campaigns -->
       <div class="section-title split camp-title"><div><span class="eyebrow live">حملات مفتوحة دلوقتي</span><h2>التبرعات <small class="count" id="camp-count"></small></h2></div><p>اختار حملة، حدّد عدد الأسهم، وتبرعك يوصل لمستحقيه.</p></div>
+      <!-- /mersal:t-campaigns -->
       <div class="carousel camp-carousel">
         <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8249;</button>
         <div class="car-track" id="donation-campaigns"></div>
@@ -120,6 +130,7 @@
 
   <section class="niyya-sec" id="niyya" aria-labelledby="niyya-h">
     <div class="wrap">
+      <!-- mersal:t-niyya -->
       <div class="section-title split"><div><span class="eyebrow">على نيتك</span><h2 id="niyya-h">تحب تبرعك يكون إيه؟</h2></div><p>اختار نيتك، وإحنا نوصّلها لمستحقيها.</p></div>
       <ul class="niyya" role="list">
         <li class="n-zakat"><a href="/zakat.html"><span class="n-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h6"/></svg></span><b>زكاة مالي</b><small>احسبها وأخرجها في دقيقة</small></a></li>
@@ -128,6 +139,7 @@
         <li><a href="/gift.html?occasion=soul"><span class="n-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.4 6.4 0 0 0 10 10z M17.5 4.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg></span><b>على روح حد غالي</b><small>صدقة باسمه وكارت لأهله</small></a></li>
         <li><a href="/gift.html"><span class="n-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-7-4-6 0M12 7c2-4 7-4 6 0"/></svg></span><b>فرحة لحد بتحبه</b><small>تبرع هدية باسمه أو بمناسبة شفاء</small></a></li>
       </ul>
+      <!-- /mersal:t-niyya -->
     </div>
   </section>
 
@@ -135,6 +147,7 @@
 
   <section class="about-intro">
     <div class="wrap grid grid-2" style="align-items:center">
+      <!-- mersal:t-about -->
       <div>
         <span class="eyebrow">من نحن</span>
         <h2 class="big-title">مرسال… <mark>فتح باب أمل جديد</mark></h2>
@@ -151,13 +164,16 @@
         <picture><source type="image/webp" srcset="/img/old/43img-7521-9c813483-sm.webp 600w, /img/old/43img-7521-9c813483-md.webp 1000w, /img/old/43img-7521-9c813483.webp 1600w" sizes="(max-width: 760px) 92vw, 460px"><img src="/img/old/43img-7521-9c813483-sm.jpg" srcset="/img/old/43img-7521-9c813483-sm.jpg 600w, /img/old/43img-7521-9c813483-md.jpg 1000w, /img/old/43img-7521-9c813483.jpg 1600w" sizes="(max-width: 760px) 92vw, 460px" alt="متطوعين مرسال بسترات المؤسسة" loading="lazy" decoding="async" width="1600" height="1067"></picture>
         <figcaption><span class="cap-eyebrow">#ابعت_فرحة</span><b>متطوعين مرسال في الميدان</b><span>ناس زيّك قرروا يوصّلوا الفرحة بإيديهم</span></figcaption>
       </figure>
+      <!-- /mersal:t-about -->
     </div>
   </section>
 
 
   <section class="numbers brand-bg" aria-label="مرسال بالأرقام">
     <div class="wrap">
+      <!-- mersal:t-numbers -->
       <h2 class="numbers-title">مرسال بالأرقام</h2>
+      <!-- /mersal:t-numbers -->
       <div class="numbers-grid">
         <a class="num" href="/p/37.html"><b data-count="5000" data-prefix="+">+5,000</b><span>مريض شهرياً في برنامج العلاج الشهري</span></a>
         <a class="num" href="/p/35.html"><b data-count="68">68</b><span>مستشفى دعمتها قوافل مرسال</span></a>
@@ -169,6 +185,7 @@
 
   <section class="hospital-feature">
     <div class="wrap grid grid-2" style="align-items:center">
+      <!-- mersal:t-hospital -->
       <div class="hf-pic" data-illus><span class="hf-status">تحت الإنشاء · نكمّل الحلم سوا</span><picture><source type="image/webp" srcset="/img/old/1-ce3f944d-sm.webp 600w, /img/old/1-ce3f944d.webp 1200w" sizes="(max-width: 760px) 92vw, 560px"><img src="/img/old/1-ce3f944d-sm.jpg" srcset="/img/old/1-ce3f944d-sm.jpg 600w, /img/old/1-ce3f944d.jpg 1200w" sizes="(max-width: 760px) 92vw, 560px" alt="طفلة على سرير مستشفى (صورة تعبيرية)" loading="lazy" width="1200" height="900"></picture></div>
       <div>
         <span class="eyebrow">الحلم اللي بنكمله سوا</span>
@@ -186,12 +203,13 @@
           <a href="/donate.html?for=p30&amp;amount=1000#online"><b>1,000 <small>جنيه</small></b> <span>سهم عام</span></a>
           <a class="waqf" href="/donate.html?for=p30&amp;amount=25000#online"><em>صدقة جارية</em> <b>25,000 <small>جنيه</small></b> <span>متر وقف خيري</span></a>
         </div>
-        <div class="hf-cta">
+        <div class="hf-cta" data-campaign="p30">
           <a class="btn btn-gold" href="/donate.html?for=p30#online">ساهم في بناء المستشفى</a>
           <a class="btn btn-ghost-teal" href="/gift.html?occasion=soul&amp;for=p30">اجعلها على روح حد غالي</a>
           <a class="hf-more" href="/p/30.html">تفاصيل المستشفى ←</a>
         </div>
       </div>
+      <!-- /mersal:t-hospital -->
     </div>
   </section>
 
@@ -199,6 +217,7 @@
 
   <section class="services-sec">
     <div class="wrap">
+      <!-- mersal:t-services -->
       <div class="section-title"><span class="eyebrow">إزاي بنساعد</span><h2>خدمات مرسال</h2><p>خدمات طبية واجتماعية متكاملة للمرضى غير القادرين وأسرهم.</p></div>
       <div class="grid grid-3 services">
         <a class="card svc" href="/p/37.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"/><path d="M7 7l7 7"/></svg></span><h3>خدمة العلاج الشهري</h3><p>أدوية شهرية للمرضى أصحاب الأمراض المزمنة.</p></a>
@@ -208,13 +227,16 @@
         <a class="card svc" href="/p/41.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="17" r="4"/><path d="M8 4h2v7h6l2 6"/></svg></span><h3>المستلزمات الطبية</h3><p>أجهزة ومستلزمات طبية لمن يحتاجها.</p></a>
         <a class="card svc" href="/p/42.html"><span class="svc-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10M10 20v-5h4v5"/></svg></span><h3>كفالات أسر المرضى</h3><p>دعم اجتماعي شهري لأسر المرضى.</p></a>
       </div>
+      <!-- /mersal:t-services -->
     </div>
   </section>
 
 
   <section class="alt" id="projects">
     <div class="wrap">
+      <!-- mersal:t-projects -->
       <div class="section-title"><span class="eyebrow">شغلنا على الأرض</span><h2>مشاريع مرسال</h2></div>
+      <!-- /mersal:t-projects -->
       <div class="carousel">
         <button class="car-arrow car-prev" type="button" aria-label="السابق">&#8249;</button>
         <div class="car-track" id="campaigns"></div>
@@ -227,16 +249,18 @@
 
   <section class="ways-sec">
     <div class="wrap">
+      <!-- mersal:t-ways -->
       <div class="section-title"><span class="eyebrow">اختار اللي يريحك</span><h2>طرق التبرع</h2><p>بالكارت، فوري، إنستاباي، محفظة، أو مندوب لحد البيت. وتبرعك بيوصل لمستحقيه.</p></div>
       <div class="ways-grid">
         <a class="card way2 only-online" href="/donate.html#online"><span class="w-ico"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></span><b>بطاقة بنكية</b><small>فيزا · ماستركارد · ميزة</small></a>
         <a class="card way2" href="/donate.html#bank"><span class="w-ico"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg></span><b>تحويل بنكي</b><small>CIB · الإمارات دبي · العربي الأفريقي</small></a>
         <a class="card way2" href="/donate.html#wallets"><span class="w-ico img"><img src="/img/old/98894335english-logo-copy-f5f96cd8.png" alt="" loading="lazy"></span><b>فوري</b><small>كود مرسال 9200</small></a>
-        <a class="card way2" href="sms:9599?body=مرسال"><span class="w-ico img"><img src="/img/old/4542logo-pic-9eed272a.jpg" alt="" loading="lazy"></span><b>رسالة SMS</b><small>ابعت "مرسال" على 9599 بـ 5 جنيه</small></a>
+        <a class="card way2" href="sms:9599?body=مرسال"><span class="w-ico img"><img src="/img/old/4542logo-pic-9eed272a.jpg" alt="" loading="lazy"></span><b>رسالة SMS</b><small>ابعت &quot;مرسال&quot; على 9599 بـ 5 جنيه</small></a>
         <a class="card way2" href="/donate.html#wallets"><span class="w-ico img"><img src="/img/old/3536unnamed-1c52e3b3.png" alt="" loading="lazy"></span><b>إنستاباي والمحافظ</b><small>فودافون كاش وغيرها</small></a>
         <a class="card way2" href="tel:19340"><span class="w-ico"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><b>مندوب لحد البيت</b><small>اتصل على 19340</small></a>
         <a class="card way2" href="/donate.html#abroad"><span class="w-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><b>من خارج مصر</b><small>GLS Bank - ألمانيا</small></a>
       </div>
+      <!-- /mersal:t-ways -->
     </div>
   </section>
 
@@ -244,6 +268,7 @@
 
   <section class="slogan-band">
     <div class="wrap">
+      <!-- mersal:t-slogan -->
       <blockquote class="ayah" lang="ar"><p><span class="orn" aria-hidden="true">﴿</span>وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا<span class="orn" aria-hidden="true">﴾</span></p><cite>سورة المائدة، آية 32</cite></blockquote>
       <div class="sb-grid">
         <div class="sb-copy">
@@ -264,6 +289,7 @@
           </div>
         </div>
       </div>
+      <!-- /mersal:t-slogan -->
     </div>
   </section>
 

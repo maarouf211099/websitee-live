@@ -45,15 +45,17 @@
     if (!t || !phone || (p !== "paymob" && p !== "app")) return;
     var n = t.lastChild; if (n && n.nodeType === 3) n.nodeValue = "دفع آمن عبر Paymob · فيزا · ماستركارد · ميزة";
   })();
-  // "مبلغ تاني": any whole amount (Arabic or Latin digits); empty goes back to 500
+  // "مبلغ تاني": any whole amount (Arabic or Latin digits); empty goes back to the default amount (the hidden field's
+  // value in the markup, set from the console's "نصوص الموقع" -> api/src/lib/texts.js)
+  var qdDef = parseInt(input.defaultValue, 10) || 500;
   var qdOther = document.getElementById("qd-other");
   if (qdOther) qdOther.addEventListener("input", function () {
     var raw = qdOther.value.replace(/[\u0660-\u0669]/g, function (d) { return d.charCodeAt(0) - 0x0660; }).replace(/[\u06F0-\u06F9]/g, function (d) { return d.charCodeAt(0) - 0x06F0; }).replace(/\D/g, "");
     if (qdOther.value !== raw) qdOther.value = raw;
     var v = parseInt(raw, 10) || 0, chips = form.querySelectorAll(".amounts button");
-    chips.forEach(function (x) { var on = !v && x.dataset.v === "500"; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
+    chips.forEach(function (x) { var on = !v && x.dataset.v === String(qdDef); x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
     qdOther.parentNode.classList.toggle("on", !!v);
-    v = v || 500; input.value = v;
+    v = v || qdDef; input.value = v;
     if (qdAmt) qdAmt.textContent = fmt.format(v);
     qdImpact(v);
   });
@@ -403,12 +405,14 @@
     // (no mersalReveal here: .in + the counters are the cards' entrance; mersalReveal's animation would hold
     // the opacity that the snapped-card focus effect needs)
   }
-  // ---------- hospital: real progress of the p30 campaign (admin data) under the hospital title ----------
+  // ---------- hospital: real progress of its campaign (admin data) under the hospital title ----------
+  // (the campaign code is data-campaign on .hf-cta, from the console's "نصوص الموقع"; p30 when absent)
   // Rendered with the hidden attribute: css/mobile.css shows it on phones (desktop may opt in with one rule).
   function hfProgress(list) {
     var title = document.querySelector(".hospital-feature .big-title"); if (!title) return;
     var old = document.querySelector(".hospital-feature .hf-progress");
-    var c = (list || []).filter(function (x) { return x && x.purpose === "p30" && +x.goal > 0; })[0];
+    var cta = document.querySelector(".hospital-feature [data-campaign]"), code = (cta && cta.getAttribute("data-campaign")) || "p30";
+    var c = (list || []).filter(function (x) { return x && x.purpose === code && +x.goal > 0; })[0];
     if (!c) { if (old) old.remove(); return; }
     var goal = +c.goal, raised = Math.max(0, +c.raised || 0), pct = Math.min(100, raised / goal * 100), unit = c.unit || "سهم", SEGS = 20, segs = "";
     for (var k = 0; k < SEGS; k++) segs += '<i style="--k:' + k + '"></i>';

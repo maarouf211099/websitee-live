@@ -27,12 +27,87 @@
     },
     footer: {
       name: "مؤسسة مرسال للأعمال الخيرية والتنموية",
-      text: "مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم."
+      text: "مساندة الفقراء وذوي الدخول المحدودة في توفير احتياجاتهم الأساسية وإحداث فارق إيجابي في مستوى حياتهم.",
+      stripTitle: "محتاج مساعدة في التبرع؟",
+      stripText: "مندوبنا يوصلك لحد باب البيت",
+      links: [
+        {
+          title: "عن مرسال",
+          href: "/p/3.html"
+        },
+        {
+          title: "اتصل بنا",
+          href: "/contact.html"
+        },
+        {
+          title: "تبرع الآن",
+          href: "/donate.html"
+        },
+        {
+          title: "طلب مساعدة",
+          href: "/help.html"
+        },
+        {
+          title: "مستشفى مرسال",
+          href: "/p/30.html"
+        },
+        {
+          title: "المشاريع",
+          href: "/#projects"
+        },
+        {
+          title: "فروع مرسال",
+          href: "/p/46.html"
+        },
+        {
+          title: "كارت عافية",
+          href: "/afia.html"
+        },
+        {
+          title: "حساب الزكاة",
+          href: "/zakat.html"
+        },
+        {
+          title: "اهدي تبرع أو صدقة على روح",
+          href: "/gift.html"
+        },
+        {
+          title: "الأسئلة الشائعة",
+          href: "/p/51.html"
+        },
+        {
+          title: "أخبار مرسال",
+          href: "/news.html"
+        },
+        {
+          title: "ألبومات الصور",
+          href: "/albums.html"
+        },
+        {
+          title: "فيديوهات",
+          href: "{youtube}"
+        },
+        {
+          title: "سياسة الخصوصية",
+          href: "/privacy.html"
+        },
+        {
+          title: "شروط الاستخدام",
+          href: "/terms.html"
+        }
+      ]
+    },
+    legal: {
+      regNo: "",
+      regYear: "",
+      regBody: "",
+      permitNo: "",
+      permitUntil: ""
     }
   } /* /mersal:site */;
   SITE.social = SITE.social || {}; SITE.footer = SITE.footer || {};
-  // Legal identity (إشهار / fundraising permit): filled in by the owner. Nothing renders while regNo is empty.
-  var LEGAL = { regNo: "", regYear: "", regBody: "", permitNo: "", permitUntil: "" };
+  // Legal identity (إشهار / fundraising permit): SITE.legal, from the console ("بيانات الموقع"). Nothing renders while regNo is empty.
+  var LEGAL = SITE.legal && typeof SITE.legal === "object" ? SITE.legal : { regNo: "", regYear: "", regBody: "", permitNo: "", permitUntil: "" };
   window.MERSAL_LEGAL = LEGAL;
   SITE.onlinePayment = SITE.payMode !== "off";
   // WhatsApp number -> wa.me link (an Egyptian 01xxxxxxxxx number gets the +20 country code)
@@ -114,13 +189,17 @@
     ["/zakat.html", "حاسبة الزكاة"],
     ["/contact.html", "تواصل معنا"]
   ];
-  var FOOT = [
+  // footer links: SITE.footer.links from the console (empty = this built-in list); "{youtube}" (any social key) follows that link
+  var FOOT_DEFAULT = [
     ["/p/3.html", "عن مرسال"], ["/contact.html", "اتصل بنا"], ["/donate.html", "تبرع الآن"], ["/help.html", "طلب مساعدة"],
     ["/p/30.html", "مستشفى مرسال"], ["/#projects", "المشاريع"], ["/p/46.html", "فروع مرسال"],
     ["/afia.html", "كارت عافية"], ["/zakat.html", "حساب الزكاة"], ["/gift.html", "اهدي تبرع أو صدقة على روح"], ["/p/51.html", "الأسئلة الشائعة"],
     ["/news.html", "أخبار مرسال"], ["/albums.html", "ألبومات الصور"], [SITE.social.youtube, "فيديوهات"],
     ["/privacy.html", "سياسة الخصوصية"], ["/terms.html", "شروط الاستخدام"]
-  ].filter(function (n) { return n[0]; });
+  ];
+  var FOOT = (SITE.footer.links && SITE.footer.links.length ? SITE.footer.links.map(function (l) { return [l && l.href, l && l.title]; }) : FOOT_DEFAULT)
+    .map(function (n) { var m = /^\{(\w+)\}$/.exec(n[0] || ""); return m ? [SITE.social[m[1]], n[1]] : n; })
+    .filter(function (n) { return n[0] && n[1]; });
   var here = location.pathname.replace(/index\.html$/, "");
   var PHONE_PATH = "M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z";
 
@@ -155,7 +234,7 @@
   // No h3 in it: the first footer h3 stays the foundation's name.
   var fStrip = document.body.classList.contains("home") || document.querySelector("main .cta-band") || /\/(donate|zakat)\.html$/.test(location.pathname) ? "" :
     '<div class="f-strip"><div class="wrap">' +
-      '<p class="fs-text"><b>محتاج مساعدة في التبرع؟</b><span>مندوبنا يوصلك لحد باب البيت</span></p>' +
+      '<p class="fs-text"><b>' + escA(SITE.footer.stripTitle || "محتاج مساعدة في التبرع؟") + "</b><span>" + escA(SITE.footer.stripText || "مندوبنا يوصلك لحد باب البيت") + "</span></p>" +
       (SITE.hotline ? '<a class="fs-tel" href="tel:' + escA(SITE.hotline) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + PHONE_PATH + '"/></svg>' +
         "<span><small>كلمنا على الخط الساخن</small><b>" + escA(SITE.hotline) + "</b></span></a>" : "") +
       '<div class="fs-btns"><a class="btn btn-gold" href="/donate.html">تبرع الآن</a><a class="btn btn-ghost" href="/zakat.html">احسب زكاتك</a></div>' +
@@ -169,7 +248,7 @@
         (SITE.footer.text ? "<p>" + escA(SITE.footer.text) + "</p>" : "") +
         social() +
       "</div>" +
-      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + escA(n[0]) + '"' + (/^https?:/.test(n[0]) ? ' target="_blank" rel="noopener"' : "") + ">" + n[1] + "</a></li>"; }).join("") + "</ul></div>" +
+      "<div><h3>روابط</h3><ul class=\"two-col\">" + FOOT.map(function (n) { return '<li><a href="' + escA(n[0]) + '"' + (/^https?:/.test(n[0]) ? ' target="_blank" rel="noopener"' : "") + ">" + escA(n[1]) + "</a></li>"; }).join("") + "</ul></div>" +
       "<div><h3>تواصل معنا</h3><ul>" +
         (SITE.address ? '<li class="f-addr"><a href="/p/46.html">' + escA(SITE.address) + "</a></li>" : "") +
         (SITE.hotline ? '<li class="f-hot"><span class="f-lbl">الخط الساخن: </span><a href="tel:' + escA(SITE.hotline) + '">' + escA(SITE.hotline) + "</a></li>" : "") +

@@ -6,11 +6,12 @@ const { app } = require("@azure/functions");
 const { requireAdmin, readFile, commitFiles, fileExists, json, fail, sessionFor, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, githubReady, setupHint, saveSettings, checkLogin, findUser, userOf, normUser, isOwnerName, cleanPerms, PERMS, USER_RE, settings } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
+const texts = require("../lib/texts");
 const pay = require("../lib/pay");
 const paymob = require("../lib/paymob");
 const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 
-const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json" };
+const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json" };
 // what each file must hold (the public pages break on anything else)
 const ARRAYS = ["menu", "albums", "news", "partners"];
 const MAX_JSON = 1024 * 1024;
@@ -34,6 +35,22 @@ function checkData(name, data) {
     else if (typeof v === "string" && LINK_KEYS.test(key || "") && v.trim() && !SAFE_LINK.test(v.trim())) bad = v;
   })(data, "");
   return bad ? "رابط مش مسموح: " + String(bad).slice(0, 80) + " (لازم يبدأ بـ / أو https:// أو tel: أو mailto:)" : null;
+}
+
+// What the texts write into the markup besides themselves: the hotline and phone (data/site.json) and the bank count
+// (data/donate.json). The home page's "من غير بطاقة" account must be one of the official accounts in data/donate.json,
+// so the content permission cannot put an account number on the home page that the site details do not list.
+async function textsContext(data) {
+  const safe = async (path) => { try { return JSON.parse(await readFile(path)); } catch { return null; } };
+  const site = (await safe("public/data/site.json")) || {}, donate = await safe(JSON_FILES.donate);
+  const q = data && data.home && data.home.quick;
+  if (q && q.offlineNumber) {
+    const digits = (t) => String(t || "").replace(/\D/g, "");
+    if (!donate || !(donate.banks || []).some((b) => b && digits(b.number) && digits(b.number) === digits(q.offlineNumber))) {
+      throw Object.assign(new Error("رقم الحساب في صندوق «من غير بطاقة» لازم يكون واحد من الحسابات البنكية في «بيانات الموقع»"), { status: 400 });
+    }
+  }
+  return { hotline: site.hotline || "19340", phone: site.phone || "01200002870", banks: texts.bankCount(donate) };
 }
 
 // &quot; &#39; &lt; &gt; &nbsp; ... &amp; last, so the editor shows (and pages.json stores) plain text
@@ -180,8 +197,10 @@ app.http("adminData", {
       if (!path) return json(404, { message: "ملف غير معروف" });
       if (req.method === "GET") { const text = await readFile(path); return withRev(json(200, JSON.parse(text)), rev(text)); }
       const body = await req.json().catch(() => null);
-      const data = body && body.data;
-      const bad = checkData(name, data);
+      let data = body && body.data;
+      // texts: its own schema (known keys only, every link and image checked, sms: links allowed), see lib/texts.js
+      let bad = name === "texts" ? null : checkData(name, data);
+      if (name === "texts") { const c = texts.clean(data); bad = c.error || (Buffer.byteLength(JSON.stringify(c.data || {})) > MAX_JSON ? "الملف أكبر من 1 ميجا" : null); if (!bad) data = c.data; }
       if (bad) return json(400, { message: bad });
       const base = baseOf(req);
       checkBase(base, base || ""); // 428 when the console sent no revision
@@ -214,6 +233,14 @@ app.http("adminData", {
           }
           const mobileSet = (sl) => (msFor[sl.mobile] ? [{ src: msFor[sl.mobile], w: 1324 }, { src: sl.mobile, w: 1766 }] : null);
           files.push({ path: "public/index.html", content: hero.apply(idx, data, { mobileSet }) });
+        }
+        if (name === "texts") {
+          // the texts are baked into the pages (lib/texts.js) in the same commit, so the file and the pages never drift
+          const ctx = await textsContext(data);
+          for (const [page, file] of [["index", "public/index.html"], ["donate", "public/donate.html"]]) {
+            const html = await readFile(file), out = texts.apply(html, data, ctx, page);
+            if (out !== html) files.push({ path: file, content: out });
+          }
         }
         return files;
       }, String((body && body.message) || `admin: update ${name}`).slice(0, 200), who(p));

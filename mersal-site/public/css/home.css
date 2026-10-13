@@ -459,7 +459,7 @@
   .home .camp:not(.in) { opacity: 0; translate: 0 26px; }
 }
 @media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
-  .home .car-track:has(.is-snapped) > .camp.in:not(.is-snapped) { scale: .94; opacity: .8; }
+  .home .car-track:has(> .is-snapped) > .camp.in:not(.is-snapped) { scale: .94; opacity: .8; }
 }
 .home .quick-donate .amounts button { transition: scale .15s var(--spring), background .2s, color .2s, border-color .2s, box-shadow .2s; }
 .home .quick-donate .amounts button:active, .camp-share:active { scale: .94; }

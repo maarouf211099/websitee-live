@@ -1093,3 +1093,33 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
 @keyframes p3-bloom { 0% { opacity: 0; transform: scale(.5); } 35% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3); } }
 @keyframes p3-digit { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16%); } }
 @keyframes p3-thumb { 0%, 100% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.3); } }
+
+/* =================================================================== Polish 4: cleaner phone header (owner, Oct 13)
+   Owner: «نشيل الخط الساخن 19340 من البار من فوق مع تطوير وتحسين الشكل». The hotline stays one tap away in the
+   bottom bar («اتصل»), the footer and every page's call card, so the header keeps only the logo, the foundation's
+   name, search and the menu. The search and menu buttons become soft glass squircles; a thin gold hairline closes
+   the header. Phone only (this file loads ≤760px); motion is press feedback only. */
+@media (max-width: 760px) {
+  .site-header .hdr-tel { display: none !important; }
+  .site-header { background: linear-gradient(180deg, rgba(0,79,79,.96), rgba(0,89,89,.93)); box-shadow: inset 0 -1px 0 rgba(254,200,48,.35), 0 8px 20px -14px rgba(0,32,32,.7); }
+  .site-header .wrap { gap: 8px; }
+  .site-header .brand { display: flex; align-items: center; gap: 10px; padding: 0; background: none; border-radius: 0; line-height: 1; margin-inline-end: auto; text-decoration: none; }
+  .site-header .brand picture { display: block; padding: 5px 7px; background: #fff; border-radius: 12px; line-height: 0; box-shadow: 0 6px 14px -8px rgba(0,0,0,.45); }
+  .site-header .brand img { height: 36px; }
+  .site-header .brand::after { content: "مؤسسة مرسال\A للأعمال الخيرية والتنموية"; white-space: pre; color: #fff; font: 800 15px/1.35 "Cairo", sans-serif; }
+  .site-header .brand { min-width: 0; flex: 0 1 auto; }
+  .site-header .search-btn, .site-header .menu-toggle { flex: none; width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+  .site-header .menu-toggle[aria-expanded="true"] { background: var(--gold); border-color: var(--gold); }
+  .site-header .menu-toggle[aria-expanded="true"] span { background: var(--teal-ink); }
+}
+@media (max-width: 399px) {
+  .site-header .brand::after { font-size: 13px; }
+  .site-header .brand img { height: 32px; }
+}
+@media (max-width: 339px) {
+  .site-header .brand::after { content: "مؤسسة مرسال"; }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  .site-header .search-btn, .site-header .menu-toggle, .site-header .brand picture { transition: transform .15s; }
+  .site-header .search-btn:active, .site-header .menu-toggle:active, .site-header .brand:active picture { transform: scale(.92); }
+}

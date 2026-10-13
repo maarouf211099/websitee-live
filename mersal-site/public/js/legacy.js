@@ -7,7 +7,9 @@
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   var pid = (/^\/p\/(\d+)\.html$/.exec(location.pathname) || [])[1];
   var forId = pid === "4" || pid === "5" ? "31" : pid; // p4 / p5 are pages of the oncology centre, whose code is p31
-  var donateHref = "/donate.html" + (forId ? "?for=p" + forId : "") + "#online";
+  var notCause = window.mersalNotCause || /^p(3|6|7|26|29|46|47|48|51)$/;
+  var donateHref = "/donate.html" + (forId && !notCause.test("p" + forId) ? "?for=p" + forId : "") + "#online";
+  var isPhone = window.matchMedia && matchMedia("(max-width: 760px)").matches;
 
   // ---------- 1. clean-up of what the old CMS left behind ----------
   if (legacyWrap) {
@@ -177,6 +179,31 @@
     });
   }
 
+  // cause pages: the closing band's gold button earmarks the donation like the side card does
+  if (pid && forId && !notCause.test("p" + forId)) $$("main .cta-band a[href^='/donate.html']").forEach(function (a) { a.href = donateHref; });
+  // phones: a lone donate button under the article repeats the side card's button, so css hides that row
+  if (legacyWrap && document.querySelector(".page-side .side-card.donate")) $$(".do-btn", legacyWrap).forEach(function (b) {
+    var row = b.parentNode;
+    if (row && row !== legacyWrap && row.children.length === 1 && !row.textContent.replace(b.textContent, "").trim()) row.classList.add("do-row");
+  });
+
+  // ---------- 2b. "تبرعك بيروح فين؟" on the about page (phones): the wording of the terms page, sections 3 and 4 ----------
+  if (pid === "3" && isPhone && legacyWrap && !document.getElementById("transparency")) {
+    var tr = document.createElement("section");
+    tr.id = "transparency"; tr.className = "m-trust"; tr.setAttribute("aria-labelledby", "tr-h");
+    tr.innerHTML = '<h2 id="tr-h">تبرعك بيروح فين؟</h2><ul class="m-trust-rows">' +
+      "<li><b>غرض محدد</b><span>لو اخترت غرض محدد بنوجّه تبرعك ليه. ولو الغرض ده اتغطّى بالكامل أو مبقاش متاح، بنوجّه التبرع لأقرب غرض شبهه، أو للتبرع العام حيث الحاجة أكبر.</span></li>" +
+      "<li><b>تبرع عام</b><span>بنوجّه تبرعك للحالات والمشروعات الأكثر احتياجاً وقت التبرع.</span></li>" +
+      '<li><b>الزكاة</b><span>بتتصرف في مصارف الزكاة بس. <a href="/zakat.html#zakat-uses">شوف المصارف ←</a></span></li>' +
+      '<li><b>غلط في التبرع؟</b><span>كلمنا على <a href="tel:19340">19340</a> في أقرب وقت ومعاك رقم العملية، وهنراجع طلبك.</span></li></ul>' +
+      '<h3>كل حالة بتتدرس قبل ما تبرعك يوصلها</h3><ol class="m-steps">' +
+      "<li>بحث اجتماعي مع المريض</li><li>زيارة ميدانية للبيت</li><li>أوراق تثبت الحالة</li><li>لجنة مرتين في الأسبوع فيها طبيب وصيدلي، والقرار بالأغلبية</li></ol>" +
+      '<a class="m-trust-src" href="/p/51.html#collapseGRf">المصدر: الأسئلة الشائعة ←</a>';
+    legacyWrap.parentNode.insertBefore(tr, legacyWrap.nextSibling);
+    if (window.mersalReveal) window.mersalReveal(tr.querySelectorAll(".m-trust-rows li, .m-steps li"));
+    if (location.hash === "#transparency") setTimeout(function () { tr.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }); }, 350);
+  }
+
   // ---------- 3. FAQ accordions (Bootstrap 5 markup) ----------
   $$('.legacy [data-bs-toggle="collapse"]').forEach(function (btn) {
     var sel = btn.getAttribute("data-bs-target") || btn.getAttribute("href");
@@ -269,16 +296,23 @@
       }
 
       var sibs = (parent ? parent.children : []).filter(function (k) { return k.href !== here && /^\/p\/\d+\.html$/.test(k.href || ""); });
+      var relTitle = parent ? parent.title : "";
       if (!sibs.length) {
-        sibs = Object.keys(pages).filter(function (id) { return "/p/" + id + ".html" !== here && pages[id].photo; })
-          .slice(0, 12).map(function (id) { return { href: "/p/" + id + ".html", title: pages[id].title }; });
+        // no siblings: the project group of the menu, else the first group with 3+ pages
+        var isP = function (k) { return /^\/p\/\d+\.html$/.test(k.href || ""); };
+        var grp = tree.filter(function (g) { return g.title === "مشاريع مرسال"; })[0] ||
+          tree.filter(function (g) { return (g.children || []).filter(isP).length >= 3; })[0];
+        if (grp) {
+          sibs = (grp.children || []).filter(function (k) { return k.href !== here && isP(k); });
+          relTitle = grp.title;
+        }
       }
       sibs = sibs.slice(0, 6);
       if (!sibs.length || !main) return;
       var sec = document.createElement("section");
       sec.className = "related";
       sec.setAttribute("aria-label", "صفحات ذات صلة");
-      sec.innerHTML = '<div class="wrap"><div class="section-title"><h2>' + (parent ? esc(parent.title) : "صفحات أخرى") + '</h2></div><div class="grid grid-3">' +
+      sec.innerHTML = '<div class="wrap"><div class="section-title"><h2>' + esc(relTitle || "صفحات أخرى") + '</h2></div><div class="grid grid-3">' +
         sibs.map(function (k) {
           var id = (k.href.match(/(\d+)/) || [])[1], pg = pages[id] || {};
           var d = (pg.desc || "").slice(0, 90);

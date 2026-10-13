@@ -212,7 +212,9 @@
   } catch (e) {}
   if (!/donate\.html$/.test(location.pathname)) {
     var pm = /^\/p\/(\d+)\.html$/.exec(location.pathname), pid = pm ? (pm[1] === "4" || pm[1] === "5" ? "31" : pm[1]) : ""; // p4/p5 = oncology centre (p31)
-    var dHref = "/donate.html" + (pid ? "?for=p" + pid : "") + "#online";
+    var NOT_CAUSE = /^p(3|6|7|26|29|46|47|48|51)$/; // pages that are not causes never earmark a donation
+    window.mersalNotCause = NOT_CAUSE;
+    var dHref = "/donate.html" + (pid && !NOT_CAUSE.test("p" + pid) ? "?for=p" + pid : "") + "#online";
     // Project pages: the side card's own project code (for=p<id> on its gold button) also goes on the ways to give
     // without a card, so a transfer, a wallet payment or a home pickup can still be earmarked for this project
     // (forms.js prefill() selects ?for= in the transfer / pickup form). The generated pages stay untouched.
@@ -220,7 +222,6 @@
     // would be recorded against the FAQ or the branches page (donate.js does not list them either): about, doctors,
     // clinic hours, volunteers (p26, p47), the Afya discount card (p29, a paid service), branches, ways to give, FAQ.
     // p4/p5 (the oncology centre) stay in: forms.js and donate.js map them to p31.
-    var NOT_CAUSE = /^p(3|6|7|26|29|46|47|48|51)$/;
     var sideBtn = document.querySelector(".page-side .side-card.donate a.btn-gold"), sideFor = "";
     try { sideFor = sideBtn ? new URL(sideBtn.href, location.href).searchParams.get("for") || "" : ""; } catch (e) {}
     if (/^p\d+$/.test(sideFor) && !NOT_CAUSE.test(sideFor) && !sideBtn.parentNode.querySelector(".side-ways")) {
@@ -263,6 +264,8 @@
       if (!giftSeen) { var mmg = bar.querySelector(".m-menu"); mmg.classList.add("has-gift"); mmg.setAttribute("aria-label", "القائمة (فيها هداياك كمتبرع)"); }
     }
     document.body.classList.add("has-mbar");
+    var mdn = bar.querySelector(".m-donate"), h1n = document.querySelector(".page-head h1");
+    if (mdn && h1n && pid && !NOT_CAUSE.test("p" + pid)) mdn.setAttribute("aria-label", "تبرع لـ " + h1n.textContent.trim());
     // Active-item pill: --i is the index of the lit item and the pill slides there (transform only). A tap moves it
     // at once, and the cross-document view transition (css: m-ind) carries it into the next page.
     bar.insertAdjacentHTML("afterbegin", '<i class="m-ind" aria-hidden="true"></i>');

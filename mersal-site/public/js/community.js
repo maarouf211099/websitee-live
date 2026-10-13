@@ -17,6 +17,29 @@
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || "null") || fallback; } catch (e) { return fallback; } }
   // Arabic count forms after a number: 1 -> one, 2 -> dual, 3-10 -> plural, 11+ -> singular
   function plural(n, one, two, few) { return n === 1 ? one : n === 2 ? two : n >= 3 && n <= 10 ? few : one; }
+  // first name for the greeting: compound names (عبد الرحمن، أبو بكر، أم كلثوم) keep their second word
+  function firstName(n) {
+    var w = (n || "").trim().split(/\s+/);
+    if (w.length > 1 && /^(عبد|عبدال\S*|أبو|ابو|أم|ام)$/.test(w[0])) return w[0] + " " + w[1];
+    return w[0] || "";
+  }
+  // fit text on at most two lines inside maxW: shrink in 4px steps until it fits; returns the lines drawn at one size
+  function fitText(ctx, text, maxW, sizes) {
+    if (window.MersalGift && typeof MersalGift.fitText === "function") { try { return MersalGift.fitText(ctx, text, maxW, sizes); } catch (e) {} }
+    var wt = sizes.weight || "600", fam = sizes.family || "Cairo, sans-serif", size = sizes.max || 40, min = sizes.min || 24, words = String(text).split(/\s+/), lines;
+    for (; ; size -= 4) {
+      ctx.font = wt + " " + size + "px " + fam;
+      if (ctx.measureText(text).width <= maxW) { lines = [text]; break; }
+      var best = null, bw = Infinity;
+      for (var i = 1; i < words.length; i++) {
+        var a = words.slice(0, i).join(" "), b = words.slice(i).join(" "), m = Math.max(ctx.measureText(a).width, ctx.measureText(b).width);
+        if (m < bw) { bw = m; best = [a, b]; }
+      }
+      if (best && bw <= maxW) { lines = best; break; }
+      if (size - 4 < min) { lines = best || [text]; break; }
+    }
+    return { lines: lines, size: size };
+  }
   var donor = read("mersalDonor", {}), all = read("mersalDonations", []);
   // Only paid donations count: rows from the old demo gateway (nothing was charged) never unlock the page, the
   // totals, the badges or the certificate
@@ -50,7 +73,7 @@
   var first = history[0], last = history[history.length - 1];
   var name = (donor.name || "").trim();
   document.getElementById("cm-initial").textContent = name ? name.trim()[0] : "م";
-  document.getElementById("cm-hello").textContent = name ? "شكراً يا " + name.split(" ")[0] : "شكراً لمساهمتك";
+  document.getElementById("cm-hello").textContent = name ? "شكراً يا " + firstName(name) : "شكراً لمساهمتك";
   document.getElementById("cm-sub").textContent = "عضو في مرسال كوميونيتي من " + new Date(first.date).toLocaleDateString(LOC, { month: "long", year: "numeric" });
 
   var badges = ["أول تبرع ✓"];
@@ -58,13 +81,14 @@
   if (history.some(function (d) { return d.monthly; })) badges.push("متبرع شهري");
   if (total >= 5000) badges.push("داعم ذهبي");
   document.getElementById("cm-badges").innerHTML = badges.map(function (b) { return '<span class="cm-badge"><i></i>' + esc(b) + "</span>"; }).join("");
-  var shares = Math.max(1, Math.round(total / 100));
-  var statVals = [history.length, total, shares];
+  // the third stat is the date of the last donation (no estimated "treatment shares")
+  var lastDay = new Date(last.date).toLocaleDateString(LOC, { day: "numeric", month: "long" });
   document.getElementById("cm-stats").innerHTML =
     '<div class="cm-stat"><b>0</b><span>' + plural(history.length, "تبرع", "تبرعين", "تبرعات") + "</span></div>" +
     '<div class="cm-stat"><b>0</b><span>جنيه ساهمت بيهم</span></div>' +
-    '<div class="cm-stat"><b>0</b><span>' + plural(shares, "سهم", "سهمين", "أسهم") + " علاج تقريباً</span></div>";
-  document.querySelectorAll("#cm-stats b").forEach(function (b, i) { odometer(b, statVals[i]); });
+    '<div class="cm-stat"><b class="cm-date">' + esc(lastDay) + "</b><span>آخر تبرع</span></div>";
+  var statVals = [history.length, total];
+  document.querySelectorAll("#cm-stats b:not(.cm-date)").forEach(function (b, i) { odometer(b, statVals[i]); });
   document.getElementById("cm-history").innerHTML = history.slice().reverse().map(function (d) {
     return "<li><span>" + esc(new Date(d.date).toLocaleDateString(LOC)) + (d.purposeTitle ? " · " + esc(d.purposeTitle) : "") + "</span><b>" + fmt.format(d.amount) + " ج</b></li>";
   }).join("");
@@ -107,17 +131,23 @@
     ctx.fillStyle = "#e9ad0c"; ctx.font = "800 70px Cairo, sans-serif"; ctx.fillText(shareCard ? "#ابعت_فرحة" : "شهادة شكر وتقدير", W / 2, 460);
     ctx.fillStyle = "#1f2a2a"; ctx.font = "600 40px Cairo, sans-serif";
     ctx.fillText(shareCard ? "أنا ساهمت في علاج مريض مع مرسال" : "تتقدم مؤسسة مرسال بخالص الشكر إلى", W / 2, 570);
-    ctx.fillStyle = "#005959"; ctx.font = "800 72px Cairo, sans-serif"; ctx.fillText(name || "متبرع كريم", W / 2, 690);
+    ctx.fillStyle = "#005959";
+    var nm = fitText(ctx, name || "متبرع كريم", W - 260, { max: 72, min: 40, weight: "800" });
+    ctx.font = "800 " + nm.size + "px Cairo, sans-serif";
+    if (nm.lines.length > 1) { ctx.fillText(nm.lines[0], W / 2, 670); ctx.fillText(nm.lines[1], W / 2, 670 + nm.size * 1.15); }
+    else ctx.fillText(nm.lines[0], W / 2, 690);
     ctx.fillStyle = "#1f2a2a"; ctx.font = "600 38px Cairo, sans-serif";
-    ctx.fillText(shareCard ? "وانت كمان تقدر تبعت فرحة لمريض محتاج" : "لمساهمته بمبلغ " + fmt.format(total) + " جنيه في علاج مرضى مرسال", W / 2, 790);
-    ctx.fillText(shareCard ? "تبرع من موقع مرسال أو اتصل 19340" : "كل جنيه وصل لمستحقيه، وكل تبرع رسم ابتسامة", W / 2, 860);
+    ctx.fillText(shareCard ? "وانت كمان تقدر تبعت فرحة لمريض محتاج" : (history.length > 1 ? "تقديراً لمساهمتكم بمبلغ " + fmt.format(total) + " جنيه مع مؤسسة مرسال" : "تقديراً لمساهمتكم الكريمة بمبلغ " + fmt.format(total) + " جنيه"), W / 2, 810);
+    if (shareCard) ctx.fillText("تبرع من موقع مرسال أو اتصل 19340", W / 2, 875);
     // amount pill
     ctx.fillStyle = "#fec830"; rounded(W / 2 - 230, 940, 460, 110, 55); ctx.fill();
     ctx.fillStyle = "#005959"; ctx.font = "800 54px 'Titillium Web', Cairo, sans-serif";
     if (shareCard) { ctx.direction = "ltr"; ctx.fillText("19340", W / 2, 1015); }
     else { ctx.direction = "rtl"; ctx.fillText(fmt.format(total) + " جنيه", W / 2, 1015); }
     ctx.direction = "rtl"; ctx.fillStyle = "#5f6b6b"; ctx.font = "600 30px Cairo, sans-serif";
-    ctx.fillText(new Date(last.date).toLocaleDateString(LOC, { year: "numeric", month: "long", day: "numeric" }) + (last.orderId ? "  ·  " + last.orderId : ""), W / 2, 1130);
+    var ld = new Date(last.date).toLocaleDateString(LOC, { year: "numeric", month: "long", day: "numeric" });
+    // one donation: its date and order id; several: the date of the last one, no order id
+    ctx.fillText(history.length > 1 ? "آخر تبرع: " + ld : ld + (last.orderId ? "  ·  " + last.orderId : ""), W / 2, 1130);
     ctx.fillStyle = "#fff"; ctx.font = "700 34px Cairo, sans-serif"; ctx.fillText("mersal-ngo.org  ·  الخط الساخن 19340", W / 2, H - 70);
     var logo = new Image(); logo.onload = function () { ctx.fillStyle = "#fff"; rounded(W / 2 - 120, 60, 240, 150, 28); ctx.fill(); ctx.drawImage(logo, W / 2 - 100, 70, 200, 118); }; logo.src = "/img/brand-logo.png";
   }

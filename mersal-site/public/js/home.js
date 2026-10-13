@@ -374,17 +374,28 @@
       }, 900);
     }
     if ("IntersectionObserver" in window) {
-      // threshold .01: a card's counters start as soon as any of it shows, so no visible card reads "0 اتوفرت"
-      var io = new IntersectionObserver(function (en) {
-        var i = 0;
-        en.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          var d = i++ * 120, card = e.target;
-          revealAll();
-          animate(card, d); io.unobserve(card);
-        });
-      }, { threshold: .01 });
-      cards.forEach(function (c) { io.observe(c); });
+      if (phone) {
+        // phones (swipe carousel): a card counts up when the visitor stops on it, not while it only peeks in
+        // from the side (owner: «بيعد في اللي بعده ف مش بيظهر العداد لما بقف فيه»). The section must be on screen
+        // (viewport observer) and the card mostly inside the track (track observer, the dots' .6 threshold).
+        var secOn = false, inTrack = [], done = [];
+        var tryRun = function () { if (!secOn) return; cards.forEach(function (c, k) { if (inTrack[k] && !done[k]) { done[k] = true; animate(c, 150); } }); };
+        new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { secOn = true; revealAll(); tryRun(); } }); }, { threshold: .15 }).observe(track);
+        var tio = new IntersectionObserver(function (en) { en.forEach(function (e) { inTrack[Array.prototype.indexOf.call(cards, e.target)] = e.intersectionRatio >= .6; }); tryRun(); }, { root: track, threshold: .6 });
+        cards.forEach(function (c) { tio.observe(c); });
+      } else {
+        // threshold .01: a card's counters start as soon as any of it shows, so no visible card reads "0 اتوفرت"
+        var io = new IntersectionObserver(function (en) {
+          var i = 0;
+          en.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            var d = i++ * 120, card = e.target;
+            revealAll();
+            animate(card, d); io.unobserve(card);
+          });
+        }, { threshold: .01 });
+        cards.forEach(function (c) { io.observe(c); });
+      }
     } else { revealAll(); cards.forEach(function (c) { animate(c, 0); }); }
     // (no mersalReveal here: .in + the counters are the cards' entrance; mersalReveal's animation would hold
     // the opacity that the snapped-card focus effect needs)

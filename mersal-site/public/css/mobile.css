@@ -1119,10 +1119,10 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
    On shorter phones the gold donate button can now sit just under the bottom bar on the first screen; the owner
    prefers the bigger slider, and the button is one small scroll away. */
 @media (max-width: 760px) and (min-height: 706px) {
-  .home .sl-card { height: min(calc((100vw - 60px) * 1.35 - 60px), calc(60svh - 60px), 440px); }
+  .home .sl-card { height: min(calc((100vw - 60px) * 1.35 - 28px), calc(60svh - 28px), 472px); }
 }
 @media (max-width: 760px) and (min-height: 706px) and (max-height: 780px) {
-  .home .sl-card { height: max(calc(50svh - 60px), calc(100svh - 413px)); }
+  .home .sl-card { height: max(calc(50svh - 28px), calc(100svh - 381px)); }
 }
 
 /* ---------- campaign cards: the whole poster, framed (owner: «الصور جوه عداد التبرعات مقصوصة مش كاملة») ----------
@@ -1141,4 +1141,20 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .home .camp-badge { order: 1; }
   .home .camp-hot { order: 2; background: var(--teal-soft); }
   .home .camp .body { padding-top: 10px; }
+}
+
+/* ---------- smoother menu (owner: «التنقل بين القوائم مش سلس») ----------
+   The menu groups no longer animate their height (grid-template-rows reflows the whole sheet on every frame, which
+   stutters on low-end Android): a group opens at once and its rows slide in with transform/opacity only. The sheet
+   itself rises a little faster. Pages are also prefetched on touch (speculation rules in layout.js). */
+@media (max-width: 760px) {
+  .m-group .m-sub-wrap { transition: none; }
+  .m-sub .m-row { transition: opacity .18s, transform .24s cubic-bezier(.2,.7,.2,1); }
+  .m-group.is-open .m-sub .m-row { transition-delay: 0s; }
+  .m-group.is-open .m-sub .m-row:nth-child(2) { transition-delay: .03s; }
+  .m-group.is-open .m-sub .m-row:nth-child(3) { transition-delay: .06s; }
+  .m-group.is-open .m-sub .m-row:nth-child(n+4) { transition-delay: .09s; }
+  .m-sheet-in { animation-duration: .26s; }
+  .m-sheet-in > * { animation-duration: .32s; }
+  .m-sheet { contain: layout paint; }
 }

@@ -168,6 +168,10 @@ section.alt { background: var(--bg-2); }
 .zakat-result .big { font-size: 34px; font-weight: 800; color: var(--gold); line-height: 1.3; }
 .zakat-result dl { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 14px; margin: 14px 0; color: rgba(255,255,255,.85); }
 .zakat-result dd { margin: 0; font-weight: 700; color: #fff; }
+.zakat-group .z-err { margin: 8px 0 0; color: #b42318; font-size: 14.5px; font-weight: 700; line-height: 1.6; } /* grams with no gold price (MWP6) */
+.zakat-group .z-help { margin: 2px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+@media (min-width: 761px) { .z-echo { display: none !important; } } /* the "= 1,500,000 جنيه" echo is a phone aid (mobile.css) */
+.zakat-page .hint a { color: inherit; text-decoration: none; font: inherit; } /* the 19340 in the hint dials (MWP6); same look on desktop, underlined on phones (mobile.css) */
 .z-empty { display: none; } /* the "start here" prompt of the empty result card: shown from 761px only (desktop.css §5) */
 
 /* ---------- footer ---------- */
@@ -1566,6 +1570,9 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .ph-trust li { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(0,48,48,.38); border: 1px solid rgba(255,255,255,.35); color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.5; }
 .ph-trust svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .ph-trust bdi { font-family: "Titillium Web", "Cairo", sans-serif; }
+.ph-trust a, .ph-trust a:hover { color: inherit; text-decoration: none; } /* the donate hero's 19340 pill dials (MWP6), same look as the other chips */
+.ph-trust .ph-tel { display: inline-flex; align-items: inherit; gap: inherit; padding-block: 12px; margin-block: -12px; } /* lays out like the chip itself (the number its own item, same gap) */ /* a 44px tap target; the padding is cancelled by the margin, so nothing moves */
+.ph-trust .ph-tel:focus-visible { outline: 2px solid var(--gold); outline-offset: -8px; border-radius: 4px; }
 @media (max-width: 760px) {
   /* no taller than the 190px head it replaces: h1 + line + two rows of chips */
   .donate-page .page-head.has-photo { min-height: 0; padding: 30px 0 16px; }

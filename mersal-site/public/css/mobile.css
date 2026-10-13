@@ -466,6 +466,63 @@ html.no-online-pay .home .ways-grid .way2.only-online + .way2 { border-top: 0; }
   .home #impact-calc .ic-tiles.ic-all > .ic-tile:nth-child(n+5) { animation: m-rise .35s cubic-bezier(.2,.7,.2,1) both; }
 }
 
+/* =================================================================== MWP6: donate path, other ways to give, zakat
+   Phone-only looks (this file is linked for max-width 760px); the logic (auto step 2, amount prefill, honest WhatsApp,
+   aria) lives in the JS and is correct at every width. */
+
+/* ---------- donate: one summary on step 3 (the review list); the sticky strip stays on step 2 ---------- */
+.stepper:has(.step[data-step="3"]:not([hidden])) .s-sum { display: none; }
+
+/* ---------- pickup: call first, then the numbered form ---------- */
+.donate-page .pk-top[hidden] { display: block !important; } /* site.css hides [hidden] with !important; desktop keeps it hidden */
+.donate-page .pk-top { margin: 2px 0 16px; text-align: center; }
+.donate-page .pk-dial { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin: 0; padding: 8px 14px; border-radius: 14px; font-size: 16px; font-weight: 800; line-height: 1.35; box-sizing: border-box; }
+.donate-page .pk-dial svg { width: 20px; height: 20px; flex: none; fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linejoin: round; }
+.donate-page .pk-dial bdi { font-family: "Titillium Web", "Cairo", sans-serif; font-size: 17px; }
+.donate-page .pk-top p { margin: 8px 0 0; font-size: 14.5px; color: var(--muted); }
+.donate-page #home > .pk-call { display: none; } /* the same call, now on top */
+.donate-page #pk-form { counter-reset: pk; }
+.donate-page #pk-form > fieldset > legend { display: flex; align-items: center; gap: 8px; }
+.donate-page #pk-form > fieldset > legend::before { counter-increment: pk; content: counter(pk); display: inline-grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--teal-text); color: #fff; font: 800 15px/1 "Titillium Web", "Cairo", sans-serif; }
+
+/* ---------- abroad: a real card button (inside .only-online, so it goes when card payments are off) ---------- */
+html:not(.no-online-pay) .donate-page .ab-card-pay[hidden] { display: flex !important; }
+.donate-page .ab-card-pay { flex-direction: column; gap: 8px; margin: 2px 0 18px; }
+.donate-page .ab-card-pay .btn { width: 100%; min-height: 48px; margin: 0; box-sizing: border-box; }
+.donate-page .ab-card-pay small { font-size: 14px; line-height: 1.6; color: var(--muted); }
+
+/* ---------- zakat ---------- */
+html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !important; }
+.zakat-page .z-quick { margin: 12px 0 0; }
+.zakat-page .z-quick a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 1.5px solid rgba(254,200,48,.75); border-radius: 999px; background: rgba(0,32,32,.28); color: #fff; font-size: 15px; font-weight: 800; text-decoration: none; }
+.zakat-page .z-quick a span { color: var(--gold); }
+/* units inside the field (WP5's desktop rule), the number at the start, no spinners */
+.zakat-page .zakat-table td[data-unit] { position: relative; }
+.zakat-page .zakat-table td[data-unit]::after { content: attr(data-unit); position: absolute; inset-inline-end: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; font-weight: 700; line-height: 1; color: var(--muted); pointer-events: none; }
+.zakat-page .zakat-table td[data-unit]:focus-within::after { color: var(--teal-text); }
+.zakat-page .zakat-table input { display: block; height: 48px; min-height: 48px; padding: 8px 14px; padding-left: 60px; text-align: right; font-size: 18px; box-sizing: border-box; -moz-appearance: textfield; appearance: textfield; }
+.zakat-page .zakat-table input::-webkit-inner-spin-button, .zakat-page .zakat-table input::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+.zakat-page .zakat-table input::placeholder { color: #8a9595; }
+.zakat-page .z-echo { display: block; margin: 6px 2px 0; font: 700 15px/1.4 "Titillium Web", "Cairo", sans-serif; color: var(--teal-text); }
+.zakat-page .z-echo[hidden] { display: none; }
+.zakat-page .zakat-group .z-err { font-size: 15px; }
+.zakat-page .hint a { display: inline-block; padding: 12px 2px; margin: -12px 0; color: var(--teal-text); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+/* the other ways: full-width outlined buttons on the teal card */
+.zakat-page .z-ways { margin: 12px 0 0; padding: 0; overflow: visible; font-size: 14.5px; }
+.zakat-page .z-ways .zw-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 0; }
+.zakat-page .z-ways .zw-row > * { margin: 0; }
+.zakat-page .z-ways .zw-row > span { display: contents; }
+.zakat-page .z-ways .zw-row > a::before { content: none; }
+.zakat-page .z-ways a { display: flex; align-items: center; justify-content: center; min-height: 44px; line-height: 1.3; padding: 6px 12px; border: 1.5px solid rgba(255,255,255,.5); border-radius: 12px; color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; box-sizing: border-box; }
+.zakat-page .z-ways a:active { background: rgba(255,255,255,.12); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .zakat-page .z-echo.z-in { animation: z-echo-in .22s ease-out both; }
+  .zakat-page .z-ways a, .donate-page .pk-dial, .donate-page .ab-card-pay .btn { transition: transform .15s; }
+  .zakat-page .z-ways a:active, .donate-page .pk-dial:active, .donate-page .ab-card-pay .btn:active { transform: scale(.97); }
+}
+@keyframes z-echo-in { from { opacity: 0; } }
+
 /* ===================================================================
    MWP7: trust and content pages (where the money goes, certificate stat, project CTAs, contact)
    =================================================================== */

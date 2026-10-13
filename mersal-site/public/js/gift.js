@@ -588,13 +588,17 @@
         amount: els.amount.value, show: els.show.checked, purpose: els.purpose.value, purposeTitle: opt ? opt.textContent : "" });
     }
     var st = { ok: false, o: values(), canvas: canvas, blob: null }, raf = 0, blobT = 0, saveT = 0;
+    var msgSay = document.getElementById("gf-msg-say"), msgLen0 = Array.from(els.msg.value).length, msgLvl = msgLen0 >= 120 ? 2 : msgLen0 >= 100 ? 1 : 0; // a restored message stays silent
     // the fields, links and label follow every keystroke; the canvas is repainted once per frame at most
     function update() {
       var o = values();
       st.o = o; st.ok = !!o.to; st.blob = null;
       toLbl.textContent = toLabel(o.occasion, o.gender);
       els.show.disabled = !(o.amount > 0);
-      count.textContent = Array.from(els.msg.value).length + " / 120";
+      var mlen = Array.from(els.msg.value).length, mlvl = mlen >= 120 ? 2 : mlen >= 100 ? 1 : 0;
+      count.textContent = mlen + " / 120";
+      // screen readers hear the limit twice at most (100 and 120 characters), not every keystroke
+      if (mlvl !== msgLvl) { msgLvl = mlvl; if (msgSay) msgSay.textContent = ["", "باقي 20 حرف", "وصلت للحد الأقصى"][mlvl]; }
       donate.href = donateHref(o);
       document.querySelectorAll("[data-gf-donate]").forEach(function (a) { a.href = donateHref(o); });
       share.href = waHref(o);

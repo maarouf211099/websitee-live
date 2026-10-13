@@ -132,7 +132,7 @@
   start();
 
   // ---------- permissions: each tab belongs to one perm; the server checks every save again ----------
-  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
+  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
   var perms = null;
   function can(perm) { return !perm || !perms || perms.indexOf(perm) >= 0; }
   function applyPerms(me) {
@@ -214,7 +214,7 @@
   var content = null;
   function loadHome() {
     homeReady();
-    api("data/content").then(function (c) { content = c; renderSlides(); renderCampaigns(); renderProjects(); renderNumbers(); homeReady(); })
+    api("data/content").then(function (c) { content = c; renderSlides(); renderCampaigns(); renderProjects(); renderNumbers(); $("#numbers-asof").value = typeof c.numbersAsOf === "string" ? c.numbersAsOf : ""; homeReady(); })
       .catch(function (e) { toast("تعذّر تحميل الرئيسية: " + e.message, true); });
   }
   function renderSlides() {
@@ -337,6 +337,8 @@
     var b = this; collect("#slides", "slides"); collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); collect("#projects", "projects"); collect("#numbers", "numbers", ["value"]);
     content.slides = (content.slides || []).filter(function (s) { return s.banner; });
     content.projects = (content.projects || []).filter(function (p) { return p.title; });
+    var asOf = $("#numbers-asof").value.replace(/\s+/g, " ").trim(); // "آخر تحديث للأرقام" (js/home.js numbersAsOf)
+    if (asOf) content.numbersAsOf = asOf; else delete content.numbersAsOf;
     busy(b, true);
     api("data/content", { method: "PUT", body: { data: content, message: "admin: home content" } }).then(published).catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); homeReady(); });
   };
@@ -511,8 +513,8 @@
 
   // ---------- users and permissions (main account only) ----------
   var PERM_NAMES = {
-    content: ["محتوى الموقع", "الرئيسية، الصفحات، القائمة، الألبومات، الكوميونيتي، الأخبار، أثر التبرع، شريط الإعلان والشركاء، ورفع الصور"],
-    site: ["بيانات الموقع", "التليفونات والسوشيال والفوتر وحسابات البنوك والمحافظ"],
+    content: ["محتوى الموقع", "الرئيسية، نصوص الموقع وعناوين الصفحات، الصفحات، القائمة، الألبومات، الكوميونيتي، الأخبار، أثر التبرع، شريط الإعلان والشركاء، ورفع الصور"],
+    site: ["بيانات الموقع", "التليفونات والسوشيال والفوتر وروابطه وبيانات الإشهار وحسابات البنوك والمحافظ"],
     donations: ["التبرعات", "عرض التبرعات وتنزيلها ومراجعة العمليات المعلقة"],
     requests: ["الطلبات", "طلبات التطوع والمساعدة والتواصل"],
     settings: ["إعدادات الدفع", "تشغيل وقفل الدفع بالبطاقة واختيار بوابة الدفع"]

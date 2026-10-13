@@ -1,4 +1,5 @@
-// Admin tab "بيانات الموقع": contact details, social links and footer text (PUT /api/console/site -> js/layout.js + data/site.json)
+// Admin tab "بيانات الموقع": contact details, social links, footer text and links, the strip above the footer and the legal
+// identity line (PUT /api/console/site -> js/layout.js + data/site.json)
 // plus the donate page's bank accounts, wallets and the account abroad (PUT /api/console/data/donate -> data/donate.json).
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
@@ -31,6 +32,17 @@
       '<h2>الفوتر</h2><div class="site-grid">' +
         S("اسم المؤسسة", "footer.name", get(site, "footer.name"), { full: true }) +
         S("نبذة قصيرة تحت الشعار", "footer.text", get(site, "footer.text"), { full: true, rows: 3 }) +
+        S("شريط فوق الفوتر في الصفحات الداخلية: العنوان", "footer.stripTitle", get(site, "footer.stripTitle"), { ph: "محتاج مساعدة في التبرع؟" }) +
+        S("شريط فوق الفوتر: السطر الصغير", "footer.stripText", get(site, "footer.stripText"), { ph: "مندوبنا يوصلك لحد باب البيت" }) +
+      "</div>" +
+      '<h2>روابط الفوتر</h2><p class="hint">عمود «روابط» في الفوتر بالترتيب ده. الرابط يبدأ بـ / (صفحة في الموقع) أو https://، ولو كتبت <code dir="ltr">{youtube}</code> (أو facebook / instagram …) الرابط بيمشي ورا لينك السوشيال. لو مسحت كل الروابط الفوتر بيرجع للروابط الأصلية.</p>' +
+      '<div class="list" id="flinks"></div><button type="button" class="btn btn-ghost" id="add-flink">+ إضافة رابط</button>' +
+      '<h2>بيانات الإشهار (سطر الهوية القانونية)</h2><p class="hint">بيظهر تحت الحقوق في الفوتر وفي صفحة سياسة الخصوصية: «مؤسسة أهلية غير هادفة للربح · مشهرة برقم …». مش هيظهر حاجة طول ما رقم الإشهار فاضي، فاكتبه بس بعد ما تتأكد منه من الورق الرسمي.</p><div class="site-grid">' +
+        S("رقم الإشهار", "legal.regNo", get(site, "legal.regNo"), { ltr: true }) +
+        S("سنة الإشهار", "legal.regYear", get(site, "legal.regYear"), { ltr: true, ph: "مثال: 2015" }) +
+        S("جهة الإشهار", "legal.regBody", get(site, "legal.regBody"), { ph: "مثال: وزارة التضامن الاجتماعي" }) +
+        S("رقم تصريح جمع التبرعات (اختياري)", "legal.permitNo", get(site, "legal.permitNo"), { ltr: true }) +
+        S("التصريح ساري حتى (اختياري)", "legal.permitUntil", get(site, "legal.permitUntil")) +
       "</div>" +
       '<h2>طرق التبرع: الحسابات البنكية</h2><p class="hint">بتظهر في صفحة طرق التبرع ← الحسابات البنكية مع زرار نسخ لكل رقم. IBAN و SWIFT اختياريين (بيظهروا كسطر إضافي).</p>' +
       '<div class="list" id="banks"></div><button type="button" class="btn btn-ghost" id="add-bank">+ إضافة حساب</button>' +
@@ -47,7 +59,17 @@
         D("رابط طرق أخرى للتبرع من الخارج", "foreign.link", f.link || "", { ltr: true, ph: "https://…" }) +
         D("نص الزرار", "foreign.linkText", f.linkText || "", { ph: "طرق أخرى للتبرع من الخارج" }) +
       '</div><div class="item-actions"><button type="button" class="btn btn-ghost btn-sm" id="foreign-img">رفع صورة الحساب</button></div></div>';
-    renderBanks(); renderWallets();
+    renderBanks(); renderWallets(); renderLinks();
+  }
+  function renderLinks() {
+    var links = site.footer.links;
+    $("#flinks", root).innerHTML = links.length ? links.map(function (l, i) {
+      // one compact row per link: name, link, ▲ ▼ حذف
+      return '<div class="item flink" data-i="' + i + '">' +
+        '<div class="field"><label>الاسم</label><input data-k="title" maxlength="60" value="' + esc(l.title || "") + '"></div>' +
+        '<div class="field"><label>الرابط</label><input data-k="href" dir="ltr" placeholder="/p/3.html" value="' + esc(l.href || "") + '"></div>' +
+        acts() + "</div>";
+    }).join("") : '<p class="hint">مفيش روابط: الفوتر هيعرض الروابط الأصلية.</p>';
   }
   function acts() { return '<div class="item-actions"><button type="button" class="btn btn-ghost btn-sm" data-act="up">▲</button><button type="button" class="btn btn-ghost btn-sm" data-act="down">▼</button><button type="button" class="btn btn-danger btn-sm" data-act="del">حذف</button></div>'; }
   function renderBanks() {
@@ -97,6 +119,7 @@
       if (el.dataset.d === "foreign.iban") v = v.replace(/\s+/g, ""); // shown grouped on the site, stored without spaces
       if (v || has(donate, el.dataset.d)) set(donate, el.dataset.d, v); // an empty new field adds no empty key
     });
+    $$("#flinks .item", root).forEach(function (it) { var o = site.footer.links[+it.dataset.i]; if (o) $$("[data-k]", it).forEach(function (i) { o[i.dataset.k] = i.value.trim(); }); });
     ["banks", "wallets"].forEach(function (key) {
       $$("#" + key + " .item", root).forEach(function (it) { var o = donate[key][+it.dataset.i]; if (o) $$("[data-k]", it).forEach(function (i) { o[i.dataset.k] = i.value.trim(); }); });
     });
@@ -109,15 +132,16 @@
     root = $("#site-root");
     root.innerHTML = '<p class="hint">جاري التحميل…</p>';
     Promise.all([A.api("site"), A.api("data/donate").catch(function () { return {}; })]).then(function (r) {
-      site = r[0] || {}; site.social = site.social || {}; site.footer = site.footer || {};
+      site = r[0] || {}; site.social = site.social || {}; site.footer = site.footer || {}; site.footer.links = site.footer.links || []; site.legal = site.legal || {};
       donate = r[1] || {}; donate.banks = donate.banks || []; donate.wallets = donate.wallets || []; donate.foreign = donate.foreign || {};
       siteLoaded = JSON.stringify(site); donateLoaded = JSON.stringify(cleanDonate());
       render();
     }).catch(function (e) { root.innerHTML = '<p class="status bad">' + esc(e.message) + "</p>"; });
 
     root.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-act], #add-bank, #add-wallet, #foreign-img"); if (!b || !donate) return;
+      var b = e.target.closest("[data-act], #add-bank, #add-wallet, #add-flink, #foreign-img"); if (!b || !donate) return;
       collect();
+      if (b.id === "add-flink") { site.footer.links.push({ title: "", href: "/" }); renderLinks(); var nl = $("#flinks .item:last-child [data-k=title]", root); if (nl) nl.focus(); return; }
       if (b.id === "add-bank") { donate.banks.push({ name: "", currency: "", number: "", iban: "", swift: "" }); renderBanks(); return; }
       if (b.id === "add-wallet") { donate.wallets.push({ name: "", value: "" }); renderWallets(); return; }
       if (b.id === "foreign-img") {
@@ -127,17 +151,20 @@
         }).catch(function (err) { A.toast(err.message, true); A.busy(b, false); });
         return;
       }
-      var it = b.closest(".item"), list = b.closest("#banks") ? "banks" : "wallets", arr = donate[list], i = +it.dataset.i, act = b.dataset.act;
+      var it = b.closest(".item"), list = b.closest("#banks") ? "banks" : b.closest("#flinks") ? "flinks" : "wallets", arr = list === "flinks" ? site.footer.links : donate[list], i = +it.dataset.i, act = b.dataset.act;
       if (act === "del") { if (!confirm("حذف العنصر ده؟")) return; arr.splice(i, 1); }
       else if (act === "up" && i > 0) arr.splice(i - 1, 0, arr.splice(i, 1)[0]);
       else if (act === "down" && i < arr.length - 1) arr.splice(i + 1, 0, arr.splice(i, 1)[0]);
       else return;
-      if (list === "banks") renderBanks(); else renderWallets();
+      if (list === "banks") renderBanks(); else if (list === "flinks") renderLinks(); else renderWallets();
     });
 
     $("#save-site").onclick = function () {
       if (!site || !donate) return;
       var b = this; collect();
+      site.footer.links = site.footer.links.filter(function (l) { return l.title && l.href; });
+      var badLink = site.footer.links.filter(function (l) { return !/^(\/(?!\/)|#|https?:\/\/|tel:|mailto:)\S*$/i.test(l.href) && !/^\{(facebook|instagram|x|linkedin|youtube|tiktok)\}$/.test(l.href); })[0];
+      if (badLink) return A.toast("رابط «" + badLink.title + "» في الفوتر لازم يبدأ بـ / أو https://", true);
       var d = cleanDonate(), sj = JSON.stringify(site), dj = JSON.stringify(d);
       if (sj === siteLoaded && dj === donateLoaded) return A.toast("مفيش تغييرات");
       A.busy(b, true);

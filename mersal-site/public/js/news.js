@@ -171,7 +171,9 @@
       "</div></section>";
     var track = home.querySelector(".nw-strip"), wrap = home.querySelector(".nw-strip-wrap"), dots = home.querySelectorAll(".nw-dots i"), cards = Array.prototype.slice.call(track.children);
     function check() { wrap.classList.toggle("overflow", track.scrollWidth > track.clientWidth + 4); }
-    check(); addEventListener("resize", check);
+    // after layout (ResizeObserver) instead of a forced layout in the render task
+    if ("ResizeObserver" in window) new ResizeObserver(function () { check(); }).observe(track);
+    else { check(); addEventListener("resize", check); }
     function step(dir) { var gap = parseFloat(getComputedStyle(track).columnGap) || 20; track.scrollBy({ left: dir * (cards[0].offsetWidth + gap), behavior: reduce ? "auto" : "smooth" }); }
     home.querySelector(".nw-next").addEventListener("click", function () { step(-1); });
     home.querySelector(".nw-prev").addEventListener("click", function () { step(1); });

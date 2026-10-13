@@ -312,9 +312,12 @@
   }
 
   // Header: shadow once the page scrolls; on phones it slides away while scrolling down and comes back on scroll up
-  var hdr = document.querySelector(".site-header"), lastY = scrollY, phone = matchMedia("(max-width: 760px)");
+  // (lastY starts unset and takes the first scroll position: reading scrollY here, while the deferred scripts run,
+  // forced the first full-page layout inside the script task)
+  var hdr = document.querySelector(".site-header"), lastY = -1, phone = matchMedia("(max-width: 760px)");
   addEventListener("scroll", function () {
     var y = scrollY;
+    if (lastY < 0) lastY = y;
     hdr.classList.toggle("scrolled", y > 10);
     if (phone.matches && !document.body.classList.contains("menu-open")) {
       if (y > 140 && y - lastY > 8) hdr.classList.add("hide");

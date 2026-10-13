@@ -202,11 +202,22 @@
     liveT = setTimeout(function () { els.live.textContent = "المبلغ " + fmt.format(a) + " جنيه، " + (covered === 1 ? "يكفي بالكامل بند واحد" : covered === 2 ? "يكفي بالكامل أي بند من بندين" : covered ? "يكفي بالكامل أي بند من " + covered + (covered <= 10 ? " بنود" : " بند") : "أقل من أصغر بند"); }, 500);
   }
   var counters = [];
+  // restart the pop without a forced reflow per tile (offsetWidth after each textContent change laid the page out
+  // again for every tile: ~130ms in the boot task on a throttled phone). The class leaves on animationend; while the
+  // pop is still running it is rewound through the Web Animations API instead.
+  function bump(el) {
+    if (!el.getAnimations) { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); return; }
+    if (!el.dataset.bw) { el.dataset.bw = "1"; el.addEventListener("animationend", function (e) { if (e.target === el) el.classList.remove("bump"); }); }
+    if (!el.classList.contains("bump")) { el.classList.add("bump"); return; }
+    var a = el.getAnimations();
+    if (a.length) a.forEach(function (x) { x.cancel(); x.play(); });
+    else { el.classList.remove("bump"); requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("bump"); }); }); }
+  }
   function countTo(el, target) {
     var from = Number(el.dataset.v) || 0;
     el.dataset.v = target;
     if (reduce || from === target) { el.textContent = fmt.format(target); return; }
-    el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+    bump(el);
     counters = counters.filter(function (c) { return c.el !== el; });
     counters.push({ el: el, from: from, to: target, t0: 0 });
     if (!raf) raf = requestAnimationFrame(tick);

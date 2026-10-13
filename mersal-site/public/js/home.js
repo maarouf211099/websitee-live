@@ -121,7 +121,7 @@
     setTimeout(wake, 2000);
     if (document.readyState === "complete") setTimeout(wake, 300); else addEventListener("load", function () { setTimeout(wake, 300); });
     if (n < 2) { root.querySelectorAll(".sl-arrow").forEach(function (a) { a.hidden = true; }); nav.hidden = true; return; }
-    var cur = 0, timer = null, hold = false, seen = true, userPaused = false, rtl = getComputedStyle(track).direction === "rtl", DUR = 6500;
+    var cur = 0, timer = null, hold = false, seen = true, userPaused = false, rtl = null, DUR = 6500; // rtl: read on first use (startEdge), not during boot (a forced style pass)
     var jumping = -1, jumpEnd = null, resume = null;
     function setActive(i) {
       if (i === cur) return;
@@ -131,7 +131,7 @@
     }
     // restart the active dot's fill so it runs in step with the autoplay timer
     function refill() { var d = dotEls[cur]; d.classList.add("reset"); void d.offsetWidth; d.classList.remove("reset"); }
-    function startEdge(t) { var pad = parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0; return rtl ? t.right - pad : t.left + pad; }
+    function startEdge(t) { if (rtl === null) rtl = getComputedStyle(track).direction === "rtl"; var pad = parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0; return rtl ? t.right - pad : t.left + pad; }
     function nearest() {
       var edge = startEdge(track.getBoundingClientRect()), best = 0, bd = Infinity;
       cards.forEach(function (c, i) { var r = c.getBoundingClientRect(), d = Math.abs((rtl ? r.right : r.left) - edge); if (d < bd) { bd = d; best = i; } });
@@ -294,7 +294,10 @@
   function carouselArrows(track) {
     var car = track.parentNode;
     function check() { car.classList.toggle("overflow", track.scrollWidth > track.clientWidth + 4); }
-    check(); addEventListener("resize", check);
+    // measured after layout (ResizeObserver), not right after the cards were written: reading scrollWidth there forced
+    // a whole-page layout inside the boot task (~180ms on a throttled phone)
+    if ("ResizeObserver" in window) new ResizeObserver(function () { check(); }).observe(track);
+    else { check(); addEventListener("resize", check); }
     function step(dir) { var card = track.firstElementChild; if (!card) return; var gap = parseFloat(getComputedStyle(track).columnGap) || 20; track.scrollBy({ left: dir * (card.offsetWidth + gap), behavior: reduceMotion ? "auto" : "smooth" }); }
     // RTL: "next" moves further to the left
     car.querySelector(".car-next").addEventListener("click", function () { step(-1); });

@@ -17,7 +17,7 @@ html { background: #004646; }
 /* the room for the floating bottom bar moves into the footer, so the page ends teal under the bar */
 body.has-mbar { padding-bottom: 0; }
 body.has-mbar .site-footer .copyright { padding-bottom: calc(16px + 96px + env(safe-area-inset-bottom)); }
-body.has-mbar:not(:has(.site-footer)) { padding-bottom: 96px; }
+body.has-mbar:not(:has(> .site-footer)) { padding-bottom: 96px; }
 /* the donate circle's halo: a ring that grows and fades three times (transform/opacity), not an endless box-shadow */
 .m-bar .m-donate i { animation: none; }
 .m-bar .m-donate i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid rgba(237,183,31,.6); opacity: 0; pointer-events: none; }
@@ -47,7 +47,7 @@ body.has-mbar:not(:has(.site-footer)) { padding-bottom: 96px; }
 /* phones do not autoplay, so the active dot is a still gold pill (no progress fill) */
 .sl-dots button::after { display: none; }
 /* glass blur on small labels repaints under every scroll; their dark backgrounds already carry the contrast */
-.sl-kicker, .sl-arrow, .sl-hint, .camp-badge { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.sl-kicker, .sl-arrow, .sl-hint, .camp-badge, .home .camp-badge { -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* the first paint shows the message: copy and donate box never start invisible */
 .sl-track:not(.moved) .sl-card.on .sl-copy > * { animation: none; }
 .quick-bar .hero-card { animation: none; }
@@ -387,7 +387,7 @@ body.has-mbar .nf-actions { display: none; }
 @media (prefers-reduced-motion: no-preference) {
   /* the poster of the card in focus settles from a slight zoom; the others wait zoomed in */
   .home .camp .camp-img img { transition: transform .9s cubic-bezier(.2,.7,.2,1); transform: scale(1.08); }
-  .home .camp.in.is-snapped .camp-img img, .home .car-track:not(:has(.is-snapped)) > .camp.in .camp-img img { transform: none; }
+  .home .camp.in.is-snapped .camp-img img, .home .car-track:not(:has(> .is-snapped)) > .camp.in .camp-img img { transform: none; }
   /* the chips pop in after the card */
   .home .camp .camp-badge, .home .camp .camp-hot { transition: opacity .4s .35s, transform .5s .35s cubic-bezier(.3,1.5,.5,1); }
   .home .camp:not(.in) .camp-badge, .home .camp:not(.in) .camp-hot { opacity: 0; transform: scale(.6); }
@@ -435,7 +435,7 @@ body.has-mbar .nf-actions { display: none; }
 .home .hf-progress p b { font: 700 19px/1.2 "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); }
 .home .hf-progress .hf-pct { margin-inline-start: auto; font: 700 14px/1 "Titillium Web", "Cairo", sans-serif; background: #fff; color: var(--teal-dark); padding: 5px 9px; border-radius: 999px; }
 .home .hf-progress .bar.seg { display: flex; gap: 2px; height: 10px; }
-.home .hf-progress .bar.seg i { position: relative; flex: 1; border-radius: 2px; background: #fff; overflow: hidden;
+.home .hf-progress .bar.seg i { position: relative; flex: 1; border-radius: 2px; background: #fff; overflow: hidden; will-change: auto;
   --f: clamp(0, calc((var(--p) - var(--k) * (100 / var(--n))) * var(--n) / 100), 1); }
 .home .hf-progress .bar.seg i::before { content: ""; position: absolute; inset: 0; background: var(--bar-c); transform: scaleX(var(--f)); transform-origin: 100% 50%; }
 .home .hf-progress .bar.seg i:first-child { border-start-start-radius: 6px; border-end-start-radius: 6px; }
@@ -566,7 +566,9 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
    the pages above). Motion is transform/opacity, once, only under no-preference and only under a JS-added class. */
 @media (max-width: 760px) {
   /* ---------- tokens (set on the page body) ---------- */
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) {
+  /* (perf: the :has() below names the exact path body > main > section > .page-grid: a loose descendant :has() on body
+     made every DOM change anywhere in the page re-check it and restyle the whole body while scrolling) */
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) {
     --fb-r: 22px;
     --fb-line: rgba(0,120,121,.14);
     --fb-shadow: 0 1px 2px rgba(0,48,48,.04), 0 12px 30px -16px rgba(0,48,48,.26);
@@ -575,15 +577,15 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   }
 
   /* ---------- page head: bigger title with its own gold accent, rounded bottom, no full-width line ---------- */
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head { border-end-start-radius: 24px; border-end-end-radius: 24px; }
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head::after { display: none; }
-  :is(.contact-page, .albums-page, body:has(main .page-grid)) .page-head:not(.has-photo) { padding: 30px 0 30px; }
-  body:has(main .page-grid) .page-head.has-photo { padding-bottom: 30px; min-height: clamp(220px, 60vw, 300px); }
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) .page-head { border-end-start-radius: 24px; border-end-end-radius: 24px; }
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) .page-head::after { display: none; }
+  :is(.contact-page, .albums-page, body:has(> main > section > .page-grid)) .page-head:not(.has-photo) { padding: 30px 0 30px; }
+  body:has(> main > section > .page-grid) .page-head.has-photo { padding-bottom: 30px; min-height: clamp(220px, 60vw, 300px); }
   :is(.community, .news) .page-head.has-photo > .wrap { padding-block: 20px 28px; }
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head h1 { font-size: 30px; line-height: 1.25; }
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head h1::after { content: ""; display: block; width: 40px; height: 4px; margin-top: 12px; border-radius: 4px; background: var(--gold); }
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head p { margin-top: 10px; font-size: 15.5px; line-height: 1.6; color: rgba(255,255,255,.9); }
-  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head .crumbs { margin-bottom: 10px; }
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) .page-head h1 { font-size: 30px; line-height: 1.25; }
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) .page-head h1::after { content: ""; display: block; width: 40px; height: 4px; margin-top: 12px; border-radius: 4px; background: var(--gold); }
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) .page-head p { margin-top: 10px; font-size: 15.5px; line-height: 1.6; color: rgba(255,255,255,.9); }
+  :is(.contact-page, .community, .news, .albums-page, body:has(> main > section > .page-grid)) .page-head .crumbs { margin-bottom: 10px; }
   :is(.community, .news) .page-head .chip { margin-bottom: 12px; padding: 5px 14px; font-size: 13.5px; }
 
   /* ---------- project / about pages: the article ---------- */
@@ -647,17 +649,17 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .related .card h3 { font-size: 17px; }
 
   /* ---------- closing band (project pages) and the news band: one dark teal card ---------- */
-  body:has(main .page-grid) .cta-band, .news .nw-cta { padding: 6px 0 40px; background: #fff; }
-  body:has(main .page-grid) .cta-band .wrap, .news .nw-cta .wrap { position: relative; overflow: hidden; margin: 0 16px; padding: 30px 20px 24px; border-radius: 26px; background: var(--fb-band); color: #fff; box-shadow: 0 26px 50px -26px rgba(0,70,70,.7); text-align: center; }
-  body:has(main .page-grid) .cta-band .wrap::before, .news .nw-cta .wrap::before { content: ""; position: absolute; inset: 0; background: url(../img/pattern-white.png) center / 320px; opacity: .5; pointer-events: none; }
-  body:has(main .page-grid) .cta-band .wrap::after, .news .nw-cta .wrap::after { content: ""; position: absolute; width: 220px; height: 220px; inset-inline-end: -90px; top: -110px; border-radius: 50%; background: radial-gradient(circle, rgba(254,200,48,.35), rgba(254,200,48,0) 70%); pointer-events: none; }
-  body:has(main .page-grid) .cta-band .wrap > *, .news .nw-cta .wrap > * { position: relative; }
-  body:has(main .page-grid) .cta-band h2, .news .nw-cta h2 { margin: 0 0 6px; font-size: 24px; line-height: 1.3; color: #fff; }
-  body:has(main .page-grid) .cta-band p, .news .nw-cta p { margin: 0 0 20px; font-size: 15.5px; line-height: 1.65; color: rgba(255,255,255,.88); }
-  body:has(main .page-grid) .cta-band .btn, .news .nw-cta .btn { display: flex; width: 100%; min-height: 52px; margin: 0 0 10px; padding: 10px 20px; border-radius: 14px; font-size: 16.5px; }
-  body:has(main .page-grid) .cta-band .btn:last-child, .news .nw-cta .btn:last-child { margin-bottom: 0; }
-  body:has(main .page-grid) .cta-band .btn-gold, .news .nw-cta .btn-gold { color: var(--teal-ink); box-shadow: 0 12px 24px -12px rgba(0,0,0,.5); }
-  body:has(main .page-grid) .cta-band .btn-teal, .news .nw-cta .btn-ghost-teal { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.5); }
+  body:has(> main > section > .page-grid) .cta-band, .news .nw-cta { padding: 6px 0 40px; background: #fff; }
+  body:has(> main > section > .page-grid) .cta-band .wrap, .news .nw-cta .wrap { position: relative; overflow: hidden; margin: 0 16px; padding: 30px 20px 24px; border-radius: 26px; background: var(--fb-band); color: #fff; box-shadow: 0 26px 50px -26px rgba(0,70,70,.7); text-align: center; }
+  body:has(> main > section > .page-grid) .cta-band .wrap::before, .news .nw-cta .wrap::before { content: ""; position: absolute; inset: 0; background: url(../img/pattern-white.png) center / 320px; opacity: .5; pointer-events: none; }
+  body:has(> main > section > .page-grid) .cta-band .wrap::after, .news .nw-cta .wrap::after { content: ""; position: absolute; width: 220px; height: 220px; inset-inline-end: -90px; top: -110px; border-radius: 50%; background: radial-gradient(circle, rgba(254,200,48,.35), rgba(254,200,48,0) 70%); pointer-events: none; }
+  body:has(> main > section > .page-grid) .cta-band .wrap > *, .news .nw-cta .wrap > * { position: relative; }
+  body:has(> main > section > .page-grid) .cta-band h2, .news .nw-cta h2 { margin: 0 0 6px; font-size: 24px; line-height: 1.3; color: #fff; }
+  body:has(> main > section > .page-grid) .cta-band p, .news .nw-cta p { margin: 0 0 20px; font-size: 15.5px; line-height: 1.65; color: rgba(255,255,255,.88); }
+  body:has(> main > section > .page-grid) .cta-band .btn, .news .nw-cta .btn { display: flex; width: 100%; min-height: 52px; margin: 0 0 10px; padding: 10px 20px; border-radius: 14px; font-size: 16.5px; }
+  body:has(> main > section > .page-grid) .cta-band .btn:last-child, .news .nw-cta .btn:last-child { margin-bottom: 0; }
+  body:has(> main > section > .page-grid) .cta-band .btn-gold, .news .nw-cta .btn-gold { color: var(--teal-ink); box-shadow: 0 12px 24px -12px rgba(0,0,0,.5); }
+  body:has(> main > section > .page-grid) .cta-band .btn-teal, .news .nw-cta .btn-ghost-teal { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.5); }
 
   /* ---------- contact ---------- */
   .contact-page main > section { padding: 24px 0 36px; }
@@ -1067,7 +1069,11 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .odo.done .od, .camp.filled .camp-num .od { animation: p3-digit .5s var(--bounce) calc(var(--i, 0) * 50ms) both; }
   .camp.filled .camp-pct { animation: p3-cnt-pop .6s var(--bounce) .1s; }
   /* the campaign thumb keeps a soft pulse after its landing bounce; its ring pulses with it */
-  .home .camp.filled .bar.seg em { animation: tipBounce .9s var(--spring) 1, p3-thumb 2.2s ease-in-out 1s infinite; }
+  /* perf: the landing bounce animates `scale` and the endless pulse `transform` (the -50% lift moved to `translate`), so the
+     finished bounce no longer shares a property with the pulse; sharing one kept the pulse off the compositor and restyled
+     every card each frame, forever (≈60 style recalcs/s, ~35% of a throttled phone CPU while idle after the campaigns) */
+  .home .camp .bar.seg em { transform: none; translate: 0 -50%; }
+  .home .camp.filled .bar.seg em { animation: p3-tip .9s var(--spring) 1, p3-thumb 2.2s ease-in-out 1s infinite; }
   .home .camp.filled .bar.seg em::after { animation: p3-ring 2.2s cubic-bezier(.2,.6,.3,1) 1s infinite; }
   /* the hospital progress: the figures and the % pill pop once the bar has filled */
   .home .hf-progress.reveal.in p b { animation: p3-cnt-pop .55s var(--bounce) .55s both; }
@@ -1092,7 +1098,8 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
 @keyframes p3-cnt-pop { 0% { transform: scale(1); } 45% { transform: scale(1.12); } 100% { transform: scale(1); } }
 @keyframes p3-bloom { 0% { opacity: 0; transform: scale(.5); } 35% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3); } }
 @keyframes p3-digit { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16%); } }
-@keyframes p3-thumb { 0%, 100% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.3); } }
+@keyframes p3-thumb { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+@keyframes p3-tip { 0% { scale: .6; } 60% { scale: 1.35; } 100% { scale: 1; } }
 
 /* =================================================================== Polish 4: cleaner phone header (owner, Oct 13)
    Owner: «نشيل الخط الساخن 19340 من البار من فوق مع تطوير وتحسين الشكل», then «البار من فوق بقي زحمه، نشيل الكلمة».
@@ -1157,4 +1164,12 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .m-sheet-in { animation-duration: .26s; }
   .m-sheet-in > * { animation-duration: .32s; }
   .m-sheet { contain: layout paint; }
+}
+
+/* =================================================================== Performance (owner: «الموقع بيبلاج ويهنج»)
+   Phones: js/layout.js (deferred) swaps the #site-header placeholder for the 60px sticky bar; until then the empty
+   placeholder held no room, so the whole page jumped down 60px when the bar arrived (CLS ≈0.07 on every page).
+   The placeholder now holds the bar's room and colour, as css/desktop.css already does on wider screens. */
+@media (max-width: 760px) {
+  #site-header { min-height: 60px; background: linear-gradient(180deg, rgba(0,79,79,.96), rgba(0,89,89,.93)); }
 }

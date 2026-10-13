@@ -559,3 +559,187 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .m-trust .reveal { opacity: 0; transform: translateY(12px); transition: opacity .45s ease, transform .45s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
   .m-trust .reveal.in { opacity: 1; transform: none; }
 }
+
+/* =================================================================== Polish (Fable): modern phone look
+   About (p/3 with "تبرعك بيروح فين؟"), contact, community, the imported project pages, news and albums. Additive: it
+   restyles what the blocks above laid out and never touches home, donate, zakat or gift (every selector is scoped to
+   the pages above). Motion is transform/opacity, once, only under no-preference and only under a JS-added class. */
+@media (max-width: 760px) {
+  /* ---------- tokens (set on the page body) ---------- */
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) {
+    --fb-r: 22px;
+    --fb-line: rgba(0,120,121,.14);
+    --fb-shadow: 0 1px 2px rgba(0,48,48,.04), 0 12px 30px -16px rgba(0,48,48,.26);
+    --fb-shadow-lg: 0 2px 4px rgba(0,48,48,.04), 0 24px 48px -24px rgba(0,48,48,.4);
+    --fb-band: #005959 radial-gradient(ellipse at 20% 0%, #007879 0%, #005f60 50%, #004d4d 100%);
+  }
+
+  /* ---------- page head: bigger title with its own gold accent, rounded bottom, no full-width line ---------- */
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head { border-end-start-radius: 24px; border-end-end-radius: 24px; }
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head::after { display: none; }
+  :is(.contact-page, .albums-page, body:has(main .page-grid)) .page-head:not(.has-photo) { padding: 30px 0 30px; }
+  body:has(main .page-grid) .page-head.has-photo { padding-bottom: 30px; min-height: clamp(220px, 60vw, 300px); }
+  :is(.community, .news) .page-head.has-photo > .wrap { padding-block: 20px 28px; }
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head h1 { font-size: 30px; line-height: 1.25; }
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head h1::after { content: ""; display: block; width: 40px; height: 4px; margin-top: 12px; border-radius: 4px; background: var(--gold); }
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head p { margin-top: 10px; font-size: 15.5px; line-height: 1.6; color: rgba(255,255,255,.9); }
+  :is(.contact-page, .community, .news, .albums-page, body:has(main .page-grid)) .page-head .crumbs { margin-bottom: 10px; }
+  :is(.community, .news) .page-head .chip { margin-bottom: 12px; padding: 5px 14px; font-size: 13.5px; }
+
+  /* ---------- project / about pages: the article ---------- */
+  main > section:has(> .page-grid) { padding: 24px 0 32px; }
+  .page-grid { gap: 24px; }
+  .legacy { font-size: 16px; line-height: 1.85; }
+  .legacy p { margin-bottom: 12px; }
+  .legacy h2, .legacy .content-sector h2 { font-size: 23px; margin-bottom: 14px; }
+  .legacy h4, .legacy .content-sector h4 { font-size: 18px; margin: 20px 0 10px; }
+  /* the old pages' info boxes become soft cards */
+  .legacy .block-card { padding: 16px 16px 8px; border: 1px solid var(--fb-line); border-radius: 18px; background: var(--bg-2); }
+  .legacy .block-card > h4:first-child { margin-top: 0; }
+  .legacy .block-card ul { margin-bottom: 6px; }
+  .legacy .gallery { margin-top: 12px; }
+  .legacy .gal-track img { border-radius: 18px; }
+
+  /* ---------- "تبرعك بيروح فين؟" (p/3): one premium card, gold-dot rows, a numbered timeline ---------- */
+  .m-trust { position: relative; overflow: hidden; margin: 26px 0 0; padding: 26px 18px 20px; border: 0; border-radius: var(--fb-r); background: linear-gradient(172deg, #fff 0%, #f1f8f8 100%); box-shadow: var(--fb-shadow-lg), inset 0 0 0 1px var(--fb-line); }
+  .m-trust::before { content: ""; position: absolute; inset: 0 0 auto; height: 6px; background: linear-gradient(90deg, var(--gold) 0 55%, var(--teal) 100%); }
+  .m-trust h2 { margin: 0 0 8px; font-size: 24px; line-height: 1.3; }
+  .m-trust-rows { margin-top: 10px; }
+  .m-trust-rows li { display: grid; grid-template-columns: 10px minmax(0, 1fr); column-gap: 12px; padding: 14px 0; border-top: 1px solid var(--fb-line); font-size: 15.5px; line-height: 1.75; }
+  .m-trust-rows li:first-child { padding-top: 10px; border-top: 0; }
+  .m-trust-rows li::before { content: ""; grid-column: 1; grid-row: 1; width: 10px; height: 10px; margin-top: 9px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px rgba(254,200,48,.25); }
+  .m-trust-rows li > b { grid-column: 2; margin-bottom: 3px; font-size: 16.5px; color: var(--teal-ink); }
+  .m-trust-rows li > span { grid-column: 2; color: var(--ink); }
+  .m-trust-rows a { white-space: nowrap; }
+  .m-trust h3 { margin: 26px 0 14px; font-size: 18.5px; line-height: 1.4; }
+  .m-steps li { position: relative; min-height: 0; padding: 5px 50px 18px 0; font-size: 15.5px; line-height: 1.7; }
+  .m-steps li:last-child { padding-bottom: 6px; }
+  .m-steps li::before { top: 2px; width: 36px; height: 36px; border: 2px solid var(--teal-text); background: #fff; color: var(--teal-text); font: 800 15px/32px "Titillium Web", "Cairo", sans-serif; }
+  .m-steps li:last-child::before { background: var(--teal-text); color: #fff; }
+  .m-steps li::after { content: ""; position: absolute; right: 17px; top: 40px; bottom: 0; width: 2px; border-radius: 2px; background: rgba(0,120,121,.22); }
+  .m-steps li:last-child::after { display: none; }
+  .m-trust-src { margin-top: 18px; padding: 0 18px; border-radius: 999px; background: var(--teal-soft); color: var(--teal-ink); font-size: 14.5px; font-weight: 800; text-decoration: none; }
+
+  /* ---------- side donate card ---------- */
+  .page-side { gap: 12px; }
+  .side-card { padding: 20px 18px; border-color: var(--fb-line); border-radius: var(--fb-r); box-shadow: var(--fb-shadow-lg); }
+  .side-card.donate { background: linear-gradient(168deg, #fff 0%, #edf6f6 100%); }
+  .side-card h3 { margin-bottom: 4px; font-size: 20px; }
+  .side-card p { margin-bottom: 14px; font-size: 14.5px; }
+  .side-amounts { gap: 10px; margin-bottom: 12px; }
+  .side-amounts a { display: flex; flex-direction: column; justify-content: center; min-height: 58px; padding: 6px; border-radius: 14px; font-size: 21px; line-height: 1.1; box-shadow: 0 1px 2px rgba(0,48,48,.05); }
+  .side-amounts a small { margin-top: 3px; font-size: 12.5px; }
+  .side-card .amt-other { border-radius: 14px; min-height: 50px; }
+  .side-card .btn-gold { min-height: 52px; border-radius: 14px; font-size: 16.5px; box-shadow: 0 12px 24px -14px rgba(233,173,12,.9); }
+  .side-ways { margin-top: 14px; padding-top: 14px; }
+  .side-ways a { border-color: var(--fb-line); }
+  .side-card.hot { padding: 14px 16px; border-radius: 18px; }
+  .side-card.hot .ic { border-radius: 14px; }
+
+  /* ---------- share bar and related pages ---------- */
+  .page-grid > .share-bar { margin-top: 6px; padding-top: 18px; }
+  .share-bar a, .share-bar button { box-shadow: 0 8px 16px -10px rgba(0,48,48,.35); }
+  .related { padding: 36px 0 30px; }
+  .related .section-title { margin-bottom: 18px; }
+  .related .grid > * { flex-basis: min(76%, 300px); }
+  .related .card { border-radius: 20px; box-shadow: var(--fb-shadow); }
+  .related .card .body { padding: 14px 16px 16px; }
+  .related .card h3 { font-size: 17px; }
+
+  /* ---------- closing band (project pages) and the news band: one dark teal card ---------- */
+  body:has(main .page-grid) .cta-band, .news .nw-cta { padding: 6px 0 40px; background: #fff; }
+  body:has(main .page-grid) .cta-band .wrap, .news .nw-cta .wrap { position: relative; overflow: hidden; margin: 0 16px; padding: 30px 20px 24px; border-radius: 26px; background: var(--fb-band); color: #fff; box-shadow: 0 26px 50px -26px rgba(0,70,70,.7); text-align: center; }
+  body:has(main .page-grid) .cta-band .wrap::before, .news .nw-cta .wrap::before { content: ""; position: absolute; inset: 0; background: url(../img/pattern-white.png) center / 320px; opacity: .5; pointer-events: none; }
+  body:has(main .page-grid) .cta-band .wrap::after, .news .nw-cta .wrap::after { content: ""; position: absolute; width: 220px; height: 220px; inset-inline-end: -90px; top: -110px; border-radius: 50%; background: radial-gradient(circle, rgba(254,200,48,.35), rgba(254,200,48,0) 70%); pointer-events: none; }
+  body:has(main .page-grid) .cta-band .wrap > *, .news .nw-cta .wrap > * { position: relative; }
+  body:has(main .page-grid) .cta-band h2, .news .nw-cta h2 { margin: 0 0 6px; font-size: 24px; line-height: 1.3; color: #fff; }
+  body:has(main .page-grid) .cta-band p, .news .nw-cta p { margin: 0 0 20px; font-size: 15.5px; line-height: 1.65; color: rgba(255,255,255,.88); }
+  body:has(main .page-grid) .cta-band .btn, .news .nw-cta .btn { display: flex; width: 100%; min-height: 52px; margin: 0 0 10px; padding: 10px 20px; border-radius: 14px; font-size: 16.5px; }
+  body:has(main .page-grid) .cta-band .btn:last-child, .news .nw-cta .btn:last-child { margin-bottom: 0; }
+  body:has(main .page-grid) .cta-band .btn-gold, .news .nw-cta .btn-gold { color: var(--teal-ink); box-shadow: 0 12px 24px -12px rgba(0,0,0,.5); }
+  body:has(main .page-grid) .cta-band .btn-teal, .news .nw-cta .btn-ghost-teal { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.5); }
+
+  /* ---------- contact ---------- */
+  .contact-page main > section { padding: 24px 0 36px; }
+  .contact-page .grid-2 { gap: 26px; }
+  .contact-page .grid-2 > div > p:first-child { margin: 0 0 16px; font-size: 16px; line-height: 1.75; color: var(--ink); }
+  .contact-page main .grid-2 > div > .bank { min-height: 80px; margin-bottom: 10px; padding-inline-start: 78px; border-color: var(--fb-line); border-radius: 18px; box-shadow: var(--fb-shadow); }
+  .contact-page main .grid-2 > div > .bank::before { border-radius: 14px; }
+  .contact-page main .grid-2 > div > .bank b { font-size: 13.5px; margin-bottom: 3px; }
+  .contact-page .ct-dir { display: inline-flex; align-items: center; min-height: 30px; margin-top: 4px; padding: 0 11px; border-radius: 999px; background: var(--teal-soft); font-size: 13px; }
+  /* MWP7's branches line and maps button never showed: site.css hides [hidden] with !important */
+  .contact-page .ct-branches[hidden] { display: block !important; margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 14.5px; color: var(--muted); }
+  .contact-page main .grid-2 > div > a:has(> picture, > img) { display: block; margin-top: 6px; border-radius: 20px; overflow: hidden; box-shadow: var(--fb-shadow-lg); }
+  .contact-page main .grid-2 > div > a > picture > img, .contact-page main .grid-2 > div > a > img[alt*="خريطة"] { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; box-shadow: none; }
+  .contact-page .ct-maplink[hidden] { display: flex !important; justify-content: center; min-height: 48px; margin-top: 12px; border: 1.5px solid var(--teal-text); border-radius: 14px; color: var(--teal-text); font-size: 15px; font-weight: 800; text-decoration: none; }
+  .contact-page .contact-card { border-radius: var(--fb-r); box-shadow: var(--fb-shadow-lg); }
+  .contact-page .field input, .contact-page .field textarea { border-radius: 12px; }
+  .contact-page .field input { min-height: 48px; }
+  .contact-page .contact-card .btn-block { min-height: 52px; border-radius: 14px; box-shadow: 0 12px 24px -14px rgba(233,173,12,.9); }
+
+  /* ---------- community ---------- */
+  .community .cm-gate, .community .cm-main { padding: 24px 0 36px; }
+  .community .cm-card { padding: 30px 20px 26px; border-radius: 26px; box-shadow: var(--fb-shadow-lg); }
+  .community .cm-lock { border-radius: 22px; }
+  .community .cm-locked h2 { font-size: 24px; line-height: 1.3; }
+  .community .cm-locked > p { font-size: 15.5px; line-height: 1.7; }
+  .community .cm-locked .btn-lg { display: flex; width: 100%; min-height: 52px; margin: 12px 0 10px; border-radius: 14px; font-size: 17px; }
+  .community .cm-welcome { padding: 20px 18px; border: 0; border-radius: 26px; background: var(--fb-band); color: #fff; box-shadow: 0 26px 50px -26px rgba(0,70,70,.7); position: relative; overflow: hidden; }
+  .community .cm-welcome::before { content: ""; position: absolute; inset: 0; background: url(../img/pattern-white.png) center / 320px; opacity: .45; pointer-events: none; }
+  .community .cm-welcome > * { position: relative; }
+  .community .cm-welcome .eyebrow { color: var(--gold); font-size: 13px; }
+  .community .cm-welcome h2 { font-size: 23px; color: #fff; }
+  .community .cm-welcome p { font-size: 14.5px; color: rgba(255,255,255,.86); }
+  .community .cm-avatar { width: 58px; height: 58px; box-shadow: 0 10px 20px -8px rgba(0,0,0,.55); }
+  .community .cm-badge { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.32); color: #fff; }
+  .community .cm-stats { gap: 0; margin: 12px 0 28px; overflow: hidden; border: 1px solid var(--fb-line); border-radius: 20px; background: #fff; box-shadow: var(--fb-shadow); }
+  .community .cm-stat { padding: 16px 6px 14px; border: 0; border-radius: 0; }
+  .community .cm-stat + .cm-stat { border-inline-start: 1px solid var(--line); }
+  .community .cm-stat b { font-size: 26px; color: var(--teal-text); }
+  .community .cm-stat b.cm-date { font-size: 16px; }
+  .community .cm-stat > span { font-size: 13px; }
+  .community .cm-h { margin: 12px 0 8px; padding-inline-start: 12px; border-inline-start: 4px solid var(--gold); font-size: 22px; line-height: 1.3; }
+  .community .cm-gifts { gap: 10px; margin: 12px 0 28px; }
+  .community .cm-gift { padding: 14px 16px; border-color: var(--fb-line); border-radius: 20px; box-shadow: var(--fb-shadow); }
+  .community .cm-history li { padding: 12px 16px; border-radius: 14px; }
+  .community .cm-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 20px; }
+  .community .cm-cta .btn { margin: 0; min-height: 48px; padding-inline: 10px; border-radius: 14px; justify-content: center; font-size: 14.5px; }
+  .community .cm-cta .btn-gold { grid-column: 1 / -1; min-height: 52px; font-size: 17px; box-shadow: 0 12px 24px -14px rgba(233,173,12,.9); }
+  .community .cm-cta .btn:nth-child(4) { grid-column: 1 / -1; }
+  .community .cm-modal-in { border-radius: 24px; }
+
+  /* ---------- news ---------- */
+  .news .nw-sec { padding: 22px 0 36px; }
+  .news .nw-card { border-radius: var(--fb-r); box-shadow: var(--fb-shadow-lg); }
+  .news .nw-filters button { border-color: var(--fb-line); }
+  .news .nw-empty.nw-soon { margin-top: 4px; padding: 28px 18px 24px; border: 1px solid var(--fb-line); border-radius: var(--fb-r); background: var(--bg-2); font-size: 16px; }
+  .news .nw-soon .nw-soc .btn { border-radius: 999px; background: #fff; }
+  .news .nw-more-wrap .btn { width: 100%; }
+
+  /* ---------- albums ---------- */
+  .albums-page main > section { padding: 22px 0 36px; }
+  .albums-page .album-grid { gap: 12px; }
+  .albums-page .album-grid .album { border-color: var(--fb-line); border-radius: 20px; box-shadow: var(--fb-shadow); }
+  .albums-page .album .body { padding: 12px 12px 14px; }
+  .albums-page .album h3 { font-size: 16px; }
+  .albums-page .album .count { bottom: 10px; padding: 7px 11px; }
+}
+
+/* ---------- motion (phone, Polish): transform/opacity, once; the hidden start state exists only under .reveal (JS) ---------- */
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  /* the side card's amount tiles follow the card in, one after another */
+  .page-side.reveal .side-amounts > * { opacity: 0; transform: translateY(10px); transition: opacity .4s ease, transform .5s cubic-bezier(.2,.7,.2,1); }
+  .page-side.reveal.in .side-amounts > * { opacity: 1; transform: none; }
+  .page-side.reveal.in .side-amounts > :nth-child(2) { transition-delay: .06s; }
+  .page-side.reveal.in .side-amounts > :nth-child(3) { transition-delay: .12s; }
+  .page-side.reveal.in .side-amounts > :nth-child(4) { transition-delay: .18s; }
+  .page-side.reveal.in .side-amounts > :nth-child(5) { transition-delay: .24s; }
+  /* the step numbers pop once their row is in; the gold dots too */
+  .m-steps li.reveal::before { transform: scale(.6); transition: transform .5s cubic-bezier(.3,1.5,.5,1) .15s; }
+  .m-steps li.reveal.in::before { transform: none; }
+  .m-trust-rows li.reveal::before { transform: scale(.4); transition: transform .5s cubic-bezier(.3,1.5,.5,1) .2s; }
+  .m-trust-rows li.reveal.in::before { transform: none; }
+  /* press feedback */
+  .side-amounts a, .m-trust-src, .ct-maplink, .cm-cta .btn, .cta-band .btn, .nw-cta .btn, .cm-gift, .album, .side-ways a { transition: transform .15s; }
+  .side-amounts a:active, .m-trust-src:active, .ct-maplink:active, .cm-cta .btn:active, .cta-band .btn:active, .nw-cta .btn:active, .side-ways a:active { transform: scale(.96); }
+}

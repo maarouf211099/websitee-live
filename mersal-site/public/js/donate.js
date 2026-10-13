@@ -761,6 +761,7 @@
       '<dl class="rcpt-rows"><dt>المبلغ</dt><dd><b>' + fmt.format(amt) + " جنيه</b></dd>" +
       "<dt>الغرض</dt><dd>" + esc(saved.purposeTitle || purposeText().trim() || "تبرع عام") + "</dd>" +
       "<dt>التاريخ</dt><dd>" + new Date().toLocaleDateString("ar-EG-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }) + "</dd>" +
+      (window.MersalGift && window.MersalGift.giftLine ? window.MersalGift.giftLine(true) : "") +
       '<dt class="rcpt-ref">رقم العملية</dt><dd class="rcpt-ref"><code dir="ltr">' + esc(o.orderId) + '</code> <button type="button" class="copy" data-copy="' + esc(o.orderId) + '" aria-label="نسخ رقم العملية">' + CI + "<span>نسخ</span></button></dd></dl>" +
       '<p class="rcpt-next">احتفظ برقم العملية. لو عندك أي سؤال عن تبرعك كلّمنا على <a href="tel:19340">19340</a> وقول الرقم ده.</p>' +
       '<div class="rcpt-actions"><button type="button" class="btn btn-ghost-teal" data-print-rcpt>احفظ التأكيد</button>' +

@@ -12,7 +12,9 @@
   if (!forms.length) return;
   var SITE = window.MERSAL_SITE || {};
   var HOTLINE = SITE.hotline || "19340";
-  var WA = String(SITE.whatsapp || SITE.phone || "01200002870").replace(/\D/g, "").replace(/^0/, "20");
+  // only the official WhatsApp from the site details (console "بيانات الموقع"); empty = every WhatsApp button and
+  // sentence ([data-wa-box]) hides and the email / hotline line ([data-no-wa]) shows instead (see waBoxes below)
+  var WA = String(SITE.whatsapp || "").replace(/\D/g, "").replace(/^0/, "20");
   var PREFIX = { volunteer: "MV", help: "MH", transfer: "MT", pickup: "MP", contact: "MC" };
   var REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var SMOOTH = REDUCED ? "auto" : "smooth";
@@ -46,6 +48,8 @@
   var LEGACY_FOR = { hospital: "p30", oncology: "p31", p4: "p31", p5: "p31" }; // p4/p5: pages of the oncology centre (p31)
   var pagesJson = null; // /data/pages.json, fetched once for the titles of ?for=p<id> purposes
 
+  $$("[data-wa-box]").forEach(function (el) { el.hidden = !WA; });
+  $$("[data-no-wa]").forEach(function (el) { el.hidden = !!WA; });
   forms.forEach(setup);
   transferCards();
 
@@ -219,7 +223,13 @@
     function prefill() {
       if (TYPE !== "transfer" && TYPE !== "pickup") return;
       ["name", "phone", "email"].forEach(function (k) { var el = form.elements[k]; if (el && !el.value && DONOR[k]) el.value = String(DONOR[k]).slice(0, Number(el.getAttribute("maxlength")) || 120); });
-      var want = new URLSearchParams(location.search).get("for") || "", sel = form.elements.purpose;
+      // ?amount= (the zakat calculator's result): fills an empty amount field, which stays editable
+      var qs = new URLSearchParams(location.search), qa = num(qs.get("amount") || ""), amt = form.elements.amount;
+      if (qa >= 10 && qa <= 10000000 && amt && amt.tagName && !amt.value) {
+        if (TYPE === "pickup") { var kind = form.querySelector('input[name="kind"][value="money"]'); if (kind) kind.checked = true; }
+        amt.value = fmt(qa);
+      }
+      var want = qs.get("for") || "", sel = form.elements.purpose;
       if (Object.prototype.hasOwnProperty.call(LEGACY_FOR, want)) want = LEGACY_FOR[want];
       want = want.replace(/[^\w-]/g, "");
       if (!want || !sel || !sel.querySelector) return;
@@ -323,7 +333,8 @@
         recapEl.hidden = !parts.length;
       }
       var text = (WA_TEXT[TYPE] || WA_TEXT.volunteer) + ref + (TYPE === "transfer" && parts.length ? "\n" + parts.join(" - ") : "");
-      if (waEl) waEl.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(text);
+      if (waEl && WA) waEl.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(text);
+      else if (waEl) { waEl.removeAttribute("href"); (waEl.closest("[data-wa-box]") || waEl).hidden = true; }
       try { localStorage.setItem("mersalRequest:" + TYPE, JSON.stringify({ ref: ref, at: Date.now() })); } catch (x) {}
       success.scrollIntoView({ behavior: SMOOTH, block: "start" });
       var h = $("h2, h3", success); if (h && h.hasAttribute("tabindex")) h.focus({ preventScroll: true });

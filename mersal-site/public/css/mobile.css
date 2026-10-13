@@ -743,3 +743,12 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .side-amounts a, .m-trust-src, .ct-maplink, .cm-cta .btn, .cta-band .btn, .nw-cta .btn, .cm-gift, .album, .side-ways a { transition: transform .15s; }
   .side-amounts a:active, .m-trust-src:active, .ct-maplink:active, .cm-cta .btn:active, .cta-band .btn:active, .nw-cta .btn:active, .side-ways a:active { transform: scale(.96); }
 }
+
+/* ===================================================================
+   MWP7 deferred
+   =================================================================== */
+/* case-verification steps on donate and zakat (static markup, hidden on desktop; site.css hides [hidden] with !important) */
+@media (max-width: 760px) {
+  html .m-trust-static[hidden] { display: block !important; margin: 24px 16px; }
+  html .m-trust-static h3 { margin-top: 0; }
+}

@@ -85,7 +85,8 @@
     var q = [];
     if (o.purpose && o.purpose !== "general") q.push("for=" + encodeURIComponent(o.purpose));
     if (o.amount >= 10) q.push("amount=" + o.amount);
-    return "/donate.html" + (q.length ? "?" + q.join("&") : "") + "#online";
+    q.push("gift=1");
+    return "/donate.html?" + q.join("&") + "#online";
   }
 
   // ---------- assets: the Cairo Arabic + Latin subsets and the two images are ready before the first draw ----------
@@ -469,7 +470,7 @@
     }
     // back from the bank the page reloads empty: the choice made before the redirect is kept in localStorage
     var s = load();
-    return paid && s.pending && s.to ? { occasion: s.occasion, to: s.to, gender: s.gender, from: typeof s.pendingFrom === "string" ? s.pendingFrom : null } : null;
+    return paid && s.pending && s.to && !(s.pendingAt && Date.now() - s.pendingAt > 864e5) ? { occasion: s.occasion, to: s.to, gender: s.gender, from: typeof s.pendingFrom === "string" ? s.pendingFrom : null } : null;
   }
   // the sender shown on the card: nothing ("فاعل خير") when the donor ticked "تبرع بدون ذكر اسمي"
   function stepperFrom() {
@@ -486,11 +487,19 @@
     function label() { if (lbl && occ) lbl.textContent = toLabel(OCC[occ.value] ? occ.value : "gift", radio(box, "gift-gender")); }
     // stored only when the donor touches the fields: a reload back from the bank must not wipe the pending choice
     function sync() { box.hidden = !on.checked; label(); store({ pending: on.checked, occasion: occ ? occ.value : "gift", to: to ? str(to.value, 60) : "", gender: radio(box, "gift-gender") || "m" }); }
+    // coming from the gift page (gift=1, or the pending choice under 24 h old) the dedication is ticked; otherwise it stays as the donor left it
+    var fresh = s.pending && s.to && (!s.pendingAt || Date.now() - s.pendingAt < 864e5);
+    if (!on.checked && to && to.value && (/(^|[?&])gift=1(&|$)/.test(location.search.slice(1)) || fresh)) on.checked = true;
     box.hidden = !on.checked; label();
     on.addEventListener("change", function () { sync(); if (on.checked && to && !to.value) setTimeout(function () { to.focus(); }, 30); });
     box.addEventListener("input", sync); box.addEventListener("change", sync);
     // at "ادفع" the sender is fixed too (name, or nothing when anonymous): the bank's return page cannot read the form
     if (on.form) on.form.addEventListener("submit", function () { if (on.checked) { sync(); store({ pendingFrom: stepperFrom() }); } });
+  }
+  // the receipt row on the paid screen (display only): "إهداء: <occasion>: <name>" or nothing
+  function giftLine(paid) {
+    var g = stepperGift(!!paid);
+    return g ? "<dt>إهداء</dt><dd>" + esc((OCC[g.occasion] || OCC.gift).label + ": " + g.to) + "</dd>" : "";
   }
   function summaryRow() {
     var g = stepperGift(false);
@@ -569,6 +578,11 @@
     var els = form.elements, canvas = document.getElementById("gf-canvas"), preview = document.getElementById("gf-preview");
     var toErr = document.getElementById("gf-to-err"), toLbl = document.getElementById("gf-to-l"), count = document.getElementById("gf-msg-count");
     var dl = document.getElementById("gf-download"), share = document.getElementById("gf-share"), donate = document.getElementById("gf-donate");
+    // leaving for the donate page: the dedication is remembered for 24 h so it can be ticked there and shown on the receipt
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest("#gf-donate, [data-gf-donate]");
+      if (a && els.to && str(els.to.value, 60)) store({ pending: true, pendingAt: Date.now(), occasion: (form.querySelector('input[name="occasion"]:checked') || {}).value || "gift", to: str(els.to.value, 60), gender: (form.querySelector('input[name="gender"]:checked') || {}).value || "m" });
+    });
     function setRadio(name, v) { var r = form.querySelector('input[name="' + name + '"][value="' + String(v).replace(/[^\w-]/g, "") + '"]'); if (r) r.checked = true; }
     var saved = load(), donor = {}, q = new URLSearchParams(location.search);
     try { donor = JSON.parse(localStorage.getItem("mersalDonor") || "{}") || {}; } catch (e) {}
@@ -715,7 +729,7 @@
     draw: function (canvas, opts) { return ready().then(function (a) { paint(canvas, clean(opts), a); return canvas; }); },
     blob: function (opts) { var c = document.createElement("canvas"); return this.draw(c, opts).then(toBlob); },
     remind: remind, ics: ics, googleUrl: googleUrl,
-    afterDonation: afterDonation, summaryRow: summaryRow
+    afterDonation: afterDonation, summaryRow: summaryRow, giftLine: giftLine
   };
   initStepper();
   initPage();

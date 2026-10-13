@@ -39,6 +39,12 @@
       qdImpact(v);
     });
   });
+  // phones: the gateway named in the site settings (Paymob, through the Mersal app); any other value keeps the written line
+  (function () {
+    var t = document.querySelector(".quick-donate .qd-trust"), p = window.MERSAL_SITE && window.MERSAL_SITE.payProvider;
+    if (!t || !phone || (p !== "paymob" && p !== "app")) return;
+    var n = t.lastChild; if (n && n.nodeType === 3) n.nodeValue = "دفع آمن عبر Paymob · فيزا · ماستركارد · ميزة";
+  })();
   // "مبلغ تاني": any whole amount (Arabic or Latin digits); empty goes back to 500
   var qdOther = document.getElementById("qd-other");
   if (qdOther) qdOther.addEventListener("input", function () {

@@ -1087,3 +1087,17 @@ body:has(#m-sheet.closing)::before { animation: fade-out .2s ease-in both; point
 .check-list:has(> li > a:only-child) { gap: 0; }
 .check-list li > a:only-child { display: flex; align-items: center; min-height: 44px; }
 .check-list li:has(> a:only-child)::before { top: 10px; }
+
+/* No layout shift in the project side card (WP7 QA, CLS on /p/30 at 1366): layout.js adds the "مبلغ تاني" row under the chips
+   and, on cause pages, the "دفع آمن" line and the "مش معاك كارت؟" box under the gold button. When the browser paints before the
+   deferred script runs, the button and the hotline card jumped down by up to 276px. Their room is held until they arrive (the
+   heights are the rendered ones; the card has a fixed width from 761px). Pages that are not causes (layout.js NOT_CAUSE) only
+   get the amount row. */
+.page-side .side-amounts:not(:has(.amt-other)):has(> a)::after { content: ""; grid-column: 1 / -1; height: 48px; }
+.page-side .side-card.donate:has(> a.btn-gold[href*="?for=p"]):not(:has(.side-ways)):not(:has(> a.btn-gold:is([href*="for=p3#"], [href*="for=p6#"], [href*="for=p7#"], [href*="for=p26#"], [href*="for=p29#"], [href*="for=p46#"], [href*="for=p47#"], [href*="for=p48#"], [href*="for=p51#"])))::after { content: ""; display: block; height: var(--side-room, 121.25px); }
+@media (min-width: 961px) {
+  .page-side { --side-room: 220px; }
+}
+@media (min-width: 961px) and (max-height: 700px) {
+  .page-side { --side-room: 175.25px; }
+}

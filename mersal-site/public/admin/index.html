@@ -38,6 +38,7 @@
       <button role="tab" data-tab="news">الأخبار</button>
       <button role="tab" data-tab="impact">أثر التبرع</button>
       <button role="tab" data-tab="extras">شريط الإعلان والشركاء</button>
+      <button role="tab" data-tab="users" hidden>المستخدمين والصلاحيات</button>
       <button role="tab" data-tab="settings">الإعدادات</button>
     </nav>
     <div class="side-foot">
@@ -150,6 +151,7 @@
 
     <section class="panel" id="tab-settings" hidden>
       <header class="panel-head"><h1>الإعدادات</h1></header>
+      <div id="pay-settings">
       <h2>الدفع بالبطاقة</h2>
       <div class="radios" id="paymode">
         <label><input type="radio" name="pm" value="off"><b>مقفول</b><span>تبويب البطاقة مخفي</span></label>
@@ -166,7 +168,8 @@
       <button class="btn btn-gold" id="save-settings">حفظ ونشر</button>
       <h2>حالة الربط</h2>
       <ul class="checks" id="checks"></ul>
-      <h2>حساب الأدمن</h2>
+      </div>
+      <h2 id="acct-title">حساب الأدمن</h2>
       <p class="hint" id="pw-hint">اسم المستخدم <code id="pw-user">admin</code>. غيّر كلمة السر من هنا، أو ظبّط <code>ADMIN_USER</code> و<code>ADMIN_PASSWORD</code> في إعدادات Azure لو عايز تتحكم فيها من هناك.</p>
       <form class="pw-form" id="pw-form">
         <div class="field"><label for="pw-cur">كلمة السر الحالية</label><input id="pw-cur" type="password" autocomplete="current-password" required></div>
@@ -174,8 +177,25 @@
         <div class="field"><label for="pw-new2">تأكيد كلمة السر الجديدة</label><input id="pw-new2" type="password" autocomplete="new-password" minlength="8" required></div>
         <button class="btn btn-teal" type="submit">تغيير كلمة السر</button>
       </form>
+      <div id="logout-all-box">
       <p class="hint" style="margin-top:14px">تغيير كلمة السر بيخرّج كل الأجهزة التانية. لو حد ممكن يكون دخل من جهاز مش بتاعك:</p>
       <button type="button" class="btn btn-danger" id="logout-all">تسجيل الخروج من كل الأجهزة</button>
+      </div>
+    </section>
+
+    <section class="panel" id="tab-users" hidden>
+      <header class="panel-head"><h1>المستخدمين والصلاحيات</h1></header>
+      <p class="hint">ضيف حساب لكل حد بيشتغل على اللوحة، واختار هو يقدر يعدّل إيه بس. الأدمن الرئيسي (<code id="u-owner">admin</code>) بيقدر يعمل كل حاجة، وهو بس اللي يدير المستخدمين. كل حفظ بيتسجل باسم اللي عمله.</p>
+      <div id="u-list" class="u-list"></div>
+      <h2>إضافة مستخدم</h2>
+      <form class="u-form" id="u-form" autocomplete="off">
+        <div class="fields">
+          <div class="field"><label for="u-name">اسم المستخدم (إنجليزي)</label><input id="u-name" autocapitalize="off" spellcheck="false" dir="ltr" required placeholder="ahmed"></div>
+          <div class="field"><label for="u-pass">كلمة السر (8 حروف على الأقل)</label><input id="u-pass" type="password" autocomplete="new-password" minlength="8" required></div>
+        </div>
+        <fieldset class="u-perms" id="u-new-perms"><legend>الصلاحيات</legend></fieldset>
+        <button class="btn btn-gold" type="submit">إضافة</button>
+      </form>
     </section>
   </main>
 </div>

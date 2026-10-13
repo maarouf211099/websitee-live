@@ -85,7 +85,15 @@
       if (lastPay) showProvider(lastPay); // the list was just rebuilt
       $("#pw-user").textContent = me.user || "admin";
       if (me.password === "env" || me.password === "aad") { $("#pw-form").hidden = true; $("#pw-hint").textContent = me.password === "env" ? "كلمة السر متظبطة من إعدادات Azure (ADMIN_PASSWORD)؛ غيّرها من هناك." : "داخل بحساب مايكروسوفت."; }
-      if (!booted) { booted = true; loadHome(); loadPages(); loadAlbums(); loadSettings(); keepAlive(); }
+      applyPerms(me);
+      if (!booted) {
+        booted = true;
+        loadPages(); // titles for the campaign pickers and the donations' purposes (public data: any login can read it)
+        if (can("content")) { loadHome(); loadAlbums(); }
+        if (can("settings")) loadSettings();
+        keepAlive();
+        openFirstTab();
+      }
     }).catch(function (e) {
       if (e.status === 401) showLogin(true); else toast("تعذّر الاتصال: " + e.message, true);
     });
@@ -122,6 +130,24 @@
       .catch(function (x) { toast(x.message, true); }).then(function () { busy(b, false); });
   });
   start();
+
+  // ---------- permissions: each tab belongs to one perm; the server checks every save again ----------
+  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
+  var perms = null;
+  function can(perm) { return !perm || !perms || perms.indexOf(perm) >= 0; }
+  function applyPerms(me) {
+    perms = Array.isArray(me.perms) ? me.perms : null;
+    $$(".tabs button").forEach(function (b) { b.hidden = !can(TAB_PERM[b.dataset.tab]); });
+    $("#pay-settings").hidden = !can("settings");
+    $("#logout-all-box").hidden = !me.owner && !!perms;
+    $("#acct-title").textContent = me.owner || !perms ? "حساب الأدمن" : "حسابي";
+    if (me.password === "user") $("#pw-hint").textContent = "داخل باسم " + (me.user || "") + ". تقدر تغيّر كلمة السر بتاعتك من هنا (بيخرّج أجهزتك التانية).";
+  }
+  function openFirstTab() {
+    var want = location.hash.slice(1), b = want && $('.tabs button[data-tab="' + want + '"]');
+    if (!b || b.hidden) b = $$(".tabs button").filter(function (x) { return !x.hidden; })[0];
+    if (b) b.click();
+  }
 
   // ---------- tabs ----------
   // Extra tabs live in /admin/tabs/*.js and register an init function: MersalAdmin.register("menu", fn)
@@ -481,5 +507,56 @@
     register: function (tab, fn) { tabInits[tab] = fn; },
     openTab: function (tab) { var b = $('.tabs button[data-tab="' + tab + '"]'); if (b) b.click(); }
   };
-  if (location.hash && $('.tabs button[data-tab="' + location.hash.slice(1) + '"]')) window.MersalAdmin.openTab(location.hash.slice(1));
+  // the first tab opens once /me said which tabs this account can use (openFirstTab)
+
+  // ---------- users and permissions (main account only) ----------
+  var PERM_NAMES = {
+    content: ["محتوى الموقع", "الرئيسية، الصفحات، القائمة، الألبومات، الكوميونيتي، الأخبار، أثر التبرع، شريط الإعلان والشركاء، ورفع الصور"],
+    site: ["بيانات الموقع", "التليفونات والسوشيال والفوتر وحسابات البنوك والمحافظ"],
+    donations: ["التبرعات", "عرض التبرعات وتنزيلها ومراجعة العمليات المعلقة"],
+    requests: ["الطلبات", "طلبات التطوع والمساعدة والتواصل"],
+    settings: ["إعدادات الدفع", "تشغيل وقفل الدفع بالبطاقة واختيار بوابة الدفع"]
+  };
+  var PERM_KEYS = Object.keys(PERM_NAMES);
+  function permBoxes(selected, name) {
+    return PERM_KEYS.map(function (k) {
+      return '<label class="u-perm"><input type="checkbox" name="' + name + '" value="' + k + '"' + (selected.indexOf(k) >= 0 ? " checked" : "") + "><b>" + esc(PERM_NAMES[k][0]) + "</b><span>" + esc(PERM_NAMES[k][1]) + "</span></label>";
+    }).join("");
+  }
+  function picked(root) { return $$('input[type="checkbox"]:checked', root).map(function (i) { return i.value; }); }
+  function renderUsers(d) {
+    $("#u-owner").textContent = d.owner || "admin";
+    var list = d.users || [];
+    $("#u-list").innerHTML = list.length ? list.map(function (u) {
+      return '<div class="item u-item' + (u.disabled ? " off" : "") + '" data-user="' + esc(u.user) + '">' +
+        '<div class="u-head"><b dir="ltr">' + esc(u.user) + "</b>" + (u.disabled ? '<span class="u-badge">موقوف</span>' : "") +
+        (u.created ? '<span class="u-meta">اتضاف ' + esc(cairoTime(u.created).slice(0, 10)) + (u.by ? " بواسطة " + esc(u.by) : "") + "</span>" : "") + "</div>" +
+        '<fieldset class="u-perms"><legend>الصلاحيات</legend>' + permBoxes(u.perms || [], "p-" + u.user) + "</fieldset>" +
+        '<div class="item-actions"><button class="btn btn-teal btn-sm" data-act="save">حفظ الصلاحيات</button><button class="btn btn-ghost btn-sm" data-act="pass">كلمة سر جديدة</button>' +
+        '<button class="btn btn-ghost btn-sm" data-act="toggle">' + (u.disabled ? "تفعيل" : "إيقاف") + '</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
+    }).join("") : '<p class="hint">مفيش مستخدمين غيرك لسه. ضيف واحد من تحت.</p>';
+  }
+  function loadUsers() { api("users").then(renderUsers).catch(function (e) { toast(e.message, true); }); }
+  $("#u-new-perms").insertAdjacentHTML("beforeend", permBoxes(["content"], "p-new"));
+  $("#u-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var b = e.target.querySelector('button[type="submit"]'), body = { user: $("#u-name").value.trim().toLowerCase(), password: $("#u-pass").value, perms: picked($("#u-new-perms")) };
+    if (!body.perms.length) { toast("اختار صلاحية واحدة على الأقل", true); return; }
+    busy(b, true);
+    api("users", { method: "POST", body: body }).then(function (d) { toast("اتضاف " + body.user + " ✓ ابعتله اسم المستخدم وكلمة السر"); $("#u-name").value = ""; $("#u-pass").value = ""; renderUsers({ owner: $("#u-owner").textContent, users: d.users }); })
+      .catch(function (x) { toast(x.message, true); }).then(function () { busy(b, false); });
+  });
+  $("#u-list").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-act]"); if (!b) return;
+    var it = b.closest(".u-item"), name = it.dataset.user, req = null, msg = "";
+    if (b.dataset.act === "save") { var ps = picked(it); if (!ps.length) { toast("اختار صلاحية واحدة على الأقل، أو أوقف الحساب", true); return; } req = { method: "PUT", body: { perms: ps } }; msg = "اتحفظت الصلاحيات ✓"; }
+    else if (b.dataset.act === "pass") { var np = prompt("كلمة السر الجديدة لـ " + name + " (8 حروف على الأقل):"); if (np == null) return; if (np.length < 8) { toast("كلمة السر لازم 8 حروف على الأقل", true); return; } req = { method: "PUT", body: { password: np } }; msg = "اتغيّرت كلمة السر ✓ (أجهزته اتخرجت)"; }
+    else if (b.dataset.act === "toggle") { var off = !it.classList.contains("off"); req = { method: "PUT", body: { disabled: off } }; msg = off ? "الحساب اتوقف ✓" : "الحساب اتفعّل ✓"; }
+    else if (b.dataset.act === "del") { if (!confirm("حذف " + name + " نهائياً؟")) return; req = { method: "DELETE", body: {} }; msg = "اتحذف ✓"; }
+    if (!req) return;
+    busy(b, true);
+    api("users/" + encodeURIComponent(name), req).then(function (d) { toast(msg); renderUsers({ owner: $("#u-owner").textContent, users: d.users }); })
+      .catch(function (x) { toast(x.message, true); busy(b, false); });
+  });
+  window.MersalAdmin.register("users", loadUsers);
 })();

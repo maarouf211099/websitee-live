@@ -45,7 +45,7 @@ app.http("adminRequests", {
   methods: ["GET"], authLevel: "anonymous", route: "console/requests",
   handler: async (req, ctx) => {
     try {
-      await requireAdmin(req);
+      await requireAdmin(req, "requests");
       const q = (k) => req.query.get(k) || "";
       const r = await forms.list({ type: q("type"), status: q("status"), from: q("from"), to: q("to") });
       return json(200, { enabled: forms.enabled(), store: r.store, statuses: forms.STATUSES, rows: r.rows });
@@ -57,7 +57,7 @@ app.http("adminRequest", {
   methods: ["GET", "PATCH"], authLevel: "anonymous", route: "console/requests/{id}",
   handler: async (req, ctx) => {
     try {
-      await requireAdmin(req);
+      await requireAdmin(req, "requests");
       const id = String(req.params.id || "").toUpperCase();
       if (!forms.typeOf(id)) return json(400, { message: "رقم طلب غير صحيح" });
       if (req.method === "GET") {

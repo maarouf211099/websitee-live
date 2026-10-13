@@ -267,6 +267,8 @@
   syncChips();
 
   // Purpose list: general/zakat/sadaqa + every project and service imported from the old site
+  var touched = false; // the donor tapped or typed in the stepper before the purpose list loaded
+  ["pointerdown", "keydown"].forEach(function (ev) { form.addEventListener(ev, function () { touched = true; }, { once: true }); });
   var CAMPAIGNS = []; // the home campaigns (content.json), for the #impact line
   var optionsReady = Promise.all([
     fetch("/content.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
@@ -305,6 +307,12 @@
     want = want.replace(/[^\w-]/g, "");
     if (want && purpose.querySelector('option[value="' + want + '"]')) purpose.value = want;
     updateImpact();
+    // A donor who already chose a cause AND an amount (a project or campaign card: ?for=…&amount=…#online) starts on
+    // step 2, once, without focus moving on load. Never on ?amount= alone (the home quick-donate keeps the
+    // زكاة / صدقة choice on step 1), never when the donor already touched the form, never on a gateway return.
+    var urlAmt = parseInt(asciiDigits(q.get("amount") || ""), 10);
+    if (want && purpose.value === want && urlAmt >= 10 && urlAmt <= 1000000 && location.hash === "#online" &&
+      MODE !== "off" && !RETURNING && !touched && cur === 1 && amt() >= 10 && amt() <= 1000000) go(2, true);
   }).catch(function () { updateImpact(); });
 
   function syncChips() {
@@ -428,7 +436,7 @@
       el.querySelector(".s-for").textContent = purposeText();
     };
   })();
-  function go(n) {
+  function go(n, quiet) { // quiet: the automatic step 2 on load (no scroll jump, no focus, no keyboard)
     // css: the new step slides in from the side it comes from (data-dir)
     form.dataset.dir = n > cur ? "fwd" : n < cur ? "back" : (form.dataset.dir || "fwd");
     cur = n;
@@ -441,6 +449,7 @@
     });
     if (n === 3) fillSummary();
     var first = form.querySelector('.step[data-step="' + n + '"] input:not([disabled]), .step[data-step="' + n + '"] select');
+    if (quiet) return;
     form.scrollIntoView({ behavior: SMOOTH, block: "start" });
     if (first && n === 2) setTimeout(function () { first.focus({ preventScroll: true }); }, 300);
   }

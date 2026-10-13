@@ -31,6 +31,7 @@
 <div class="page-head"><div class="wrap">
   <h1>حاسبة الزكاة</h1>
   <p>اكتب قيم أموالك بالجنيه المصري، والحاسبة هتطلعلك قيمة الزكاة (2.5%).</p>
+  <p class="z-quick only-online" hidden><a href="/donate.html?for=zakat#online">عارف مبلغ زكاتك؟ ادفعها على طول <span aria-hidden="true">←</span></a></p>
 </div></div>
 <main>
   <section>
@@ -42,6 +43,8 @@
 
         <div class="zakat-group"><h3>سعر الذهب اليوم</h3>
           <table class="zakat-table"><tr><td><label for="zi-gold21price">سعر جرام الذهب عيار 21 (جنيه)</label></td><td data-unit="جنيه"><input id="zi-gold21price" name="gold21price" type="text" inputmode="decimal" autocomplete="off" maxlength="15"></td></tr></table>
+          <p class="z-err" id="z-gold-err" hidden></p>
+          <p class="z-help" id="z-gold-help" hidden>مش عارف السعر؟ اسأل أقرب محل دهب</p>
         </div>
         <div class="zakat-group"><h3>النقود</h3>
           <table class="zakat-table">
@@ -70,10 +73,10 @@
             <tr><td><label for="zi-debts">ديون عليك مستحقة الآن</label></td><td data-unit="جنيه"><input id="zi-debts" name="debts" type="text" inputmode="decimal" autocomplete="off" maxlength="15"></td></tr>
           </table>
         </div>
-        <p class="hint">زكاة الزروع والأنعام وعروض التجارة المعقدة: كلمنا على 19340 ونساعدك في حسابها.</p>
+        <p class="hint">زكاة الزروع والأنعام وعروض التجارة المعقدة: كلمنا على <a href="tel:19340" data-site="hotline">19340</a> ونساعدك في حسابها.</p>
       </form>
 
-      <aside class="zakat-result" aria-live="polite">
+      <aside class="zakat-result">
         <div>قيمة الزكاة</div>
         <div class="big" id="z-total">0 جنيه</div>
         <p class="z-empty">ابدأ بسعر جرام الذهب عيار 21، وبعدين اكتب أموالك.</p>
@@ -87,6 +90,7 @@
         <div id="z-note" class="hint" style="color:rgba(255,255,255,.8)"></div>
         <a class="btn btn-gold" id="z-pay" href="/donate.html?for=zakat#online" style="width:100%;margin-top:10px">أخرج زكاتك الآن</a>
         <p class="z-ways"><span class="zw-row"><span>أو أخرجها بـ <a href="/donate.html?for=zakat#bank">تحويل بنكي</a></span><a href="/donate.html?for=zakat#wallets">فوري أو إنستاباي</a><a href="/donate.html?for=zakat#home">مندوب لحد البيت</a></span></p>
+        <p id="z-say" class="sr-only" role="status"></p>
       </aside>
       <div class="z-bar" id="z-bar" aria-hidden="true"><span><small>قيمة زكاتك</small><b id="z-bar-amt">0 جنيه</b></span><a class="btn btn-gold" id="z-bar-pay" tabindex="-1" href="/donate.html?for=zakat#online">أخرج زكاتك</a></div>
     </div>
@@ -127,7 +131,7 @@ addEventListener("DOMContentLoaded", function () {
       shown = z; totalEl.classList.remove("bump"); void totalEl.offsetWidth; totalEl.classList.add("bump");
     });
   }
-  function calc() {
+  function calc(ev) {
     var p21 = v("gold21price"), gold = (v("g24") * 24 / 21 + v("g21") + v("g18") * 18 / 21) * p21;
     var assets = gold;
     f.querySelectorAll("[data-add]").forEach(function (i) { assets += v(i.name); });
@@ -140,7 +144,13 @@ addEventListener("DOMContentLoaded", function () {
     document.getElementById("z-net").textContent = fmt.format(net);
     var nisab = p21 * 85, note = document.getElementById("z-note");
     document.getElementById("z-nisab").textContent = p21 ? fmt.format(nisab) : "—";
-    note.textContent = !p21 ? "اكتب سعر جرام الذهب عيار 21 لحساب الذهب والنصاب." :
+    // grams typed with no gold price: the gold would silently count as 0, so say it at the price field
+    var grams = v("g24") + v("g21") + v("g18") > 0, noPrice = grams && !p21, GOLD_MSG = "اكتب سعر جرام الدهب عيار 21 النهارده علشان نحسب دهبك";
+    var pIn = f.elements.gold21price, gErr = document.getElementById("z-gold-err");
+    gErr.textContent = noPrice ? GOLD_MSG : ""; gErr.hidden = !noPrice; document.getElementById("z-gold-help").hidden = !noPrice;
+    if (noPrice) { pIn.setAttribute("aria-invalid", "true"); pIn.setAttribute("aria-describedby", "z-gold-err z-gold-help"); }
+    else { pIn.removeAttribute("aria-invalid"); pIn.removeAttribute("aria-describedby"); }
+    note.textContent = noPrice ? GOLD_MSG : !p21 ? "اكتب سعر جرام الذهب عيار 21 لحساب الذهب والنصاب." :
       (net >= nisab ? "أموالك بلغت النصاب." : "أموالك لم تبلغ النصاب.");
     // the card form takes 10 .. 1,000,000 EGP: a smaller zakat is rounded up to 10, a larger one capped
     var amt = zakat > 0 ? Math.min(1000000, Math.max(10, Math.ceil(zakat))) : 0;
@@ -148,10 +158,30 @@ addEventListener("DOMContentLoaded", function () {
     // slim bar (phones): same amount and link, shown once something is typed and the full card is off screen
     document.getElementById("z-bar-amt").textContent = fmt.format(zakat) + " جنيه";
     document.getElementById("z-bar-pay").href = document.getElementById("z-pay").href;
+    // the other ways carry the amount too (the transfer / pickup forms fill it in, still editable)
+    document.querySelectorAll(".z-ways a").forEach(function (a) {
+      var h = a.getAttribute("href").replace(/&amount=\d+/, "");
+      a.setAttribute("href", amt >= 10 ? h.replace("#", "&amount=" + amt + "#") : h);
+    });
+    // screen readers hear one line once typing pauses (the visible total counts up silently)
+    clearTimeout(sayT);
+    if (ev) sayT = setTimeout(function () { say.textContent = "زكاتك: " + fmt.format(zakat) + " جنيه. " + note.textContent; }, 700);
     typed = typed || assets > 0 || debts > 0;
     syncBar();
   }
-  var bar = document.getElementById("z-bar"), typed = false, cardVisible = true;
+  var bar = document.getElementById("z-bar"), typed = false, cardVisible = true, say = document.getElementById("z-say"), sayT = null;
+  // under a typed amount of 1,000 or more: "= 1,500,000 جنيه" (the field itself is never reformatted); phones only (mobile.css)
+  var echo = document.createElement("output"); echo.className = "z-echo"; echo.setAttribute("aria-hidden", "true"); echo.hidden = true;
+  function syncEcho(inp) {
+    var td = inp && inp.closest && inp.closest("td[data-unit]"), x = td ? parseFloat(n(inp.value)) : 0;
+    if (!td || !(x >= 1000)) { echo.hidden = true; return; }
+    if (echo.parentNode !== td.parentNode) { echo.hidden = true; td.parentNode.appendChild(echo); }
+    echo.textContent = "= " + fmt.format(x) + " " + td.getAttribute("data-unit");
+    if (echo.hidden) { echo.hidden = false; echo.classList.remove("z-in"); void echo.offsetWidth; echo.classList.add("z-in"); }
+  }
+  f.addEventListener("input", function (e) { syncEcho(e.target); });
+  f.addEventListener("focusin", function (e) { syncEcho(e.target); });
+  if (window.matchMedia && matchMedia("(max-width: 760px)").matches) f.querySelectorAll("td[data-unit] input").forEach(function (i) { if (!i.placeholder) i.placeholder = "0"; });
   function syncBar() {
     var on = typed && !cardVisible;
     bar.classList.toggle("show", on); bar.setAttribute("aria-hidden", on ? "false" : "true");

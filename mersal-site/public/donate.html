@@ -38,7 +38,7 @@
   <ul class="ph-trust" role="list">
     <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>دفع آمن ومشفّر</li>
     <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-2.2-1.4L13.6 21 12 19.6 10.4 21l-2.2-1.4L6 21z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/></svg>رقم متابعة لتبرعك</li>
-    <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>اسألنا على <bdi data-site="hotline">19340</bdi></li>
+    <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><a class="ph-tel" href="tel:19340" data-site-href="hotline">اسألنا على <bdi data-site="hotline">19340</bdi></a></li>
   </ul>
 </div></div>
 
@@ -267,7 +267,7 @@
                   <div class="amt-row">
                     <div class="field" data-field="amount">
                       <label for="tr-amount">المبلغ</label>
-                      <input id="tr-amount" name="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="16" placeholder="1,000" data-amount required>
+                      <input id="tr-amount" name="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="16" placeholder="مثال: 1,000" data-amount required>
                       <p class="f-err"></p>
                     </div>
                     <div class="field" data-field="currency">
@@ -351,7 +351,7 @@
                 <div class="hp" aria-hidden="true"><label for="tr-website">الموقع الإلكتروني</label><input id="tr-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
 
                 <div class="req-submit"><button class="btn btn-gold btn-block" type="submit">سجّل التبرع</button></div>
-                <p class="req-note">بعد التسجيل هتاخد رقم طلب، وتقدر تبعتلنا صورة الإيصال على واتساب عشان نأكد تبرعك أسرع.<br>بياناتك بيشوفها فريق مرسال بس عشان يأكد تبرعك. <a href="/privacy.html" target="_blank" rel="noopener" style="text-decoration:underline">سياسة الخصوصية</a></p>
+                <p class="req-note">بعد التسجيل هتاخد رقم طلب<span data-wa-box>، وتقدر تبعتلنا صورة الإيصال على واتساب</span><span data-no-wa hidden>، وفريق مرسال هيراجع التحويل</span> عشان نأكد تبرعك أسرع.<br>بياناتك بيشوفها فريق مرسال بس عشان يأكد تبرعك. <a href="/privacy.html" target="_blank" rel="noopener" style="text-decoration:underline">سياسة الخصوصية</a></p>
               </form>
 
               <section id="tr-success" class="stepper req-success" hidden aria-live="polite">
@@ -361,9 +361,10 @@
                 <p class="req-recap" data-recap hidden></p>
                 <p>هنراجع التحويل ونأكده ونخصصه للغرض اللي اخترته.</p>
                 <div class="ref-box"><div><small>رقم الطلب - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
-                <p>ابعتلنا <b>صورة إيصال التحويل</b> على واتساب ومعاها رقم الطلب عشان نأكد تبرعك أسرع:</p>
+                <p data-wa-box>ابعتلنا <b>صورة إيصال التحويل</b> على واتساب ومعاها رقم الطلب عشان نأكد تبرعك أسرع:</p>
+                <p data-no-wa hidden>ابعت صورة الإيصال ومعاها رقم الطلب على <a data-site="email" href="mailto:info@mersal-ngo.org">info@mersal-ngo.org</a> أو كلمنا على <a data-site="hotline" href="tel:19340">19340</a></p>
                 <div class="actions">
-                  <a class="btn btn-wa" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> ابعت الإيصال على واتساب</a>
+                  <a class="btn btn-wa" data-wa data-wa-box href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> ابعت الإيصال على واتساب</a>
                   <a class="btn btn-teal" href="tel:19340">اتصل بالخط الساخن 19340</a>
                 </div>
                 <a class="again" data-again href="#tr-form">تسجيل تبرع تاني</a>
@@ -422,6 +423,7 @@
 
         <div class="tab-panel" id="home" role="tabpanel" aria-labelledby="t-home" hidden>
           <p class="req-intro">سجّل عنوانك والميعاد اللي يناسبك، ومندوب مرسال هيكلمك يأكد ويجيلك لحد البيت يستلم تبرعك - <b>فلوس أو تبرع عيني</b>.</p>
+          <div class="pk-top" hidden><a class="btn btn-teal pk-dial" href="tel:19340" data-site-href="hotline"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>اتصل <bdi data-site="hotline">19340</bdi> وإحنا نسجّل لك المندوب</a><p>أو سجّل بياناتك هنا لو تحب</p></div>
           <div id="pk-alert" class="req-alert" hidden aria-live="polite"></div>
           <form id="pk-form" class="stepper req-form" data-form="pickup" data-alert="pk-alert" data-success="pk-success" novalidate>
             <fieldset>
@@ -438,7 +440,7 @@
               <div class="row-2" data-show-if="kind=money">
                 <div class="field" data-field="amount">
                   <label for="pk-amount">المبلغ <small>(بالجنيه)</small></label>
-                  <input id="pk-amount" name="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="16" placeholder="1,000" data-amount required>
+                  <input id="pk-amount" name="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="16" placeholder="مثال: 1,000" data-amount required>
                   <p class="f-err"></p>
                 </div>
                 <div class="field" data-field="purpose">
@@ -546,9 +548,10 @@
             <p class="req-recap" data-recap hidden></p>
             <p>مندوب مرسال هيكلمك على الموبايل اللي كتبته يأكد الميعاد قبل ما ييجي.</p>
             <p>يمكنك متابعة طلبك بالكود ده:</p>
+            <p data-no-wa hidden>عايز تغيّر الميعاد؟ كلمنا على <a data-site="hotline" href="tel:19340">19340</a> أو ابعت على <a data-site="email" href="mailto:info@mersal-ngo.org">info@mersal-ngo.org</a> ومعاك كود المتابعة.</p>
             <div class="ref-box"><div><small>كود المتابعة - احتفظ بيه</small><code data-ref></code></div><button type="button" data-copy-ref><svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><g class="ci-a"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></g><path class="ci-b" d="M5 12.5l4.5 4.5L19 7"/></svg><span>نسخ</span></button></div>
             <div class="actions">
-              <a class="btn btn-wa" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> تابع طلبك على واتساب</a>
+              <a class="btn btn-wa" data-wa data-wa-box href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.4 11.4 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .2-1.2c-.1-.1-.3-.2-.5-.3z"/></svg> تابع طلبك على واتساب</a>
               <a class="btn btn-teal" href="tel:19340">اتصل بالخط الساخن 19340</a>
             </div>
             <a class="again" data-again href="#pk-form">طلب مندوب تاني</a>
@@ -558,6 +561,7 @@
 
         <div class="tab-panel" id="abroad" role="tabpanel" aria-labelledby="t-abroad" hidden>
           <p>للتبرع من خارج مصر <span class="only-online">يمكنك استخدام البطاقة البنكية من تبويب <b>بالبطاقة البنكية</b>، أو </span>التحويل على حساب مرسال في ألمانيا:</p>
+          <p class="only-online ab-card-pay" hidden><a class="btn btn-gold" href="#online">ادفع بالكارت (فيزا / ماستركارد)</a><small>المبلغ بيتحسب بالجنيه المصري، والبنك بتاعك بيحوّله لعملتك وممكن ياخد رسوم تحويل عملة.</small></p>
           <!-- filled from /data/donate.json (foreign) by js/donate.js -->
           <div id="abroad-body">
           <article class="bk-card ab-card"><header class="bk-head"><span class="bk-logo bk-initials" aria-hidden="true">GLS</span><h3 class="bk-name">GLS Bank</h3></header>

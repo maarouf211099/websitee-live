@@ -744,6 +744,232 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .side-amounts a:active, .m-trust-src:active, .ct-maplink:active, .cm-cta .btn:active, .cta-band .btn:active, .nw-cta .btn:active, .side-ways a:active { transform: scale(.96); }
 }
 
+/* =================================================================== Polish 2 (Fable): modern home + donate
+   Phone look for index.html and donate.html, in the same language as the Polish block above: 30px titles with a gold
+   accent, soft layered shadows, 16–24px radii, dark-teal bands with gold. Additive: it restyles what the blocks above
+   laid out (heights of the quick-donate strip are untouched, so the gold button keeps clearing the bottom bar), moves
+   or hides no control, and changes no JS. Motion is transform/opacity, once, under no-preference only. */
+@media (max-width: 760px) {
+  /* ---------- tokens ---------- */
+  .home, .donate-page {
+    --fb-r: 22px;
+    --fb-line: rgba(0,120,121,.14);
+    --fb-shadow: 0 1px 2px rgba(0,48,48,.04), 0 12px 30px -16px rgba(0,48,48,.26);
+    --fb-shadow-lg: 0 2px 4px rgba(0,48,48,.04), 0 24px 48px -24px rgba(0,48,48,.4);
+    --fb-gold-shadow: 0 12px 24px -12px rgba(233,173,12,.9);
+    --fb-band: #005959 radial-gradient(ellipse at 20% 0%, #007879 0%, #005f60 50%, #004d4d 100%);
+  }
+
+  /* ---------- home: section heads (one voice for the whole page) ---------- */
+  .home .section-title h2, .home .numbers-title { font-size: 27px; line-height: 1.3; letter-spacing: -.2px; }
+  .home .section-title p { margin-top: 8px; font-size: 15.5px; line-height: 1.6; }
+  .home .section-title { margin-bottom: 22px; }
+  .home .big-title { font-size: 27px; }
+  .home .big-title mark { background: none; color: var(--teal-text); box-shadow: inset 0 -.38em 0 rgba(254,200,48,.45); }
+
+  /* ---------- home: hero ---------- */
+  .home .sl-card { border-radius: 24px; box-shadow: 0 20px 40px -22px rgba(0,30,30,.7); }
+  .home .sl-kicker { padding: 6px 12px; background: rgba(0,32,32,.72); font-size: 13.5px; }
+  .home .sl-pill { font-size: 15.5px; }
+  .home .sl-btn { border-radius: 14px; height: 48px; padding: 0 22px; font-size: 15.5px; box-shadow: 0 12px 24px -12px rgba(0,0,0,.6); }
+  .home .sl-dots button[aria-selected="true"]::before { box-shadow: 0 0 0 3px rgba(254,200,48,.25); }
+
+  /* ---------- home: quick donate (same box heights: see the min-height rules above) ---------- */
+  .home .quick-bar .hero-card { position: relative; border-radius: 24px; background: #fff; box-shadow: var(--fb-shadow-lg), inset 0 0 0 1px var(--fb-line); }
+  .home .quick-bar .quick-donate::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; border-radius: 24px 24px 0 0; background: linear-gradient(90deg, var(--gold) 0 55%, var(--teal) 100%); }
+  .home .quick-donate .qd-text b { font-size: 21px; line-height: 1.3; color: var(--teal-ink); }
+  .home .quick-donate .qd-text .qd-trust { color: var(--teal-text); font-size: 13.5px; }
+  .home .quick-donate .amounts { gap: 8px; }
+  .home .quick-donate .amounts button { border-radius: 14px; border-color: var(--fb-line); font: 800 17px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-ink); box-shadow: 0 1px 2px rgba(0,48,48,.05); }
+  .home .quick-donate .amounts button.on { color: #fff; box-shadow: 0 10px 20px -12px rgba(0,96,96,.8); }
+  .home .quick-donate .amt-other { border-radius: 14px; border-color: rgba(0,120,121,.3); }
+  .home .quick-donate .amt-other > span { color: var(--teal-text); }
+  .home .quick-donate .qd-impact { color: var(--teal-ink); font-weight: 700; }
+  .home .quick-bar .quick-donate .qd-go { border-radius: 14px; font-size: 17px; box-shadow: var(--fb-gold-shadow); }
+  .home .quick-offline { border-radius: 24px; box-shadow: var(--fb-shadow-lg); }
+
+  /* ---------- home: trust tiles under the hero ---------- */
+  .home .ts-tile { padding: 12px; border-color: var(--fb-line); border-radius: 18px; box-shadow: var(--fb-shadow); }
+  .home .ts-ic { width: 38px; height: 38px; }
+  .home .ts-ic svg { width: 20px; height: 20px; }
+  .home .ts-ways { gap: 8px; margin-top: 10px; }
+  .home .ts-ways a { border-radius: 14px; border-color: var(--fb-line); box-shadow: var(--fb-shadow); }
+
+  /* ---------- home: campaigns carousel (structure and motion kept; the card gets the premium finish) ---------- */
+  .home .camp { border-color: var(--fb-line); border-radius: 24px; box-shadow: var(--fb-shadow-lg); }
+  .home .camp .body { padding: 16px 16px 18px; }
+  .home .camp h3 { font-size: 20px; }
+  .home .camp .camp-num { font-size: 30px; color: var(--teal-ink); }
+  .home .camp .camp-give { min-height: 50px; border-radius: 14px; font-size: 16.5px; box-shadow: var(--fb-gold-shadow); }
+  .home .camp-badge { padding: 7px 13px; }
+  .home .camp-title .count { padding: 6px 10px; }
+  .home #camp-dots { margin-top: 6px; }
+
+  /* ---------- home: "على نيتك" tiles ---------- */
+  .home .niyya a { padding: 16px; border-radius: 20px; border-color: var(--fb-line); box-shadow: var(--fb-shadow); }
+  .home .niyya .n-ico { width: 48px; height: 48px; border-radius: 16px; }
+  .home .niyya b { font-size: 18px; }
+  .home .niyya .n-zakat a { box-shadow: var(--fb-shadow), inset 0 0 0 1.5px var(--gold); }
+
+  /* ---------- home: about ---------- */
+  .home .about-intro p { font-size: 16px; line-height: 1.75; }
+  .home .values li { border-radius: 14px; }
+  .home .about-intro .btn-teal { display: flex; width: 100%; min-height: 52px; border-radius: 14px; font-size: 16.5px; }
+  .home .about-pic img { border-radius: 24px; box-shadow: var(--fb-shadow-lg); }
+  .home .about-pic figcaption { border-radius: 0 0 24px 24px; }
+
+  /* ---------- home: numbers band as one rounded dark-teal card ---------- */
+  .home .numbers { margin: 8px 12px; padding: 30px 0 26px; border-radius: 28px; box-shadow: 0 26px 50px -26px rgba(0,70,70,.7); }
+  .home .numbers-title { margin-bottom: 14px; font-size: 26px; }
+  .home .numbers-title::after { width: 40px; height: 4px; margin-top: 10px; }
+  .home .num b { font-size: 36px; }
+
+  /* ---------- home: hospital ---------- */
+  .home .hf-pic img { border-radius: 24px; box-shadow: var(--fb-shadow-lg); }
+  .home .hf-status { padding: 9px 13px; font-size: 13.5px; }
+  .home .facts { gap: 8px; }
+  .home .facts div { border-radius: 16px; border: 1px solid var(--fb-line); box-shadow: var(--fb-shadow); }
+  .home .facts b { font-size: 26px; color: var(--teal-text); }
+  .home .hf-progress { border-radius: 16px; }
+  .home .hf-shares a { border-radius: 18px; border-color: var(--fb-line); box-shadow: var(--fb-shadow); }
+  .home .hf-shares b { font-size: 23px; }
+  .home .hf-cta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .home .hf-cta .btn { margin: 0; min-height: 52px; border-radius: 14px; font-size: 16.5px; justify-content: center; }
+  .home .hf-cta .btn-gold { box-shadow: var(--fb-gold-shadow); }
+  .home .hf-cta .hf-more { justify-content: center; }
+
+  /* ---------- home: impact calculator ---------- */
+  .home .ic { border-color: var(--fb-line); box-shadow: var(--fb-shadow-lg); }
+  .home .ic-title { font-size: 26px; }
+  .home .ic-input { border-radius: 14px; }
+  .home #impact-calc .ic-tile-in { border-radius: 16px; border-color: var(--fb-line); }
+  .home #impact-calc .ic-showall { border-radius: 14px; border-color: var(--fb-line); }
+  .home .ic-cta { min-height: 52px; border-radius: 14px; box-shadow: var(--fb-gold-shadow); }
+
+  /* ---------- home: services, projects, ways, partners ---------- */
+  .home .services .svc { padding: 18px 16px; border-radius: 20px; border: 1px solid var(--fb-line); box-shadow: var(--fb-shadow); }
+  .home .services .svc-i { width: 48px; height: 48px; margin-bottom: 12px; }
+  .home #projects .card { border-radius: 22px; border-color: var(--fb-line); box-shadow: var(--fb-shadow); }
+  .home .ways-grid { border-color: var(--fb-line); border-radius: 24px; box-shadow: var(--fb-shadow-lg); }
+  .home .ways-grid .way2 { min-height: 76px; }
+  .home .ways-grid .way2 + .way2 { border-top-color: var(--fb-line); }
+  .home .pt-card { border-radius: 18px; box-shadow: var(--fb-shadow); }
+
+  /* ---------- home: closing band ---------- */
+  .home .slogan-band { padding: 36px 0 40px; }
+  .home .ayah { font-size: clamp(20px, 5.4vw, 26px); }
+  .home .sb-copy .btn-gold { display: flex; width: 100%; min-height: 54px; border-radius: 16px; font-size: 17px; box-shadow: var(--fb-gold-shadow); }
+  .home .slogan-band .hot-card { margin-top: 12px; border-radius: 22px; box-shadow: 0 26px 50px -26px rgba(0,70,70,.7); }
+
+  /* ---------- home: footer ---------- */
+  .home .site-footer { border-start-start-radius: 28px; border-start-end-radius: 28px; padding-top: 26px; }
+  .home .site-footer .logo-box { border-radius: 12px; }
+
+  /* ---------- donate: head (same as the other pages: 30px title, gold accent, rounded bottom, no full-width line) ---------- */
+  .donate-page .page-head { border-end-start-radius: 24px; border-end-end-radius: 24px; min-height: clamp(230px, 60vw, 300px); padding-bottom: 24px; }
+  .donate-page .page-head::after { display: none; }
+  .donate-page .page-head h1 { font-size: 30px; line-height: 1.25; }
+  .donate-page .page-head h1::after { content: ""; display: block; width: 40px; height: 4px; margin-top: 10px; border-radius: 4px; background: var(--gold); }
+  .donate-page .page-head p { margin-top: 8px; font-size: 15.5px; line-height: 1.6; color: rgba(255,255,255,.9); }
+  .donate-page .ph-trust { gap: 8px; margin-top: 12px; }
+  .donate-page .ph-trust li { padding: 6px 12px; background: rgba(0,40,40,.42); border-color: rgba(255,255,255,.3); font-size: 13.5px; }
+  .donate-page .ph-trust svg { stroke: var(--gold); }
+
+  /* ---------- donate: tabs ---------- */
+  .donate-page main > section { padding-top: 22px; }
+  .donate-page .tabs { gap: 8px; margin-bottom: 16px; }
+  .donate-page .tabs button { min-height: 50px; border-radius: 16px; border-color: var(--fb-line); font-size: 14px; box-shadow: var(--fb-shadow); }
+  .donate-page .tabs button[aria-selected="true"] { box-shadow: 0 12px 24px -12px rgba(0,89,89,.7); }
+
+  /* ---------- donate: the card stepper ---------- */
+  .donate-page .stepper { padding: 20px 16px 18px; border-color: var(--fb-line); border-radius: var(--fb-r); box-shadow: var(--fb-shadow-lg); }
+  .donate-page .steps { margin-bottom: 18px; }
+  .donate-page .steps li { font-size: 13.5px; }
+  .donate-page .steps li span { width: 32px; height: 32px; font-size: 15px; }
+  .donate-page .steps li + li::before, .donate-page .steps li + li::after { top: 16px; }
+  .donate-page .niyya-chips { gap: 8px; }
+  .donate-page .niyya-chips button { min-height: 46px; border-color: var(--fb-line); font-size: 15px; }
+  .donate-page .niyya-note { font-size: 14px; }
+  .donate-page .field label { font-size: 14.5px; font-weight: 700; color: var(--teal-ink); }
+  .donate-page .field input, .donate-page .field select, .donate-page .field textarea { border-radius: 12px; border-color: rgba(0,120,121,.28); }
+  .donate-page .field input, .donate-page .field select { min-height: 50px; }
+  .donate-page .amounts.big { gap: 8px; margin: 2px 0 12px; }
+  .donate-page .amounts.big button { min-height: 52px; border-radius: 14px; border-color: var(--fb-line); font: 800 18px/1 "Titillium Web", "Cairo", sans-serif; color: var(--teal-ink); box-shadow: 0 1px 2px rgba(0,48,48,.05); }
+  .donate-page .amounts.big button.on { color: #fff; }
+  .donate-page .amount-field { margin-top: 2px; }
+  .donate-page .input-suffix input { min-height: 56px; border-radius: 14px; font-size: 24px; font-family: "Titillium Web", "Cairo", sans-serif; color: var(--teal-ink); }
+  .donate-page .input-suffix span { font-size: 15px; }
+  .donate-page .stepper .impact { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 14px; padding: 8px 14px; border-radius: 12px; background: var(--teal-soft); color: var(--teal-ink); font-size: 14.5px; font-weight: 700; line-height: 1.5; }
+  .donate-page .stepper .impact:empty { display: none; }
+  .donate-page .stepper .btn-block, .donate-page .step-nav .btn { min-height: 52px; border-radius: 14px; font-size: 16.5px; }
+  .donate-page .stepper .btn-gold { box-shadow: var(--fb-gold-shadow); }
+  .donate-page .step-nav { gap: 10px; margin-top: 10px; }
+  .donate-page .step-nav .btn-ghost-teal { border-width: 1.5px; }
+  .donate-page .s-sum { border-radius: 14px; border-color: var(--fb-line); padding: 8px 14px; font-size: 14px; }
+  .donate-page .s-sum b { font-size: 18px; }
+  .donate-page .stepper .check { margin: 4px 0 8px; padding: 12px 14px; border: 1.5px solid var(--fb-line); border-radius: 14px; background: var(--bg-2); font-size: 15px; line-height: 1.5; align-items: center; }
+  .donate-page .stepper .hint { font-size: 14px; line-height: 1.6; }
+  .donate-page .gf-step-gift { padding: 14px 14px 4px; border-radius: 16px; background: var(--bg-2); border: 1px solid var(--fb-line); }
+  .donate-page .summary { gap: 10px 14px; padding: 16px; border-radius: 18px; border-inline-start: 4px solid var(--gold); }
+  .donate-page .summary dd { font-size: 16px; }
+  .donate-page .pay-trust { padding: 14px; border-radius: 16px; background: var(--bg-2); border: 1px solid var(--fb-line); margin-bottom: 4px; }
+  .donate-page .pay-methods { margin-bottom: 0; justify-content: center; }
+  .donate-page .pm { border-radius: 10px; padding: 8px 11px; }
+  .donate-page .gateway { border-radius: 18px; }
+
+  /* ---------- donate: bank accounts ---------- */
+  .donate-page .bk-official { border-radius: 18px; }
+  .donate-page .bk-grid { gap: 12px; }
+  .donate-page .bk-card { border-color: var(--fb-line); border-radius: 20px; box-shadow: var(--fb-shadow); }
+  .donate-page .bk-head { padding: 12px 14px; }
+  .donate-page .bk-logo { border-radius: 12px; }
+  .donate-page .bk-acc .copy { border-radius: 12px; }
+  .donate-page .bk-acc + .bk-acc { border-top-color: var(--fb-line); }
+  .donate-page .ab-card { border-radius: 20px; box-shadow: var(--fb-shadow); }
+  .donate-page .ab-thumb { border-radius: 14px; }
+  .donate-page .ab-more .btn { display: flex; width: 100%; min-height: 50px; border-radius: 14px; }
+
+  /* ---------- donate: "حوّلت؟ سجّل تبرعك" + the transfer / pickup forms ---------- */
+  .donate-page .tr-cta { padding: 18px 16px 16px; border-color: var(--fb-line); border-radius: 20px; background: linear-gradient(168deg, #fff 0%, #edf6f6 100%); box-shadow: var(--fb-shadow); }
+  .donate-page .tr-cta-head { grid-template-columns: auto minmax(0, 1fr); }
+  .donate-page .tr-cta-btn { grid-column: 1 / -1; width: 100%; min-height: 50px; border-radius: 14px; box-shadow: var(--fb-gold-shadow); }
+  .donate-page .tr-cta.open .tr-cta-btn { box-shadow: inset 0 0 0 1.5px #b9dada; }
+  .donate-page .tr-cta-txt h3 { font-size: 17px; }
+  .donate-page .tr-box .req-form, .donate-page .req-form { border-color: var(--fb-line); border-radius: var(--fb-r); box-shadow: var(--fb-shadow-lg); }
+  .donate-page .req-form legend { font-size: 18px; }
+  .donate-page .req-form .seg label > span { border-radius: 14px; }
+  .donate-page .req-submit .btn-block { min-height: 54px; border-radius: 14px; box-shadow: var(--fb-gold-shadow); }
+  .donate-page .pk-dial { border-radius: 14px; min-height: 50px; }
+  .donate-page .req-success { border-radius: var(--fb-r); }
+  .donate-page .req-success .actions .btn { min-height: 50px; border-radius: 14px; }
+
+  /* ---------- donate: instapay / fawry / wallets ---------- */
+  .donate-page .pw-intro { font-size: 15.5px; }
+  .donate-page .pw { padding: 16px; border-color: var(--fb-line); border-radius: 22px; box-shadow: var(--fb-shadow); }
+  .donate-page .pw-badge { border-radius: 16px; box-shadow: 0 8px 16px -8px rgba(0,48,48,.4); }
+  .donate-page .pw h3 { font-size: 18px; }
+  .donate-page .pw-code { margin-top: 12px; padding: 8px 8px 8px 12px; border-radius: 14px; background: var(--teal-soft); }
+  .donate-page .pw-code .copy { border-radius: 12px; }
+  .donate-page .pw-act { display: flex; width: 100%; min-height: 48px; border-radius: 14px; box-sizing: border-box; }
+
+  /* ---------- donate: side cards and the impact disclosure ---------- */
+  .donate-page .side-ads > a { border-radius: 22px; box-shadow: var(--fb-shadow-lg); }
+  .donate-page .side-ads > a.hot-card { padding: 16px 16px 14px; }
+  .donate-page .ic-more > summary { min-height: 58px; border-color: var(--fb-line); border-radius: 18px; box-shadow: var(--fb-shadow); }
+  .donate-page .ic { border-color: var(--fb-line); box-shadow: var(--fb-shadow-lg); }
+}
+
+/* ---------- motion (phone, Polish 2): transform/opacity, once ---------- */
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  /* press feedback on the new big targets */
+  .home .niyya a, .home .hf-shares a, .home .hf-cta .btn, .home .about-intro .btn-teal, .home .sb-copy .btn-gold, .home .ic-cta, .home .ts-tile, .home .ts-ways a, .home .services .svc,
+  .donate-page .niyya-chips button, .donate-page .step-nav .btn, .donate-page .stepper .btn-block, .donate-page .tr-cta-btn, .donate-page .req-submit .btn-block, .donate-page .pw-act, .donate-page .ab-more .btn { transition: transform .15s; }
+  .home .niyya a:active, .home .hf-shares a:active, .home .hf-cta .btn:active, .home .about-intro .btn-teal:active, .home .sb-copy .btn-gold:active, .home .ic-cta:active, .home .ts-tile:active, .home .ts-ways a:active, .home .services .svc:active,
+  .donate-page .niyya-chips button:active, .donate-page .step-nav .btn:active, .donate-page .stepper .btn-block:active, .donate-page .tr-cta-btn:active, .donate-page .req-submit .btn-block:active, .donate-page .pw-act:active, .donate-page .ab-more .btn:active { transform: scale(.96); }
+  /* the hospital share tiles and the services follow their section in, one after another (hidden only under .reveal) */
+  .home .hf-shares a.reveal, .home .services .svc.reveal { transition: opacity .4s ease, transform .5s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+  /* the side cards on donate rise once (they already carry .reveal from layout.js) */
+  .donate-page .side-ads > .reveal { transition: opacity .45s ease, transform .5s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
 /* ===================================================================
    MWP7 deferred
    =================================================================== */

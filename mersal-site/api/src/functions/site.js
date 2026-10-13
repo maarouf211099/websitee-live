@@ -70,7 +70,7 @@ app.http("adminSite", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/site",
   handler: async (req, ctx) => {
     try {
-      const p = await requireAdmin(req);
+      const p = await requireAdmin(req, req.method === "GET" ? null : "site");
       if (req.method === "GET") { const cur = parseSite(await readFile(LAYOUT)); return withRev(json(200, cur), siteRev(cur)); }
       const b = (await req.json().catch(() => ({}))) || {};
       const draft = normalize({ ...(b.site || b), payMode: "off", payProvider: null });

@@ -3,7 +3,7 @@
 // Saves that replace a whole file (data/*, pages) need the revision the console read (X-Mersal-Base, see lib/commit.js):
 // a file changed by someone else in between is a 409 instead of a silent overwrite.
 const { app } = require("@azure/functions");
-const { requireAdmin, readFile, commitFiles, fileExists, json, fail, sessionFor, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, githubReady, setupHint, saveSettings } = require("../lib/admin");
+const { requireAdmin, readFile, commitFiles, fileExists, json, fail, sessionFor, sessionCookie, verifyPassword, passwordSource, hashPassword, setupCodeOk, adminUser, throttle, loginFailed, loginOk, githubReady, setupHint, saveSettings, checkLogin, findUser, userOf, normUser, isOwnerName, cleanPerms, PERMS, USER_RE, settings } = require("../lib/admin");
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
 const pay = require("../lib/pay");
@@ -78,14 +78,21 @@ app.http("adminLogin", {
       const user = String((b && b.user) || "").trim(), pass = String((b && b.password) || "");
       const source = await passwordSource();
       if (source === "setup") {
+        // the other users exist only once the main account has its password
+        if (user && !isOwnerName(user)) return json(409, { message: "الأدمن الرئيسي لازم يدخل ويختار كلمة السر الأول" });
         if (setupHint() === "unavailable") return json(503, { message: "ضيف GITHUB_TOKEN في إعدادات Azure الأول، وبعدها كود التفعيل هو آخر 8 حروف منه", setup: true });
         if (!setupCodeOk(b && b.code)) { await loginFailed(req); return json(401, { message: "كود التفعيل غلط", setup: true }); }
         if (user !== adminUser()) return json(400, { message: "اسم المستخدم لازم يكون " + adminUser(), setup: true });
         if (pass.length < 8) return json(400, { message: "كلمة السر لازم 8 حروف على الأقل", setup: true });
         await saveSettings({ adminPasswordHash: await hashPassword(pass), sessionsValidAfter: Date.now() }, "admin: set console password", { name: user, email: "admin@mersal-ngo.org" });
-      } else if (!(await verifyPassword(user, pass))) { await loginFailed(req); return json(401, { message: "اسم المستخدم أو كلمة السر غلط" }); }
+        loginOk(req);
+        return { ...json(200, { ok: true, user }), cookies: [await sessionFor(req, user)] };
+      }
+      const kind = await checkLogin(user, pass);
+      if (!kind) { await loginFailed(req); return json(401, { message: "اسم المستخدم أو كلمة السر غلط" }); }
       loginOk(req);
-      return { ...json(200, { ok: true, user }), cookies: [await sessionFor(req, user)] };
+      const name = kind === "owner" ? user : normUser(user);
+      return { ...json(200, { ok: true, user: name }), cookies: [await sessionFor(req, name)] };
     } catch (e) { return fail(e, ctx); }
   },
 });
@@ -97,7 +104,7 @@ app.http("adminLogout", {
     try {
       const b = await req.json().catch(() => ({}));
       if (b && b.everywhere) {
-        const p = await requireAdmin(req);
+        const p = await requireAdmin(req, "users");
         await saveSettings({ sessionsValidAfter: Date.now() }, "admin: sign out everywhere", who(p));
       }
       return { ...json(200, { ok: true }), cookies: [sessionCookie(req, "", 0)] };
@@ -112,6 +119,23 @@ app.http("adminPassword", {
     try {
       const p = await requireAdmin(req);
       if (p.via !== "password") return json(409, { message: "الحساب ده بيدخل بمايكروسوفت، مفيش كلمة سر هنا" });
+      if (!p.owner) {
+        // another user changes its own password: new hash + validAfter (ends its other sessions)
+        await throttle(req);
+        const b = await req.json().catch(() => ({}));
+        if (!(await checkLogin(p.userDetails, String((b && b.current) || "")))) { await loginFailed(req); return json(401, { message: "كلمة السر الحالية غلط" }); }
+        loginOk(req);
+        const next = String((b && b.next) || "");
+        if (next.length < 8) return json(400, { message: "كلمة السر الجديدة لازم 8 حروف على الأقل" });
+        const hash = await hashPassword(next), name = p.userDetails;
+        const sha = await saveSettings((cur) => {
+          const users = { ...(cur.users || {}) };
+          if (!users[name]) throw Object.assign(new Error("الحساب ده اتمسح"), { status: 401 });
+          users[name] = { ...users[name], hash, validAfter: Date.now() };
+          return { users };
+        }, `admin: ${name} changed their password`, who(p));
+        return { ...json(200, { ok: true, commit: sha }), cookies: [await sessionFor(req, name)] };
+      }
       if (process.env.ADMIN_PASSWORD) return json(409, { message: "كلمة السر متظبطة من إعدادات Azure (ADMIN_PASSWORD)، غيّرها من هناك" });
       await throttle(req); // a stolen cookie must not allow unlimited guesses at the current password
       const b = await req.json().catch(() => ({}));
@@ -131,8 +155,8 @@ app.http("adminMe", {
   handler: async (req, ctx) => {
     try {
       const p = await requireAdmin(req);
-      const res = json(200, { user: p.userDetails, roles: p.userRoles, via: p.via, github: githubReady(), donations: donations.enabled(),
-        password: p.via === "password" ? await passwordSource() : "aad",
+      const res = json(200, { user: p.userDetails, roles: p.userRoles, owner: !!p.owner, perms: p.perms, via: p.via, github: githubReady(), donations: donations.enabled(),
+        password: p.via !== "password" ? "aad" : p.owner ? await passwordSource() : "user",
         mpgs: !!(process.env.MPGS_MERCHANT && process.env.MPGS_API_PASSWORD), merchant: process.env.MPGS_MERCHANT || null,
         // Paymob: ready to take real donations, or the NAMES of the missing settings + why the keys cannot (never values),
         // and test/live from the key prefix
@@ -149,9 +173,10 @@ app.http("adminData", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/data/{name}",
   handler: async (req, ctx) => {
     try {
-      const p = await requireAdmin(req);
       const name = String(req.params.name || "");
       const path = Object.prototype.hasOwnProperty.call(JSON_FILES, name) ? JSON_FILES[name] : null;
+      // the files are public on the site anyway: reading needs a login, saving needs the perm of the tab that edits it
+      const p = await requireAdmin(req, req.method === "GET" ? null : name === "donate" ? "site" : "content");
       if (!path) return json(404, { message: "ملف غير معروف" });
       if (req.method === "GET") { const text = await readFile(path); return withRev(json(200, JSON.parse(text)), rev(text)); }
       const body = await req.json().catch(() => null);
@@ -205,7 +230,7 @@ app.http("adminPage", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/page/{id}",
   handler: async (req, ctx) => {
     try {
-      const p = await requireAdmin(req);
+      const p = await requireAdmin(req, req.method === "GET" ? null : "content");
       const raw = String(req.params.id || "").trim(), isStatic = STATIC.includes(raw);
       const id = isStatic ? raw : raw.replace(/\D/g, "").slice(0, 4);
       if (!id) return json(404, { message: "صفحة غير معروفة" });
@@ -256,7 +281,7 @@ app.http("adminUpload", {
   methods: ["POST"], authLevel: "anonymous", route: "console/upload",
   handler: async (req, ctx) => {
     try {
-      const p = await requireAdmin(req);
+      const p = await requireAdmin(req, "content");
       const b = await req.json();
       const files = (b.files || []).slice(0, 40).map((f, i) => {
         const ext = (/\.(jpe?g|png|webp|gif)$/i.exec(f.name || "") || [, "jpg"])[1].toLowerCase();
@@ -282,7 +307,7 @@ app.http("adminSettings", {
   methods: ["GET", "PUT"], authLevel: "anonymous", route: "console/settings",
   handler: async (req, ctx) => {
     try {
-      const p = await requireAdmin(req);
+      const p = await requireAdmin(req, req.method === "GET" ? null : "settings");
       const path = "public/js/layout.js";
       const providers = () => ({ app: pay.ready("app"), paymob: pay.ready("paymob"), mpgs: pay.ready("mpgs") });
       if (req.method === "GET") {
@@ -316,10 +341,62 @@ app.http("adminDonations", {
   methods: ["GET"], authLevel: "anonymous", route: "console/donations",
   handler: async (req, ctx) => {
     try {
-      await requireAdmin(req);
+      await requireAdmin(req, "donations");
       const rows = await donations.list({ from: req.query.get("from") || "", to: req.query.get("to") || "" });
       if (rows === null) return json(200, { enabled: false, rows: [] });
       return json(200, { enabled: true, rows });
+    } catch (e) { return fail(e, ctx); }
+  },
+});
+
+// ---- console users (main account only) ----
+// GET /api/console/users -> { owner, perms: [...], users: [{ user, perms, disabled, created, by }] }  (never the hashes)
+// POST { user, password, perms }                       -> new user
+// PUT /api/console/users/{name} { perms?, password?, disabled? } -> a new password or a disable ends its sessions
+// DELETE /api/console/users/{name}
+const listUsers = (s) => Object.keys((s && s.users) || {}).sort().map((k) => {
+  const u = s.users[k] || {};
+  return { user: k, perms: cleanPerms(u.perms), disabled: !!u.disabled, created: u.created || null, by: u.by || null };
+});
+app.http("adminUsers", {
+  methods: ["GET", "POST", "PUT", "DELETE"], authLevel: "anonymous", route: "console/users/{name?}",
+  handler: async (req, ctx) => {
+    try {
+      const p = await requireAdmin(req, "users");
+      if (req.method === "GET") return json(200, { owner: p.userDetails, perms: PERMS, users: listUsers(await settings()) });
+      const b = (await req.json().catch(() => null)) || {};
+      const name = normUser(req.method === "POST" ? b.user : req.params.name);
+      if (!USER_RE.test(name)) return json(400, { message: "اسم المستخدم من 3 لـ 32 حرف: حروف إنجليزي صغيرة وأرقام و . _ - (ويبدأ بحرف أو رقم)" });
+      if (isOwnerName(name) || name === normUser(p.userDetails)) return json(400, { message: "ده اسم الأدمن الرئيسي، اختار اسم تاني" });
+      const pass = b.password == null ? null : String(b.password);
+      if (pass != null && pass.length < 8) return json(400, { message: "كلمة السر لازم 8 حروف على الأقل" });
+      if (b.perms != null && !Array.isArray(b.perms)) return json(400, { message: "الصلاحيات لازم تكون قائمة" });
+      if (req.method === "POST" && !pass) return json(400, { message: "اكتب كلمة سر للمستخدم الجديد (8 حروف على الأقل)" });
+      if (req.method === "POST" && !cleanPerms(b.perms).length) return json(400, { message: "اختار صلاحية واحدة على الأقل" });
+      const hash = pass ? await hashPassword(pass) : null, now = Date.now();
+      let action = "";
+      const sha = await saveSettings((cur) => {
+        const users = { ...((cur && cur.users) || {}) }, had = Object.prototype.hasOwnProperty.call(users, name);
+        if (req.method === "POST") {
+          if (had) throw Object.assign(new Error("الاسم ده موجود قبل كده"), { status: 409 });
+          if (Object.keys(users).length >= 50) throw Object.assign(new Error("وصلت لأقصى عدد مستخدمين (50)"), { status: 409 });
+          users[name] = { hash, perms: cleanPerms(b.perms), validAfter: now, created: new Date(now).toISOString(), by: p.userDetails };
+          action = "add user " + name;
+        } else {
+          if (!had) throw Object.assign(new Error("المستخدم ده مش موجود"), { status: 404 });
+          if (req.method === "DELETE") { delete users[name]; action = "remove user " + name; }
+          else {
+            const u = { ...users[name] };
+            if (b.perms != null) u.perms = cleanPerms(b.perms);
+            if (hash) { u.hash = hash; u.validAfter = now; }
+            if (b.disabled != null) { u.disabled = !!b.disabled; if (u.disabled) u.validAfter = now; }
+            users[name] = u;
+            action = "update user " + name + (hash ? " (new password)" : "") + (b.disabled != null ? (b.disabled ? " (disabled)" : " (enabled)") : "");
+          }
+        }
+        return { users };
+      }, "admin: " + (req.method === "POST" ? "add user " + name : req.method === "DELETE" ? "remove user " + name : "update user " + name), who(p));
+      return json(200, { ok: true, commit: sha, action, users: listUsers(await settings()) });
     } catch (e) { return fail(e, ctx); }
   },
 });

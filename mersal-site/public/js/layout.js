@@ -224,7 +224,7 @@
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
-      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo.webp"><img src="/img/brand-logo.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></picture></a>' +
+      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo-w.webp"><img src="/img/brand-logo-w.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></picture></a>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return "<li" + (n[0] === "/" ? ' class="nav-home"' : "") + '><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
       }).join("") + "</ul>" +
@@ -255,7 +255,7 @@
   var footer =
     '<footer class="site-footer">' + fStrip + '<div class="wrap cols">' +
       "<div>" +
-        '<div class="logo-box"><picture><source type="image/webp" srcset="/img/brand-logo-h.webp"><img src="/img/brand-logo-h.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="302" height="52" loading="lazy" decoding="async"></picture></div>' +
+        '<div class="logo-box"><picture><source type="image/webp" srcset="/img/brand-logo-w.webp"><img src="/img/brand-logo-w.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="118" height="70" loading="lazy" decoding="async"></picture></div>' +
         "<h3>" + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + "</h3>" +
         (SITE.footer.text ? "<p>" + escA(SITE.footer.text) + "</p>" : "") +
         social() +

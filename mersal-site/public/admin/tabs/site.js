@@ -3,6 +3,7 @@
 // plus the donate page's bank accounts, wallets and the account abroad (PUT /api/console/data/donate -> data/donate.json).
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
+  function ih(id) { return window.MersalImgSizes ? window.MersalImgSizes.hint(id) : ""; } // recommended-size hint line (tabs/sizes.js)
   var root, site = null, donate = null, siteLoaded = "", donateLoaded = "";
   var SOCIAL = [["facebook", "فيسبوك"], ["instagram", "إنستجرام"], ["x", "إكس (تويتر)"], ["linkedin", "لينكدإن"], ["youtube", "يوتيوب"], ["tiktok", "تيك توك"]];
 
@@ -58,7 +59,7 @@
         D("وصف الصورة", "foreign.alt", f.alt || "", { full: true }) +
         D("رابط طرق أخرى للتبرع من الخارج", "foreign.link", f.link || "", { ltr: true, ph: "https://…" }) +
         D("نص الزرار", "foreign.linkText", f.linkText || "", { ph: "طرق أخرى للتبرع من الخارج" }) +
-      '</div><div class="item-actions"><button type="button" class="btn btn-ghost btn-sm" id="foreign-img">رفع صورة الحساب</button></div></div>';
+      '</div><div class="item-actions">' + ih("abroad") + '<button type="button" class="btn btn-ghost btn-sm" id="foreign-img">رفع صورة الحساب</button></div></div>';
     renderBanks(); renderWallets(); renderLinks();
   }
   function renderLinks() {
@@ -84,7 +85,7 @@
         '<div class="field full"><label>شعار البنك (رابط صورة)</label><div style="display:flex;gap:10px;align-items:center">' +
           '<span data-logo-prev style="flex:none;display:flex;align-items:center;justify-content:center;width:104px;height:46px;padding:4px 6px;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden"></span>' +
           '<input data-k="logo" dir="ltr" placeholder="/img/banks/….png أو https://…" value="' + esc(b.logo || "") + '"></div>' +
-          (first ? '<small style="color:var(--muted);font-size:12px">اختياري. الحسابات اللي ورا بعض بنفس اسم البنك بتظهر في كارت واحد بالشعار ده؛ من غير شعار بيظهر أول حرف من اسم البنك.</small>' : "") + "</div>" +
+          ih("bank") + (first ? '<small style="color:var(--muted);font-size:12px">اختياري. الحسابات اللي ورا بعض بنفس اسم البنك بتظهر في كارت واحد بالشعار ده؛ من غير شعار بيظهر أول حرف من اسم البنك.</small>' : "") + "</div>" +
         "</div>" + acts() + "</div>";
     }).join("");
     // logo preview: follows the field as it is typed (only site paths and http(s) links are loaded)
@@ -145,7 +146,7 @@
       if (b.id === "add-bank") { donate.banks.push({ name: "", currency: "", number: "", iban: "", swift: "" }); renderBanks(); return; }
       if (b.id === "add-wallet") { donate.wallets.push({ name: "", value: "" }); renderWallets(); return; }
       if (b.id === "foreign-img") {
-        A.pick(false).then(function (files) {
+        A.pick(false, "abroad").then(function (files) {
           if (!files.length) return; A.busy(b, true);
           return A.upload(files, 1000).then(function (r) { donate.foreign.image = r[0].url; render(); A.toast("اترفعت الصورة، اضغط حفظ ونشر"); });
         }).catch(function (err) { A.toast(err.message, true); A.busy(b, false); });

@@ -39,6 +39,7 @@
       <button role="tab" data-tab="impact">أثر التبرع</button>
       <button role="tab" data-tab="extras">شريط الإعلان والشركاء</button>
       <button role="tab" data-tab="texts">نصوص الموقع</button>
+      <button role="tab" data-tab="sizes">مقاسات الصور للمصمم</button>
       <button role="tab" data-tab="users" hidden>المستخدمين والصلاحيات</button>
       <button role="tab" data-tab="settings">الإعدادات</button>
     </nav>
@@ -67,7 +68,7 @@
       <button class="btn btn-ghost" id="add-campaign">+ إضافة حملة</button>
 
       <h2>مشاريع مرسال</h2>
-      <p class="hint">شريط المشاريع اللي بيظهر في الرئيسية بعد الحملات: صورة 900×600، اسم، وصف قصير، وصفحة المشروع (زرار "اعرف أكثر").</p>
+      <p class="hint">شريط المشاريع اللي بيظهر في الرئيسية بعد الحملات: صورة 16:10 (1200×750)، اسم، وصف قصير، وصفحة المشروع (زرار "اعرف أكثر").</p>
       <div class="list" id="projects"></div>
       <button class="btn btn-ghost" id="add-project">+ إضافة مشروع</button>
 
@@ -94,6 +95,7 @@
             <button type="button" id="pg-img">صورة</button>
             <button type="button" id="pg-html">HTML</button>
           </div>
+          <p class="hint" id="hint-page-img"></p>
           <div class="body legacy" id="pg-body" contenteditable="true"></div>
           <textarea id="pg-src" hidden></textarea>
           <div class="row"><button class="btn btn-gold" id="save-page">حفظ ونشر</button><a class="btn btn-ghost" id="pg-view" target="_blank" rel="noopener">معاينة ↗</a></div>
@@ -150,6 +152,11 @@
     <section class="panel" id="tab-texts" hidden>
       <header class="panel-head"><h1>نصوص الموقع</h1><button class="btn btn-gold" id="save-texts">حفظ ونشر</button></header>
       <div id="texts-root"></div>
+    </section>
+
+    <section class="panel" id="tab-sizes" hidden>
+      <header class="panel-head"><h1>مقاسات الصور للمصمم</h1></header>
+      <div id="sizes-root"></div>
     </section>
 
     <section class="panel" id="tab-extras" hidden>
@@ -217,5 +224,6 @@
 <script src="/admin/tabs/impact.js"></script>
 <script src="/admin/tabs/extras.js"></script>
 <script src="/admin/tabs/texts.js"></script>
+<script src="/admin/tabs/sizes.js"></script>
 </body>
 </html>

@@ -19,8 +19,9 @@
   .off-brand:hover { color: #fff; }
   .off-mark { width: 40px; height: 40px; border-radius: 12px; background: #fff; display: grid; place-items: center; flex: none; }
   .off-mark svg { width: 24px; height: 24px; fill: var(--teal, #009091); }
-  .off-logo { background: #fff; border-radius: 10px; padding: 5px 8px; display: inline-flex; }
-  .off-logo img { height: 34px; width: auto; }
+  .off-logo { display: inline-flex; }
+  .off-logo img { height: 40px; width: auto; }
+  .off-logo img[src*="brand-logo."] { background: #fff; border-radius: 10px; padding: 4px 8px; height: 42px; } /* the teal logo (older cache) keeps its white chip */
   .off-net { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.85); background: rgba(255,255,255,.1); border-radius: 999px; padding: 4px 12px 4px 10px; }
   .off-net i { width: 8px; height: 8px; border-radius: 50%; background: #ff8a7a; box-shadow: 0 0 0 3px rgba(255,138,122,.25); }
 
@@ -147,7 +148,7 @@
   function match(url) { return caches.match(url, { ignoreVary: true }).catch(function () { return null; }); }
 
   // ----- the real logo, only when it is already saved (no failed image request while offline) -----
-  var LOGOS = ["/img/brand-logo.webp", "/img/brand-logo.png"]; // the header shows the WebP, so that one is usually saved
+  var LOGOS = ["/img/brand-logo-w.webp", "/img/brand-logo-w.png", "/img/brand-logo.webp", "/img/brand-logo.png"]; // the header shows the reversed WebP (transparent, for dark backgrounds), so that one is usually saved
   LOGOS.reduce(function (p, u) { return p.then(function (hit) { return hit || match(u).then(function (r) { return r && r.ok ? u : null; }); }); }, Promise.resolve(null)).then(function (src) {
     if (!src) return;
     var a = $("off-brand"), img = new Image();

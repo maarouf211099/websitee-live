@@ -113,3 +113,7 @@ html[lang="en"] [dir="ltr"] { unicode-bidi: isolate; }
 .i18n-note b { color: var(--teal-dark, #005959); }
 .i18n-note .i18n-sum { margin-top: 6px; color: var(--muted, #5f6b6b); }
 html[lang="en"] article[lang="ar"] { text-align: right; }
+
+/* ---------- Bars & logo (Fable v2): the desktop menu underline grows from the left, the logo settles from its left edge ---------- */
+html[dir="ltr"] .nav > li > a::after, html[dir="ltr"] .nav .sub-toggle::after { transform-origin: 0 50%; }
+html[dir="ltr"] .site-header .brand, html[dir="ltr"] .site-header.scrolled:not(.hide) .brand { transform-origin: 0 50%; }

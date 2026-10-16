@@ -224,7 +224,12 @@
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
-      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo-w.webp"><img src="/img/brand-logo-w.png" alt="مؤسسة مرسال الخيرية" width="78" height="46"></picture></a>' +
+      // Bars & logo (Fable v2): phones and tablets show the horizontal reversed lockup (img/brand-wide-w: «مؤسسة مرسال الخيرية»
+      // + MERSAL CHARITY FOUNDATION, gold/white on transparent); the one-row desktop header (1180px+) the stacked mark cut clean
+      // above its "FOUNDATION" line (img/brand-mark-w). The sizes live in css/mobile.css and css/desktop.css ("Bars & logo").
+      '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture>' +
+        '<source media="(min-width: 1180px)" type="image/webp" srcset="/img/brand-mark-w.webp"><source media="(min-width: 1180px)" srcset="/img/brand-mark-w.png">' +
+        '<source type="image/webp" srcset="/img/brand-wide-w.webp"><img src="/img/brand-wide-w.png" alt="مؤسسة مرسال الخيرية" width="640" height="110"></picture></a>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return "<li" + (n[0] === "/" ? ' class="nav-home"' : "") + '><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
       }).join("") + "</ul>" +
@@ -255,7 +260,7 @@
   var footer =
     '<footer class="site-footer">' + fStrip + '<div class="wrap cols">' +
       "<div>" +
-        '<div class="logo-box"><picture><source type="image/webp" srcset="/img/brand-logo-w.webp"><img src="/img/brand-logo-w.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="118" height="70" loading="lazy" decoding="async"></picture></div>' +
+        '<div class="logo-box"><picture><source type="image/webp" srcset="/img/brand-mark-w.webp"><img src="/img/brand-mark-w.png" alt="مؤسسة مرسال الخيرية - Mersal Charity Foundation" width="400" height="214" loading="lazy" decoding="async"></picture></div>' +
         "<h3>" + escA(SITE.footer.name || "مؤسسة مرسال للأعمال الخيرية والتنموية") + "</h3>" +
         (SITE.footer.text ? "<p>" + escA(SITE.footer.text) + "</p>" : "") +
         social() +
@@ -398,6 +403,14 @@
       e.preventDefault();
       setTimeout(function () { location.assign(mdn.href); }, 240);
     });
+    // Bars & logo (Fable v2): a tapped bar icon hops once (css/mobile.css .bump, transform only). Not the lit item (its
+    // p3-icon-in would replay when the class goes) and not the heart (it has its own burst).
+    bar.addEventListener("pointerdown", function (e) {
+      var el = e.target.closest && e.target.closest(".m-bar a, .m-bar button");
+      if (!el || el.classList.contains("on") || el.classList.contains("m-donate") || p3Reduce) return;
+      el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+      setTimeout(function () { el.classList.remove("bump"); }, 520);
+    }, { passive: true });
     // the continuous beat pauses while the tab is in the background (css: html.p3-paused)
     document.addEventListener("visibilitychange", function () { document.documentElement.classList.toggle("p3-paused", document.hidden); });
   }

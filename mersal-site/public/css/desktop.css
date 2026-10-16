@@ -1178,3 +1178,65 @@ section.alt { background: linear-gradient(180deg, #f7faf9, #fbf8f1); }
   .home .sl-card.on .sl-kicker { animation: brand-kicker .7s var(--spring, cubic-bezier(.2,.7,.2,1)) both; }
 }
 @keyframes brand-kicker { from { opacity: 0; transform: translateY(12px) scale(.9); } }
+
+/* =================================================================== Bars & logo (Fable v2)
+   Owner: «اللوجو حاسس حجمه مش حلو، ممكن تطوّر في الشكل والبار العلوي والسفلي والانميشن أكتر». Tablets and desktop (this
+   file loads from 761px); css/mobile.css closes with the same block for phones.
+   LOGO: tablets (761-1179px, and the compact header from 1180px) show the horizontal reversed lockup (img/brand-wide-w,
+   «مؤسسة مرسال الخيرية» + MERSAL CHARITY FOUNDATION) at 34px, centred on the 44px buttons. The one-row desktop header
+   keeps the stacked mark, now cut clean above its "FOUNDATION" line (img/brand-mark-w, a <source media> in js/layout.js)
+   at 44px in the 76px bar: air above and below, no cropping trick. The footer shows the same clean mark at 64px.
+   TOP BAR: the icon buttons become 44px glass squircles like the phone's (the gutter language switch stays round), the
+   menu links get a gold underline that grows from the inline end on hover and stays under the current page.
+   MOTION: the logo, the menu items and the buttons fade down in once, the logo gets one light sweep masked to its
+   glyphs. Transform/opacity only, once, static under reduced motion. */
+.site-header .brand { display: block; position: relative; line-height: 0; }
+.site-header .brand picture { display: block; position: relative; line-height: 0; overflow: hidden; }
+.site-header .brand img { display: block; height: 34px; width: auto; aspect-ratio: auto; object-fit: contain; object-position: 50% 50%; }
+.site-footer .logo-box img { height: 64px; width: auto; aspect-ratio: auto; object-fit: contain; object-position: 50% 50%; }
+@media (min-width: 1180px) {
+  .site-header .brand img { height: 44px; }
+  body.nav-compact .site-header .brand img { height: 42px; }
+  /* menu links: no pill, a gold underline (grows from the inline end on hover; stays under the current page) */
+  .nav > li > a, .nav .sub-toggle { position: relative; }
+  .nav > li > a::after, .nav .sub-toggle::after { content: ""; position: absolute; inset-inline: 8px; bottom: 7px; height: 2px; border-radius: 2px; background: var(--gold); transform: scaleX(0); transform-origin: 100% 50%; pointer-events: none; }
+  .nav > li > a:hover, .nav .sub-toggle:hover, .nav .has-sub.open > .sub-toggle { background: none; }
+  .nav > li > a[aria-current="page"], .nav .has-sub.active > .sub-toggle { box-shadow: none; }
+  .nav > li > a[aria-current="page"]::after, .nav .has-sub.active > .sub-toggle::after, .nav > li > a:hover::after, .nav .sub-toggle:hover::after, .nav .has-sub.open > .sub-toggle::after { transform: scaleX(1); }
+  .site-header.hdr-tight .nav > li > a::after, .site-header.hdr-tight .nav .sub-toggle::after { inset-inline: 7px; }
+  /* the language switch in the gutter: a quiet round chip */
+  body:not(.nav-compact) .site-header .lang-sw { border-radius: 50%; background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.2); box-shadow: none; }
+}
+/* the icon buttons: 44px glass squircles with an inner highlight, like the phone's */
+.site-header .search-btn, .site-header .hdr-tel, .site-header .lang-sw, .site-header .menu-toggle { border-radius: 14px; color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.07)); border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 3px 8px -4px rgba(0,0,0,.45); }
+.site-header .search-btn:hover, .site-header .hdr-tel:hover, .site-header .lang-sw:hover { background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.12)); color: var(--gold); }
+.site-header .search-btn svg { width: 19px; height: 19px; stroke-width: 2.3; }
+.site-header .menu-toggle span { width: 18px; height: 2px; border-radius: 2px; }
+.site-header .menu-toggle span + span { margin-top: 5px; }
+.site-header .menu-toggle[aria-expanded="true"] { background: var(--gold); border-color: var(--gold); }
+.site-header .menu-toggle[aria-expanded="true"] span { background: var(--teal-ink); }
+/* the header: a hair deeper, a brighter gold hairline */
+#site-header, .site-header, .site-header.scrolled { background: linear-gradient(180deg, #006262 0%, #005252 100%); box-shadow: inset 0 -1px 0 rgba(254,200,48,.46), 0 10px 26px -16px rgba(0,0,0,.6); }
+@media (prefers-reduced-motion: no-preference) {
+  .site-header .brand, .site-header .nav > li, .site-header .hdr-zakat, .site-header .hdr-tel, .site-header .search-btn, .site-header .lang-sw, .site-header .wrap > .btn-gold, .site-header .menu-toggle { animation: fb-hdr-in .6s var(--spring) backwards; }
+  .site-header .nav > li:nth-child(1) { animation-delay: .05s; } .site-header .nav > li:nth-child(2) { animation-delay: .08s; } .site-header .nav > li:nth-child(3) { animation-delay: .11s; }
+  .site-header .nav > li:nth-child(4) { animation-delay: .14s; } .site-header .nav > li:nth-child(5) { animation-delay: .17s; } .site-header .nav > li:nth-child(6) { animation-delay: .2s; }
+  .site-header .nav > li:nth-child(n+7) { animation-delay: .23s; }
+  .site-header .hdr-zakat { animation-delay: .2s; } .site-header .hdr-tel { animation-delay: .24s; } .site-header .search-btn { animation-delay: .28s; }
+  .site-header .lang-sw { animation-delay: .32s; } .site-header .wrap > .btn-gold { animation-delay: .34s; } .site-header .menu-toggle { animation-delay: .34s; }
+  .nav > li > a::after, .nav .sub-toggle::after { transition: transform .28s var(--ease); }
+  /* one light sweep over the logo, masked to its glyphs (the lockup on tablets, the mark from 1180px) */
+  .site-header .brand picture { -webkit-mask: url(../img/brand-wide-w.png) 50% 50% / contain no-repeat; mask: url(../img/brand-wide-w.png) 50% 50% / contain no-repeat; }
+  .site-header .brand picture::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%); transform: translateX(-160%); animation: brand-shine 1.2s 1.1s cubic-bezier(.4,0,.2,1) 1 both; }
+  @media (min-width: 1180px) {
+    .site-header .brand picture { -webkit-mask-image: url(../img/brand-mark-w.png); mask-image: url(../img/brand-mark-w.png); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header .brand, .site-header .nav > li, .site-header .hdr-zakat, .site-header .hdr-tel, .site-header .search-btn, .site-header .lang-sw, .site-header .wrap > .btn-gold, .site-header .menu-toggle { animation: none; }
+  .site-header .brand picture::after { content: none; }
+}
+@keyframes fb-hdr-in { from { opacity: 0; transform: translateY(-10px); } }

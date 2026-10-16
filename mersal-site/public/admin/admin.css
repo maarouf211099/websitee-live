@@ -106,7 +106,7 @@ code { background: #e4f3f3; padding: 2px 8px; border-radius: 6px; direction: ltr
 .pages-list li.group { background: #f0f6f6; color: var(--teal); font-size: 12px; cursor: default; padding: 5px 12px; letter-spacing: .2px; }
 .pages-list li.group:hover { background: #f0f6f6; color: var(--teal); }
 .menu-item { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: grid; gap: 10px; }
-.menu-head, .menu-sub { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 6px 10px; align-items: end; }
+.menu-head, .menu-sub { display: grid; grid-template-columns: 1fr .8fr 1.2fr auto; gap: 6px 10px; align-items: end; }
 .menu-subs { display: grid; gap: 8px; padding: 8px 0 0 0; padding-inline-start: 16px; border-inline-start: 3px solid #e4f3f3; }
 .menu-sub { background: #f8fbfb; border-radius: 12px; padding: 8px 10px; }
 .mini-actions { display: flex; gap: 6px; flex-wrap: wrap; padding-bottom: 2px; }
@@ -194,3 +194,13 @@ p.hint + .imghint, .row + .imghint { margin-bottom: 8px; }
   .sz-table tbody th { font-size: 15px; }
 }
 .sz-table td:nth-child(4) { min-width: 140px; }
+
+/* tab "English" (tabs/english.js) and the English fields of the home tab */
+.en-list { display: grid; gap: 6px; margin: 10px 0 24px; }
+.en-row, .en-add { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: start; }
+.en-add { margin-top: 10px; padding: 10px; background: #f8fbfb; border-radius: 12px; }
+.en-ar { padding: 8px 10px; background: #f4f8f8; border-radius: 10px; font-size: 14px; line-height: 1.5; }
+.en-row textarea, .en-add textarea { width: 100%; min-height: 38px; font: inherit; font-size: 14px; resize: vertical; }
+.en-adv { margin-top: 20px; } .en-adv textarea { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
+.en-box { margin-top: 4px; } .en-box > summary { cursor: pointer; font-weight: 700; color: #005959; }
+@media (max-width: 860px) { .en-row, .en-add { grid-template-columns: 1fr; } }

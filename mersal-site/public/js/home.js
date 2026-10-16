@@ -182,7 +182,8 @@
     root.addEventListener("focusin", stop); root.addEventListener("focusout", play);
     // keyboard: tabbing to a card's link scrolls that card into its snap position
     track.addEventListener("focusin", function (e) { var c = e.target.closest(".sl-card"); if (c) goTo(cards.indexOf(c), false); });
-    root.addEventListener("keydown", function (e) { if (e.key === "ArrowLeft") goTo(cur + 1, true); if (e.key === "ArrowRight") goTo(cur - 1, true); });
+    // RTL: ArrowLeft moves forward; the English (LTR) page uses ArrowRight
+    root.addEventListener("keydown", function (e) { var f = document.documentElement.dir === "ltr" ? "ArrowRight" : "ArrowLeft", b = f === "ArrowLeft" ? "ArrowRight" : "ArrowLeft"; if (e.key === f) goTo(cur + 1, true); if (e.key === b) goTo(cur - 1, true); });
     // visible pause/play (WCAG 2.2.2); under reduced motion nothing moves, so there is nothing to pause
     if (pauseBtn) {
       var pauseVis = function () { pauseBtn.hidden = reduceMotion || phoneMq.matches; };
@@ -301,9 +302,10 @@
     if ("ResizeObserver" in window) new ResizeObserver(function () { check(); }).observe(track);
     else { check(); addEventListener("resize", check); }
     function step(dir) { var card = track.firstElementChild; if (!card) return; var gap = parseFloat(getComputedStyle(track).columnGap) || 20; track.scrollBy({ left: dir * (card.offsetWidth + gap), behavior: reduceMotion ? "auto" : "smooth" }); }
-    // RTL: "next" moves further to the left
-    car.querySelector(".car-next").addEventListener("click", function () { step(-1); });
-    car.querySelector(".car-prev").addEventListener("click", function () { step(1); });
+    // RTL: "next" moves further to the left; in English (LTR) to the right
+    var fwd = document.documentElement.dir === "ltr" ? 1 : -1;
+    car.querySelector(".car-next").addEventListener("click", function () { step(fwd); });
+    car.querySelector(".car-prev").addEventListener("click", function () { step(-fwd); });
   }
 
   // ---------- donation campaigns: "cause cards" ----------

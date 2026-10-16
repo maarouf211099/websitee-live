@@ -1,148 +1,182 @@
 [
   {
     "title": "عن مرسال",
+    "title_en": "About Mersal",
     "href": "/p/3.html"
   },
   {
     "title": "مشاريع مرسال",
+    "title_en": "Our projects",
     "href": null,
     "children": [
       {
         "title": "مستشفى مرسال للأطفال",
+        "title_en": "Mersal Children's Hospital",
         "href": "/p/30.html"
       },
       {
         "title": "مركز مرسال لعلاج الأورام",
+        "title_en": "Mersal Oncology Center",
         "href": "/p/31.html"
       },
       {
         "title": "مشروع حضانات مرسال",
+        "title_en": "Mersal Neonatal Incubators",
         "href": "/p/52.html"
       },
       {
         "title": "فريق الطوارئ في مرسال",
+        "title_en": "Mersal Emergency Team",
         "href": "/p/18.html"
       },
       {
         "title": "دار الضيافة في مرسال",
+        "title_en": "Mersal Guest House",
         "href": "/p/32.html"
       },
       {
         "title": "مشروع حكاية صوت",
+        "title_en": "Hekayet Sout (Hearing) Project",
         "href": "/p/33.html"
       },
       {
         "title": "علاج مرضى الـ PKU",
+        "title_en": "PKU Patient Treatment",
         "href": "/p/34.html"
       },
       {
         "title": "قوافل مرسال",
+        "title_en": "Mersal Medical Convoys",
         "href": "/p/35.html"
       },
       {
         "title": "مشروع الدعم النفسي",
+        "title_en": "Psychological Support Project",
         "href": "/p/36.html"
       }
     ]
   },
   {
     "title": "خدمات مرسال",
+    "title_en": "Our services",
     "href": null,
     "children": [
       {
         "title": "خدمة العلاج الشهري",
+        "title_en": "Monthly Treatment Program",
         "href": "/p/37.html"
       },
       {
         "title": "الكشف الطبي والفحوصات",
+        "title_en": "Medical Exams & Tests",
         "href": "/p/38.html"
       },
       {
         "title": "العمليات الجراحية",
+        "title_en": "Surgeries",
         "href": "/p/39.html"
       },
       {
         "title": "سداد ديون المرضى",
+        "title_en": "Paying Off Patients' Debts",
         "href": "/p/40.html"
       },
       {
         "title": "المستلزمات الطبية",
+        "title_en": "Medical Supplies",
         "href": "/p/41.html"
       },
       {
         "title": "كفالات أسر المرضى",
+        "title_en": "Patient Family Sponsorship",
         "href": "/p/42.html"
       }
     ]
   },
   {
     "title": "مشاريع الاستدامة",
+    "title_en": "Sustainability",
     "href": null,
     "children": [
       {
         "title": "عيادات مرسال",
+        "title_en": "Mersal Clinics",
         "href": "/p/43.html"
       },
       {
         "title": "متجر مرسال",
+        "title_en": "Mersal Store",
         "href": "/p/45.html"
       },
       {
         "title": "أكاديمية مرسال",
+        "title_en": "Mersal Academy",
         "href": "/p/44.html"
       }
     ]
   },
   {
     "title": "تواصل معنا",
+    "title_en": "Contact us",
     "href": null,
     "children": [
       {
         "title": "اتصل بنا",
+        "title_en": "Call us",
         "href": "/contact.html"
       },
       {
         "title": "ألبومات الصور",
+        "title_en": "Photo albums",
         "href": "/albums.html"
       },
       {
         "title": "أخبار مرسال",
+        "title_en": "Mersal news",
         "href": "/news.html"
       },
       {
         "title": "فروع مرسال",
+        "title_en": "Our branches",
         "href": "/p/46.html"
       }
     ]
   },
   {
     "title": "ساعد مرسال",
+    "title_en": "Help Mersal",
     "href": null,
     "children": [
       {
         "title": "تبرع الآن",
+        "title_en": "Donate now",
         "href": "/donate.html"
       },
       {
         "title": "حساب الزكاة",
+        "title_en": "Zakat calculator",
         "href": "/zakat.html"
       },
       {
         "title": "اهدي تبرع",
+        "title_en": "Gift a donation",
         "href": "/gift.html"
       },
       {
         "title": "تطوع معنا",
+        "title_en": "Volunteer with us",
         "href": "/volunteer.html"
       },
       {
         "title": "طلب مساعدة",
+        "title_en": "Request help",
         "href": "/help.html"
       }
     ]
   },
   {
     "title": "كارت عافية",
+    "title_en": "Afia Card",
     "href": "/afia.html"
   }
 ]

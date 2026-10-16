@@ -71,6 +71,8 @@
     if (!o.purpose || o.purpose === "general" || o.purpose === "sadaqa" || !o.purposeTitle || /تبرع عام/.test(o.purposeTitle)) return "";
     return "لدعم " + o.purposeTitle;
   }
+  // English version (js/i18n.js): the card's texts are translated whole, before they are wrapped into lines
+  var T = window.mersalI18n ? window.mersalI18n.tr : function (s) { return s; };
   function texts(o) {
     var c = OCC[o.occasion], f = o.gender === "f";
     return { pill: c.pill, lead: pick(c.lead, f), name: o.to, bless: pick(c.bless, f), msg: o.msg, purpose: purposeLine(o),
@@ -164,6 +166,7 @@
   function blocks(ctx, t, s) {
     var out = [];
     function text(wt, px, color, value, maxLines, lh, gap) {
+      value = T(value);
       font(ctx, wt, px * s);
       var r = wrapEven(ctx, value, MAXW, maxLines);
       out.push({ k: "text", wt: wt, px: px * s, color: color, lines: r.lines, lh: lh, h: r.lines.length * px * s * lh, gap: gap * s });
@@ -171,7 +174,7 @@
     font(ctx, 700, 32 * s);
     out.push({ k: "pill", text: t.pill, w: Math.min(MAXW, ctx.measureText(t.pill).width + 72 * s), px: 32 * s, h: 66 * s, gap: 30 * s });
     text(600, 42, "#5f6b6b", t.lead, 1, 1.4, 2);
-    var nm = fitName(ctx, t.name || PLACEHOLDER, MAXW, s);
+    var nm = fitName(ctx, t.name || T(PLACEHOLDER), MAXW, s);
     out.push({ k: "text", wt: 800, px: nm.px, color: t.name ? "#005959" : "#a9c4c4", lines: nm.lines, lh: 1.32, h: nm.lines.length * nm.px * 1.32, gap: 24 * s });
     out.push({ k: "divider", h: 6 * s, gap: 30 * s });
     text(600, 40, "#1f2a2a", t.bless, 3, 1.55, 28);
@@ -542,7 +545,7 @@
   function loadPurposes(sel, want) {
     return Promise.all([getJSON("/content.json", {}), getJSON("/data/menu.json", [])]).then(function (res) {
       var groups = {}, seen = {}, titles = {}, alias = {};
-      sel.querySelectorAll("option").forEach(function (o) { titles[o.textContent.trim()] = o.value; });
+      sel.querySelectorAll("option").forEach(function (o) { titles[(o.getAttribute("data-ar") || o.textContent).trim()] = o.value; }); // data-ar: the Arabic title (js/i18n.js, English)
       function add(group, id, title) {
         var t = String(title || "").trim(), v = "p" + id;
         if (seen[id] || has(LEGACY, v) || !t) return;
@@ -677,6 +680,7 @@
       t.addEventListener("click", function () { openTab(t); });
       t.addEventListener("keydown", function (e) {
         var dir = e.key === "ArrowLeft" ? 1 : e.key === "ArrowRight" ? -1 : 0; // RTL: left moves forward
+        if (document.documentElement.dir === "ltr") dir = -dir; // English (LTR): right moves forward
         if (e.key === "Home" || e.key === "End") { e.preventDefault(); var v = tabs.filter(visible); openTab(e.key === "Home" ? v[0] : v[v.length - 1], true); return; }
         if (!dir) return;
         e.preventDefault();

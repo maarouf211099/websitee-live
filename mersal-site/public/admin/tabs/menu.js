@@ -27,23 +27,26 @@
       '<p class="hint">قائمة الهيدر في كل صفحات الموقع. العنصر الرئيسي ممكن يكون رابط مباشر، أو مجموعة (من غير رابط) تحتها روابط فرعية. الترتيب بالأسهم ▲▼.</p>' +
       '<div class="list" id="menu-list">' + (tree || []).map(function (it, i) {
         return '<div class="menu-item" data-i="' + i + '">' +
-          '<div class="menu-head"><div class="field"><label>العنصر الرئيسي</label><input data-k="title" value="' + esc(it.title || "") + '" placeholder="مثال: مشاريع مرسال"></div>' +
+          '<div class="menu-head"><div class="field"><label>العنصر الرئيسي</label><input data-k="title" value="' + esc(it.title || "") + '" placeholder="مثال: مشاريع مرسال"></div>' + enField(it) +
             hrefField(it.href, opts, "رابطه (اختياري لو مجموعة)") + actions() + "</div>" +
           '<div class="menu-subs">' + (it.children || []).map(function (k, j) {
-            return '<div class="menu-sub" data-j="' + j + '"><div class="field"><label>رابط فرعي</label><input data-k="title" value="' + esc(k.title || "") + '"></div>' +
+            return '<div class="menu-sub" data-j="' + j + '"><div class="field"><label>رابط فرعي</label><input data-k="title" value="' + esc(k.title || "") + '"></div>' + enField(k) +
               hrefField(k.href, opts, "الرابط") + actions() + "</div>";
           }).join("") + '<div><button type="button" class="btn btn-ghost btn-sm" data-act="addsub">+ رابط فرعي</button></div></div>' +
         "</div>";
       }).join("") + "</div>" +
       '<div class="row"><button type="button" class="btn btn-ghost" id="add-top">+ إضافة عنصر رئيسي</button></div>';
   }
+  // English name (js/i18n.js, the site's English version): empty = the English dictionary decides
+  function enField(o) { return '<div class="field"><label>English</label><input data-k="title_en" dir="ltr" lang="en" value="' + esc(o.title_en || "") + '"></div>'; }
   // read the inputs back into the tree (before any change or save)
   function collect() {
     $$(".menu-item", root).forEach(function (el) {
       var it = tree[+el.dataset.i]; if (!it) return;
       it.title = $('.menu-head [data-k="title"]', el).value.trim();
+      it.title_en = $('.menu-head [data-k="title_en"]', el).value.trim();
       it.href = $('.menu-head [data-k="href"]', el).value.trim() || null;
-      it.children = $$(".menu-sub", el).map(function (s) { return { title: $('[data-k="title"]', s).value.trim(), href: $('[data-k="href"]', s).value.trim() }; });
+      it.children = $$(".menu-sub", el).map(function (s) { return { title: $('[data-k="title"]', s).value.trim(), title_en: $('[data-k="title_en"]', s).value.trim(), href: $('[data-k="href"]', s).value.trim() }; });
     });
   }
   function okHref(h) { return !h || /^(\/|#|https?:\/\/|tel:|mailto:)/.test(h); }
@@ -85,7 +88,8 @@
         for (var j = 0; j < (it.children || []).length; j++) { var k = it.children[j]; if ((k.title || k.href) && (!k.title || !k.href || !okHref(k.href))) return A.toast('رابط فرعي تحت "' + it.title + '" ناقص الاسم أو الرابط', true); }
       }
       var clean = tree.map(function (it) {
-        var kids = (it.children || []).filter(function (k) { return k.title && k.href; }), o = { title: it.title, href: it.href || null };
+        var kids = (it.children || []).filter(function (k) { return k.title && k.href; }).map(function (k) { var c = { title: k.title }; if (k.title_en) c.title_en = k.title_en; c.href = k.href; return c; });
+        var o = { title: it.title }; if (it.title_en) o.title_en = it.title_en; o.href = it.href || null;
         if (kids.length) o.children = kids; return o;
       });
       A.busy(b, true);

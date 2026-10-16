@@ -224,12 +224,10 @@
       '</div>' + social() +
     '</div></div>' +
     '<header class="site-header"><div class="wrap">' +
-      // Bars & logo (Fable v2): phones and tablets show the horizontal reversed lockup (img/brand-wide-w: «مؤسسة مرسال الخيرية»
-      // + MERSAL CHARITY FOUNDATION, gold/white on transparent); the one-row desktop header (1180px+) the stacked mark cut clean
-      // above its "FOUNDATION" line (img/brand-mark-w). The sizes live in css/mobile.css and css/desktop.css ("Bars & logo").
+      // The stacked reversed mark (img/brand-mark-w: gold «مرسال» over white «Mersal», transparent) at every width
+      // (owner, Oct 16: back to the mark, at a fitting size). Sizes: css/mobile.css + css/desktop.css ("Header v3").
       '<a class="brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture>' +
-        '<source media="(min-width: 1180px)" type="image/webp" srcset="/img/brand-mark-w.webp"><source media="(min-width: 1180px)" srcset="/img/brand-mark-w.png">' +
-        '<source type="image/webp" srcset="/img/brand-wide-w.webp"><img src="/img/brand-wide-w.png" alt="مؤسسة مرسال الخيرية" width="640" height="110"></picture></a>' +
+        '<source type="image/webp" srcset="/img/brand-mark-w.webp"><img src="/img/brand-mark-w.png" alt="مؤسسة مرسال الخيرية" width="400" height="214"></picture></a>' +
       '<ul class="nav" id="nav">' + NAV.map(function (n) {
         return "<li" + (n[0] === "/" ? ' class="nav-home"' : "") + '><a href="' + n[0] + '"' + (here === n[0] ? ' aria-current="page"' : "") + ">" + n[1] + "</a></li>";
       }).join("") + "</ul>" +
@@ -760,7 +758,7 @@
     var cs = getComputedStyle(w), box = w.getBoundingClientRect();
     var l = box.left + parseFloat(cs.paddingLeft) - 1, r = box.right - parseFloat(cs.paddingRight) + 1;
     return w.scrollWidth > w.clientWidth + 1 || Array.prototype.some.call(w.children, function (c) {
-      if (!c.offsetWidth || c.classList.contains("lang-sw")) return false; // the language switch sits in the gutter from 1180px
+      if (!c.offsetWidth) return false; // the language switch now sits in the row (in place of the search button)
       var b = c.getBoundingClientRect(); return b.left < l || b.right > r;
     });
   }

@@ -1240,3 +1240,16 @@ section.alt { background: linear-gradient(180deg, #f7faf9, #fbf8f1); }
   .site-header .brand picture::after { content: none; }
 }
 @keyframes fb-hdr-in { from { opacity: 0; transform: translateY(-10px); } }
+
+/* =================================================================== Header v3 (owner, Oct 16)
+   The stacked reversed mark at every width (img/brand-mark-w); no search button in the header (search: the menu, and the
+   "/" key); the language switch takes the search button's place in the row, as the same 44px glass squircle (no more gutter chip). */
+.site-header .search-btn { display: none !important; }
+.site-header .brand img { height: 42px; width: auto; }
+@media (min-width: 1180px) { .site-header .brand img { height: 46px; } body.nav-compact .site-header .brand img { height: 42px; } }
+@media (prefers-reduced-motion: no-preference) { .site-header .brand picture { -webkit-mask: url(../img/brand-mark-w.png) 50% 50% / contain no-repeat; mask: url(../img/brand-mark-w.png) 50% 50% / contain no-repeat; } }
+.site-header .lang-sw, body:not(.nav-compact) .site-header .lang-sw { position: static; translate: none; inset: auto; width: 44px; min-width: 44px; height: 44px; aspect-ratio: auto; padding: 0;
+  border-radius: 14px; font: 800 14px/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px;
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.07)); border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 3px 8px -4px rgba(0,0,0,.45); }
+.site-header .lang-sw[lang="ar"], body:not(.nav-compact) .site-header .lang-sw[lang="ar"] { font: 800 13.5px/1 "Cairo", sans-serif; letter-spacing: 0; }

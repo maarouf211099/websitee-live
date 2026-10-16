@@ -1242,3 +1242,87 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   }
   @keyframes brand-shine { from { transform: translateX(-160%); } to { transform: translateX(160%); } }
 }
+
+/* =================================================================== Bars & logo (Fable v2)
+   Owner: «اللوجو حاسس حجمه مش حلو، ممكن تطوّر في الشكل والبار العلوي والسفلي والانميشن أكتر». Phone only (this file
+   loads <= 760px); css/desktop.css closes with the same block for tablets and desktop.
+   LOGO: the 46px stacked mark filled the 60px bar edge to edge (7px of air, the "FOUNDATION" line cropped by a trick).
+   The header now shows the horizontal reversed lockup (img/brand-wide-w, 640x110, drawn from brand-logo-h with its teal
+   turned white): 32px tall, ~186px wide, centred on the 42px glass buttons, with the foundation's full name in both
+   scripts. The footer keeps the stacked mark, cut clean above its "FOUNDATION" line (img/brand-mark-w, 400x214), so
+   nothing is ever half-cropped. The size no longer changes on scroll (the old 28px jump was a layout shift): the bar
+   stays 60px and the lockup settles to 92% with a transform.
+   TOP BAR: a deeper teal sweep, a brighter gold hairline, 42px squircle glass buttons with an inner highlight.
+   BOTTOM BAR: same 64px / 10px offset (the home quick-donate button keeps its place); a gold hairline along the top
+   edge, a softer deeper shadow, 11.5px/800 labels in one ink, a 54x32 capsule with an inner highlight under the lit
+   icon, the heart with a thinner white rim. A tapped icon hops once (.bump from js/layout.js); the lit one pops in.
+   MOTION: the header's logo and buttons fade down in once, the lockup gets one light sweep masked to its glyphs
+   (the mask is static; only the sweep translates), the bottom bar rises in once, the menu sheet's rows follow each
+   other with a spring. Everything is transform/opacity, runs once, and under reduced motion shows its final state. */
+@media (max-width: 760px) {
+  /* ---------- logo ---------- */
+  .site-header .brand { display: block; position: relative; margin-inline-end: auto; padding: 0; line-height: 0; transform-origin: 100% 50%; }
+  .site-header .brand picture { display: block; position: relative; line-height: 0; overflow: hidden; }
+  .site-header .brand img, .site-header.scrolled .brand img { display: block; height: 32px; width: auto; max-width: calc(100vw - 150px); aspect-ratio: auto; object-fit: contain; object-position: 50% 50%; }
+  @media (max-width: 359px) { .site-header .brand img, .site-header.scrolled .brand img { height: 30px; } }
+  .site-header.scrolled:not(.hide) .brand { transform: scale(.92); }
+  .site-header.scrolled:not(.hide) .brand:active { transform: scale(.86); }
+  .site-footer .logo-box img { height: 54px; width: auto; aspect-ratio: auto; object-fit: contain; object-position: 50% 50%; }
+  /* ---------- top bar ---------- */
+  #site-header, .site-header { background: linear-gradient(180deg, #006262 0%, #005252 100%); box-shadow: inset 0 -1px 0 rgba(254,200,48,.46), 0 10px 26px -16px rgba(0,32,32,.8); }
+  .site-header .wrap, .site-header.scrolled .wrap { min-height: 60px; gap: 8px; }
+  .site-header .search-btn, .site-header .menu-toggle { width: 42px; height: 42px; border-radius: 13px; color: #fff;
+    background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.07)); border: 1px solid rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 3px 8px -4px rgba(0,0,0,.45); }
+  .site-header .search-btn svg { width: 19px; height: 19px; stroke-width: 2.3; }
+  .site-header .menu-toggle span { width: 18px; height: 2px; border-radius: 2px; }
+  .site-header .menu-toggle span + span { margin-top: 5px; }
+  .site-header .menu-toggle[aria-expanded="true"] { background: var(--gold); border-color: var(--gold); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 3px 8px -4px rgba(0,0,0,.45); }
+  /* ---------- bottom bar ---------- */
+  .m-bar { --pad: 6px; inset-inline: 12px; height: 64px; border-radius: 26px; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,48,48,.06), 0 24px 48px -20px rgba(0,48,48,.55), 0 0 0 1px rgba(0,89,89,.1); }
+  .m-bar::before { content: ""; position: absolute; top: 0; inset-inline: 26px; height: 1px; z-index: 1; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(254,200,48,.55) 25%, rgba(254,200,48,.55) 75%, transparent); }
+  .m-bar a, .m-bar button { gap: 3px; color: #536768; border-radius: 20px; }
+  .m-bar a span, .m-bar button span { font: 800 11.5px/1.15 "Cairo", sans-serif; letter-spacing: 0; padding-inline: 2px; }
+  .m-bar svg { width: 24px; height: 24px; stroke-width: 2; }
+  .m-bar .on span, body.menu-open .m-bar .m-menu span { color: var(--teal-text); }
+  .m-bar .m-ind::before { top: 7px; width: 54px; height: 32px; margin-left: -27px;
+    background: linear-gradient(145deg, #00b1b2 0%, var(--teal-text) 52%, #00696a 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 8px 16px -8px rgba(0,120,121,.9); }
+  .m-bar .m-donate i { border-width: 3px; box-shadow: 0 2px 4px rgba(0,48,48,.12), 0 14px 28px -8px rgba(233,173,12,.85), 0 0 0 1px rgba(233,173,12,.45); }
+  .m-bar .m-donate span { color: var(--teal-dark); }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  /* the header: logo, then search, then the menu fade down in once (backwards fill: the base transform returns after) */
+  .site-header .brand, .site-header .search-btn, .site-header .menu-toggle { animation: fb-hdr-in .6s var(--spring) backwards; }
+  .site-header .search-btn { animation-delay: .07s; }
+  .site-header .menu-toggle { animation-delay: .13s; }
+  .site-header .brand { transition: transform .32s var(--spring); }
+  .site-header .brand:active, .site-header.scrolled:not(.hide) .brand:active { transition-duration: .12s; }
+  /* one light sweep over the lockup, masked to its glyphs (mask static, the sweep translates) */
+  .site-header .brand picture { -webkit-mask: url(../img/brand-wide-w.png) 50% 50% / contain no-repeat; mask: url(../img/brand-wide-w.png) 50% 50% / contain no-repeat; }
+  .site-header .brand picture::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%); transform: translateX(-160%); animation: brand-shine 1.2s 1s cubic-bezier(.4,0,.2,1) 1 both; }
+  /* the bottom bar rises in once; a tapped icon hops */
+  .m-bar { animation: fb-bar-in .55s var(--spring) .1s backwards; }
+  .m-bar .bump svg { animation: fb-bump .48s var(--bounce); }
+  .m-bar .m-ind { transition: transform .46s var(--spring), opacity .2s; }
+  /* the menu sheet's rows follow each other with a spring */
+  .m-sheet-in > * { animation: fb-row-in .5s var(--spring) both; }
+  .m-sheet-in > :nth-child(2) { animation-delay: .04s; }
+  .m-sheet-in > :nth-child(3) { animation-delay: .08s; }
+  .m-sheet-in > :nth-child(4) { animation-delay: .12s; }
+  .m-sheet-in > :nth-child(5) { animation-delay: .16s; }
+  .m-sheet-in > :nth-child(6) { animation-delay: .2s; }
+  .m-sheet-in > :nth-child(7) { animation-delay: .24s; }
+  .m-sheet-in > :nth-child(n+8) { animation-delay: .28s; }
+  .m-sheet.closing .m-sheet-in > * { animation: none; }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .site-header .brand, .site-header .search-btn, .site-header .menu-toggle, .m-bar, .m-bar .bump svg { animation: none; }
+  .site-header .brand picture::after { content: none; }
+}
+@keyframes fb-hdr-in { from { opacity: 0; transform: translateY(-10px); } }
+@keyframes fb-bar-in { from { opacity: 0; transform: translateY(18px); } }
+@keyframes fb-bump { 0% { transform: scale(1); } 35% { transform: scale(.82) translateY(2px); } 70% { transform: scale(1.14) translateY(-2px); } 100% { transform: none; } }
+@keyframes fb-row-in { from { opacity: 0; transform: translateY(16px) scale(.985); } }

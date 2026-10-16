@@ -2,6 +2,7 @@
 // Array order = display order (the first 6 are the home strip); "ترتيب حسب التاريخ" sorts newest first.
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
+  function ih(id) { return window.MersalImgSizes ? window.MersalImgSizes.hint(id) : ""; } // recommended-size hint line (tabs/sizes.js)
   var root, items = null, loaded = "";
   var TAGS = ["خبر", "قصة نجاح", "فعالية"];
   // today in Egypt (a UTC date would still say yesterday between midnight and 2-3 am Cairo time)
@@ -33,7 +34,7 @@
           field("ملخص قصير (بيظهر في الكارت)", '<textarea data-k="text" rows="2" maxlength="300">' + esc(n.text || "") + "</textarea>", true) +
           field("النص الكامل (اختياري - سطر فاضي = فقرة جديدة)", '<textarea data-k="body" rows="5">' + esc(n.body || "") + "</textarea>", true) +
         "</div>" +
-        '<div class="item-actions"><button type="button" class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button>' +
+        '<div class="item-actions">' + ih("news") + '<button type="button" class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button>' +
           '<button type="button" class="btn btn-ghost btn-sm" data-act="up" aria-label="لفوق">▲</button><button type="button" class="btn btn-ghost btn-sm" data-act="down" aria-label="لتحت">▼</button>' +
           '<button type="button" class="btn btn-danger btn-sm" data-act="del">حذف</button>' +
           (n.id && loaded.indexOf('"' + n.id + '"') > -1 ? '<a class="btn btn-ghost btn-sm" href="/news.html#n-' + encodeURIComponent(n.id) + '" target="_blank" rel="noopener">معاينة ↗</a>' : "") +
@@ -67,7 +68,7 @@
       else if (act === "up" && i > 0) items.splice(i - 1, 0, items.splice(i, 1)[0]);
       else if (act === "down" && i < items.length - 1) items.splice(i + 1, 0, items.splice(i, 1)[0]);
       else if (act === "img") {
-        A.pick(false).then(function (files) {
+        A.pick(false, "news").then(function (files) {
           if (!files.length) return; A.busy(b, true);
           return A.upload(files, 1200, 600).then(function (r) { n.image = r[0].url; n.imageSm = r[0].urlSm; renderList(); A.toast("اترفعت الصورة، اضغط حفظ ونشر"); });
         }).catch(function (err) { A.toast(err.message, true); A.busy(b, false); });

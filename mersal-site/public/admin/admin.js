@@ -132,7 +132,7 @@
   start();
 
   // ---------- permissions: each tab belongs to one perm; the server checks every save again ----------
-  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
+  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
   var perms = null;
   function can(perm) { return !perm || !perms || perms.indexOf(perm) >= 0; }
   function applyPerms(me) {
@@ -184,10 +184,11 @@
       img.onerror = rej; img.src = url;
     });
   }
-  function pick(multiple) {
+  // slot: id in tabs/sizes.js - after a file is chosen, a non-blocking toast says when its shape is far from the recommended one
+  function pick(multiple, slot) {
     return new Promise(function (res) {
       var i = document.createElement("input"); i.type = "file"; i.accept = "image/*"; i.multiple = !!multiple;
-      i.onchange = function () { res(Array.prototype.slice.call(i.files)); }; i.click();
+      i.onchange = function () { var f = Array.prototype.slice.call(i.files); if (slot && window.MersalImgSizes) { try { window.MersalImgSizes.check(f, slot); } catch (e) {} } res(f); }; i.click();
     });
   }
   // returns [{url, urlSm}] after committing the images
@@ -210,6 +211,9 @@
     });
   }
 
+  // hint line (recommended size) for an image slot: see tabs/sizes.js
+  function ih(id) { return window.MersalImgSizes ? window.MersalImgSizes.hint(id) : ""; }
+
   // ---------- home ----------
   var content = null;
   function loadHome() {
@@ -228,7 +232,7 @@
         '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" dir="ltr" value="' + esc(s.link || "/donate.html") + '"></div>' +
         '<div class="field"><label>مكان الصورة على الموبايل</label><input data-k="focus" dir="ltr" placeholder="مثال: 40% 50%" value="' + esc(s.focus || "50% 50%") + '"></div>' +
         '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div></div>' +
-        '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="mimg" title="صورة أعلى جودة للموبايل (عرض 1800px أو أكتر، أفضل 4:5 طولي)">صورة الموبايل</button>' + (s.mobile ? '<button class="btn btn-ghost btn-sm" data-act="mdel">إلغاء صورة الموبايل</button>' : "") + '<button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
+        '<div class="item-actions">' + ih("hero") + ih("hero-m") + '<button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="mimg" title="صورة أعلى جودة للموبايل (عرض 1800px أو أكتر، أفضل 4:5 طولي)">صورة الموبايل</button>' + (s.mobile ? '<button class="btn btn-ghost btn-sm" data-act="mdel">إلغاء صورة الموبايل</button>' : "") + '<button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
   function renderCampaigns() {
@@ -250,7 +254,7 @@
         '<div class="field"><label>تم توفير</label><input data-k="raised" type="number" value="' + esc(c.raised || 0) + '"></div>' +
         '<div class="field full"><label>صفحة المشروع</label><select data-k="link"><option value="/donate.html">— بدون صفحة —</option>' + opts + "</select></div>" +
         "</div>" +
-        '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
+        '<div class="item-actions">' + ih("campaign") + '<button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
   // projects carousel on the home page (content.json "projects"): same card shape as the campaigns, without the figures
@@ -265,7 +269,7 @@
         '<div class="field"><label>صفحة المشروع</label><select data-k="link"><option value="/donate.html">— صفحة التبرع —</option>' + opts + (known ? "" : '<option value="' + esc(link) + '" selected>' + esc(link) + "</option>") + "</select></div>" +
         '<div class="field"><label>نص الزرار (اختياري)</label><input data-k="button" value="' + esc(c.button || "") + '" placeholder="اعرف أكثر"></div>' +
         "</div>" +
-        '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
+        '<div class="item-actions">' + ih("project") + '<button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
   function renderNumbers() {
@@ -300,13 +304,13 @@
       else if (b.dataset.act === "mimg") {
         // a dedicated phone photo (the hero card on phones is a tall 4:5 story card): 1800px wide so it is
         // 2x on a 3x phone (the card is ~1100 device px wide); never upscaled, so upload a big original
-        pick(false).then(function (files) {
+        pick(false, "hero-m").then(function (files) {
           if (!files.length) return; busy(b, true);
           return upload(files, 1800, 0, 0, .85).then(function (r) { arr[i].mobile = r[0].url; render(); toast("اترفعت صورة الموبايل، اضغط حفظ ونشر"); });
         }).catch(function (err) { toast(err.message, true); busy(b, false); });
       }
       else if (b.dataset.act === "img") {
-        pick(false).then(function (files) {
+        pick(false, imgOpts.slot).then(function (files) {
           if (!files.length) return; busy(b, true);
           return upload(files, imgOpts.big, imgOpts.sm, imgOpts.mobile).then(function (r) {
             if (key === "slides") { arr[i].banner = r[0].url; arr[i].bannerSm = r[0].urlSm; arr[i].mobile = r[0].urlM || ""; } else { arr[i].image = r[0].url; arr[i].imageSm = r[0].urlSm; }
@@ -316,9 +320,9 @@
       }
     });
   }
-  listActions("#slides", "slides", renderSlides, { big: 1920, sm: 1200, mobile: .46 });
-  listActions("#campaigns", "campaigns", renderCampaigns, { big: 900, sm: 600 });
-  listActions("#projects", "projects", renderProjects, { big: 900, sm: 600 });
+  listActions("#slides", "slides", renderSlides, { big: 1920, sm: 1200, mobile: .46, slot: "hero" });
+  listActions("#campaigns", "campaigns", renderCampaigns, { big: 900, sm: 600, slot: "campaign" });
+  listActions("#projects", "projects", renderProjects, { big: 900, sm: 600, slot: "project" });
   listActions("#numbers", "numbers", renderNumbers, {});
   $("#add-slide").onclick = function () { collect("#slides", "slides"); (content.slides = content.slides || []).push({ banner: "", bannerSm: "", kicker: "", title: "", text: "", button: "تبرع الآن", link: "/donate.html", focus: "50% 50%", alt: "" }); renderSlides(); };
   $("#add-campaign").onclick = function () { collect("#campaigns", "campaigns", ["unitPrice", "goal", "raised", "donors"]); (content.campaigns = content.campaigns || []).push({ title: "حملة جديدة", text: "", image: "", imageSm: "", unit: "سهم", unitPrice: 0, goal: 0, raised: 0, link: "/donate.html", purpose: "general" }); renderCampaigns(); };
@@ -378,7 +382,7 @@
   $$(".toolbar [data-cmd]").forEach(function (b) { b.addEventListener("click", function () { $("#pg-body").focus(); document.execCommand(b.dataset.cmd, false, b.dataset.val || null); }); });
   $("#pg-link").onclick = function () { var u = prompt("الرابط:", "https://"); if (u) { $("#pg-body").focus(); document.execCommand("createLink", false, u); } };
   $("#pg-img").onclick = function () {
-    var b = this; pick(false).then(function (files) { if (!files.length) return; busy(b, true); return upload(files, 1400).then(function (r) { $("#pg-body").focus(); document.execCommand("insertHTML", false, '<p><img src="' + r[0].url + '" alt="" loading="lazy"></p>'); }); })
+    var b = this; pick(false, "page").then(function (files) { if (!files.length) return; busy(b, true); return upload(files, 1400).then(function (r) { $("#pg-body").focus(); document.execCommand("insertHTML", false, '<p><img src="' + r[0].url + '" alt="" loading="lazy"></p>'); }); })
       .catch(function (e) { toast(e.message, true); }).then(function () { busy(b, false); });
   };
   function toggleHtml() {
@@ -405,7 +409,7 @@
         '<div class="field"><label>اسم الألبوم</label><input data-k="title" value="' + esc(a.title) + '"></div>' +
         '<div class="field"><label>التاريخ</label><input data-k="date" type="date" value="' + esc((a.date || "").slice(0, 10)) + '"></div></div>' +
         '<div class="photos">' + (a.photos || []).map(function (p, j) { return '<figure><img src="' + esc((a.thumbs || a.photos)[j] || p) + '" alt=""><button type="button" data-del="' + j + '" aria-label="حذف">×</button></figure>'; }).join("") + "</div>" +
-        '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="photos">+ إضافة صور</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف الألبوم</button></div></div>';
+        '<div class="item-actions">' + ih("album") + '<button class="btn btn-ghost btn-sm" data-act="photos">+ إضافة صور</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف الألبوم</button></div></div>';
     }).join("");
   }
   function collectAlbums() { $$("#albums .item").forEach(function (it) { var a = albums[+it.dataset.i]; $$("[data-k]", it).forEach(function (inp) { a[inp.dataset.k] = inp.value; }); }); }
@@ -418,7 +422,7 @@
     else if (b.dataset.act === "up" && i > 0) { albums.splice(i - 1, 0, albums.splice(i, 1)[0]); renderAlbums(); }
     else if (b.dataset.act === "down" && i < albums.length - 1) { albums.splice(i + 1, 0, albums.splice(i, 1)[0]); renderAlbums(); }
     else if (b.dataset.act === "photos") {
-      pick(true).then(function (files) {
+      pick(true, "album").then(function (files) {
         if (!files.length) return; busy(b, true); toast("جاري رفع " + files.length + " صورة…");
         return upload(files.slice(0, 20), 1600, 600).then(function (r) {
           a.photos = a.photos || []; a.thumbs = a.thumbs || a.photos.slice();

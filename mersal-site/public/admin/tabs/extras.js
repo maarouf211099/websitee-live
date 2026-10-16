@@ -3,6 +3,7 @@
 // The site side is js/extras.js. The WhatsApp button needs no setting here: it shows once "بيانات الموقع" has a WhatsApp number.
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
+  function ih(id) { return window.MersalImgSizes ? window.MersalImgSizes.hint(id) : ""; } // recommended-size hint line (tabs/sizes.js)
   var root, ann = null, list = null, loadedAnn = "", loadedList = "";
   var TONES = [["gold", "ذهبي (العادي)"], ["teal", "فاتح (معلومة)"], ["red", "أحمر (حاجة عاجلة)"]];
   var TONE_CSS = { gold: ["#fec830", "#003c3c", "#003c3c", "#fff"], teal: ["#e4f3f3", "#003c3c", "#007879", "#fff"], red: ["#b42318", "#fff", "#fff", "#b42318"] };
@@ -45,7 +46,7 @@
         field("الاسم", '<input data-k="name" maxlength="60" value="' + esc(p.name || "") + '" placeholder="مثال: بنك مصر">') +
         field("اللوجو (اختياري)", '<input data-k="logo" dir="ltr" placeholder="/img/banks/… أو ارفع صورة" value="' + esc(p.logo || "") + '">') +
         field("الرابط لما حد يضغط (اختياري)", '<input data-k="link" dir="ltr" placeholder="/donate.html#bank" value="' + esc(p.link || "") + '">', true) +
-        '</div><div class="item-actions"><button type="button" class="btn btn-ghost btn-sm" data-act="logo">رفع لوجو</button>' +
+        '</div><div class="item-actions">' + ih("partner") + '<button type="button" class="btn btn-ghost btn-sm" data-act="logo">رفع لوجو</button>' +
         (p.logo ? '<button type="button" class="btn btn-ghost btn-sm" data-act="nologo">من غير لوجو</button>' : "") +
         '<button type="button" class="btn btn-ghost btn-sm" data-act="up" aria-label="لفوق">▲</button><button type="button" class="btn btn-ghost btn-sm" data-act="down" aria-label="لتحت">▼</button>' +
         '<button type="button" class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
@@ -142,7 +143,7 @@
       else if (act === "down" && i < list.length - 1) list.splice(i + 1, 0, list.splice(i, 1)[0]);
       else if (act === "nologo") p.logo = "";
       else if (act === "logo") {
-        A.pick(false).then(function (files) {
+        A.pick(false, "partner").then(function (files) {
           if (!files.length) return;
           A.busy(b, true); b.textContent = "جاري الرفع…";
           var stem = "logo-" + (files[0].name.replace(/\.[^.]+$/, "").replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 20) || "partner");

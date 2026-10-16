@@ -4,6 +4,7 @@
 // (PUT /api/console/seo). Sections missing from texts.json are not shown and stay as they are on the site.
 (function () {
   var A = window.MersalAdmin, $ = A.$, $$ = A.$$, esc = A.esc;
+  function ih(id) { return window.MersalImgSizes ? window.MersalImgSizes.hint(id) : ""; } // recommended-size hint line (tabs/sizes.js)
   var root, data = null, loaded = "", banks = [], seo = null, seoLoaded = "";
 
   var ICONS = {
@@ -82,7 +83,7 @@
     if (type === "img") {
       var ok = val && okImg(val);
       return '<div style="display:flex;gap:8px;align-items:center">' + (ok ? '<img src="' + esc(val) + '" alt="" style="width:64px;height:44px;object-fit:contain;background:#f1f5f5;border-radius:8px;flex:none">' : "") +
-        "<input" + attr + ' dir="ltr" placeholder="/img/… أو ارفع صورة" value="' + esc(val || "") + '"><button type="button" class="btn btn-ghost btn-sm" data-up="' + esc(path) + '"' + (sec && sec.logo ? ' data-logo="1"' : "") + ">رفع</button></div>";
+        "<input" + attr + ' dir="ltr" placeholder="/img/… أو ارفع صورة" value="' + esc(val || "") + '"><button type="button" class="btn btn-ghost btn-sm" data-up="' + esc(path) + '"' + (sec && sec.logo ? ' data-logo="1"' : "") + ">رفع</button></div>" + ih(sec && sec.logo ? "logo-ways" : /^home\.hospital/.test(path) ? "hospital" : "about");
     }
     return "<input" + attr + ' value="' + esc(val == null ? "" : val) + '">';
   }
@@ -200,7 +201,7 @@
   }
   function uploadTo(btn) {
     var path = btn.dataset.up, owner = path.replace(/\.image$/, ""), sec = SECTIONS.filter(function (s) { return path.indexOf(s.path + ".") === 0; })[0];
-    A.pick(false).then(function (files) {
+    A.pick(false, btn.dataset.logo ? "logo-ways" : /^home\.hospital/.test(path) ? "hospital" : "about").then(function (files) {
       if (!files.length) return;
       A.busy(btn, true); btn.textContent = "جاري الرفع…";
       if (btn.dataset.logo) {

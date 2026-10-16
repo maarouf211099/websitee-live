@@ -132,7 +132,7 @@
   start();
 
   // ---------- permissions: each tab belongs to one perm; the server checks every save again ----------
-  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
+  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", english: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
   var perms = null;
   function can(perm) { return !perm || !perms || perms.indexOf(perm) >= 0; }
   function applyPerms(me) {
@@ -221,6 +221,13 @@
     api("data/content").then(function (c) { content = c; renderSlides(); renderCampaigns(); renderProjects(); renderNumbers(); $("#numbers-asof").value = typeof c.numbersAsOf === "string" ? c.numbersAsOf : ""; homeReady(); })
       .catch(function (e) { toast("تعذّر تحميل الرئيسية: " + e.message, true); });
   }
+  // English version (js/i18n.js): optional x_en fields beside the Arabic ones; empty = the English dictionary
+  // ("English" tab) is used for that text, and when it has no entry the Arabic shows
+  function enFields(o, list) {
+    return '<details class="field full en-box"><summary>English (النسخة الإنجليزية)</summary><div class="fields">' + list.map(function (f) {
+      return '<div class="field' + (f[2] ? " full" : "") + '"><label>' + esc(f[1]) + '</label><input data-k="' + f[0] + '_en" dir="ltr" lang="en" value="' + esc(o[f[0] + "_en"] || "") + '"></div>';
+    }).join("") + "</div></details>";
+  }
   function renderSlides() {
     $("#slides").innerHTML = (content.slides || []).map(function (s, i) {
       return '<div class="item" data-i="' + i + '"><div class="thumbs"><img class="thumb wide" src="' + esc(s.bannerSm || s.banner || "") + '" alt="">' +
@@ -231,7 +238,8 @@
         '<div class="field"><label>نص الزرار</label><input data-k="button" value="' + esc(s.button || "تبرع الآن") + '"></div>' +
         '<div class="field"><label>الرابط عند الضغط</label><input data-k="link" dir="ltr" value="' + esc(s.link || "/donate.html") + '"></div>' +
         '<div class="field"><label>مكان الصورة على الموبايل</label><input data-k="focus" dir="ltr" placeholder="مثال: 40% 50%" value="' + esc(s.focus || "50% 50%") + '"></div>' +
-        '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div></div>' +
+        '<div class="field"><label>وصف الصورة</label><input data-k="alt" value="' + esc(s.alt || "") + '"></div>' +
+        enFields(s, [["kicker", "Kicker"], ["title", "Title"], ["text", "Line under the title"], ["button", "Button text"], ["alt", "Image description", 1]]) + "</div>" +
         '<div class="item-actions">' + ih("hero") + ih("hero-m") + '<button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="mimg" title="صورة أعلى جودة للموبايل (عرض 1800px أو أكتر، أفضل 4:5 طولي)">صورة الموبايل</button>' + (s.mobile ? '<button class="btn btn-ghost btn-sm" data-act="mdel">إلغاء صورة الموبايل</button>' : "") + '<button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }
@@ -253,6 +261,7 @@
         '<div class="field"><label>الهدف</label><input data-k="goal" type="number" value="' + esc(c.goal || 0) + '"></div>' +
         '<div class="field"><label>تم توفير</label><input data-k="raised" type="number" value="' + esc(c.raised || 0) + '"></div>' +
         '<div class="field full"><label>صفحة المشروع</label><select data-k="link"><option value="/donate.html">— بدون صفحة —</option>' + opts + "</select></div>" +
+        enFields(c, [["title", "Campaign name", 1], ["text", "Short description", 1], ["impact", "Impact line", 1], ["unit", "Unit, plural (shares / doses)"]]) +
         "</div>" +
         '<div class="item-actions">' + ih("campaign") + '<button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
@@ -268,6 +277,7 @@
         '<div class="field full"><label>وصف قصير (سطرين)</label><input data-k="text" value="' + esc(c.text || "") + '"></div>' +
         '<div class="field"><label>صفحة المشروع</label><select data-k="link"><option value="/donate.html">— صفحة التبرع —</option>' + opts + (known ? "" : '<option value="' + esc(link) + '" selected>' + esc(link) + "</option>") + "</select></div>" +
         '<div class="field"><label>نص الزرار (اختياري)</label><input data-k="button" value="' + esc(c.button || "") + '" placeholder="اعرف أكثر"></div>' +
+        enFields(c, [["title", "Project name", 1], ["text", "Short description", 1], ["button", "Button text"]]) +
         "</div>" +
         '<div class="item-actions">' + ih("project") + '<button class="btn btn-ghost btn-sm" data-act="img">رفع صورة</button><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
@@ -278,7 +288,8 @@
         '<div class="field"><label>الرقم</label><input data-k="value" type="number" value="' + esc(n.value) + '"></div>' +
         '<div class="field"><label>علامة قبل الرقم (+ مثلاً)</label><input data-k="prefix" value="' + esc(n.prefix || "") + '"></div>' +
         '<div class="field full"><label>الوصف</label><input data-k="label" value="' + esc(n.label) + '"></div>' +
-        '<div class="field full"><label>رابط (اختياري)</label><input data-k="link" dir="ltr" value="' + esc(n.link || "") + '"></div></div>' +
+        '<div class="field full"><label>رابط (اختياري)</label><input data-k="link" dir="ltr" value="' + esc(n.link || "") + '"></div>' +
+        enFields(n, [["label", "Description (English)", 1]]) + "</div>" +
         '<div class="item-actions"><button class="btn btn-ghost btn-sm" data-act="up">▲</button><button class="btn btn-ghost btn-sm" data-act="down">▼</button><button class="btn btn-danger btn-sm" data-act="del">حذف</button></div></div>';
     }).join("");
   }

@@ -201,6 +201,17 @@
     .map(function (n) { var m = /^\{(\w+)\}$/.exec(n[0] || ""); return m ? [SITE.social[m[1]], n[1]] : n; })
     .filter(function (n) { return n[0] && n[1]; });
   var here = location.pathname.replace(/index\.html$/, "");
+  // Language switch (العربي / English): js/i18n.js (loaded by the inline snippet in <head> only when English is on) sets
+  // window.mersalI18n. The choice is kept in localStorage "mersalLang"; ?lang=en|ar in a link sets it too. A switch reloads
+  // the page without ?lang, so it always opens in the language just picked.
+  var EN = !!window.mersalI18n;
+  function setLang(l) {
+    try { localStorage.setItem("mersalLang", l); } catch (e) {}
+    var u = location.pathname + location.search.replace(/([?&])lang=(en|ar)(&|$)/, function (m, a, b, c) { return c ? a : ""; }).replace(/[?&]$/, "") + location.hash;
+    location.replace(u || "/");
+  }
+  window.mersalSetLang = setLang;
+  var LANG_BTN = '<button type="button" class="lang-sw" data-lang="' + (EN ? "ar" : "en") + '" lang="' + (EN ? "ar" : "en") + '" aria-label="' + (EN ? "العربية" : "English") + '">' + (EN ? "عربي" : "EN") + "</button>";
   var PHONE_PATH = "M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z";
 
   var header =
@@ -223,6 +234,7 @@
       (SITE.hotline ? '<a class="hdr-tel" href="tel:' + escA(SITE.hotline) + '" aria-label="الخط الساخن ' + escA(SITE.hotline) + '" title="الخط الساخن">' +
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + PHONE_PATH + '"/></svg><b>' + escA(SITE.hotline) + "</b></a>" : "") +
       '<button type="button" class="search-btn" aria-label="بحث في الموقع"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>' +
+      LANG_BTN + // tablets and desktop (hidden on phones, where it is the first row of the menu sheet)
       '<a class="btn btn-gold" href="/donate.html">تبرع الآن</a>' +
       // last in the row, so on tablets the DOM order is the visual order (logo, hotline, search, "تبرع الآن", menu)
       '<button class="menu-toggle" aria-label="القائمة" aria-expanded="false"><span></span><span></span><span></span></button>' +
@@ -494,6 +506,8 @@
       '<div class="m-sheet-head"><a class="m-brand" href="/" aria-label="مؤسسة مرسال - الرئيسية"><picture><source type="image/webp" srcset="/img/brand-logo.webp"><img src="/img/brand-logo.png" alt="" width="78" height="46" loading="lazy" decoding="async"></picture></a>' +
         '<button type="button" class="m-close" aria-label="إغلاق القائمة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       '<div class="m-sheet-in">' +
+      '<div class="m-lang" role="group" aria-label="' + (EN ? "Language" : "اللغة") + '"><span class="m-lang-lbl">' + (EN ? "Language" : "اللغة") + "</span>" +
+        '<button type="button" lang="ar" data-lang="ar" aria-pressed="' + !EN + '">عربي</button><button type="button" lang="en" data-lang="en" aria-pressed="' + EN + '">English</button></div>' +
       '<button type="button" class="m-search-row" id="m-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>ابحث في الموقع…</span></button>' +
       '<div class="m-quick">' +
         '<a href="/donate.html#online" class="q-donate">' + ic.donate + "<span>تبرع الآن</span></a>" +
@@ -520,6 +534,7 @@
     // the sheet's history entry is handed over to the search panel (no Back in between)
     document.getElementById("m-search").addEventListener("click", function () { setMenu(false, true, true); openSearch(); });
     sheet.querySelector(".m-close").addEventListener("click", function () { setMenu(false); menuBack(); });
+    sheet.querySelectorAll(".m-lang button").forEach(function (b) { b.addEventListener("click", function () { if (b.getAttribute("aria-pressed") !== "true") setLang(b.dataset.lang); }); });
     // groups: <details> opens at once (so the rows exist), then .is-open grows the height (css grid-rows); closing runs the other way
     sheet.querySelectorAll(".m-group > summary").forEach(function (sm) {
       sm.addEventListener("click", function (e) {
@@ -654,7 +669,9 @@
     var q = norm(sInput.value.trim());
     clearTimeout(sCountT);
     if (!index || !q) { sList.innerHTML = ""; sCount.textContent = ""; return; }
-    var hits = index.filter(function (x) { return norm(x.t + " " + x.d).indexOf(q) > -1; })
+    // English: the titles and summaries are matched in English too (js/i18n.js translates them)
+    var en = EN && window.mersalI18n.tr ? function (x) { return x.en || (x.en = norm(window.mersalI18n.tr(x.t) + " " + window.mersalI18n.tr(x.d || ""))); } : function () { return ""; };
+    var hits = index.filter(function (x) { return norm(x.t + " " + x.d).indexOf(q) > -1 || en(x).indexOf(q) > -1; })
       .sort(function (a, b) { return (norm(b.t).indexOf(q) > -1) - (norm(a.t).indexOf(q) > -1); }).slice(0, 8);
     sList.innerHTML = hits.length ? hits.map(function (x) { return '<li><a href="' + esc(x.u) + '"><b>' + esc(x.t) + "</b><span>" + esc((x.d || "").slice(0, 90)) + "</span></a></li>"; }).join("")
       : '<li class="none">مفيش نتايج. جرّب كلمة تانية أو كلمنا على 19340.</li>';
@@ -664,6 +681,8 @@
   sInput.addEventListener("input", runSearch);
   sList.addEventListener("click", function (e) { var a = e.target.closest("a"); if (a && !followFromOverlay(e, a, function () { closeSearch(true); })) closeSearch(); });
   document.querySelector(".search-btn").addEventListener("click", openSearch);
+  var langSw = document.querySelector(".site-header .lang-sw");
+  if (langSw) langSw.addEventListener("click", function () { setLang(langSw.dataset.lang); });
   panel.querySelector(".search-close").addEventListener("click", closeSearch);
   panel.addEventListener("click", function (e) { if (e.target === panel) closeSearch(); });
   addEventListener("keydown", function (e) {
@@ -728,7 +747,7 @@
     var cs = getComputedStyle(w), box = w.getBoundingClientRect();
     var l = box.left + parseFloat(cs.paddingLeft) - 1, r = box.right - parseFloat(cs.paddingRight) + 1;
     return w.scrollWidth > w.clientWidth + 1 || Array.prototype.some.call(w.children, function (c) {
-      if (!c.offsetWidth) return false;
+      if (!c.offsetWidth || c.classList.contains("lang-sw")) return false; // the language switch sits in the gutter from 1180px
       var b = c.getBoundingClientRect(); return b.left < l || b.right > r;
     });
   }

@@ -1720,3 +1720,28 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .amt-other button { flex: none; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--gold); color: var(--teal-ink); font: 800 14px "Cairo", sans-serif; cursor: pointer; }
 .camp-other { display: block; margin-top: 6px; font-size: 13.5px; font-weight: 700; color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; text-align: center; padding-block: 6px; }
 .amt-other input:focus, .amt-other input:focus-visible { outline: 0; box-shadow: none; } /* the field's frame shows focus */
+
+/* language switch (js/layout.js): "EN" / "عربي" in the header from 761px (phones: the first row of the menu sheet) */
+.site-header .lang-sw { display: none; }
+@media (min-width: 761px) {
+  .site-header .lang-sw { display: inline-grid; place-items: center; flex: none; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: #fff; font: 700 14px/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .4px;
+    transition: background .2s, color .2s, transform .22s var(--spring, ease); -webkit-tap-highlight-color: transparent; }
+  .site-header .lang-sw:hover { background: rgba(255,255,255,.14); color: var(--gold); }
+  .site-header .lang-sw:active { transform: scale(.94); }
+  .site-header .lang-sw[lang="ar"] { font: 700 14.5px/1 "Cairo", sans-serif; letter-spacing: 0; }
+}
+/* desktop (1180px+, one-row header): the row has no room to spare (js/layout.js would hide the zakat link and the hotline),
+   so the switch sits outside the content column, centred in the header's inline-end gutter (26-40px round) */
+@media (min-width: 1180px) {
+  body:not(.nav-compact) .site-header .lang-sw { --lg-g: max(var(--gut, 24px), (100% - var(--wrap-c, 100%)) / 2); --lg-w: clamp(26px, calc(var(--lg-g) - 16px), 40px);
+    position: absolute; top: 50%; translate: 0 -50%; inset-inline-end: calc((var(--lg-g) - var(--lg-w)) / 2); width: var(--lg-w); min-width: 0; height: auto; aspect-ratio: 1; padding: 0; font-size: 12.5px; }
+  body:not(.nav-compact) .site-header .lang-sw[lang="ar"] { font-size: 12.5px; }
+}
+.m-lang { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; padding: 6px 6px 6px 14px; padding-inline: 14px 6px; }
+.m-lang-lbl { flex: 1; font: 700 15px "Cairo", sans-serif; color: var(--teal-dark); }
+.m-lang button { min-height: 40px; min-width: 76px; padding: 0 14px; border-radius: 12px; border: 1.5px solid transparent; background: var(--bg-2, #f3f6f6); color: var(--teal-dark); cursor: pointer;
+  font: 700 14.5px/1 "Cairo", sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.m-lang button[lang="en"] { font-family: "Titillium Web", "Cairo", sans-serif; }
+.m-lang button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.m-lang button:active { transform: scale(.96); }

@@ -279,7 +279,7 @@
     // one option per cause: pages that are aliases of another code (LEGACY, e.g. p4/p5 -> p31) are skipped, and a
     // second page with a title that is already listed becomes an alias of the first one (so ?for= still finds it)
     var groups = {}, seen = {}, titles = {}, alias = {};
-    purpose.querySelectorAll("option").forEach(function (o) { titles[o.textContent.trim()] = o.value; });
+    purpose.querySelectorAll("option").forEach(function (o) { titles[(o.getAttribute("data-ar") || o.textContent).trim()] = o.value; }); // data-ar: the Arabic title (js/i18n.js, English)
     function add(group, id, title) {
       var t = String(title || "").trim(), v = "p" + id;
       if (seen[id] || has(LEGACY, v) || !t) return;

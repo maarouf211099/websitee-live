@@ -1,0 +1,115 @@
+/* English version (loaded only when English is on: the inline snippet in each page's <head>, see js/i18n.js).
+   Everything is scoped to html[dir="ltr"] / html[lang="en"], so the Arabic pages never see a rule of this file.
+   The site is written in RTL with logical properties (inline-start/end), so most of it mirrors by itself; this file
+   fixes what does not: physical left/right, arrows and chevrons, carousels, the English font and CSS-generated texts. */
+
+/* hold the first paint until the English texts are in (js/i18n.js removes the class; 3s at most) */
+html.i18n-wait body { visibility: hidden; }
+
+/* ---------- font: Titillium Web (self-hosted, latin) with Cairo for any Arabic left on the page ---------- */
+html[lang="en"] body, html[lang="en"] body *:not(svg):not(svg *) { font-family: "Titillium Web", "Cairo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important; }
+html[lang="en"] [lang|="ar"], html[lang="en"] [lang|="ar"] * { font-family: "Cairo", sans-serif !important; }
+
+/* ---------- arrows and chevrons drawn for RTL point the other way ---------- */
+html[dir="ltr"] svg:has(> path[d="M19 12H5M11 6l-6 6 6 6"]),
+html[dir="ltr"] svg:has(> path[d="M15 6l-6 6 6 6"]) { transform: scaleX(-1); }
+html[dir="ltr"] .m-row .chev, html[dir="ltr"] .m-group .chev, html[dir="ltr"] .m-group[open] > summary .chev { transform: none; }
+html[dir="ltr"] .m-group.is-open > summary .chev { transform: rotate(90deg); }
+html[dir="ltr"] .pt-pause .i-play { transform: none; }
+@keyframes slArrowLtr { 35% { translate: 5px 0; } }
+html[dir="ltr"] .sl-card.on .sl-btn svg { animation-name: slArrowLtr; }
+@keyframes hintNudgeLtr { 50% { transform: translateX(5px); } }
+html[dir="ltr"] .sl-hint svg { animation-name: hintNudgeLtr; }
+/* arrows written as text in CSS */
+html[dir="ltr"] .news .nw-soon .nw-soc .btn::after,
+html[dir="ltr"] .home .svc::after,
+html[dir="ltr"] .related .card .more::after,
+html[dir="ltr"] .nw-read::after { content: "→"; }
+html[dir="ltr"] .home .svc::after { transform: translateX(-8px); }
+html[dir="ltr"] .related .card:hover .more::after { transform: translateX(4px); }
+html[dir="ltr"] .community .cm-preview li:hover { transform: translateX(3px); }
+
+/* ---------- physical left/right written for RTL ---------- */
+html[dir="ltr"] .car-prev { right: auto; left: -14px; } html[dir="ltr"] .car-next { left: auto; right: -14px; }
+html[dir="ltr"] .nw-prev { right: auto; left: -14px; } html[dir="ltr"] .nw-next { left: auto; right: -14px; }
+html[dir="ltr"] .sl-prev { right: auto; left: 16px; } html[dir="ltr"] .sl-next { left: auto; right: 16px; }
+@media (min-width: 1300px) { html[dir="ltr"] .sl-prev { right: auto; left: max(16px, calc(50% - 722px)); } html[dir="ltr"] .sl-next { left: auto; right: max(16px, calc(50% - 722px)); } }
+html[dir="ltr"] .search-close { left: auto; right: 24px; }
+html[dir="ltr"] .search-box input { padding: 14px 48px 14px 16px; }
+html[dir="ltr"] .lb-close { left: auto; right: 16px; }
+html[dir="ltr"] .lb-prev { right: auto; left: 16px; } html[dir="ltr"] .lb-next { left: auto; right: 16px; }
+html[dir="ltr"] .bk-num, html[dir="ltr"] .summary dd[dir="ltr"], html[dir="ltr"] .m-contact b[dir="ltr"],
+html[dir="ltr"] .rcpt-rows dd.rcpt-ref code, html[dir="ltr"] .gf-banks li > code { text-align: left; }
+html[dir="ltr"] .zakat-page .zakat-table input { padding-left: 14px; padding-right: 60px; text-align: left; }
+html[dir="ltr"] .home .num b { text-align: left; }
+html[dir="ltr"] .home .hf-progress .bar.seg i::before { transform-origin: 0 50%; }
+html[dir="ltr"] .site-header .brand, html[dir="ltr"] body:not(.nav-compact) .site-header .brand { transform-origin: 0 50%; }
+@media (max-width: 760px) {
+  html[dir="ltr"] .m-steps li::before { right: auto; left: 0; }
+  html[dir="ltr"] .m-steps li::after { right: auto; left: 17px; }
+}
+/* pages that align their intro with an inline style="text-align:right" */
+html[dir="ltr"] main [style*="text-align:right"]:not([lang|="ar"] *), html[dir="ltr"] main [style*="text-align: right"]:not([lang|="ar"] *) { text-align: left !important; }
+
+/* ---------- moving parts ---------- */
+/* phone bottom bar: the lit-item pill slides toward the inline start, which is now the left */
+html[dir="ltr"] .m-bar .m-ind { transform: translateX(calc(var(--i, 0) * 100%)); }
+/* tablet drawer comes in from the right edge */
+@keyframes drawer-in-ltr { from { transform: translateX(100%); } }
+@keyframes drawer-out-ltr { to { transform: translateX(100%); } }
+@media (min-width: 761px) {
+  html[dir="ltr"] .m-sheet { animation-name: drawer-in-ltr; }
+  html[dir="ltr"] .m-sheet.closing { animation-name: drawer-out-ltr; }
+}
+/* the campaign row's one-time swipe hint and the partner rail move the other way */
+@keyframes camp-nudge-ltr { 0%, 100% { transform: none; } 40% { transform: translateX(-34px); } 70% { transform: translateX(6px); } }
+@media (max-width: 760px) { html[dir="ltr"] .home .camp-carousel .car-track.nudge { animation-name: camp-nudge-ltr; } }
+@keyframes pt-loop-ltr { to { transform: translateX(-50%); } }
+html[dir="ltr"] .pt-run .pt-rail { animation-name: pt-loop-ltr; }
+/* donate stepper: forward slides in from the right */
+@keyframes step-in-ltr { from { opacity: 0; transform: translateX(22px); } }
+@keyframes step-back-ltr { from { opacity: 0; transform: translateX(-22px); } }
+html[dir="ltr"] .stepper[data-dir] .step:not([hidden]), html[dir="ltr"] .gateway:not([hidden]) { animation-name: step-in-ltr; }
+html[dir="ltr"] .stepper[data-dir="back"] .step:not([hidden]) { animation-name: step-back-ltr; }
+/* the slider's progress dot fills from the left */
+@keyframes dotfillClipLtr { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+html[dir="ltr"] .sl-dots button[aria-selected="true"]::after { animation-name: dotfillClipLtr; }
+html[dir="ltr"] .btn-gold::after { transform: translateX(-120%); }
+html[dir="ltr"] .btn-gold:hover::after { transform: translateX(120%); }
+
+/* ---------- texts that CSS writes ---------- */
+@media (min-width: 761px) {
+  html[lang="en"] #t-online::after { content: "Visa · Mastercard · Meeza"; content: "Visa · Mastercard · Meeza" / ""; }
+  html[lang="en"] #t-wallets::after { content: "InstaPay · Fawry 9200 · wallets"; content: "InstaPay · Fawry 9200 · wallets" / ""; }
+  html[lang="en"] #t-bank::after { content: "Mersal's official accounts"; content: "Mersal's official accounts" / ""; }
+  html[lang="en"] #t-home::after { content: "We come to your door"; content: "We come to your door" / ""; }
+  html[lang="en"] #t-abroad::after { content: "Transfer from outside Egypt"; content: "Transfer from outside Egypt" / ""; }
+}
+html[lang="en"] .home a.num::after { content: "Details →"; }
+html[lang="en"] [data-illus]::after { content: "Illustrative photo"; }
+html[lang="en"].rcpt-print .rcpt-head::before { content: "Mersal Foundation · Donation confirmation"; }
+@media (max-width: 760px) {
+  html[lang="en"] .site-footer .cols > div:last-child li.f-mail > a::before { content: "Email"; }
+  html[lang="en"] .site-header .hdr-tel b::before { content: "Hotline"; }
+}
+@media print {
+  html[lang="en"] #bank::before { content: "Bank accounts"; } html[lang="en"] #wallets::before { content: "Wallets & InstaPay"; } html[lang="en"] #home::before { content: "Home collection"; }
+}
+/* the Quran verse stays in Arabic; its meaning follows in English */
+html[lang="en"] .ayah cite::after { display: block; margin-top: 6px; font-family: "Titillium Web", system-ui, sans-serif !important; font-style: normal; }
+html[lang="en"] .home .ayah cite::after { content: "Al-Ma'idah 5:32 · “Whoever saves one life, it is as if they had saved all of humanity.”"; }
+html[lang="en"] .zakat-page .ayah cite::after { content: "At-Tawbah 9:103 · “Take from their wealth a charity to purify them and help them grow.”"; }
+
+/* ---------- English typography ---------- */
+html[lang="en"] body { letter-spacing: 0; }
+html[lang="en"] h1, html[lang="en"] h2, html[lang="en"] h3 { letter-spacing: -.005em; }
+html[lang="en"] .eyebrow { letter-spacing: .02em; }
+/* numbers, phone numbers and amounts line up from the left */
+html[lang="en"] [dir="ltr"] { unicode-bidi: isolate; }
+
+/* ---------- imported pages (p/*.html), privacy and terms: Arabic body with an English note ---------- */
+.i18n-note { margin: 0 0 18px; padding: 14px 16px; border-radius: 14px; background: #f3f8f8; border: 1px solid rgba(0,89,89,.14); border-inline-start: 4px solid var(--gold, #fec830); color: var(--ink, #1c2b2b); }
+.i18n-note p { margin: 0; line-height: 1.55; }
+.i18n-note b { color: var(--teal-dark, #005959); }
+.i18n-note .i18n-sum { margin-top: 6px; color: var(--muted, #5f6b6b); }
+html[lang="en"] article[lang="ar"] { text-align: right; }

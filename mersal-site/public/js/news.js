@@ -175,8 +175,9 @@
     if ("ResizeObserver" in window) new ResizeObserver(function () { check(); }).observe(track);
     else { check(); addEventListener("resize", check); }
     function step(dir) { var gap = parseFloat(getComputedStyle(track).columnGap) || 20; track.scrollBy({ left: dir * (cards[0].offsetWidth + gap), behavior: reduce ? "auto" : "smooth" }); }
-    home.querySelector(".nw-next").addEventListener("click", function () { step(-1); });
-    home.querySelector(".nw-prev").addEventListener("click", function () { step(1); });
+    var fwd = document.documentElement.dir === "ltr" ? 1 : -1; // RTL: next is further left; English (LTR): right
+    home.querySelector(".nw-next").addEventListener("click", function () { step(fwd); });
+    home.querySelector(".nw-prev").addEventListener("click", function () { step(-fwd); });
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (es) {
         es.forEach(function (e) { if (e.intersectionRatio >= .6) { var i = cards.indexOf(e.target); Array.prototype.forEach.call(dots, function (d, k) { d.classList.toggle("on", k === i); }); } });

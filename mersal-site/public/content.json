@@ -5,263 +5,347 @@
       "banner": "/img/old/9270-381d6513.jpg",
       "link": "/donate.html#online",
       "alt": "أم مع طفليها يبتسمون - ابعت فرحة لمرضى مرسال",
+      "alt_en": "A mother smiling with her two children - send joy to Mersal's patients",
       "bannerSm": "/img/old/9270-381d6513-sm.jpg",
       "title": "ابعت فرحة لمرضى مرسال",
+      "title_en": "Send joy to Mersal's patients",
       "text": "كل تبرع بيرسم ابتسامة",
+      "text_en": "Every donation brings a smile",
       "button": "تبرع الآن",
+      "button_en": "Donate now",
       "focus": "35% 50%",
       "kicker": "#ابعت_فرحة",
+      "kicker_en": "#SendJoy",
       "mobile": "/img/old/9270-381d6513-m.jpg"
     },
     {
       "banner": "/img/old/9770-c30d41fe.jpg",
       "link": "/donate.html?amount=500#online",
       "alt": "شنطة مرسال بالاحتياجات الأساسية - احتياجاتهم من اختيارهم",
+      "alt_en": "A Mersal bag of basic essentials - their needs, their choice",
       "bannerSm": "/img/old/9770-c30d41fe-sm.jpg",
       "title": "احتياجاتهم من اختيارهم",
+      "title_en": "Their needs, their choice",
       "text": "سعر الكارت 500 جنيه",
+      "text_en": "Card price: EGP 500",
       "button": "اشتري كارت بـ 500",
+      "button_en": "Buy a card for EGP 500",
       "focus": "30% 50%",
       "kicker": "كارت الاحتياجات",
+      "kicker_en": "Essentials card",
       "mobile": "/img/old/9770-c30d41fe-m.jpg"
     },
     {
       "banner": "/img/old/2791-aca7e195.jpg",
       "link": "/donate.html?for=p42&amount=750#online",
       "alt": "يد تسلّم كارت كفالة ليد أخرى - شارك في كفالة أسرة مريض",
+      "alt_en": "A hand passing a sponsorship card to another - help sponsor a patient's family",
       "bannerSm": "/img/old/2791-aca7e195-sm.jpg",
       "title": "شارك في كفالة أسرة مريض",
+      "title_en": "Help sponsor a patient's family",
       "text": "قيمة السهم 750 جنيه",
+      "text_en": "One share: EGP 750",
       "button": "اكفل أسرة",
+      "button_en": "Sponsor a family",
       "focus": "45% 50%",
       "kicker": "كفالات الأسر",
+      "kicker_en": "Family sponsorship",
       "mobile": "/img/old/2791-aca7e195-m.jpg"
     },
     {
       "banner": "/img/old/8177-ee001799.jpg",
       "link": "/donate.html?for=p31&amount=500#online",
       "alt": "مريضة أورام تبتسم على سرير العلاج - انقذ حياة مريض أورام",
+      "alt_en": "A cancer patient smiling in her treatment bed - save a cancer patient's life",
       "bannerSm": "/img/old/8177-ee001799-sm.jpg",
       "title": "انقذ حياة مريض أورام",
+      "title_en": "Save a cancer patient's life",
       "text": "السهم 500 جنيه",
+      "text_en": "One share: EGP 500",
       "button": "ساهم بسهم",
+      "button_en": "Give a share",
       "focus": "45% 50%",
       "kicker": "مركز مرسال للأورام",
+      "kicker_en": "Mersal Oncology Center",
       "mobile": "/img/old/8177-ee001799-m.jpg"
     }
   ],
   "campaigns": [
     {
       "title": "علاج مرضى الأورام",
+      "title_en": "Cancer patient treatment",
       "text": "علاج مرضى الأورام",
+      "text_en": "Cancer patient treatment",
       "image": "/img/old/20260406130217-46584c7d.jpg",
       "unit": "جرعة",
+      "unit_en": "doses",
       "unitPrice": 500,
       "goal": 20000,
       "raised": 16601,
       "link": "/p/31.html",
       "purpose": "p31",
       "imageSm": "/img/old/20260406130217-46584c7d-sm.jpg",
-      "impact": "كل جرعة = يوم علاج لمريض أورام"
+      "impact": "كل جرعة = يوم علاج لمريض أورام",
+      "impact_en": "Each dose = one day of treatment for a cancer patient"
     },
     {
       "title": "مشروع الحضانات",
+      "title_en": "Incubators project",
       "text": "مشروع حضانات مرسال",
+      "text_en": "Mersal Neonatal Incubators",
       "image": "/img/old/20230215124111-d72b3d98.jpg",
       "unit": "سهم",
+      "unit_en": "shares",
       "unitPrice": 75,
       "goal": 15000,
       "raised": 4443,
       "link": "/p/52.html",
       "purpose": "p52",
       "imageSm": "/img/old/20230215124111-d72b3d98-sm.jpg",
-      "impact": "سهم في حضّانة بتنقذ طفل حديث الولادة"
+      "impact": "سهم في حضّانة بتنقذ طفل حديث الولادة",
+      "impact_en": "A share in an incubator that saves a newborn"
     },
     {
       "title": "مستشفى مرسال للأطفال",
+      "title_en": "Mersal Children's Hospital",
       "text": "مستشفى مرسال للأطفال",
+      "text_en": "Mersal Children's Hospital",
       "image": "/img/old/20230215124414-9748fdf5.jpg",
       "unit": "سهم",
+      "unit_en": "shares",
       "unitPrice": 500,
       "goal": 10000,
       "raised": 6939,
       "link": "/p/30.html",
       "purpose": "p30",
       "imageSm": "/img/old/20230215124414-9748fdf5-sm.jpg",
-      "impact": "سهم في بناء مستشفى للأطفال الأكثر احتياجاً"
+      "impact": "سهم في بناء مستشفى للأطفال الأكثر احتياجاً",
+      "impact_en": "A share in building a hospital for children most in need"
     },
     {
       "title": "كفالات مرضى",
+      "title_en": "Patient sponsorships",
       "text": "كفالات مرضى",
+      "text_en": "Patient sponsorships",
       "image": "/img/old/20260830103226-a28fe23c.jpg",
       "unit": "سهم",
+      "unit_en": "shares",
       "unitPrice": 750,
       "goal": 20000,
       "raised": 0,
       "link": "/p/42.html",
       "purpose": "p42",
       "imageSm": "/img/old/20260830103226-a28fe23c-sm.jpg",
-      "impact": "كفالة أسرة مريض لمدة شهر"
+      "impact": "كفالة أسرة مريض لمدة شهر",
+      "impact_en": "Sponsor a patient's family for a month"
     },
     {
       "title": "علاج شهري",
+      "title_en": "Monthly treatment",
       "text": "سهم علاج شهري",
+      "text_en": "A monthly treatment share",
       "image": "/img/old/20260406221511-c43c274e.jpg",
       "unit": "سهم",
+      "unit_en": "shares",
       "unitPrice": 100,
       "goal": 500000,
       "raised": 158328,
       "link": "/p/37.html",
       "purpose": "p37",
       "imageSm": "/img/old/20260406221511-c43c274e-sm.jpg",
-      "impact": "علاج شهري لمريض مزمن غير قادر"
+      "impact": "علاج شهري لمريض مزمن غير قادر",
+      "impact_en": "Monthly treatment for a chronic patient in need"
     }
   ],
   "channels": [
     {
       "title": "تقدر تتبرع عن طريق خدمة فورى",
+      "title_en": "Give through Fawry",
       "text": "كود مرسال 9200",
+      "text_en": "Mersal code 9200",
       "image": "/img/old/98894335english-logo-copy-f5f96cd8.png"
     },
     {
       "title": "التبرع عن طريق الرسائل القصيرة",
+      "title_en": "Give by text message",
       "text": "ابعت رسالة فيها كلمة مرسال على 9599 ب 5 جنيه بس",
+      "text_en": "Text the word Mersal (مرسال) to 9599 for just EGP 5",
       "image": "/img/old/4542logo-pic-9eed272a.jpg"
     },
     {
       "title": "إنستاباي",
+      "title_en": "InstaPay",
       "text": "تبرع باستخدام إنستاباي",
+      "text_en": "Give with InstaPay",
       "image": "/img/old/3536unnamed-1c52e3b3.png"
     }
   ],
   "projects": [
     {
       "title": "المنتدى الأول للأمراض النادرة",
+      "title_en": "The First Rare Diseases Forum",
       "text": "منتدى الأمراض النادرة نحو رعاية صحية أكثر شمولًا وإنصافًا عن المؤتمر تنظم مؤسسة مرسال مؤتمرها تحت عنوان \"منتدى",
+      "text_en": "The Rare Diseases Forum: towards more inclusive and equitable healthcare. Mersal Foundation organised its conference under this title.",
       "image": "/img/old/inline-babf970b69.jpg",
       "link": "/p/54.html",
       "imageSm": "/img/old/inline-babf970b69-sm.jpg"
     },
     {
       "title": "مركز الحالات الحرجة للأطفال حديثي الولادة",
+      "title_en": "Critical Care Center for Newborns",
       "text": "مشروع حضانات مرسال بدأت فكرة المشروع من حضانات مرسال. عندما قدمت مرسال للمرضى غير القادرين 12 محضن بأجهزتهم، و",
+      "text_en": "Mersal's incubators project began when Mersal provided 12 fully equipped incubators with a medical team of consultants for families who couldn't afford care.",
       "image": "/img/old/newborn-5cf8b010.jpeg",
       "link": "/p/52.html",
       "imageSm": "/img/old/newborn-5cf8b010-sm.jpeg"
     },
     {
       "title": "متجر مرسال",
+      "title_en": "Mersal Store",
       "text": "متجر مرسال يعد متجر مرسال أحد المشاريع في مؤسسة مرسال، وتعود أرباحه للمساعدة في علاج المرضى كمشروع استدامة مرب",
+      "text_en": "Mersal Store is one of the foundation's projects: its profits help treat patients, as a sustainable source of income for our services.",
       "image": "/img/old/store-d5475e25.jpg",
       "link": "/p/45.html"
     },
     {
       "title": "أكاديمية مرسال",
+      "title_en": "Mersal Academy",
       "text": "أكاديمية مرسال تهدف الأكاديمية لعمل برامج تعليمية في مجالات الإدارة وإدارة الأعمال لتكون مصدراً للتدريب على ال",
+      "text_en": "Mersal Academy runs educational programmes in management and business administration, training people in the scientific methods of leading business schools.",
       "image": "/img/old/academy-89e75870.jpg",
       "link": "/p/44.html"
     },
     {
       "title": "عيادات مرسال",
+      "title_en": "Mersal Clinics",
       "text": "عيادات مرسال توفر عيادات مرسال الخدمة الطبية بأعلى مستوى من الكفاءة للمرضى القادرين وغير القادرين. يوجد أكثر م",
+      "text_en": "Mersal Clinics provide high-quality medical care to patients who can and cannot afford it, across more than 15 specialties.",
       "image": "/img/old/clinics-7283e9d3.jpg",
       "link": "/p/43.html",
       "imageSm": "/img/old/clinics-7283e9d3-sm.jpg"
     },
     {
       "title": "كفالات أسر المرضى",
+      "title_en": "Patient Family Sponsorship",
       "text": "كفالات أسر المرضى تحاول مرسال تقديم خدمة تكاملية للمرضى وتسعى لتحسين الحياة ولهذا تقوم من خلال مشروع الكفالات ",
+      "text_en": "Mersal aims to provide complete care and improve lives, so its sponsorship project gives monthly support to the families of patients.",
       "image": "/img/old/family-541d8c42.jpg",
       "link": "/p/42.html",
       "imageSm": "/img/old/family-541d8c42-sm.jpg"
     },
     {
       "title": "سداد ديون المرضى",
+      "title_en": "Paying Off Patients' Debts",
       "text": "سداد ديون المرضى قد يقع العبء المادي على المرضى بشكل يمنعهم من القدرة على السداد وذلك بسبب ارتفاع تكلفة الخدما",
+      "text_en": "The cost of care can leave patients unable to pay their medical bills. Mersal pays off treatment debts for patients who are struggling.",
       "image": "/img/old/patients-7d3371fe.jpg",
       "link": "/p/40.html",
       "imageSm": "/img/old/patients-7d3371fe-sm.jpg"
     },
     {
       "title": "العمليات الجراحية",
+      "title_en": "Surgeries",
       "text": "العمليات الجراحية يعاني المرضى من أمراض لابد من علاجها بتدخل جراحي، للحفاظ على حياتهم، ومنع أية مضاعفات مُحتمل",
+      "text_en": "Some illnesses can only be treated with surgery, to save the patient's life, prevent complications or end their pain. Mersal covers surgery costs.",
       "image": "/img/old/surgeries-bb159cf7.jpg",
       "link": "/p/39.html",
       "imageSm": "/img/old/surgeries-bb159cf7-sm.jpg"
     },
     {
       "title": "الكشف الطبي والفحوصات",
+      "title_en": "Medical Exams & Tests",
       "text": "الكشف الطبي والفحوصات توفر مرسال خدمة الكشف الطبي للمرضى غير القادرين، وذلك بغرض اكتشاف المرض أو الفحص الدوري ",
+      "text_en": "Mersal provides medical check-ups for patients who can't afford them, to diagnose illness or for the regular tests some patients need.",
       "image": "/img/old/medical-b4e6b27d.jpg",
       "link": "/p/38.html",
       "imageSm": "/img/old/medical-b4e6b27d-sm.jpg"
     },
     {
       "title": "خدمة العلاج الشهري",
+      "title_en": "Monthly Treatment Program",
       "text": "خدمة العلاج الشهري يعاني مرضى الأمراض المزمنة من ارتفاع تكلفة الأدوية التي لا يستطيعون توفيرها شهريًا؛ ولهذا ت",
+      "text_en": "Patients with chronic illnesses struggle with the high cost of medicines they need every month, so Mersal steps in with monthly treatment.",
       "image": "/img/old/services-0bc4a092.jpg",
       "link": "/p/37.html",
       "imageSm": "/img/old/services-0bc4a092-sm.jpg"
     },
     {
       "title": "مشروع الدعم النفسي",
+      "title_en": "Psychological Support Project",
       "text": "مشروع الدعم النفسي تؤمن مرسال بأهمية تكامل الخدمات الطبية المقدمة للمرضى وذويهم، ولذلك تقوم مرسال بتوفير جلسات",
+      "text_en": "Mersal believes in integrated care for patients and their families, so it provides psychological support sessions for registered patients.",
       "image": "/img/old/psycho-9cc0e60e.jpg",
       "link": "/p/36.html",
       "imageSm": "/img/old/psycho-9cc0e60e-sm.jpg"
     },
     {
       "title": "قوافل مرسال",
+      "title_en": "Mersal Convoys",
       "text": "قوافل مرسال يستمر سعي مرسال في تقديم الخدمات التكاملية مع مقدمي الخدمات الطبية ولهذا يشارك فريق القوافل بمرسال",
+      "text_en": "Mersal works with healthcare providers to bring integrated services to patients; our convoys team serves villages and underserved areas.",
       "image": "/img/old/mersal-ee82f575.jpg",
       "link": "/p/35.html",
       "imageSm": "/img/old/mersal-ee82f575-sm.jpg"
     },
     {
       "title": "مشروع علاج مرض الـ PKU",
+      "title_en": "PKU Treatment Project",
       "text": "مشروع علاج مرض الـ PKU مرض الـ PKU هو أحد أمراض التمثيل الغذائي والتي يتم اكتشافها في الأسابيع الأولى من ولادة",
+      "text_en": "PKU is a metabolic disease detected in the first weeks of a baby's life. Its treatment is costly, so Mersal helps families provide it.",
       "image": "/img/old/pku-2427afff.jpg",
       "link": "/p/34.html",
       "imageSm": "/img/old/pku-2427afff-sm.jpg"
     },
     {
       "title": "مشروع حكاية صوت",
+      "title_en": "Hekayet Sout Project",
       "text": "مشروع حكاية صوت قد يكون العلاج بسيطاً فقط يحتاج دعم حتى يتحقق الشفاء. هذا هو الحال مع ضعاف السمع والصم الذين ي",
+      "text_en": "Sometimes the cure is simple and only needs support. That is the case for many people with hearing loss whose hearing can be restored or improved.",
       "image": "/img/old/sout-70432c7e.jpg",
       "link": "/p/33.html",
       "imageSm": "/img/old/sout-70432c7e-sm.jpg"
     },
     {
       "title": "دار ضيافة مرسال",
+      "title_en": "Mersal Guest House",
       "text": "دار ضيافة مرسال توفر دار ضيافة مرسال إقامة مجانية بمحافظة القاهرة للمرضى المغتربين الذين يواجهون عدم القدرة عل",
+      "text_en": "The Mersal Guest House offers free accommodation in Cairo for patients from other governorates who can't travel daily or afford a place to stay during treatment.",
       "image": "/img/old/unnam-7b9de1dd.jpg",
       "link": "/p/32.html",
       "imageSm": "/img/old/unnam-7b9de1dd-sm.jpg"
     },
     {
       "title": "مركز مرسال لعلاج الأورام",
+      "title_en": "Mersal Oncology Center",
       "text": "مركز مرسال لتشخيص و علاج الأورام : مركز أورام مرسال يقدم خدمات الفحص والمتابعة، وجرعات العلاج الكيميائي، ويدعم",
+      "text_en": "Mersal's center for cancer diagnosis and treatment offers screening and follow-up, chemotherapy, and supports surgery, radiotherapy and transplants.",
       "image": "/img/old/oncology-bca87d8f.jpg",
       "link": "/p/31.html",
       "imageSm": "/img/old/oncology-bca87d8f-sm.jpg"
     },
     {
       "title": "مستشفى مرسال للأطفال",
+      "title_en": "Mersal Children's Hospital",
       "text": "مستشفى مرسال للأطفال حرصاً من مرسال على دعم القطاع الصحي وتطبيقاً لحق كل فرد في الرعاية الصحية المتكاملة، نكمل",
+      "text_en": "To support the health sector and every person's right to complete healthcare, we are completing the dream: a 5,000 m² children's hospital for critical cases.",
       "image": "/img/old/1-ce3f944d.jpg",
       "link": "/p/30.html",
       "imageSm": "/img/old/1-ce3f944d-sm.jpg"
     },
     {
       "title": "مشروع الـ PKU",
+      "title_en": "PKU Project",
       "text": "مرض الـ PKU : هو أحد الأمراض الوراثية النادرة عالميًا لكنه من أكثر الأمراض الغذائية انتشارًا رغم إن اكتشافه يت",
+      "text_en": "PKU is a rare inherited metabolic disease that is detected in the first weeks after birth and needs a lifelong special diet. Mersal helps families afford it.",
       "image": "/img/old/4260d24f89e3bfa-29d2887f.jpg",
       "link": "/p/20.html",
       "imageSm": "/img/old/4260d24f89e3bfa-29d2887f-sm.jpg"
     },
     {
       "title": "فريق طوارئ مرسال",
+      "title_en": "Mersal Emergency Team",
       "text": "فريق طوارئ مرسال تهدف مرسال لأن تصبح المنقذ الأول لكافة المرضى بتقديم الدعم الفوري العاجل، فتوفر بمشروع الطوار",
+      "text_en": "Mersal aims to be the first responder for every patient, providing urgent medical services around the clock through its emergency project.",
       "image": "/img/old/savers-66549d79.jpg",
       "link": "/p/18.html",
       "imageSm": "/img/old/savers-66549d79-sm.jpg"
@@ -272,24 +356,28 @@
       "value": 5000,
       "prefix": "+",
       "label": "مريض شهرياً في برنامج العلاج الشهري",
+      "label_en": "patients a month in the monthly treatment program",
       "link": "/p/37.html"
     },
     {
       "value": 68,
       "prefix": "",
       "label": "مستشفى دعمتها قوافل مرسال",
+      "label_en": "hospitals supported by Mersal convoys",
       "link": "/p/35.html"
     },
     {
       "value": 15,
       "prefix": "+",
       "label": "تخصص طبي في عيادات مرسال",
+      "label_en": "medical specialties at Mersal Clinics",
       "link": "/p/43.html"
     },
     {
       "value": 1400,
       "prefix": "+",
       "label": "مريض استضافتهم دار ضيافة مرسال",
+      "label_en": "patients hosted at the Mersal Guest House",
       "link": "/p/32.html"
     }
   ]

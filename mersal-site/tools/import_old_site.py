@@ -297,6 +297,10 @@ def head(title, desc):
 </head>"""
 
 
+# English switch (js/i18n.js): same inline snippet as in every other page's <head>
+LANG_SNIPPET = '<!-- mersal:lang --><script>(function(){var l;try{var m=/[?&]lang=(en|ar)(?:&|$)/.exec(location.search);l=m?m[1]:localStorage.getItem("mersalLang");if(m)localStorage.setItem("mersalLang",l)}catch(e){}if(l==="en"){var h=document.documentElement;h.lang="en";h.dir="ltr";h.className+=" i18n-wait";setTimeout(function(){h.classList.remove("i18n-wait")},3000);document.write(\'<link rel="stylesheet" href="/css/en.css"><script src="/js/i18n.js"><\\/script>\')}})()</script><!-- /mersal:lang -->\n'
+
+
 def hero_img(src):
     """Page banner photo as <picture> (WebP sibling when tools/optimize_images.py produced one)."""
     if not src:
@@ -341,7 +345,7 @@ def page_html(title, body, desc, cover=None, share_img=None, pid=None, crumbs=No
              f'<meta property="og:url" content="{SITE_URL}/p/{pid}.html">') if pid else ""
     body = content_markup(body)
     side = side_html(pid, title) if pid else ""
-    head_html = head(title, desc).replace("</head>", og + chr(10) + canon + chr(10) + "</head>")
+    head_html = head(title, desc).replace("</head>", og + chr(10) + canon + chr(10) + LANG_SNIPPET + "</head>")
     return f"""{head_html}
 <body>
 <div id="site-header"></div>

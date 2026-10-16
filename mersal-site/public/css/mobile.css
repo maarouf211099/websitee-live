@@ -1326,3 +1326,25 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
 @keyframes fb-bar-in { from { opacity: 0; transform: translateY(18px); } }
 @keyframes fb-bump { 0% { transform: scale(1); } 35% { transform: scale(.82) translateY(2px); } 70% { transform: scale(1.14) translateY(-2px); } 100% { transform: none; } }
 @keyframes fb-row-in { from { opacity: 0; transform: translateY(16px) scale(.985); } }
+
+/* =================================================================== Header v3 (owner, Oct 16)
+   «رجّع اللوجو تاني بحجم مناسب وشيل السيرش وخلّي مكانه عربي وإنجليزي». The stacked reversed mark comes back (img/brand-mark-w,
+   400x214: gold «مرسال» over white «Mersal») at 40px in the 60px bar, so it breathes 10px above and below; the search button
+   leaves the header (search stays in the menu sheet) and the language switch takes its place as the same 42px glass squircle. */
+@media (max-width: 760px) {
+  .site-header .search-btn { display: none !important; }
+  .site-header .brand img, .site-header.scrolled .brand img { height: 40px; width: auto; max-width: none; }
+  .site-header .brand picture { -webkit-mask: none; mask: none; }
+  .site-header .brand picture::after { content: none; }
+  .site-header .lang-sw { display: inline-grid; place-items: center; flex: none; width: 42px; height: 42px; padding: 0; border-radius: 13px; cursor: pointer; color: #fff;
+    background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.07)); border: 1px solid rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 3px 8px -4px rgba(0,0,0,.45);
+    font: 800 14px/1 "Titillium Web", "Cairo", sans-serif; letter-spacing: .5px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .site-header .lang-sw[lang="ar"] { font: 800 13.5px/1 "Cairo", sans-serif; letter-spacing: 0; }
+  .site-header .lang-sw:active { color: var(--gold); }
+}
+@media (max-width: 359px) { .site-header .brand img, .site-header.scrolled .brand img { height: 36px; } }
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  .site-header .lang-sw { transition: transform .15s; }
+  .site-header .lang-sw:active { transform: scale(.92); }
+}

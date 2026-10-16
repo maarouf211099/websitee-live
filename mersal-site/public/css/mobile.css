@@ -1173,3 +1173,72 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
 @media (max-width: 760px) {
   #site-header { min-height: 60px; background: linear-gradient(180deg, rgba(0,79,79,.96), rgba(0,89,89,.93)); }
 }
+
+/* =================================================================== Brand pass (Fable): transparent logo, new backgrounds
+   Owner: «اللوجو ميبقاش على خلفية بيضا، عايزه شفاف كده … والباكجروند لو تقدر تغيّره». The header and the footer show the
+   reversed logo (img/brand-logo-w: gold Arabic, white Latin, transparent) with no white chip; the teal logo stays on light
+   surfaces (tablet drawer head, JSON-LD, the gift card canvas). The dark bands swap the small white pattern image for a deep
+   teal sweep with a large faint lattice and two soft lights (see --brand-surface). Phone only (this file loads <= 760px);
+   the same block closes css/desktop.css. Nothing here animates. */
+@media (max-width: 760px) {
+  :root {
+    /* the brand surface: a deep teal sweep, a large faint geometric lattice (img/pattern-geo.svg, 0.8 KB), a warm gold
+       light low on the left and a cool one high on the right. Only static gradients and one tiny SVG: nothing animates,
+       nothing is fixed. White text keeps >= 5.5:1 on the lightest pixel of the sweep (#007070), the gold text 7:1. */
+    --brand-surface: radial-gradient(62% 56% at 8% 108%, rgba(254,200,48,.17), transparent 72%), radial-gradient(48% 46% at 94% -14%, rgba(255,255,255,.1), transparent 70%), url(../img/pattern-geo.svg), linear-gradient(165deg, #007070 0%, #005b5b 50%, #003f3f 100%);
+    /* the darker sweep for bands with small text (footer, closing bands): lightest pixel #006262, white text >= 6.4:1 */
+    --brand-surface-deep: radial-gradient(62% 56% at 8% 108%, rgba(254,200,48,.13), transparent 72%), radial-gradient(48% 46% at 94% -14%, rgba(255,255,255,.08), transparent 70%), url(../img/pattern-geo.svg), linear-gradient(165deg, #006262 0%, #004d4d 50%, #003434 100%);
+    --brand-surface-size: auto, auto, 280px 280px, auto;
+  --brand-surface-pos: 0 0, 0 0, center top, 0 0;
+  --fb-band: #003f3f radial-gradient(62% 56% at 8% 108%, rgba(254,200,48,.13), transparent 72%), radial-gradient(48% 46% at 94% -14%, rgba(255,255,255,.08), transparent 70%), linear-gradient(165deg, #006262 0%, #004d4d 50%, #003434 100%); /* the cards draw the lattice in their ::before */
+  }
+  /* ---------- the logo: no white chip, the reversed transparent logo (img/brand-logo-w) on every dark surface ---------- */
+  .site-header .brand, .site-footer .logo-box { background: none; padding: 0; border-radius: 0; box-shadow: none; }
+  /* the logo files end in a "FOUNDATION" line that is cut off at the bottom (rows 222-236 of 237; js/gift.js draws the mark
+     without it too): the box keeps the mark's ratio and crops that line */
+  .site-header .brand img, .site-footer .logo-box img { width: auto; aspect-ratio: 400 / 213; object-fit: cover; object-position: 50% 0; }
+  /* ---------- brand surfaces ---------- */
+  .home .slider, .brand-bg, .page-head, .req-call, .ic-head { background-color: #004d4d; background-image: var(--brand-surface); background-size: var(--brand-surface-size); background-position: var(--brand-surface-pos); background-repeat: no-repeat, no-repeat, repeat, no-repeat; }
+  .site-footer { background-color: #003f3f; background-image: var(--brand-surface-deep); background-size: var(--brand-surface-size); background-position: var(--brand-surface-pos); background-repeat: no-repeat, no-repeat, repeat, no-repeat; box-shadow: inset 0 1px 0 rgba(254,200,48,.28); }
+  .page-head:not(.has-photo)::before { background: none; }
+  /* the footer's bottom line and the copyright */
+  .site-footer .copyright { background: rgba(0,0,0,.22); }
+  /* the logo can grow a little now that it has no chip: 46px in the 60px bar */
+  .site-header .brand img { height: 46px; }
+  .site-header .brand { margin-inline-end: auto; display: block; line-height: 0; }
+  /* the phone header: the same deep teal as the slider, so the bar and the hero read as one surface */
+  #site-header, .site-header { background: linear-gradient(180deg, #005c5c, #005555); box-shadow: inset 0 -1px 0 rgba(254,200,48,.38), 0 8px 20px -14px rgba(0,32,32,.7); }
+  /* the photo-less page heads of the gift, community, news and help pages */
+  :is(.gift, .community, .news, .help-page) .page-head.has-photo { background-color: #004d4d; background-image: var(--brand-surface); background-size: var(--brand-surface-size); background-position: var(--brand-surface-pos); background-repeat: no-repeat, no-repeat, repeat, no-repeat; }
+  /* the closing bands (project pages, news) and the community welcome card: the lattice replaces the white pattern */
+  body:has(> main > section > .page-grid) .cta-band .wrap::before, .news .nw-cta .wrap::before, .community .cm-welcome::before { background: url(../img/pattern-geo.svg) center / 240px; opacity: 1; }
+  .site-footer .logo-box { margin: 0 0 10px; }
+  .site-footer .logo-box img { height: 56px; }
+  /* section rhythm: the title's gold rule a touch softer, the alternate (sand) sections a warm gradient instead of flat */
+  .section-title h2::after { border-radius: 999px; }
+  section.alt { background: linear-gradient(180deg, #f7faf9, #fbf8f1); }
+  /* ---------- motion (owner: «مع تطوير الشكل والانميشن») ----------
+     Transform and opacity only, every piece runs once (nothing new loops), reduced-motion keeps the final state, nothing
+     moves layout. Logical properties throughout (the English LTR version mirrors it). */
+  @media (prefers-reduced-motion: no-preference) {
+    /* section headers: the paragraph follows the title in, a beat later; the gold rule still grows (site.css) */
+    .section-title.reveal p { transition: opacity .6s var(--ease, ease-out) .22s, transform .7s var(--spring, cubic-bezier(.2,.7,.2,1)) .22s; }
+    .section-title.reveal:not(.in) p { opacity: 0; transform: translateY(10px); }
+    /* cards: the photo settles from a slight zoom as the card rises (the card clips it; the hover zoom reuses the transition) */
+    .card.reveal .media, .card.reveal > picture > img, .camp.reveal .camp-img img { transition: transform 1.1s var(--ease, ease-out); }
+    .card.reveal:not(.in) .media, .card.reveal:not(.in) > picture > img, .camp.reveal:not(.in) .camp-img img { transform: scale(1.07); }
+    /* the main gold calls to action: one soft light sweep when they come into view (never repeats) */
+    .quick-bar .qd-go, .reveal.in .btn-gold, .page-side .btn-gold, .cta-band .btn-gold, .hf-cta .btn-gold, .site-footer .btn-gold { position: relative; overflow: hidden; isolation: isolate; }
+    .quick-bar .qd-go::after, .reveal.in .btn-gold::after, .cta-band .btn-gold::after, .hf-cta .btn-gold::after, .site-footer .btn-gold::after {
+      content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, transparent 32%, rgba(255,255,255,.5) 50%, transparent 68%);
+      transform: translateX(-160%); animation: brand-shine 1.15s .55s cubic-bezier(.4,0,.2,1) 1 both; }
+    .quick-bar .qd-go::after { animation-delay: 1.3s; }
+    /* press feedback on tiles and amount chips (the buttons already have theirs in site.css) */
+    .ts-tile, .amounts button, .contact-cards a, .side-amounts a, .m-quick a { transition: transform .18s var(--spring, cubic-bezier(.2,.7,.2,1)); }
+    .ts-tile:active, .amounts button:active, .contact-cards a:active, .side-amounts a:active, .m-quick a:active { transform: scale(.96); }
+    /* the header logo: a tiny lift on press */
+    .site-header .brand:active { transform: scale(.94); transition: transform .12s; }
+  }
+  @keyframes brand-shine { from { transform: translateX(-160%); } to { transform: translateX(160%); } }
+}

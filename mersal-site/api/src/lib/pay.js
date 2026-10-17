@@ -44,7 +44,7 @@ function write(js, mode, provider) {
 // GitHub hiccup): no token needed, and a console change shows here once its deploy is out (about a minute). The site is
 // PUBLIC_BASE_URL (the custom domain once there is one) or this Static Web App's own default hostname, never the
 // request's Host header (the switch is cached for everyone).
-const DEFAULT_SITE = "https://jolly-moss-063f03a10.3.azurestaticapps.net";
+const DEFAULT_SITE = "https://salmon-beach-0fa37e810.4.azurestaticapps.net";
 const siteBase = () => { const v = env("PUBLIC_BASE_URL").replace(/\/+$/, ""); return /^https:\/\/[A-Za-z0-9.-]+(:\d+)?$/.test(v) ? v : DEFAULT_SITE; };
 async function readDeployed() {
   const r = await fetch(`${siteBase()}/js/layout.js?pay=${Date.now()}`, { cache: "no-store", signal: AbortSignal.timeout(5000) });

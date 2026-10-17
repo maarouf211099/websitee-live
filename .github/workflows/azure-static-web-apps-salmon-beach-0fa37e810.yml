@@ -4,14 +4,13 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+  # no pull-request previews: the Free plan has only 3 staging slots (they filled up on the previous app);
+  # Actions -> this workflow -> Run workflow redeploys main on demand
+  workflow_dispatch:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:

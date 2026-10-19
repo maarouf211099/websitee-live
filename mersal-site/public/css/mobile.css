@@ -1374,3 +1374,31 @@ section { padding: 44px 0; }
 /* the brand-band numbers a notch bigger too */
 .home .num b { font-size: 40px; }
 .home .facts b span, .home .num b span { font-size: inherit; }
+
+/* ===== Footer v2 on phones (owner, Oct 20): the link pills were a cloud; now two tidy columns with hairlines,
+   small gold section labels, a calmer surface over the pattern, and the contact row as one card ===== */
+.site-footer { background-image: linear-gradient(rgba(0,55,55,.62), rgba(0,55,55,.62)), var(--brand-surface-deep); background-size: auto, var(--brand-surface-size); background-position: 0 0, var(--brand-surface-pos); background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat; }
+.site-footer .cols { gap: 18px; }
+.site-footer .cols > div:first-child { text-align: center; }
+.site-footer .cols > div:first-child .logo-box { margin: 0 auto 6px; }
+.site-footer .cols > div:first-child > p { font-size: 13px; color: rgba(255,255,255,.8); max-width: 34ch; margin-inline: auto; }
+.site-footer .social { justify-content: center; }
+.site-footer .social a { width: 40px; height: 40px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.14); }
+/* section labels back, as small gold tags */
+.site-footer .cols > div:not(:first-child) > h3 { position: static; width: auto; height: auto; margin: 0 0 8px; padding: 0; overflow: visible; clip: auto; white-space: normal; border: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: var(--gold); letter-spacing: .2px; }
+.site-footer .cols > div:not(:first-child) > h3::before { content: ""; width: 14px; height: 3px; border-radius: 3px; background: var(--gold); }
+/* the links: two columns, one hairline per row, a small gold chevron */
+.site-footer .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.site-footer .two-col li a, .site-footer .two-col #pwa-foot .pwa-foot-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 44px; padding: 2px 0; border: 0; border-bottom: 1px solid rgba(255,255,255,.12); border-radius: 0; font-size: 14px; font-weight: 600; color: rgba(255,255,255,.92); text-wrap: pretty; }
+.site-footer .two-col li a::after { content: "‹"; color: var(--gold); font-weight: 800; font-size: 16px; opacity: .85; }
+[dir="ltr"] .site-footer .two-col li a::after { content: "›"; }
+.site-footer .two-col li:nth-last-child(-n+2) a { border-bottom: 0; }
+.site-footer .two-col li a:active, .site-footer .two-col #pwa-foot .pwa-foot-btn:active { background: none; color: var(--gold); }
+.site-footer .two-col #pwa-foot { grid-column: 1 / -1; }
+.site-footer .two-col #pwa-foot .pwa-foot-btn { justify-content: center; margin-top: 8px; min-height: 46px; border: 1px solid rgba(255,255,255,.28); border-radius: 12px; background: rgba(255,255,255,.06); }
+/* contact: one card, the hotline gold */
+.site-footer .cols > div:last-child > ul { gap: 8px; padding: 12px; border-radius: 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); }
+.site-footer .cols > div:last-child li > a { border-color: rgba(255,255,255,.22); background: rgba(0,0,0,.12); }
+.site-footer .f-addr > a, .site-footer .cols > div:last-child li.f-addr > a { background: none; border: 0; color: rgba(255,255,255,.78); text-decoration: none; justify-content: center; text-align: center; font-size: 13px; }
+.site-footer .f-addr > a::before { content: "📍 "; }
+.site-footer .copyright { margin-top: 14px; }

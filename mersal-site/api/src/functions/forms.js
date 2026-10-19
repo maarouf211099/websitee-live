@@ -5,8 +5,19 @@
 //   PATCH /api/console/requests/{id}  { status, note }             (admin)      -> { ok, row }
 // Storage and validation live in ../lib/forms.js.
 const { app } = require("@azure/functions");
-const { requireAdmin, json, fail } = require("../lib/admin");
+const { requireAdmin, json, fail, readFile, githubReady } = require("../lib/admin");
 const forms = require("../lib/forms");
+// the console's causes (data/causes.json): their titles in the request summaries, refreshed every 10 minutes, never awaited long
+let causesAt = 0;
+async function loadCauses() {
+  if (Date.now() - causesAt < 10 * 60e3) return;
+  causesAt = Date.now();
+  try {
+    const timeout = new Promise((_, rej) => { const t = setTimeout(() => rej(new Error("timeout")), 3000); if (t.unref) t.unref(); });
+    const text = githubReady() ? await Promise.race([readFile("public/data/causes.json"), timeout]) : null;
+    if (text) forms.setCauses(JSON.parse(text));
+  } catch { /* the ids stay as labels until the next try */ }
+}
 
 const HOTLINE = "19340";
 
@@ -24,6 +35,7 @@ app.http("formsSubmit", {
       const bot = forms.botCheck(body);
       if (bot === "no-time") return json(400, { message: "بيانات غير صالحة. حدّث الصفحة وجرّب تاني" });
       if (bot) { ctx.log("requests: dropped", type, bot, ip); return json(200, { ok: true, ref: forms.makeRef(type) }); }
+      if (/^(transfer|pickup)$/.test(type)) await loadCauses();
       const v = forms.validate(type, body);
       if (!v.ok) return json(400, { message: "راجع البيانات اللي عليها علامة", errors: v.errors });
       const rec = forms.makeRecord(type, v.data);

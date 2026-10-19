@@ -204,3 +204,13 @@ p.hint + .imghint, .row + .imghint { margin-bottom: 8px; }
 .en-adv { margin-top: 20px; } .en-adv textarea { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
 .en-box { margin-top: 4px; } .en-box > summary { cursor: pointer; font-weight: 700; color: #005959; }
 @media (max-width: 860px) { .en-row, .en-add { grid-template-columns: 1fr; } }
+
+/* --- جهات التبرع (tabs/causes.js) --- */
+.cause-row.off { opacity: .6; }
+.cause-head { display: grid; grid-template-columns: 44px minmax(0, 2fr) minmax(0, 1.5fr) minmax(0, 1fr); gap: 10px; align-items: end; }
+.cause-head .c-prev { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #e4f3f3; color: #007879; align-self: end; }
+.cause-head .c-prev svg { width: 24px; height: 24px; }
+.cause-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.cause-row .c-id { margin-inline-start: auto; font-size: 11.5px; color: var(--muted); background: #f1f5f5; padding: 3px 8px; border-radius: 6px; }
+.cause-row .check { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; }
+@media (max-width: 760px) { .cause-head { grid-template-columns: 44px minmax(0, 1fr); } .cause-body { grid-template-columns: 1fr; } }

@@ -132,7 +132,7 @@
   start();
 
   // ---------- permissions: each tab belongs to one perm; the server checks every save again ----------
-  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", english: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
+  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", english: "content", causes: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
   var perms = null;
   function can(perm) { return !perm || !perms || perms.indexOf(perm) >= 0; }
   function applyPerms(me) {
@@ -462,7 +462,9 @@
       }).join("");
     }).catch(function (e) { toast(e.message, true); });
   }
-  function purposeName(p) { var m = /^p(\d+)$/.exec(p || ""); if (m && pagesIndex[m[1]]) return pagesIndex[m[1]].title; return { general: "تبرع عام", zakat: "زكاة", sadaqa: "صدقة" }[p] || p || ""; }
+  var causeNames = {}; // id -> title (data/causes.json, "جهات التبرع"): the purposes of the donations and requests
+  fetch("/data/causes.json").then(function (r) { return r.json(); }).then(function (d) { (d && d.causes || []).forEach(function (c) { if (c && c.id) causeNames[c.id] = c.title; }); }).catch(function () {});
+  function purposeName(p) { var m = /^p(\d+)$/.exec(p || ""); if (m && pagesIndex[m[1]]) return pagesIndex[m[1]].title; return { general: "تبرع عام", zakat: "زكاة", sadaqa: "صدقة" }[p] || causeNames[p] || p || ""; }
   $("#d-load").onclick = loadDonations;
   $("#csv").onclick = function () {
     var head = ["التاريخ (القاهرة)", "المبلغ", "العملة", "الجهة", "المتبرع", "الموبايل", "البريد", "رقم العملية", "رقم عملية البنك"];
@@ -528,7 +530,7 @@
 
   // ---------- users and permissions (main account only) ----------
   var PERM_NAMES = {
-    content: ["محتوى الموقع", "الرئيسية، نصوص الموقع وعناوين الصفحات، الصفحات، القائمة، الألبومات، الكوميونيتي، الأخبار، أثر التبرع، شريط الإعلان والشركاء، ورفع الصور"],
+    content: ["محتوى الموقع", "الرئيسية، جهات التبرع، نصوص الموقع وعناوين الصفحات، الصفحات، القائمة، الألبومات، الكوميونيتي، الأخبار، أثر التبرع، شريط الإعلان والشركاء، ورفع الصور"],
     site: ["بيانات الموقع", "التليفونات والسوشيال والفوتر وروابطه وبيانات الإشهار وحسابات البنوك والمحافظ"],
     donations: ["التبرعات", "عرض التبرعات وتنزيلها ومراجعة العمليات المعلقة"],
     requests: ["الطلبات", "طلبات التطوع والمساعدة والتواصل"],

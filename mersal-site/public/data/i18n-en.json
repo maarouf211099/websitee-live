@@ -1345,7 +1345,25 @@
 "أمتار": "square metres",
 "مترين": "2 square metres",
 "ساعات": "hours",
-"ساعتين": "2 hours"
+"ساعتين": "2 hours",
+"زكاة مال": "Zakat",
+"أو اختار مشروع أو صفحة معيّنة": "Or pick a specific project or page",
+"المشروع": "Project",
+"جهة التبرع": "Donation cause",
+"هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها الشرعية في مرسال.": "Your donation will be recorded as Zakat and spent on its lawful recipients at Mersal.",
+"هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها الشرعية في مرسال: علاج وكفالات المرضى الفقراء، ديونهم الطبية، وابن السبيل.": "Your donation will be recorded as Zakat and spent on its lawful recipients at Mersal: treating and sponsoring poor patients, their medical debts, and the wayfarer.",
+"صدقة جارية أجرها مستمر، ربنا يجعلها في ميزان حسناتك.": "An ongoing charity whose reward continues. May it weigh in your favour.",
+"اختار مصرف الزكاة": "Choose where your Zakat goes",
+"اختار مشروع الصدقة الجارية": "Choose the Sadaqa Jariya project",
+"علاج وأدوية وعمليات لمرضى غير قادرين": "Treatment, medicine and surgery for patients who cannot afford it",
+"مريض بعيد عن بيته محتاج يسافر ويتعالج": "A patient far from home who needs to travel for treatment",
+"علاج شهري لمريض مزمن": "Monthly treatment for a chronic patient",
+"أطفال ضمور العضلات الشوكي": "Children with spinal muscular atrophy",
+"جلسات غسيل كلوي لمرضى الفشل الكلوي": "Dialysis sessions for kidney failure patients",
+"حالة معيّنة محتاجة مساندة": "A specific case that needs support",
+"سهم في بناء مستشفى مرسال للأطفال": "A share in building Mersal Children's Hospital",
+"أجهزة بتخدم آلاف المرضى لسنين": "Equipment that serves thousands of patients for years",
+"حضّانة بتنقذ طفل حديث الولادة": "An incubator that saves a newborn"
 },
 "patterns": [
 [

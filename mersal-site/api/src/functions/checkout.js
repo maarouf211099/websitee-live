@@ -69,9 +69,24 @@ async function readSwitch() {
 // Never wait long on GitHub for a label
 const within = (ms, p) => Promise.race([p, new Promise((_, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); if (t.unref) t.unref(); })]);
 // Item name shown on Paymob's checkout page: the cause's title (project pages from data/pages.json, cached 10 minutes)
-let pagesCache = null;
+let pagesCache = null, causesCache = null;
+// The console's causes (data/causes.json, "جهات التبرع"): id -> { title, group, link }, cached 10 minutes
+async function causeOf(purpose) {
+  if (!/^c[a-z0-9]{1,12}$/.test(purpose)) return null;
+  try {
+    if (!causesCache || Date.now() - causesCache.at > 10 * 60e3) {
+      const d = JSON.parse(await within(3000, readFile("public/data/causes.json")));
+      const map = {};
+      for (const c of (d && Array.isArray(d.causes) ? d.causes : [])) if (c && typeof c.id === "string") map[c.id] = c;
+      causesCache = { map, at: Date.now() };
+    }
+    return causesCache.map[purpose] || null;
+  } catch { return null; }
+}
 async function purposeTitle(purpose) {
   if (Object.prototype.hasOwnProperty.call(PURPOSES, purpose)) return PURPOSES[purpose];
+  const cause = await causeOf(purpose);
+  if (cause && clean(cause.title, 50)) return clean(cause.title, 50);
   try {
     if (!pagesCache || Date.now() - pagesCache.at > 10 * 60e3) pagesCache = { pages: JSON.parse(await within(3000, readFile("public/data/pages.json"))), at: Date.now() };
     const p = pagesCache.pages && pagesCache.pages[purpose.slice(1)];
@@ -109,7 +124,7 @@ app.http("checkout", {
     const phone = mersalapp.asciiDigits(clean(b.phone, 20)).replace(/[^\d+]/g, ""); // ٠١٠… typed on an Arabic keyboard counts
     // general/zakat/... or a project page from the old site ("p30" = /p/30.html); own keys only ("constructor" is not one)
     const pk = typeof b.purpose === "string" ? b.purpose : "";
-    const purpose = Object.prototype.hasOwnProperty.call(PURPOSES, pk) || /^p\d{1,4}$/.test(pk) ? pk : "general";
+    const purpose = Object.prototype.hasOwnProperty.call(PURPOSES, pk) || /^p\d{1,4}$/.test(pk) || /^c[a-z0-9]{1,12}$/.test(pk) ? pk : "general";
     if (name.length < 2) return bad("من فضلك اكتب الاسم");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad("البريد الإلكتروني غير صحيح");
     if (phone.length < 8) return bad("رقم الموبايل غير صحيح");
@@ -129,7 +144,7 @@ app.http("checkout", {
     await limits.hit("checkout", ip, now, log);
     await limits.hit("checkout", "*", now, log);
 
-    if (ps.provider === "app") return appCheckout({ amount, purpose, name, email, phone }, ctx);
+    if (ps.provider === "app") return appCheckout({ amount, purpose, name, email, phone, cause: await causeOf(purpose) }, ctx);
     const orderId = newOrderId();
     const origin = String(process.env.PUBLIC_BASE_URL || new URL(req.url).origin).trim().replace(/\/+$/, "");
     if (ps.provider === "paymob") return paymobCheckout({ orderId, amount, purpose, name, email, phone, origin }, ctx);
@@ -200,10 +215,13 @@ app.http("checkoutStatus", {
 // Paymob through the Mersal app's backend: the app's function creates its order and the Paymob checkout and records the
 // donation in the app's own table (nothing is saved here). The donate page shows the checkout inside the page and asks
 // /api/verify?gw=app until the app reports it paid or failed.
-async function appCheckout({ amount, purpose, name, email, phone }, ctx) {
+async function appCheckout({ amount, purpose, name, email, phone, cause }, ctx) {
+  // a cause's donation goes to the app campaign of its page (p30, p31, p37 …) when that page has one, else of its group
+  const pm = cause && /^\/p\/(\d{1,4})\.html$/.exec(String(cause.link || ""));
+  const campaignHint = cause ? (pm && mersalapp.hasCampaign("p" + pm[1]) ? "p" + pm[1] : String(cause.group || "general")) : purpose;
   let r;
   try {
-    r = await mersalapp.createDonation({ amount, purpose, name, email, phone, idempotencyKey: "web-" + randomUUID() });
+    r = await mersalapp.createDonation({ amount, purpose, campaignHint, name, email, phone, idempotencyKey: "web-" + randomUUID() });
   } catch (e) {
     if (e.status === 400) {
       ctx.warn("app checkout: refused by the app's function", mersalapp.redact(e.message));

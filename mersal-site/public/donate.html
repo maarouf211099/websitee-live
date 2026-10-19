@@ -16,6 +16,7 @@
 <link rel="preload" as="image" type="image/svg+xml" href="/img/pattern-geo.svg" media="(min-width: 761px)">
 <link rel="stylesheet" href="/css/desktop.css" media="(min-width: 761px)">
 <link rel="stylesheet" href="/css/mobile.css" media="(max-width: 760px)">
+<link rel="stylesheet" href="/css/causes.css">
 <meta property="og:site_name" content="مؤسسة مرسال">
 <meta property="og:image" content="https://www.mersal-ngo.org/img/hero.jpg">
 <title>طرق التبرع | مؤسسة مرسال</title>
@@ -66,15 +67,16 @@
 
             <fieldset class="step" data-step="1">
               <legend class="sr-only">المبلغ وجهة التبرع</legend>
-              <div class="niyya-chips" id="niyya-chips" role="radiogroup" aria-label="نيتك">
-                <button type="button" role="radio" data-p="general" aria-checked="true" tabindex="0">تبرع عام</button>
-                <button type="button" role="radio" data-p="zakat" aria-checked="false" tabindex="-1">زكاة</button>
-                <button type="button" role="radio" data-p="sadaqa" aria-checked="false" tabindex="-1">صدقة</button>
-                <button type="button" role="radio" data-p="p30" aria-checked="false" tabindex="-1" hidden>صدقة جارية</button>
+              <div class="niyya-seg" id="niyya-chips" role="radiogroup" aria-label="نيتك">
+                <button type="button" role="radio" data-p="general" aria-checked="true" tabindex="0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7v1H4z"/><path d="M12 8V5M8 21h8M12 16v5"/></svg><span>تبرع عام</span></button>
+                <button type="button" role="radio" data-p="zakat" aria-checked="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v10M9.5 9.5h4a1.75 1.75 0 0 1 0 3.5h-3a1.75 1.75 0 0 0 0 3.5h4"/></svg><span>زكاة مال</span></button>
+                <button type="button" role="radio" data-p="sadaqa" aria-checked="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.6 12 21 12 21z"/><path d="M8 12h2.5l1.5-2.5 2 5 1.5-2.5H16"/></svg><span>صدقة جارية</span></button>
               </div>
               <p class="niyya-note" id="niyya-note" aria-live="polite">تبرعك بيروح للمكان اللي محتاجه أكتر.</p>
-              <div class="field">
-                <label for="purpose">أو اختار مشروع معيّن</label>
+              <div class="causes" id="causes" role="radiogroup" aria-label="جهة التبرع" hidden></div>
+              <details class="purpose-more" id="purpose-more">
+                <summary><span>أو اختار مشروع أو صفحة معيّنة</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+                <label for="purpose" class="sr-only">المشروع</label>
                 <select id="purpose" name="purpose">
                   <optgroup label="عام">
                     <option value="general">تبرع عام - حيث الحاجة أكبر</option>
@@ -82,7 +84,7 @@
                     <option value="sadaqa">صدقة</option>
                   </optgroup>
                 </select>
-              </div>
+              </details>
               <!-- mersal:t-donate-amounts -->
               <div class="amounts big" role="group" aria-label="المبلغ">
                 <button type="button" data-v="100" aria-pressed="false" aria-label="100 جنيه">100</button>
@@ -597,6 +599,7 @@
 <div id="site-footer"></div>
 <script defer src="/js/layout.js"></script>
 <script defer src="/js/pwa.js"></script>
+<script defer src="/js/cause-icons.js"></script>
 <script defer src="/js/donate.js"></script>
 <script defer src="/js/impact.js"></script>
 <script defer src="/js/forms.js"></script>

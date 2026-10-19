@@ -80,7 +80,7 @@ async function settle(orderId, log = () => {}) {
 }
 
 // ---------- Paymob ----------
-const PURPOSE_RE = /^(general|zakat|sadaqa|hospital|oncology|cases|p\d{1,4})$/;
+const PURPOSE_RE = /^(general|zakat|sadaqa|hospital|oncology|cases|p\d{1,4}|c[a-z0-9]{1,12})$/; // c…: data/causes.json
 const yes = (v) => v === true || v === "true";
 // txn = a Paymob transaction from Paymob's API (retrieveTransaction / inquire). opts: { orderId: expected orderId,
 // paymobOrderId: expected Paymob order id (from a verified hmac), row: the pending order (undefined = read it), log }.

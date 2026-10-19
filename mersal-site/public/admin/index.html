@@ -31,6 +31,7 @@
       <button role="tab" data-tab="pages">الصفحات</button>
       <button role="tab" data-tab="menu">القائمة</button>
       <button role="tab" data-tab="albums">الألبومات</button>
+      <button role="tab" data-tab="causes">جهات التبرع</button>
       <button role="tab" data-tab="donations">التبرعات</button>
       <button role="tab" data-tab="requests">الطلبات</button>
       <button role="tab" data-tab="site">بيانات الموقع</button>
@@ -109,6 +110,11 @@
       <p class="hint">الصور بتتصغّر على جهازك قبل الرفع (1600px للعرض و600px للمعاينة).</p>
       <div class="list" id="albums"></div>
       <button class="btn btn-ghost" id="add-album">+ ألبوم جديد</button>
+    </section>
+
+    <section class="panel" id="tab-causes" hidden>
+      <header class="panel-head"><h1>جهات التبرع</h1><button class="btn btn-gold" id="save-causes">حفظ ونشر</button></header>
+      <div id="causes-root"></div>
     </section>
 
     <section class="panel" id="tab-donations" hidden>
@@ -230,6 +236,8 @@
 <script src="/admin/tabs/extras.js"></script>
 <script src="/admin/tabs/texts.js"></script>
 <script src="/admin/tabs/english.js"></script>
+<script src="/js/cause-icons.js"></script>
+<script src="/admin/tabs/causes.js"></script>
 <script src="/admin/tabs/sizes.js"></script>
 </body>
 </html>

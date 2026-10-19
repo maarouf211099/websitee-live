@@ -351,6 +351,17 @@
     if (!track.dataset.wired) { carouselArrows(track); track.dataset.wired = "1"; }
     // phones: a swipeable card carousel (css/mobile.css) with dots and the snapped-card focus effect
     trackDots(track, document.getElementById("camp-dots"));
+    // phones: «عرض كل الحملات» (console: نصوص الموقع) under the dots stacks the cards into one list
+    var all = document.getElementById("camp-all"), dots = document.getElementById("camp-dots");
+    if (all && phone && list.length > 1 && !all.dataset.wired) {
+      all.dataset.wired = "1"; all.hidden = false;
+      if (dots && dots.parentNode) dots.parentNode.insertBefore(all, dots.nextSibling);
+      all.addEventListener("click", function () {
+        track.classList.add("all"); track.classList.remove("nudge"); if (dots) dots.hidden = true; all.hidden = true;
+        cards.forEach(function (c) { c.classList.add("in"); });
+        if (window.mersalTap) window.mersalTap(8);
+      });
+    }
     // one clock drives the number, the percentage, the bar and its thumb: the bar and the % pill take
     // exactly as long as the odometer (units digit first, leftmost digit last), so all three settle together
     function animate(card, delay) {

@@ -69,8 +69,10 @@ const isEmail = (s) => s.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s
 const toInt = (v) => { const s = latinDigits(v).replace(/[\s,]/g, ""); return /^-?\d+$/.test(s) ? parseInt(s, 10) : NaN; };
 const pickKey = (map, v) => (has(map, v) ? String(v) : "");
 // "" -> general; a PURPOSES key; or a campaign page "p<id>". "" when it is none of those.
-const pickPurpose = (v) => (v == null || v === "" ? "general" : has(PURPOSES, v) ? String(v) : /^p\d{1,4}$/.test(String(v)) ? String(v) : "");
-const purposeLabel = (p) => PURPOSES[p] || (/^p(\d{1,4})$/.test(p || "") ? "مشروع " + p.slice(1) : p || "");
+let CAUSE_TITLES = {}; // id -> title from data/causes.json (functions/forms.js refreshes it before each request)
+const setCauses = (d) => { const m = {}; for (const c of (d && Array.isArray(d.causes) ? d.causes : [])) if (c && typeof c.id === "string" && typeof c.title === "string") m[c.id] = c.title; CAUSE_TITLES = m; };
+const pickPurpose = (v) => (v == null || v === "" ? "general" : has(PURPOSES, v) ? String(v) : /^p\d{1,4}$/.test(String(v)) || /^c[a-z0-9]{1,12}$/.test(String(v)) ? String(v) : "");
+const purposeLabel = (p) => PURPOSES[p] || CAUSE_TITLES[p] || (/^p(\d{1,4})$/.test(p || "") ? "مشروع " + p.slice(1) : p || "");
 const truthy = (v) => v === true || v === 1 || v === "1" || v === "true" || v === "on" || v === "yes";
 // "5,000", "٥٠٠٠٫٥", 1500 -> number with at most 2 decimals; NaN when it is not a plain positive amount
 function toAmount(v) {
@@ -321,7 +323,7 @@ async function forward(rec, log = () => {}) {
 
 module.exports = {
   TYPES, STATUSES, STATUS_LABELS, HOW, AVAILABILITY, RELATION, CASE_TYPES, GOVERNORATES, METHODS, CURRENCIES, PURPOSES, KINDS, SLOTS,
-  latinDigits, clean, normalizePhone, isEgyptMobile, isEmail, toAmount, cairoDay, isDay, validate, botCheck, pickPurpose, purposeLabel, hasType: (t) => has(TYPES, t),
+  latinDigits, clean, normalizePhone, isEgyptMobile, isEmail, toAmount, cairoDay, isDay, validate, botCheck, pickPurpose, purposeLabel, setCauses, hasType: (t) => has(TYPES, t),
   rateAllowed, rateHit, clientIp, makeRef, typeOf, summary, metaOf, makeRecord, toEntity, fromEntity,
   enabled, save, list, get, update, forward, _hits: limits._mem,
 };

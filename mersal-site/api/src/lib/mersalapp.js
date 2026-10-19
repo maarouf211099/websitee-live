@@ -97,14 +97,14 @@ async function call(method, path, { body, headers = {}, timeout }) {
 }
 
 // -> { orderId, checkoutUrl }; throws { status: 400 } when the app's function refuses the donation itself, 502 otherwise
-async function createDonation({ amount, purpose, name, email, phone, idempotencyKey }) {
+async function createDonation({ amount, purpose, campaignHint, name, email, phone, idempotencyKey }) {
   const donorPhone = egyptMobile(phone);
   if (!donorPhone) throw err(400, "phone");
   if (!Number.isInteger(amount) || amount <= 0) throw err(400, "amount");
   const r = await call("POST", "/payments-donations", {
     headers: { "x-idempotency-key": idempotencyKey, "x-client-info": "mersal-website" },
     body: {
-      campaignId: campaignFor(purpose), amountEgp: amount, donorName: String(name || "").slice(0, 120), donorPhone,
+      campaignId: campaignFor(campaignHint || purpose), amountEgp: amount, donorName: String(name || "").slice(0, 120), donorPhone,
       ...(email ? { donorEmail: String(email).slice(0, 120) } : {}), subOption: "website",
     },
     timeout: CREATE_TIMEOUT,
@@ -140,4 +140,4 @@ async function donationStatus(orderId, { cancelled = false } = {}) {
   };
 }
 
-module.exports = { cfg, missing, blockedNow, _unblock: () => { blocked = null; }, BLOCK_MS, campaignFor, CAMPAIGNS, GENERAL, egyptMobile, asciiDigits, validOrderId, checkoutUrlOk, createDonation, donationStatus, redact, DEFAULT_URL, CREATE_TIMEOUT, STATUS_TIMEOUT };
+module.exports = { hasCampaign: (p) => Object.prototype.hasOwnProperty.call(CAMPAIGNS, p), cfg, missing, blockedNow, _unblock: () => { blocked = null; }, BLOCK_MS, campaignFor, CAMPAIGNS, GENERAL, egyptMobile, asciiDigits, validOrderId, checkoutUrlOk, createDonation, donationStatus, redact, DEFAULT_URL, CREATE_TIMEOUT, STATUS_TIMEOUT };

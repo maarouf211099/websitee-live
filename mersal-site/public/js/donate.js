@@ -270,12 +270,41 @@
   var touched = false; // the donor tapped or typed in the stepper before the purpose list loaded
   ["pointerdown", "keydown"].forEach(function (ev) { form.addEventListener(ev, function () { touched = true; }, { once: true }); });
   var CAMPAIGNS = []; // the home campaigns (content.json), for the #impact line
+  var CAUSES = { groups: [], causes: [] }; // the زكاة مال / صدقة جارية causes (data/causes.json, edited in the console)
+  var EN = document.documentElement.lang === "en";
   var optionsReady = Promise.all([
     fetch("/content.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
-    fetch("/data/menu.json").then(function (r) { return r.json(); }).catch(function () { return []; })
+    fetch("/data/menu.json").then(function (r) { return r.json(); }).catch(function () { return []; }),
+    fetch("/data/causes.json").then(function (r) { return r.json(); }).catch(function () { return null; })
   ]).then(function (res) {
     CAMPAIGNS = ((res[0] || {}).campaigns) || [];
     if (!Array.isArray(CAMPAIGNS)) CAMPAIGNS = [];
+    // the causes: one option per cause under its group (before the projects), hidden causes are skipped
+    var cz = res[2] && typeof res[2] === "object" ? res[2] : {};
+    CAUSES.groups = (Array.isArray(cz.groups) ? cz.groups : []).filter(function (g) { return g && /^(zakat|sadaqa)$/.test(g.id); });
+    CAUSES.causes = (Array.isArray(cz.causes) ? cz.causes : []).filter(function (c) { return c && c.on !== false && /^c[a-z0-9]{1,12}$/.test(c.id || "") && String(c.title || "").trim(); });
+    if (cz.note) CAUSES.note = String(cz.note);
+    var tr = function (c) { return EN && c.en ? c.en : String(c.title || "").trim(); };
+    var first = purpose.querySelector("optgroup");
+    CAUSES.groups.forEach(function (g) {
+      var list = CAUSES.causes.filter(function (c) { return c.group === g.id; });
+      if (!list.length) return;
+      var og = document.createElement("optgroup"); og.label = tr(g);
+      list.forEach(function (c) { var o = document.createElement("option"); o.value = c.id; o.textContent = tr(c); o.setAttribute("data-ar", String(c.title || "").trim()); og.appendChild(o); });
+      if (first && first.nextSibling) purpose.insertBefore(og, first.nextSibling); else purpose.appendChild(og);
+      first = og;
+    });
+    // the transfer and pickup forms offer the same causes
+    ["tr-purpose", "pk-purpose"].forEach(function (id) {
+      var sel = document.getElementById(id); if (!sel) return;
+      CAUSES.groups.forEach(function (g) {
+        var list = CAUSES.causes.filter(function (c) { return c.group === g.id; });
+        if (!list.length) return;
+        var og = document.createElement("optgroup"); og.label = tr(g);
+        list.forEach(function (c) { var o = document.createElement("option"); o.value = c.id; o.textContent = tr(c); og.appendChild(o); });
+        sel.appendChild(og);
+      });
+    });
     // one option per cause: pages that are aliases of another code (LEGACY, e.g. p4/p5 -> p31) are skipped, and a
     // second page with a title that is already listed becomes an alias of the first one (so ?for= still finds it)
     var groups = {}, seen = {}, titles = {}, alias = {};
@@ -332,67 +361,93 @@
   amount.addEventListener("input", function () { syncChips(); updateImpact(); changedLater(); });
   purpose.addEventListener("change", function () { updateImpact(); changedLater(); });
 
-  // ---------- intention chips «نيتك» (display only) ----------
-  // A chip picks the same #purpose option a donor could pick by hand and fires the same "change", so updateImpact() and
-  // changedLater() run exactly as for a manual pick; nothing else is sent. The chips follow the select: a project
-  // picked in it clears them, ?for= (zakat.html's link) lights the matching one once the options are in.
-  (function niyyaChips() {
-    var box = document.getElementById("niyya-chips"), note = document.getElementById("niyya-note");
+  // ---------- intention segment «نيتك» + the cause cards ----------
+  // The segment (تبرع عام / زكاة مال / صدقة جارية) and the cards under it pick the same #purpose option a donor could
+  // pick by hand in the "مشروع معيّن" list and fire the same "change", so updateImpact() and changedLater() run exactly
+  // as for a manual pick; nothing else is sent. They follow the select: ?for= lights the matching one once the
+  // options are in, a project picked in the list goes back to "تبرع عام" with the list open.
+  (function niyya() {
+    var box = document.getElementById("niyya-chips"), note = document.getElementById("niyya-note"), grid = document.getElementById("causes"), more = document.getElementById("purpose-more");
     if (!box) return;
     var chips = Array.prototype.slice.call(box.querySelectorAll("[data-p]"));
-    var NOTE = {
-      general: "تبرعك بيروح للمكان اللي محتاجه أكتر.",
-      zakat: "هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها في مرسال: علاج وكفالات المرضى الفقراء، ديونهم الطبية، وابن السبيل.",
-      sadaqa: "هيتسجّل تبرعك «صدقة». ربنا يتقبّل منك.",
-      p30: "صدقة جارية في بناء مستشفى مرسال للأطفال، ربنا يجعلها في ميزان حسناتك."
-    };
-    var shownKey = note && note.textContent.trim() === NOTE.general ? "general" : null; // donate.html ships the general line
-    function visible() { return chips.filter(function (c) { return !c.hidden; }); }
+    var NOTE = { general: "تبرعك بيروح للمكان اللي محتاجه أكتر.", zakat: "هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها الشرعية في مرسال.", sadaqa: "صدقة جارية أجرها مستمر، ربنا يجعلها في ميزان حسناتك." };
+    var shownKey = "general", builtFor = "", icons = window.MersalCauseIcons;
+    function groupData(id) { return CAUSES.groups.filter(function (g) { return g.id === id; })[0] || null; }
+    function causeOf(v) {
+      var m = /^p(\d{1,4})$/.exec(v || "");
+      return CAUSES.causes.filter(function (c) { return c.id === v || (m && c.link === "/p/" + m[1] + ".html"); })[0] || null;
+    }
+    function groupOf(v) { var c = causeOf(v); return c ? c.group : /^(zakat|sadaqa)$/.test(v) ? v : "general"; }
+    function hasCauses(g) { return CAUSES.causes.some(function (c) { return c.group === g; }); }
+    function title(c) { return EN && c.en ? c.en : String(c.title || "").trim(); }
+    // the cards of one group: icon tile, title, one line; the picked one carries the gold ring and the check
+    function build(g) {
+      builtFor = g;
+      var list = CAUSES.causes.filter(function (c) { return c.group === g; });
+      grid.hidden = !list.length;
+      grid.innerHTML = list.map(function (c, i) {
+        return '<button type="button" role="radio" class="cause" data-c="' + esc(c.id) + '" aria-checked="false" tabindex="-1" style="--i:' + i + '">' +
+          '<span class="c-tile">' + (icons ? icons.svg(c.icon) : "") + "</span>" +
+          '<span class="c-txt"><b>' + esc(title(c)) + "</b>" + (c.desc ? "<small>" + esc(c.desc) + "</small>" : "") + "</span>" +
+          '<span class="c-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>';
+      }).join("");
+      if (!list.length) return;
+      grid.classList.remove("in"); void grid.offsetWidth; grid.classList.add("in"); // replay the stagger
+    }
     function sync() {
-      var v = purpose.value, on = null;
-      chips.forEach(function (c) {
-        c.hidden = !purpose.querySelector('option[value="' + c.dataset.p + '"]'); // p30 waits for the project options
-        var hit = !c.hidden && c.dataset.p === v;
-        c.setAttribute("aria-checked", hit ? "true" : "false");
-        if (hit) on = c;
+      var v = purpose.value, g = groupOf(v), c = causeOf(v), on = null;
+      chips.forEach(function (ch) {
+        var hit = ch.dataset.p === g;
+        ch.setAttribute("aria-checked", hit ? "true" : "false"); ch.tabIndex = hit ? 0 : -1;
+        if (hit) on = ch;
       });
-      var tab = on || visible()[0]; // roving tabindex: the checked chip, or the first one when a project is picked
-      chips.forEach(function (c) { c.tabIndex = c === tab ? 0 : -1; });
-      var key = Object.prototype.hasOwnProperty.call(NOTE, v) ? v : "";
+      box.style.setProperty("--on", String(Math.max(0, chips.indexOf(on))));
+      box.classList.toggle("is-zakat", g === "zakat");
+      if (g !== builtFor) build(g);
+      var cards = grid.querySelectorAll(".cause"), any = false;
+      cards.forEach(function (k) { var hit = !!c && k.dataset.c === c.id; k.setAttribute("aria-checked", hit ? "true" : "false"); k.tabIndex = hit ? 0 : -1; any = any || hit; });
+      if (!any && cards.length) cards[0].tabIndex = 0;
+      grid.classList.toggle("picked", any);
+      // "مشروع معيّن" stays open when the donor picked a project from the list, so the choice stays visible
+      if (more && /^p\d{1,4}$/.test(v) && !c) more.open = true;
+      var gd = groupData(g), key = g + ":" + (c ? c.id : "");
       if (!note || key === shownKey) return; // the live region speaks only when the line really changes
       shownKey = key;
-      note.textContent = key ? NOTE[key] : "";
-      if (key === "zakat") {
+      var line = c ? (c.desc ? title(c) + ": " + c.desc : title(c)) : g === "general" ? (CAUSES.note || NOTE.general) : (gd && gd.note) || NOTE[g] || "";
+      if (!c && gd && gd.hint && hasCauses(g)) line = gd.hint + " · " + line;
+      note.textContent = line;
+      if (g === "zakat" && !c) {
         var a = document.createElement("a"); a.href = "/zakat.html#zakat-uses"; a.textContent = "التفاصيل ←";
         note.appendChild(document.createTextNode(" ")); note.appendChild(a);
       }
     }
-    function pick(c) {
-      purpose.value = c.dataset.p;
+    function pick(v) {
+      if (!purpose.querySelector('option[value="' + v + '"]')) return;
+      purpose.value = v;
       purpose.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    box.addEventListener("click", function (e) {
-      var c = e.target.closest("[data-p]");
-      if (!c || c.hidden) return;
-      pick(c);
       if (window.mersalTap) window.mersalTap(8);
-    });
-    // radiogroup keys: the arrows move to the next / previous chip and pick it (Left is "next" in RTL), Home / End jump
-    box.addEventListener("keydown", function (e) {
-      var vis = visible(), i = vis.indexOf(document.activeElement);
-      if (i < 0) return;
-      var rtl = getComputedStyle(box).direction === "rtl", n = vis.length, j = -1;
-      if (e.key === "ArrowDown" || e.key === (rtl ? "ArrowLeft" : "ArrowRight")) j = (i + 1) % n;
-      else if (e.key === "ArrowUp" || e.key === (rtl ? "ArrowRight" : "ArrowLeft")) j = (i - 1 + n) % n;
-      else if (e.key === "Home") j = 0;
-      else if (e.key === "End") j = n - 1;
-      if (j < 0) return;
-      e.preventDefault();
-      vis[j].focus();
-      pick(vis[j]);
-    });
+    }
+    box.addEventListener("click", function (e) { var c = e.target.closest("[data-p]"); if (c) pick(c.dataset.p); });
+    grid.addEventListener("click", function (e) { var k = e.target.closest("[data-c]"); if (k) pick(k.dataset.c); });
+    // radiogroup keys: the arrows move to the next / previous item and pick it (Left is "next" in RTL), Home / End jump
+    function keys(root, sel, attr) {
+      root.addEventListener("keydown", function (e) {
+        var vis = Array.prototype.slice.call(root.querySelectorAll(sel)), i = vis.indexOf(document.activeElement);
+        if (i < 0) return;
+        var rtl = getComputedStyle(root).direction === "rtl", n = vis.length, j = -1;
+        if (e.key === "ArrowDown" || e.key === (rtl ? "ArrowLeft" : "ArrowRight")) j = (i + 1) % n;
+        else if (e.key === "ArrowUp" || e.key === (rtl ? "ArrowRight" : "ArrowLeft")) j = (i - 1 + n) % n;
+        else if (e.key === "Home") j = 0;
+        else if (e.key === "End") j = n - 1;
+        if (j < 0) return;
+        e.preventDefault();
+        vis[j].focus();
+        pick(vis[j].getAttribute(attr));
+      });
+    }
+    keys(box, "[data-p]", "data-p"); keys(grid, "[data-c]", "data-c");
     purpose.addEventListener("change", sync);
-    if (window.MutationObserver) new MutationObserver(sync).observe(purpose, { childList: true, subtree: true });
+    optionsReady.then(function () { builtFor = ""; sync(); });
     sync();
   })();
 

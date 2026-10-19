@@ -1,0 +1,21 @@
+{
+  "_note": "جهات التبرع في صفحة طرق التبرع (الخطوة 1): المجموعات والجهات بترتيبها. بتتعدل من لوحة التحكم ← جهات التبرع. id الجهة ثابت (بيتسجل مع كل تبرع) ومش بيتغير.",
+  "note": "تبرعك بيروح للمكان اللي محتاجه أكتر.",
+  "groups": [
+    { "id": "zakat", "title": "زكاة مال", "en": "Zakat", "icon": "zakat", "note": "هيتسجّل تبرعك «زكاة مال»، ويتصرف في مصارفها الشرعية في مرسال: علاج وكفالات المرضى الفقراء، ديونهم الطبية، وابن السبيل.", "hint": "اختار مصرف الزكاة" },
+    { "id": "sadaqa", "title": "صدقة جارية", "en": "Sadaqa Jariya", "icon": "sadaqa", "note": "صدقة جارية أجرها مستمر، ربنا يجعلها في ميزان حسناتك.", "hint": "اختار مشروع الصدقة الجارية" }
+  ],
+  "causes": [
+    { "id": "czk1", "group": "zakat", "title": "علاج مرضى", "en": "Patient treatment", "desc": "علاج وأدوية وعمليات لمرضى غير قادرين", "icon": "heart", "link": "", "on": true },
+    { "id": "czk2", "group": "zakat", "title": "كفالات شهرية", "en": "Monthly sponsorships", "desc": "كفالة أسرة مريض لمدة شهر", "icon": "family", "link": "/p/42.html", "on": true },
+    { "id": "czk3", "group": "zakat", "title": "ابن السبيل", "en": "The wayfarer", "desc": "مريض بعيد عن بيته محتاج يسافر ويتعالج", "icon": "road", "link": "", "on": true },
+    { "id": "czk4", "group": "zakat", "title": "كارت السند", "en": "Sanad card", "desc": "علاج شهري لمريض مزمن", "icon": "card", "link": "/p/37.html", "on": true },
+    { "id": "czk5", "group": "zakat", "title": "مرضى ضمور العضلات SMA", "en": "SMA patients", "desc": "أطفال ضمور العضلات الشوكي", "icon": "child", "link": "", "on": true },
+    { "id": "czk6", "group": "zakat", "title": "جلسات غسيل كلوى", "en": "Dialysis sessions", "desc": "جلسات غسيل كلوي لمرضى الفشل الكلوي", "icon": "kidney", "link": "", "on": true },
+    { "id": "czk7", "group": "zakat", "title": "تبرع لحالة", "en": "Donate to a case", "desc": "حالة معيّنة محتاجة مساندة", "icon": "case", "link": "", "on": true },
+    { "id": "csj1", "group": "sadaqa", "title": "مستشفى مرسال", "en": "Mersal Hospital", "desc": "سهم في بناء مستشفى مرسال للأطفال", "icon": "hospital", "link": "/p/30.html", "on": true },
+    { "id": "csj2", "group": "sadaqa", "title": "أجهزة طبية", "en": "Medical equipment", "desc": "أجهزة بتخدم آلاف المرضى لسنين", "icon": "device", "link": "", "on": true },
+    { "id": "csj3", "group": "sadaqa", "title": "حضانات مرسال المعادي", "en": "Mersal Maadi incubators", "desc": "حضّانة بتنقذ طفل حديث الولادة", "icon": "baby", "link": "/p/52.html", "on": true },
+    { "id": "csj4", "group": "sadaqa", "title": "حضانات مرسال فيصل", "en": "Mersal Faisal incubators", "desc": "حضّانة بتنقذ طفل حديث الولادة", "icon": "baby", "link": "/p/52.html", "on": true }
+  ]
+}

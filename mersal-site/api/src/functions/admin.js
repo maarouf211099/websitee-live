@@ -11,7 +11,7 @@ const pay = require("../lib/pay");
 const paymob = require("../lib/paymob");
 const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 
-const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json", i18n: "public/data/i18n-en.json" };
+const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json", i18n: "public/data/i18n-en.json", causes: "public/data/causes.json" };
 // what each file must hold (the public pages break on anything else)
 const ARRAYS = ["menu", "albums", "news", "partners"];
 const MAX_JSON = 1024 * 1024;

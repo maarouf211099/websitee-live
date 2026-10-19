@@ -1,0 +1,85 @@
+/* طرق التبرع, step 1: the intention segment (تبرع عام / زكاة مال / صدقة جارية), the cause cards under it and the
+   folded "مشروع معيّن" list. Loaded after mobile.css / desktop.css, so these rules win at equal specificity.
+   Motion: transform / opacity only; reduced motion shows the final state. */
+
+/* --- the segment: a pill track with a sliding highlight (--on = index of the checked chip) --- */
+.niyya-seg { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; margin: 0 0 10px; border-radius: 999px; background: var(--teal-soft); border: 1px solid rgba(0,120,121,.12); }
+.niyya-seg::before { content: ""; position: absolute; z-index: -1; top: 4px; bottom: 4px; inset-inline-start: 4px; width: calc((100% - 16px) / 3); border-radius: 999px; background: var(--teal-text); box-shadow: 0 6px 16px -8px rgba(0,60,60,.6); transform: translateX(calc(var(--on, 0) * (-100% - 4px))); }
+[dir="ltr"] .niyya-seg::before { transform: translateX(calc(var(--on, 0) * (100% + 4px))); }
+.niyya-seg.is-zakat::before { background: var(--gold); box-shadow: 0 6px 16px -8px rgba(233,173,12,.9); }
+.niyya-seg button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; font: 800 14.5px/1.2 "Cairo", sans-serif; color: var(--teal-dark); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; white-space: nowrap; }
+.niyya-seg button svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.niyya-seg button[aria-checked="true"] { color: #fff; }
+.niyya-seg button[data-p="zakat"][aria-checked="true"] { color: var(--teal-ink); }
+.niyya-seg button:focus-visible { outline: 3px solid var(--gold-dark); outline-offset: -3px; }
+.niyya-note { margin: 0 0 12px; font-size: 14px; line-height: 1.6; color: var(--muted); }
+.niyya-note a { color: var(--teal-text); font-weight: 700; }
+
+/* --- the cause cards --- */
+.causes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
+.causes[hidden] { display: none; }
+.cause { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 68px; padding: 10px 12px; border-radius: 18px; border: 1.5px solid var(--line); background: #fff; text-align: start; font: inherit; color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; box-shadow: var(--sh-1); }
+.cause .c-tile { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--teal-soft); color: var(--teal-text); }
+.cause .c-tile svg { width: 24px; height: 24px; }
+.cause .c-txt { display: grid; gap: 2px; min-width: 0; }
+.cause b { font-size: 15px; font-weight: 800; line-height: 1.3; color: var(--teal-ink); }
+.cause small { font-size: 12.5px; line-height: 1.45; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cause .c-check { position: absolute; top: 8px; inset-inline-end: 8px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--teal-ink); opacity: 0; transform: scale(.5); }
+.cause .c-check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.cause:hover { border-color: var(--teal); }
+.cause[aria-checked="true"] { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold), var(--sh-1); }
+.cause[aria-checked="true"] .c-tile { background: var(--teal-text); color: #fff; }
+.cause[aria-checked="true"] .c-check { opacity: 1; transform: scale(1); }
+.causes.picked .cause:not([aria-checked="true"]) { opacity: .78; }
+.cause:focus-visible { outline: 3px solid var(--gold-dark); outline-offset: 2px; }
+
+/* --- the folded "مشروع معيّن" list --- */
+.purpose-more { margin: 0 0 14px; border: 1.5px dashed var(--line); border-radius: 14px; background: var(--bg-2); }
+.purpose-more summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; list-style: none; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--teal-text); -webkit-tap-highlight-color: transparent; }
+.purpose-more summary::-webkit-details-marker { display: none; }
+.purpose-more summary svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.purpose-more[open] summary svg { transform: rotate(180deg); }
+.purpose-more select { margin: 0 12px 12px; width: calc(100% - 24px); }
+.purpose-more[open] { border-style: solid; background: #fff; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .niyya-seg::before { transition: transform .32s var(--spring, cubic-bezier(.22,1,.36,1)), background .25s, box-shadow .25s; }
+  .niyya-seg button { transition: color .2s; }
+  .cause { transition: border-color .2s, box-shadow .2s, opacity .25s, transform .2s var(--spring, cubic-bezier(.22,1,.36,1)); }
+  .cause .c-tile { transition: background .2s, color .2s; }
+  .cause .c-check { transition: opacity .2s, transform .25s var(--bounce, cubic-bezier(.34,1.45,.64,1)); }
+  .cause:active { transform: scale(.97); }
+  .causes.in .cause { animation: cause-in .42s var(--spring, cubic-bezier(.22,1,.36,1)) both; animation-delay: calc(var(--i, 0) * 45ms); }
+  @keyframes cause-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+  .purpose-more summary svg { transition: transform .25s; }
+}
+
+@media (max-width: 760px) {
+  .cause { grid-template-columns: 1fr; align-content: start; gap: 8px; min-height: 0; padding: 12px; }
+  .cause .c-tile { width: 40px; height: 40px; border-radius: 12px; }
+  .cause .c-tile svg { width: 22px; height: 22px; }
+  .cause b { font-size: 14.5px; }
+  .cause small { font-size: 12px; }
+  .cause .c-check { top: 10px; }
+}
+@media (max-width: 360px) {
+  .niyya-seg button { font-size: 13px; gap: 4px; }
+  .niyya-seg button svg { width: 17px; height: 17px; }
+}
+
+/* --- desktop: step 1 keeps its 12-column grid (desktop.css); the segment, note, cards and the list take full rows --- */
+@media (min-width: 961px) {
+  .donate-page .step[data-step="1"] > .niyya-seg { grid-column: 1 / 8; grid-row: 1; margin: 0; }
+  .donate-page .step[data-step="1"] > .niyya-note { grid-column: 8 / -1; grid-row: 1; align-self: center; margin: 0; font-size: 14px; }
+  .donate-page .step[data-step="1"] > .causes { grid-column: 1 / -1; grid-row: 2; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 16px 0 0; }
+  .donate-page .step[data-step="1"] > .purpose-more { grid-column: 1 / -1; grid-row: 3; margin: 12px 0 0; }
+  .donate-page .step[data-step="1"] > .amounts { grid-row: 4; }
+  .donate-page .step[data-step="1"] > .impact { grid-row: 5; }
+  .donate-page .step[data-step="1"] > .amount-field { grid-row: 6; }
+  .donate-page .step[data-step="1"] > [data-next] { grid-row: 6; }
+  .niyya-seg button { min-height: 48px; font-size: 15px; }
+  .cause { min-height: 76px; padding: 12px 14px; }
+  .cause b { font-size: 15.5px; }
+  .cause:hover { transform: translateY(-2px); box-shadow: var(--sh-2); }
+}
+@media (min-width: 961px) and (max-width: 1180px) { .donate-page .step[data-step="1"] > .causes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

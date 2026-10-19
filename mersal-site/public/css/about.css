@@ -1,0 +1,34 @@
+/* "عن مرسال" hub (js/about.js): the numbers strip and one card grid per menu group. */
+.ah-nums { background: var(--teal-dark); color: #fff; padding: 26px 0; }
+.ah-nums ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.ah-nums li a, .ah-nums li > b { color: inherit; text-decoration: none; }
+.ah-nums li a, .ah-nums li { display: grid; gap: 2px; text-align: center; }
+.ah-nums b { font: 800 clamp(26px, 3vw, 36px)/1.1 "Titillium Web", "Cairo", sans-serif; color: var(--gold); }
+.ah-nums span { font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.85); }
+.ah-group { padding: 48px 0 8px; }
+.ah-group .section-title { margin-bottom: 24px; }
+.ah-group .section-title .eyebrow { display: block; margin-bottom: 6px; color: var(--gold-ink, #8a6100); font-weight: 800; font-size: 14px; }
+.ah-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.ah-card { display: grid; grid-template-rows: auto 1fr; border-radius: 18px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: var(--sh-1, 0 1px 2px rgba(0,48,48,.05)); color: var(--ink); text-decoration: none; }
+.ah-card img, .ah-card .ah-noimg { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--teal-soft); }
+.ah-card .ah-body { display: grid; gap: 6px; padding: 14px 16px 16px; align-content: start; }
+.ah-card b { font-size: 17px; line-height: 1.35; color: var(--teal-dark); }
+.ah-card small { font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.ah-card i { font-style: normal; font-size: 13.5px; font-weight: 800; color: var(--teal-text); margin-top: 2px; }
+.ah-card:hover { border-color: var(--teal); color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .ah-card { transition: transform .22s ease, box-shadow .22s ease, border-color .2s; }
+  .ah-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2, 0 12px 30px -16px rgba(0,48,48,.35)); }
+}
+@media (max-width: 960px) { .ah-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .ah-nums { padding: 20px 0; }
+  .ah-nums ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ah-group { padding: 32px 0 4px; }
+  .ah-grid { grid-template-columns: 1fr; gap: 12px; }
+  .ah-card { grid-template-columns: 120px 1fr; grid-template-rows: none; align-items: center; }
+  .ah-card img, .ah-card .ah-noimg { height: 100%; aspect-ratio: auto; min-height: 112px; }
+  .ah-card .ah-body { padding: 12px 12px 12px 14px; }
+  .ah-card b { font-size: 15.5px; }
+  .ah-card small { font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+}

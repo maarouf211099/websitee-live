@@ -1348,3 +1348,9 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .site-header .lang-sw { transition: transform .15s; }
   .site-header .lang-sw:active { transform: scale(.92); }
 }
+
+/* --- «عرض كل الحملات» (home.js): the campaign carousel stacked into one list --- */
+.home .camp-all { display: flex; width: calc(100% - 32px); margin: 4px 16px 0; min-height: 46px; justify-content: center; border-radius: 14px; font-weight: 800; color: var(--teal-dark); background: #fff; border: 1.5px solid var(--teal); box-shadow: var(--sh-1, 0 1px 2px rgba(0,48,48,.05)); }
+.home .camp-all[hidden] { display: none; }
+.home .camp-carousel .car-track.all { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: 1fr; gap: 16px; overflow: visible; scroll-snap-type: none; padding: 6px 16px 8px; }
+.home .camp-carousel .car-track.all > .camp { scroll-snap-align: none; opacity: 1; transform: none; }

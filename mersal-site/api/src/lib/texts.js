@@ -68,7 +68,7 @@ const SHAPE = {
       items: [{ icon: E(...Object.keys(ICONS.trust)), title: S(80), sub: S(80), link: L, show: SHOW }],
       ways: [{ label: S(40), code: S(20), image: I, w: N, h: N, link: L }],
     },
-    campaigns: { eyebrow: S(60), title: S(60), sub: S(200) },
+    campaigns: { eyebrow: S(60), title: S(60), sub: S(200), cta: S(40) },
     niyya: { eyebrow: S(60), title: S(80), sub: S(200), items: [{ icon: E(...Object.keys(ICONS.niyya)), title: S(60), sub: S(120), link: L, highlight: B }] },
     about: {
       eyebrow: S(60), title: S(60), mark: S(80), text: T(900), values: [{ title: S(60), text: S(120) }], button: S(60), link: L,
@@ -188,7 +188,8 @@ const R = {
       return "  <a " + href(w.link, ctx, "/donate.html#wallets") + ">" + img + "<span>" + tok(w.label, ctx) + (w.code ? ' <b dir="ltr">' + esc(w.code) + "</b>" : "") + "</span></a>";
     }))
     .concat(["</div>"]),
-  "t-campaigns": (h, c) => ['<div class="section-title split camp-title"><div><span class="eyebrow live">' + esc(c.eyebrow) + "</span><h2>" + esc(c.title) + ' <small class="count" id="camp-count"></small></h2></div>' + (c.sub ? "<p>" + esc(c.sub) + "</p>" : "") + "</div>"],
+  "t-campaigns": (h, c) => ['<div class="section-title split camp-title"><div><span class="eyebrow live">' + esc(c.eyebrow) + "</span><h2>" + esc(c.title) + ' <small class="count" id="camp-count"></small></h2></div>' + (c.sub ? "<p>" + esc(c.sub) + "</p>" : "") + "</div>" +
+    (c.cta ? '<button type="button" class="btn btn-ghost camp-all" id="camp-all" hidden>' + esc(c.cta) + "</button>" : "")],
   "t-niyya": (h, n, ctx) => ['<div class="section-title split"><div><span class="eyebrow">' + esc(n.eyebrow) + '</span><h2 id="niyya-h">' + esc(n.title) + "</h2></div>" + (n.sub ? "<p>" + esc(n.sub) + "</p>" : "") + "</div>", '<ul class="niyya" role="list">']
     .concat((n.items || []).map((it) => "  <li" + (it.highlight ? ' class="n-zakat"' : "") + "><a " + href(it.link, ctx) + '><span class="n-ico" aria-hidden="true"><svg viewBox="0 0 24 24">' + svgIn("niyya", it.icon) + "</svg></span><b>" + tok(it.title, ctx) + "</b><small>" + tok(it.sub, ctx) + "</small></a></li>"))
     .concat(["</ul>"]),

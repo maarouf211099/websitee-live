@@ -1,0 +1,8 @@
+{
+  "_note": "ترتيب أقسام الرئيسية (لوحة التحكم ← ترتيب الرئيسية). phone: الترتيب على الموبايل، desktop: على الكمبيوتر، hidden: أقسام مخفية. بيتكتب كـ CSS جوه index.html عند الحفظ (api/src/lib/layout.js).",
+  "home": {
+    "phone": ["slider", "quick", "campaigns", "trust", "niyya", "about", "numbers", "hospital", "impact", "services", "projects", "ways", "partners", "slogan"],
+    "desktop": ["slider", "quick", "trust", "campaigns", "niyya", "about", "numbers", "hospital", "impact", "services", "projects", "ways", "partners", "slogan"],
+    "hidden": []
+  }
+}

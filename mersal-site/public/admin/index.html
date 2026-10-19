@@ -28,6 +28,7 @@
     <div class="brand"><img src="/img/brand-logo.png" alt="مرسال" width="70" height="42"><span>لوحة التحكم</span></div>
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="home" aria-selected="true">الرئيسية</button>
+      <button role="tab" data-tab="order">ترتيب الرئيسية</button>
       <button role="tab" data-tab="pages">الصفحات</button>
       <button role="tab" data-tab="menu">القائمة</button>
       <button role="tab" data-tab="albums">الألبومات</button>
@@ -81,6 +82,11 @@
       <button class="btn btn-ghost" id="add-number">+ إضافة رقم</button>
       <div class="site-grid" style="margin-top:12px"><div class="field"><label for="numbers-asof">آخر تحديث للأرقام (اختياري: بيظهر تحت الأرقام «آخر تحديث للأرقام: …»)</label><input id="numbers-asof" maxlength="40" placeholder="مثال: أكتوبر 2026"></div></div>
       <p class="hint">عنوان القسم وباقي نصوص الرئيسية في تبويب «نصوص الموقع».</p>
+    </section>
+
+    <section class="panel" id="tab-order" hidden>
+      <header class="panel-head"><h1>ترتيب الرئيسية</h1><button class="btn btn-gold" id="save-order">حفظ ونشر</button></header>
+      <div id="order-root"></div>
     </section>
 
     <section class="panel" id="tab-pages" hidden>
@@ -243,6 +249,7 @@
 <script src="/admin/tabs/extras.js"></script>
 <script src="/admin/tabs/texts.js"></script>
 <script src="/admin/tabs/anytext.js"></script>
+<script src="/admin/tabs/order.js"></script>
 <script src="/admin/tabs/english.js"></script>
 <script src="/js/cause-icons.js"></script>
 <script src="/admin/tabs/causes.js"></script>

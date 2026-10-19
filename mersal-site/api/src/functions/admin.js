@@ -7,11 +7,12 @@ const { requireAdmin, readFile, commitFiles, fileExists, json, fail, sessionFor,
 const donations = require("../lib/donations");
 const hero = require("../lib/hero");
 const texts = require("../lib/texts");
+const layout = require("../lib/layout");
 const pay = require("../lib/pay");
 const paymob = require("../lib/paymob");
 const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 
-const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json", i18n: "public/data/i18n-en.json", causes: "public/data/causes.json", overrides: "public/data/overrides.json" };
+const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json", i18n: "public/data/i18n-en.json", causes: "public/data/causes.json", overrides: "public/data/overrides.json", layout: "public/data/layout.json" };
 // what each file must hold (the public pages break on anything else)
 const ARRAYS = ["menu", "albums", "news", "partners"];
 const MAX_JSON = 1024 * 1024;
@@ -207,6 +208,7 @@ app.http("adminData", {
       let data = body && body.data;
       // texts: its own schema (known keys only, every link and image checked, sms: links allowed), see lib/texts.js
       let bad = name === "texts" ? null : checkData(name, data);
+      if (name === "layout") { const c = layout.clean(data); bad = c.error || null; if (!bad) data = c.data; }
       if (name === "texts") { const c = texts.clean(data); bad = c.error || (Buffer.byteLength(JSON.stringify(c.data || {})) > MAX_JSON ? "الملف أكبر من 1 ميجا" : null); if (!bad) data = c.data; }
       if (bad) return json(400, { message: bad });
       const base = baseOf(req);
@@ -240,6 +242,11 @@ app.http("adminData", {
           }
           const mobileSet = (sl) => (msFor[sl.mobile] ? [{ src: msFor[sl.mobile], w: 1324 }, { src: sl.mobile, w: 1766 }] : null);
           files.push({ path: "public/index.html", content: hero.apply(idx, data, { mobileSet }) });
+        }
+        if (name === "layout") {
+          // the order is baked into index.html as CSS in the same commit (lib/layout.js)
+          const idx = await readFile("public/index.html"), out = layout.apply(idx, data);
+          if (out !== idx) files.push({ path: "public/index.html", content: out });
         }
         if (name === "texts") {
           // the texts are baked into the pages (lib/texts.js) in the same commit, so the file and the pages never drift

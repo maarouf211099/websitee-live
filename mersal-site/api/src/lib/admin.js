@@ -250,7 +250,7 @@ async function requireAdmin(req, perm) {
 const ALLOWED = [
   /^public\/index\.html$/,
   /^public\/(contact|afia|zakat|donate|albums|volunteer|help|gift|news)\.html$/,
-  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community|news|impact|announce|partners|texts|i18n-en)\.json$/,
+  /^public\/content\.json$/, /^public\/data\/(menu|albums|pages|settings|site|donate|community|news|impact|announce|partners|texts|i18n-en|causes|overrides|layout)\.json$/,
   /^public\/p\/\d{1,4}\.html$/, /^public\/js\/layout\.js$/,
   /^public\/img\/uploads\/[A-Za-z0-9._-]+\.(jpe?g|png|webp|gif)$/,
 ];

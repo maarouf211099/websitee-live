@@ -1745,3 +1745,71 @@ main .bank a[href^="tel:"], main .bank a[href^="mailto:"], .alert a[href^="tel:"
 .m-lang button[lang="en"] { font-family: "Titillium Web", "Cairo", sans-serif; }
 .m-lang button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
 .m-lang button:active { transform: scale(.96); }
+
+/* ===================== Polish 5: consistency pass (owner, Oct 19, Fable) =====================
+   One radius / shadow / hover language for every card on every page, one press feedback for every button, one
+   focus ring, a gold reading-progress hairline under the header, lighter and quicker reveals, and entrance motion
+   for the inner page heads. Motion is transform / opacity only; reduced motion shows the final state. */
+:root { --card-r: var(--r-lg, 22px); --card-sh: var(--sh-1, 0 1px 2px rgba(0,48,48,.05), 0 8px 20px -12px rgba(0,48,48,.22)); --card-sh-hover: var(--sh-2, 0 2px 6px rgba(0,48,48,.05), 0 22px 44px -22px rgba(0,48,48,.38)); }
+
+/* cards: same corner, same shadow, same lift */
+.card, .side-card, .contact-cards a, .svc, .way2, .bank, .ah-card, .cause, .zakat-group, .news-card, .gf-card, .hot-card, .ts-tile, .niyya a, .about-values li, .ic-card, .pw-card, .tr-card { border-radius: var(--card-r); }
+.card, .side-card, .contact-cards a, .svc, .way2, .ah-card, .news-card { box-shadow: var(--card-sh); border-color: var(--line); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card, .side-card, .contact-cards a, .svc, .way2, .ah-card, .news-card, .niyya a, .ts-tile { transition: transform .25s var(--spring, cubic-bezier(.22,1,.36,1)), box-shadow .25s ease, border-color .2s; }
+  a.card:hover, .contact-cards a:hover, a.svc:hover, .way2:hover, .ah-card:hover, a.news-card:hover, .niyya a:hover, a.ts-tile:hover { transform: translateY(-4px); box-shadow: var(--card-sh-hover); border-color: rgba(0,120,121,.35); }
+}
+
+/* buttons: one press, one focus ring, one hover lift for the primary ones */
+.btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.btn:focus-visible, .niyya a:focus-visible, .card:focus-visible, .contact-cards a:focus-visible, .ah-card:focus-visible { outline: 3px solid var(--gold-dark); outline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .btn { transition: transform .15s var(--spring, cubic-bezier(.22,1,.36,1)), background .2s, color .2s, box-shadow .2s, border-color .2s; }
+  .btn:active { transform: scale(.96); }
+  .btn-gold:hover, .btn-teal:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -12px rgba(0,48,48,.5); }
+  .btn-gold:hover { box-shadow: var(--sh-gold, 0 12px 26px -12px rgba(233,173,12,.6)); }
+  .btn-gold:active, .btn-teal:active { transform: scale(.96); box-shadow: none; }
+}
+
+/* reveals: quicker and lighter than before, so the page never feels like it is waiting */
+.reveal { transform: translateY(18px); transition-duration: .55s, .55s; }
+.reveal.zoom { transform: scale(.96); }
+
+/* section rhythm: every title block breathes the same, the eyebrow reads as a tag */
+.section-title { margin-bottom: 32px; }
+.section-title p { max-width: 62ch; }
+.eyebrow { font-size: 13.5px; letter-spacing: .2px; }
+
+/* inner page heads: the title slides in, the breadcrumb settles after it, the photo card floats up once */
+@media (prefers-reduced-motion: no-preference) {
+  .page-head h1 { animation: p5-up .55s var(--spring, cubic-bezier(.22,1,.36,1)) both; }
+  .page-head p, .page-head .crumbs, .page-head .ph-trust { animation: p5-up .55s .12s var(--spring, cubic-bezier(.22,1,.36,1)) both; }
+  .page-head.has-photo > picture { animation: p5-float .7s .1s var(--spring, cubic-bezier(.22,1,.36,1)) both; }
+  @keyframes p5-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes p5-float { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+}
+
+/* article content: rounded pictures with a soft shadow, links with a sliding underline */
+.legacy img { border-radius: var(--r-md, 16px); box-shadow: var(--card-sh); }
+.legacy .content-sector a:not(.btn) { color: var(--teal-text); font-weight: 700; text-decoration: none; background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1.5px; }
+@media (prefers-reduced-motion: no-preference) {
+  .legacy .content-sector a:not(.btn) { background-size: 0 1.5px; transition: background-size .25s ease; }
+  .legacy .content-sector a:not(.btn):hover { background-size: 100% 1.5px; }
+}
+
+/* forms: one focus ring everywhere */
+input:not([type="checkbox"]):not([type="radio"]):focus-visible, textarea:focus-visible, select:focus-visible { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+
+/* reading progress: a gold hairline under the sticky header (js/layout.js sets --read on <html>) */
+.read-bar { position: fixed; top: 0; inset-inline-start: 0; z-index: 61; width: 100%; height: 3px; background: var(--gold); transform-origin: 0 50%; transform: scaleX(var(--read, 0)); pointer-events: none; opacity: .95; }
+[dir="rtl"] .read-bar { transform-origin: 100% 50%; }
+@media (prefers-reduced-motion: reduce) { .read-bar { display: none; } }
+
+/* footer: the columns' headings get the gold tick, the copyright line is quieter */
+.site-footer h3 { display: inline-flex; align-items: center; gap: 8px; }
+.site-footer h3::before { content: ""; width: 14px; height: 3px; border-radius: 3px; background: var(--gold); }
+.site-footer .copyright { font-size: 13px; opacity: .9; }
+
+/* CTA band on inner pages: a card, not a bare strip */
+.cta-band .wrap { background: #fff; border: 1px solid var(--line); border-radius: var(--card-r); padding: 34px 20px; box-shadow: var(--card-sh); }
+.cta-band { padding: 40px 0; }

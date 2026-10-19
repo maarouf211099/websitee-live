@@ -1253,3 +1253,6 @@ section.alt { background: linear-gradient(180deg, #f7faf9, #fbf8f1); }
   background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.07)); border: 1px solid rgba(255,255,255,.18);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 3px 8px -4px rgba(0,0,0,.45); }
 .site-header .lang-sw[lang="ar"], body:not(.nav-compact) .site-header .lang-sw[lang="ar"] { font: 800 13.5px/1 "Cairo", sans-serif; letter-spacing: 0; }
+
+/* --- Polish 5 (desktop): the CTA card sits inside the page width --- */
+.cta-band .wrap { max-width: 880px; }

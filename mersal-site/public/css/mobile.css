@@ -1354,3 +1354,9 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
 .home .camp-all[hidden] { display: none; }
 .home .camp-carousel .car-track.all { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: 1fr; gap: 16px; overflow: visible; scroll-snap-type: none; padding: 6px 16px 8px; }
 .home .camp-carousel .car-track.all > .camp { scroll-snap-align: none; opacity: 1; transform: none; }
+
+/* --- Polish 5 (phones): section rhythm and lighter cards --- */
+section { padding: 44px 0; }
+.section-title { margin-bottom: 22px; }
+.cta-band .wrap { padding: 26px 16px; margin: 0 16px; width: auto; }
+.read-bar { top: 0; }

@@ -587,17 +587,6 @@
     scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
   });
 
-  // Reading progress: a gold hairline under the header (css .read-bar), --read on <html> = scrolled share, from one
-  // passive scroll listener through requestAnimationFrame (transform only, no layout)
-  (function () {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var bar = document.createElement("div"); bar.className = "read-bar"; bar.setAttribute("aria-hidden", "true"); document.body.appendChild(bar);
-    var ticking = false, H = document.documentElement;
-    function paint() { ticking = false; var max = H.scrollHeight - innerHeight; H.style.setProperty("--read", max > 0 ? Math.min(1, Math.max(0, (scrollY || H.scrollTop) / max)).toFixed(4) : "0"); }
-    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
-    addEventListener("resize", paint, { passive: true }); paint();
-  })();
-
   // Skip link + back-to-top
   document.body.insertAdjacentHTML("afterbegin", '<a class="skip-link" href="#main">تخطي إلى المحتوى</a>');
   var mainEl = document.querySelector("main"); if (mainEl && !mainEl.id) mainEl.id = "main";

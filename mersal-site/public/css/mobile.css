@@ -1359,7 +1359,6 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
 section { padding: 44px 0; }
 .section-title { margin-bottom: 22px; }
 .cta-band .wrap { padding: 26px 16px; margin: 0 16px; width: auto; }
-.read-bar { top: 0; }
 
 /* --- Owner, Oct 20: the hospital's numbers on phones were small; big gold-on-teal tiles with the count-up --- */
 .home .facts { gap: 10px; margin: 16px 0; }

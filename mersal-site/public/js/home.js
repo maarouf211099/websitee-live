@@ -452,6 +452,8 @@
     var n = Math.min(+card.dataset.max || 50, Math.max(1, (+out.textContent || 1) + +b.dataset.d)), total = n * +card.dataset.unit;
     out.textContent = n; give.href = give.dataset.base + total + "#online"; if (amt) amt.textContent = fmt.format(total);
     give.classList.remove("bump"); void give.offsetWidth; give.classList.add("bump");
+    // "+": a little heart floats up from the stepper (css .qty-heart), removed when its animation ends
+    if (+b.dataset.d > 0 && !reduceMotion) { var h = document.createElement("span"); h.className = "qty-heart"; h.setAttribute("aria-hidden", "true"); h.textContent = "\u2764"; b.parentNode.appendChild(h); h.addEventListener("animationend", function () { h.remove(); }); setTimeout(function () { if (h.parentNode) h.remove(); }, 1200); }
     if (window.mersalTap) window.mersalTap(8);
   });
   // share a campaign: native share sheet on phones, WhatsApp elsewhere

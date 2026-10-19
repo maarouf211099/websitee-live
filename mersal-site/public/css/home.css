@@ -535,3 +535,43 @@
 
 /* tablets and desktop only (css/desktop.css §3): the other ways to give, under the quick-donate button */
 .qd-alt { display: none; }
+
+/* ===== Owner, Oct 20: an animated gold border runs around every open campaign card ("زي بوردر بيعمل أنيميشن") =====
+   A big conic-gradient square (::before) spins behind the card (transform only, composited); ::after fills the card
+   back in white 2px inside, so only a 2px ring shows. Completed campaigns keep a quiet static ring; reduced motion
+   shows a static gold ring. */
+.home .camp.camp { position: relative; overflow: hidden; background: transparent; }
+.home .camp::before, .home .camp::after { content: ""; position: absolute; pointer-events: none; }
+.home .camp::before { z-index: -2; inset: -70%; background: conic-gradient(from 0deg, transparent 0 52%, rgba(254,200,48,.35) 62%, var(--gold) 72%, #fff 76%, var(--gold) 80%, transparent 90%); }
+.home .camp::after { z-index: -1; inset: 2px; border-radius: 20px; background: #fff; }
+.home .camp { isolation: isolate; }
+.home .camp.is-done::before { background: conic-gradient(var(--line) 0 100%); }
+@media (prefers-reduced-motion: no-preference) {
+  .home .camp.in:not(.is-done)::before { animation: camp-ring 4.5s linear infinite; }
+  .home .camp.is-urgent.in::before { animation-duration: 2.6s; }
+  @keyframes camp-ring { to { transform: rotate(360deg); } }
+}
+@media (prefers-reduced-motion: reduce) { .home .camp::before { background: var(--gold); } }
+
+/* the gold donate button gets one shine sweep when its card comes in (and on hover on desktop) */
+.home .camp .camp-give, .home .qd-go { position: relative; overflow: hidden; }
+.home .camp .camp-give::before, .home .qd-go::before { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; inset-inline-start: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); transform: skewX(-18deg); pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .home .camp.in .camp-give::before { animation: shine 1.1s .6s ease both; }
+  .home .qd-go::before { animation: shine 1.2s 1.4s ease both; }
+  @media (hover: hover) { .home .camp .camp-give:hover::before { animation: shine .8s ease both; } }
+  @keyframes shine { from { inset-inline-start: -60%; } to { inset-inline-start: 130%; } }
+}
+
+/* "+" on the quantity stepper: a little heart floats up from the button (home.js) */
+.home .camp-qty { position: relative; }
+.home .qty-heart { position: absolute; top: 0; inset-inline-end: 8px; font-size: 16px; color: #e0245e; pointer-events: none; animation: qty-heart .75s ease-out forwards; }
+@keyframes qty-heart { from { opacity: 1; transform: translateY(0) scale(.8); } to { opacity: 0; transform: translateY(-34px) scale(1.25); } }
+@media (prefers-reduced-motion: reduce) { .home .qty-heart { display: none; } }
+
+/* the progress bar glows once the counter settles */
+@media (prefers-reduced-motion: no-preference) {
+  .home .camp.filled .bar.seg i:nth-child(-n+1) { box-shadow: 0 0 0 0 rgba(254,200,48,0); }
+  .home .camp.filled .bar.seg em { animation: bar-pop .5s var(--bounce, cubic-bezier(.34,1.45,.64,1)) both; }
+  @keyframes bar-pop { from { transform: scale(.6); } to { transform: scale(1); } }
+}

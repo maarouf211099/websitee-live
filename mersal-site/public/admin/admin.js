@@ -132,7 +132,7 @@
   start();
 
   // ---------- permissions: each tab belongs to one perm; the server checks every save again ----------
-  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", english: "content", causes: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
+  var TAB_PERM = { home: "content", pages: "content", menu: "content", albums: "content", community: "content", news: "content", impact: "content", extras: "content", texts: "content", english: "content", causes: "content", anytext: "content", sizes: null, site: "site", donations: "donations", requests: "requests", users: "users", settings: null };
   var perms = null;
   function can(perm) { return !perm || !perms || perms.indexOf(perm) >= 0; }
   function applyPerms(me) {

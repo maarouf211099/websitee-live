@@ -795,6 +795,7 @@
       if (h > 0 && h < 160 && !(a.exp && Date.now() > a.exp) && !document.getElementById("ann-bar"))
         document.querySelector(".site-header").insertAdjacentHTML("afterend", '<div id="ann-bar" class="ann-bar t-' + (/^(gold|teal|red)$/.test(a.tone) ? a.tone : "gold") + '" style="min-height:' + h + 'px" aria-hidden="true"></div>');
     } catch (e) {}
+    var tw = document.createElement("script"); tw.src = "/js/tweaks.js"; document.body.appendChild(tw); // console text overrides (data/overrides.json)
     var js = document.createElement("script"); js.src = "/js/extras.js";
     js.onerror = function () { var s = document.getElementById("ann-bar"); if (s && !s.firstChild) s.parentNode.removeChild(s); }; // no script: no empty room
     document.body.appendChild(js);

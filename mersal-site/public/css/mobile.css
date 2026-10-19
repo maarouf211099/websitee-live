@@ -144,7 +144,7 @@ body.has-mbar:not(:has(> .site-footer)) { padding-bottom: 96px; }
 .way2 small { font-size: 14px; }
 .niyya small { font-size: 14px; }
 .num span { font-size: 14px; } /* white on the teal band: size only */
-.facts span, .values span { font-size: 14px; }
+.facts div > span, .values span { font-size: 14px; } /* the label only: the odometer digits inside b are spans too (they inherit b's size) */
 .pt-card .pt-name { font-size: 14px; }
 .contact-cards span, .contact-cards b { font-size: 14px; }
 .home .hf-status, .home .about-pic figcaption span, .home .about-pic .cap-eyebrow, .ic-eyebrow { font-size: 14px; }
@@ -1360,3 +1360,18 @@ section { padding: 44px 0; }
 .section-title { margin-bottom: 22px; }
 .cta-band .wrap { padding: 26px 16px; margin: 0 16px; width: auto; }
 .read-bar { top: 0; }
+
+/* --- Owner, Oct 20: the hospital's numbers on phones were small; big gold-on-teal tiles with the count-up --- */
+.home .facts { gap: 10px; margin: 16px 0; }
+.home .facts div { position: relative; overflow: hidden; padding: 18px 12px 16px; border-radius: 18px; background: linear-gradient(160deg, #ffffff 0%, #eef7f7 100%); border: 1px solid var(--fb-line); box-shadow: var(--fb-shadow); }
+.home .facts div::before { content: ""; position: absolute; top: 10px; inset-inline-start: 12px; width: 22px; height: 3px; border-radius: 3px; background: var(--gold); }
+.home .facts b { display: block; font: 800 40px/1.05 "Titillium Web", "Cairo", sans-serif; color: var(--teal-dark); letter-spacing: -.5px; margin-bottom: 4px; }
+.home .facts div > span { display: block; font-size: 14px; font-weight: 700; color: var(--muted); line-height: 1.4; } /* the label only: the odometer digits are spans too */
+.home .facts div:active { transform: scale(.97); }
+/* the shares rows: the price reads as the gold tag */
+.home .hf-shares b { font-size: 24px; color: var(--teal-dark); }
+.home .hf-shares b small { color: var(--muted); }
+.home .hf-shares a { min-height: 60px; }
+/* the brand-band numbers a notch bigger too */
+.home .num b { font-size: 40px; }
+.home .facts b span, .home .num b span { font-size: inherit; }

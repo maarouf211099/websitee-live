@@ -1348,3 +1348,12 @@ html:not(.no-online-pay) .zakat-page .z-quick[hidden] { display: block !importan
   .site-header .lang-sw { transition: transform .15s; }
   .site-header .lang-sw:active { transform: scale(.92); }
 }
+
+/* --- Home order on phones (owner, Oct 19): the campaigns come right after the quick-donate box, the trust tiles
+   («ليه تطمن لمرسال») move down to where the campaigns were. Desktop keeps the DOM order. --- */
+.home main { display: flex; flex-direction: column; }
+.home main > * { order: 10; }
+.home main > .slider { order: 1; }
+.home main > .quick-bar { order: 2; }
+.home main > .campaigns-sec { order: 3; }
+.home main > .trust-strip { order: 4; }

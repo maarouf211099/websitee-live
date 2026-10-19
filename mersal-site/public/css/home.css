@@ -575,3 +575,20 @@
   .home .camp.filled .bar.seg em { animation: bar-pop .5s var(--bounce, cubic-bezier(.34,1.45,.64,1)) both; }
   @keyframes bar-pop { from { transform: scale(.6); } to { transform: scale(1); } }
 }
+
+/* ===== Ambient motion (owner, Oct 20) ===== */
+@media (prefers-reduced-motion: no-preference) {
+  /* the active slide's photo breathes (slow Ken Burns) for as long as it is on */
+  .sl-card.on img { animation: kb 8s ease-out both; }
+  @keyframes kb { from { transform: scale(1); } to { transform: scale(1.07); } }
+  /* the wave under the hero drifts */
+  .hero-wave { animation: wave-drift 9s ease-in-out infinite alternate; }
+  @keyframes wave-drift { from { transform: translateX(-10px) scaleX(1.03); } to { transform: translateX(10px) scaleX(1.03); } }
+  /* the chosen amount in the quick box pops */
+  .home .quick-donate .amounts button.on { animation: pop .3s var(--spring); }
+  /* two small hearts drift up through the «ابعت فرحة» band */
+  .home .slogan-band::before, .home .slogan-band::after { display: block; content: "\2764"; position: absolute; bottom: -30px; z-index: 0; font-size: 22px; color: rgba(224,36,94,.28); pointer-events: none; animation: heart-up 11s linear infinite; }
+  .home .slogan-band::before { inset-inline-start: 12%; }
+  .home .slogan-band::after { inset-inline-end: 14%; font-size: 16px; animation-duration: 14s; animation-delay: 5s; }
+  @keyframes heart-up { 0% { transform: translateY(0) rotate(-8deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: .6; } 100% { transform: translateY(-420px) rotate(10deg); opacity: 0; } }
+}

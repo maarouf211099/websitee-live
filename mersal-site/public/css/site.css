@@ -1809,3 +1809,32 @@ input:not([type="checkbox"]):not([type="radio"]):focus-visible, textarea:focus-v
 /* CTA band on inner pages: a card, not a bare strip */
 .cta-band .wrap { background: #fff; border: 1px solid var(--line); border-radius: var(--card-r); padding: 34px 20px; box-shadow: var(--card-sh); }
 .cta-band { padding: 40px 0; }
+
+/* ===== Ambient motion (owner, Oct 20): soft gold / teal orbs drifting behind the brand bands and the page heads
+   (js/layout.js puts two <i class="orb"> in each), the highlighted word in big titles sweeps in, and the service /
+   intention icons pop when their card arrives. Transform / opacity only; reduced motion = static. ===== */
+.orb { position: absolute; z-index: 0; width: 320px; height: 320px; border-radius: 50%; pointer-events: none; opacity: .55; background: radial-gradient(circle at 50% 50%, rgba(254,200,48,.42) 0%, rgba(254,200,48,.12) 38%, transparent 68%); }
+.orb.o2 { width: 420px; height: 420px; background: radial-gradient(circle at 50% 50%, rgba(0,194,196,.38) 0%, rgba(0,194,196,.1) 40%, transparent 70%); }
+.orb.o1 { top: -120px; inset-inline-start: -80px; }
+.orb.o2 { bottom: -180px; inset-inline-end: -120px; }
+.has-orbs { position: relative; overflow: hidden; isolation: isolate; }
+.has-orbs > .wrap, .has-orbs > picture, .has-orbs > .cols, .has-orbs > .copyright, .has-orbs > .f-strip { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .orb.o1 { animation: orb-a 22s ease-in-out infinite alternate; }
+  .orb.o2 { animation: orb-b 28s ease-in-out infinite alternate; }
+  @keyframes orb-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(60px, 50px) scale(1.12); } }
+  @keyframes orb-b { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(-70px, -40px) scale(.95); } }
+}
+@media (max-width: 760px) { .orb { width: 220px; height: 220px; } .orb.o2 { width: 280px; height: 280px; } }
+
+/* the highlighted word of a big title: the gold stroke draws in once the title is on screen */
+.big-title mark { position: relative; isolation: isolate; background: none; }
+.big-title mark::before { content: ""; position: absolute; z-index: -1; inset: 62% -.1em 2px; border-radius: 4px; background: rgba(254,200,48,.55); transform-origin: 100% 50%; }
+[dir="ltr"] .big-title mark::before { transform-origin: 0 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .big-title.reveal mark::before { transform: scaleX(0); transition: transform .6s var(--spring, cubic-bezier(.22,1,.36,1)) .35s; }
+  .big-title.reveal.in mark::before { transform: scaleX(1); }
+  /* icons pop in after their card */
+  .svc.reveal.in .svc-i, .niyya a.reveal.in .n-ico, .contact-cards a.reveal.in .ic, .ts-tile.reveal.in .ts-ico { animation: ico-pop .55s var(--bounce, cubic-bezier(.34,1.45,.64,1)) .25s both; }
+  @keyframes ico-pop { from { transform: scale(.4) rotate(-10deg); opacity: 0; } 60% { opacity: 1; } to { transform: none; opacity: 1; } }
+}

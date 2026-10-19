@@ -449,7 +449,12 @@
     });
   };
   document.querySelectorAll("main .about-pic, main .hf-pic, main .grid > img, main .grid > picture > img").forEach(function (el) { el.classList.add("zoom"); });
-  window.mersalReveal(document.querySelectorAll("main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > picture > img, main .grid > div > img, main .legacy .row > *, main .legacy li, main .legacy > img, main .page-side, main .share-bar, .site-footer .cols > div"));
+  // ambient orbs behind the brand bands and the page heads (css .orb): two per band, static under reduced motion
+  document.querySelectorAll(".page-head, .numbers, .site-footer, .hospital-feature, .req-call, .ic-head").forEach(function (band) {
+    band.classList.add("has-orbs");
+    band.insertAdjacentHTML("afterbegin", '<i class="orb o1" aria-hidden="true"></i><i class="orb o2" aria-hidden="true"></i>');
+  });
+  window.mersalReveal(document.querySelectorAll("main .big-title, main .niyya a, main .ts-tile, main .section-title, main .num, main .way2, main .about-pic, main .hf-pic, main .contact-cards a, main .card, main .bank, main .banner-strip > *, main .zakat-group, main .side-ads > *, main .grid > img, main .grid > picture > img, main .grid > div > img, main .legacy .row > *, main .legacy li, main .legacy > img, main .page-side, main .share-bar, .site-footer .cols > div"));
   // desktop only (761px+, the phone keeps its approved motion): the zakat uses and the gift steps fade up once too
   if (window.matchMedia && matchMedia("(min-width: 761px)").matches) window.mersalReveal(document.querySelectorAll("main .zk-cards li, main .gf-steps li"));
 

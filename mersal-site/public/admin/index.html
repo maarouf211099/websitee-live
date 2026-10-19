@@ -40,6 +40,7 @@
       <button role="tab" data-tab="impact">أثر التبرع</button>
       <button role="tab" data-tab="extras">شريط الإعلان والشركاء</button>
       <button role="tab" data-tab="texts">نصوص الموقع</button>
+      <button role="tab" data-tab="anytext">تعديل أي نص</button>
       <button role="tab" data-tab="english">English</button>
       <button role="tab" data-tab="sizes">مقاسات الصور للمصمم</button>
       <button role="tab" data-tab="users" hidden>المستخدمين والصلاحيات</button>
@@ -57,6 +58,7 @@
 
     <section class="panel" id="tab-home">
       <header class="panel-head"><h1>الرئيسية</h1><button class="btn btn-gold" id="save-home">حفظ ونشر</button></header>
+      <p class="hint">هنا السلايدر والحملات والمشاريع والأرقام. باقي أقسام الرئيسية (ساهم مع مرسال، ليه تطمن، على نيتك، من نحن، المستشفى، الخدمات، آخر الصفحة) في تبويب «نصوص الموقع»، وأي كلمة تانية في «تعديل أي نص».</p>
       <div class="status bad" id="home-pages-status" hidden>قائمة الصفحات ما اتحمّلتش، فصفحات الحملات والمشاريع ظاهرة كروابط زي ما هي ومش هتتغير لو حفظت. <button type="button" class="btn btn-ghost btn-sm" id="home-pages-retry">حاول تاني</button></div>
 
       <h2>السلايدر</h2>
@@ -160,6 +162,11 @@
       <header class="panel-head"><h1>النسخة الإنجليزية (English)</h1><button class="btn btn-gold" id="save-english">حفظ ونشر</button></header>
       <div id="english-root"></div>
     </section>
+    <section class="panel" id="tab-anytext" hidden>
+      <header class="panel-head"><h1>تعديل أي نص</h1><button class="btn btn-gold" id="save-anytext">حفظ ونشر</button></header>
+      <div id="anytext-root"></div>
+    </section>
+
     <section class="panel" id="tab-texts" hidden>
       <header class="panel-head"><h1>نصوص الموقع</h1><button class="btn btn-gold" id="save-texts">حفظ ونشر</button></header>
       <div id="texts-root"></div>
@@ -235,6 +242,7 @@
 <script src="/admin/tabs/impact.js"></script>
 <script src="/admin/tabs/extras.js"></script>
 <script src="/admin/tabs/texts.js"></script>
+<script src="/admin/tabs/anytext.js"></script>
 <script src="/admin/tabs/english.js"></script>
 <script src="/js/cause-icons.js"></script>
 <script src="/admin/tabs/causes.js"></script>

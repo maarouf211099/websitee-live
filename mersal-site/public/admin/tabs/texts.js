@@ -122,6 +122,8 @@
   }
   function render() {
     root.innerHTML = '<p class="hint">كل نصوص الصفحة الرئيسية وأزرار المبالغ في صفحة التبرع. الحفظ بيكتبها جوه الصفحات نفسها (من غير ما الصفحة تتأخر)، وبتظهر على الموقع خلال دقيقة. <a href="/" target="_blank" rel="noopener">افتح الرئيسية ↗</a></p>' +
+      '<nav class="tx-index" aria-label="أقسام الصفحة"><b>اختار القسم:</b> ' + SECTIONS.map(function (s) { return '<a href="#" data-jump="' + esc(s.path) + '">' + esc(s.title) + "</a>"; }).join("") + '<a href="#" data-jump="seo">عناوين الصفحات لجوجل</a></nav>' +
+      '<p class="hint">مش لاقي النص اللي عايز تعدّله هنا؟ تبويب <a href="#" data-open="anytext">«تعديل أي نص»</a> بيعدّل أي كلمة في أي صفحة.</p>' +
       SECTIONS.map(sectionHtml).join("") +
       '<details class="tx-sec" data-sec="seo"><summary><h2 style="display:inline;margin:0;font-size:17px">عناوين الصفحات لجوجل والمشاركة</h2></summary><p class="hint">العنوان (أحسن أقل من 60 حرف) والوصف (أحسن 70 لـ 160 حرف) اللي بيظهروا في جوجل وفي واتساب وفيسبوك لما حد يشارك الرابط. صفحات المحتوى وتواصل معنا وكارت عافية والزكاة عناوينها من تبويب «الصفحات».</p><div class="list" id="seo-list">' + seoHtml() + "</div></details>";
     seoPreview();
@@ -245,6 +247,9 @@
       }
     });
     root.addEventListener("click", function (e) {
+      var jump = e.target.closest("[data-jump]");
+      if (jump) { e.preventDefault(); var d = root.querySelector('.tx-sec[data-sec="' + jump.dataset.jump + '"]'); if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth", block: "start" }); } return; }
+      var op = e.target.closest("[data-open]"); if (op) { e.preventDefault(); A.openTab(op.dataset.open); return; }
       var up = e.target.closest("[data-up]"); if (up && data) { uploadTo(up); return; }
       var add = e.target.closest("[data-add]"), act = e.target.closest("[data-act]");
       if (!data || (!add && !act)) return;

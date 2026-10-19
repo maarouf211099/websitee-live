@@ -11,7 +11,7 @@ const pay = require("../lib/pay");
 const paymob = require("../lib/paymob");
 const { rev, retry, checkBase, baseOf, SHA_HEADER } = require("../lib/commit");
 
-const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json", i18n: "public/data/i18n-en.json", causes: "public/data/causes.json" };
+const JSON_FILES = { content: "public/content.json", albums: "public/data/albums.json", pages: "public/data/pages.json", menu: "public/data/menu.json", donate: "public/data/donate.json", community: "public/data/community.json", news: "public/data/news.json", impact: "public/data/impact.json", announce: "public/data/announce.json", partners: "public/data/partners.json", texts: "public/data/texts.json", i18n: "public/data/i18n-en.json", causes: "public/data/causes.json", overrides: "public/data/overrides.json" };
 // what each file must hold (the public pages break on anything else)
 const ARRAYS = ["menu", "albums", "news", "partners"];
 const MAX_JSON = 1024 * 1024;
@@ -27,6 +27,13 @@ function checkData(name, data) {
     return ARRAYS.includes(name) ? "البيانات لازم تكون قائمة" : "البيانات ناقصة أو مش بالشكل الصحيح";
   }
   if (Buffer.byteLength(JSON.stringify(data)) > MAX_JSON) return "الملف أكبر من 1 ميجا";
+  if (name === "overrides") {
+    // { text: { original -> replacement } }: plain strings only (js/tweaks.js writes them as text, never as markup)
+    const t = data.text;
+    if (!t || typeof t !== "object" || Array.isArray(t)) return "البيانات ناقصة أو مش بالشكل الصحيح";
+    if (Object.keys(t).length > 3000) return "أكتر من 3000 تعديل";
+    for (const k of Object.keys(t)) if (!k.trim() || k.length > 600 || typeof t[k] !== "string" || t[k].length > 600) return "في تعديل فاضي أو أطول من 600 حرف";
+  }
   let bad = null;
   (function walk(v, key) {
     if (bad) return;
